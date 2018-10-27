@@ -1,0 +1,777 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fury.utils &mdash; FURY 0.1.0.post25.dev0+g7caf823 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0.post25.dev0+g7caf823
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing_link.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors_link.html">Credits</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fury.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fury.utils</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">vtk</span>
+<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="k">import</span> <span class="n">numpy_support</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">map_coordinates</span>
+<span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="k">import</span> <span class="n">line_colors</span>
+
+
+<div class="viewcode-block" id="set_input"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.actor.set_input">[docs]</a><span class="k">def</span> <span class="nf">set_input</span><span class="p">(</span><span class="n">vtk_object</span><span class="p">,</span> <span class="n">inp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generic input function which takes into account VTK 5 or 6</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vtk_object: vtk object</span>
+<span class="sd">    inp: vtkPolyData or vtkImageData or vtkAlgorithmOutput</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtk_object</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -------</span>
+<span class="sd">    This can be used in the following way::</span>
+<span class="sd">        from fury.utils import set_input</span>
+<span class="sd">        poly_mapper = set_input(vtk.vtkPolyDataMapper(), poly_data)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">)</span> \
+       <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">):</span>
+            <span class="n">vtk_object</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkAlgorithmOutput</span><span class="p">):</span>
+        <span class="n">vtk_object</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+
+    <span class="n">vtk_object</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">vtk_object</span></div>
+
+
+<div class="viewcode-block" id="numpy_to_vtk_points"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.numpy_to_vtk_points">[docs]</a><span class="k">def</span> <span class="nf">numpy_to_vtk_points</span><span class="p">(</span><span class="n">points</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Numpy points array to a vtk points array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points : ndarray</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtk_points : vtkPoints()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_points</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPoints</span><span class="p">()</span>
+    <span class="n">vtk_points</span><span class="o">.</span><span class="n">SetData</span><span class="p">(</span><span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points</span><span class="p">),</span>
+                                                  <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">vtk_points</span></div>
+
+
+<div class="viewcode-block" id="numpy_to_vtk_colors"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.numpy_to_vtk_colors">[docs]</a><span class="k">def</span> <span class="nf">numpy_to_vtk_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Numpy color array to a vtk color array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    colors: ndarray</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtk_colors : vtkDataArray</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If colors are not already in UNSIGNED_CHAR you may need to multiply by 255.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from fury.utils import numpy_to_vtk_colors</span>
+<span class="sd">    &gt;&gt;&gt; rgb_array = np.random.rand(100, 3)</span>
+<span class="sd">    &gt;&gt;&gt; vtk_colors = numpy_to_vtk_colors(255 * rgb_array)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vtk_colors</span></div>
+
+
+<span class="k">def</span> <span class="nf">map_coordinates_3d_4d</span><span class="p">(</span><span class="n">input_array</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Evaluate the input_array data at the given indices</span>
+<span class="sd">    using trilinear interpolation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    input_array : ndarray,</span>
+<span class="sd">        3D or 4D array</span>
+<span class="sd">    indices : ndarray</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : ndarray</span>
+<span class="sd">        1D or 2D array</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">input_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">input_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Input array can only be 3d or 4d&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">input_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">map_coordinates</span><span class="p">(</span><span class="n">input_array</span><span class="p">,</span> <span class="n">indices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">input_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">values_4d</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">input_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">values_tmp</span> <span class="o">=</span> <span class="n">map_coordinates</span><span class="p">(</span><span class="n">input_array</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">],</span>
+                                         <span class="n">indices</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">values_4d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values_tmp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values_4d</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="lines_to_vtk_polydata"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.lines_to_vtk_polydata">[docs]</a><span class="k">def</span> <span class="nf">lines_to_vtk_polydata</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create a vtkPolyData with lines and colors</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    lines : list</span>
+<span class="sd">        list of N curves represented as 2D ndarrays</span>
+<span class="sd">    colors : array (N, 3), list of arrays, tuple (3,), array (K,), None</span>
+<span class="sd">        If None then a standard orientation colormap is used for every line.</span>
+<span class="sd">        If one tuple of color is used. Then all streamlines will have the same</span>
+<span class="sd">        colour.</span>
+<span class="sd">        If an array (N, 3) is given, where N is equal to the number of lines.</span>
+<span class="sd">        Then every line is coloured with a different RGB color.</span>
+<span class="sd">        If a list of RGB arrays is given then every point of every line takes</span>
+<span class="sd">        a different color.</span>
+<span class="sd">        If an array (K, 3) is given, where K is the number of points of all</span>
+<span class="sd">        lines then every point is colored with a different RGB color.</span>
+<span class="sd">        If an array (K,) is given, where K is the number of points of all</span>
+<span class="sd">        lines then these are considered as the values to be used by the</span>
+<span class="sd">        colormap.</span>
+<span class="sd">        If an array (L,) is given, where L is the number of streamlines then</span>
+<span class="sd">        these are considered as the values to be used by the colormap per</span>
+<span class="sd">        streamline.</span>
+<span class="sd">        If an array (X, Y, Z) or (X, Y, Z, 3) is given then the values for the</span>
+<span class="sd">        colormap are interpolated automatically using trilinear interpolation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    poly_data : vtkPolyData</span>
+<span class="sd">    is_colormap : bool, true if the input color array was a colormap</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Get the 3d points_array</span>
+    <span class="n">points_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+    <span class="n">nb_lines</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+    <span class="n">nb_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">points_array</span><span class="p">)</span>
+
+    <span class="n">lines_range</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">nb_lines</span><span class="p">)</span>
+
+    <span class="c1"># Get lines_array in vtk input format</span>
+    <span class="n">lines_array</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Using np.intp (instead of int64), because of a bug in numpy:</span>
+    <span class="c1"># https://github.com/nipy/dipy/pull/789</span>
+    <span class="c1"># https://github.com/numpy/numpy/issues/4384</span>
+    <span class="n">points_per_line</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">nb_lines</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">intp</span><span class="p">)</span>
+    <span class="n">current_position</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lines_range</span><span class="p">:</span>
+        <span class="n">current_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">points_per_line</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_len</span>
+
+        <span class="n">end_position</span> <span class="o">=</span> <span class="n">current_position</span> <span class="o">+</span> <span class="n">current_len</span>
+        <span class="n">lines_array</span> <span class="o">+=</span> <span class="p">[</span><span class="n">current_len</span><span class="p">]</span>
+        <span class="n">lines_array</span> <span class="o">+=</span> <span class="nb">range</span><span class="p">(</span><span class="n">current_position</span><span class="p">,</span> <span class="n">end_position</span><span class="p">)</span>
+        <span class="n">current_position</span> <span class="o">=</span> <span class="n">end_position</span>
+
+    <span class="n">lines_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lines_array</span><span class="p">)</span>
+
+    <span class="c1"># Set Points to vtk array format</span>
+    <span class="n">vtk_points</span> <span class="o">=</span> <span class="n">numpy_to_vtk_points</span><span class="p">(</span><span class="n">points_array</span><span class="p">)</span>
+
+    <span class="c1"># Set Lines to vtk array format</span>
+    <span class="n">vtk_lines</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCellArray</span><span class="p">()</span>
+    <span class="n">vtk_lines</span><span class="o">.</span><span class="n">GetData</span><span class="p">()</span><span class="o">.</span><span class="n">DeepCopy</span><span class="p">(</span><span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">lines_array</span><span class="p">))</span>
+    <span class="n">vtk_lines</span><span class="o">.</span><span class="n">SetNumberOfCells</span><span class="p">(</span><span class="n">nb_lines</span><span class="p">)</span>
+
+    <span class="n">is_colormap</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="c1"># Get colors_array (reformat to have colors for each points)</span>
+    <span class="c1">#           - if/else tested and work in normal simple case</span>
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># set automatic rgb colors</span>
+        <span class="n">cols_arr</span> <span class="o">=</span> <span class="n">line_colors</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+        <span class="n">colors_mapper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lines_range</span><span class="p">,</span> <span class="n">points_per_line</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols_arr</span><span class="p">[</span><span class="n">colors_mapper</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cols_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cols_arr</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">object</span><span class="p">:</span>  <span class="c1"># colors is a list of colors</span>
+            <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_arr</span><span class="p">)</span> <span class="o">==</span> <span class="n">nb_points</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cols_arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># values for every point</span>
+                    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">cols_arr</span><span class="p">,</span>
+                                                            <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">is_colormap</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">elif</span> <span class="n">cols_arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># map color to each point</span>
+                    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols_arr</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">cols_arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cols_arr</span><span class="p">)</span> <span class="o">==</span> <span class="n">nb_lines</span><span class="p">:</span>  <span class="c1"># values for every streamline</span>
+                    <span class="n">cols_arrx</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">colors</span><span class="p">):</span>
+                        <span class="n">cols_arrx</span> <span class="o">+=</span> <span class="n">lines</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">[</span><span class="n">value</span><span class="p">]</span>
+                    <span class="n">cols_arrx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cols_arrx</span><span class="p">)</span>
+                    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">cols_arrx</span><span class="p">,</span>
+                                                            <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">is_colormap</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>  <span class="c1"># the same colors for all points</span>
+                    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols_arr</span><span class="p">,</span> <span class="p">(</span><span class="n">nb_points</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+
+            <span class="k">elif</span> <span class="n">cols_arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># map color to each line</span>
+                <span class="n">colors_mapper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">lines_range</span><span class="p">,</span> <span class="n">points_per_line</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols_arr</span><span class="p">[</span><span class="n">colors_mapper</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># colormap</span>
+                <span class="c1">#  get colors for each vertex</span>
+                <span class="n">cols_arr</span> <span class="o">=</span> <span class="n">map_coordinates_3d_4d</span><span class="p">(</span><span class="n">cols_arr</span><span class="p">,</span> <span class="n">points_array</span><span class="p">)</span>
+                <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">cols_arr</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">is_colormap</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">vtk_colors</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;Colors&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create the poly_data</span>
+    <span class="n">poly_data</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
+    <span class="n">poly_data</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">vtk_points</span><span class="p">)</span>
+    <span class="n">poly_data</span><span class="o">.</span><span class="n">SetLines</span><span class="p">(</span><span class="n">vtk_lines</span><span class="p">)</span>
+    <span class="n">poly_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">poly_data</span><span class="p">,</span> <span class="n">is_colormap</span></div>
+
+
+<span class="k">def</span> <span class="nf">get_polydata_lines</span><span class="p">(</span><span class="n">line_polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; vtk polydata to a list of lines ndarrays</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    line_polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    lines : list</span>
+<span class="sd">        List of N curves represented as 2D ndarrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines_vertices</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">line_polydata</span><span class="o">.</span><span class="n">GetPoints</span><span class="p">()</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span>
+    <span class="n">lines_idx</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">line_polydata</span><span class="o">.</span><span class="n">GetLines</span><span class="p">()</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_idx</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">current_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines_idx</span><span class="p">):</span>
+        <span class="n">line_len</span> <span class="o">=</span> <span class="n">lines_idx</span><span class="p">[</span><span class="n">current_idx</span><span class="p">]</span>
+
+        <span class="n">next_idx</span> <span class="o">=</span> <span class="n">current_idx</span> <span class="o">+</span> <span class="n">line_len</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">line_range</span> <span class="o">=</span> <span class="n">lines_idx</span><span class="p">[</span><span class="n">current_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="n">next_idx</span><span class="p">]</span>
+
+        <span class="n">lines</span> <span class="o">+=</span> <span class="p">[</span><span class="n">lines_vertices</span><span class="p">[</span><span class="n">line_range</span><span class="p">]]</span>
+        <span class="n">current_idx</span> <span class="o">=</span> <span class="n">next_idx</span>
+    <span class="k">return</span> <span class="n">lines</span>
+
+
+<span class="k">def</span> <span class="nf">get_polydata_triangles</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get triangles (ndarrays Nx3 int) from a vtk polydata</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : array (N, 3)</span>
+<span class="sd">        triangles</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_polys</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">polydata</span><span class="o">.</span><span class="n">GetPolys</span><span class="p">()</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span>
+    <span class="k">assert</span><span class="p">((</span><span class="n">vtk_polys</span><span class="p">[::</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>  <span class="c1"># test if its really triangles</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">vtk_polys</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">4</span><span class="p">],</span> <span class="n">vtk_polys</span><span class="p">[</span><span class="mi">2</span><span class="p">::</span><span class="mi">4</span><span class="p">],</span> <span class="n">vtk_polys</span><span class="p">[</span><span class="mi">3</span><span class="p">::</span><span class="mi">4</span><span class="p">]])</span><span class="o">.</span><span class="n">T</span>
+
+
+<span class="k">def</span> <span class="nf">get_polydata_vertices</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get vertices (ndarrays Nx3 int) from a vtk polydata</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : array (N, 3)</span>
+<span class="sd">        points, represented as 2D ndarrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">polydata</span><span class="o">.</span><span class="n">GetPoints</span><span class="p">()</span><span class="o">.</span><span class="n">GetData</span><span class="p">())</span>
+
+
+<span class="k">def</span> <span class="nf">get_polydata_normals</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get vertices normal (ndarrays Nx3 int) from a vtk polydata</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : array (N, 3)</span>
+<span class="sd">        Normals, represented as 2D ndarrays (Nx3). None if there are no normals</span>
+<span class="sd">        in the vtk polydata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_normals</span> <span class="o">=</span> <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetNormals</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">vtk_normals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_normals</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_polydata_colors</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get points color (ndarrays Nx3 int) from a vtk polydata</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : array (N, 3)</span>
+<span class="sd">        Colors. None if no normals in the vtk polydata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">vtk_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_colors</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="set_polydata_triangles"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.set_polydata_triangles">[docs]</a><span class="k">def</span> <span class="nf">set_polydata_triangles</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">triangles</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; set polydata triangles with a numpy array (ndarrays Nx3 int)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+<span class="sd">    triangles : array (N, 3)</span>
+<span class="sd">        triangles, represented as 2D ndarrays (Nx3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_triangles</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">triangles</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span>
+                                    <span class="n">triangles</span><span class="p">])</span>
+    <span class="n">vtk_triangles</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtkIdTypeArray</span><span class="p">(</span><span class="n">vtk_triangles</span><span class="p">,</span>
+                                                          <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vtk_cells</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCellArray</span><span class="p">()</span>
+    <span class="n">vtk_cells</span><span class="o">.</span><span class="n">SetCells</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">triangles</span><span class="p">),</span> <span class="n">vtk_triangles</span><span class="p">)</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">SetPolys</span><span class="p">(</span><span class="n">vtk_cells</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polydata</span></div>
+
+
+<div class="viewcode-block" id="set_polydata_vertices"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.set_polydata_vertices">[docs]</a><span class="k">def</span> <span class="nf">set_polydata_vertices</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">vertices</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; set polydata vertices with a numpy array (ndarrays Nx3 int)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+<span class="sd">    vertices : vertices, represented as 2D ndarrays (Nx3)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_points</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPoints</span><span class="p">()</span>
+    <span class="n">vtk_points</span><span class="o">.</span><span class="n">SetData</span><span class="p">(</span><span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">vtk_points</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polydata</span></div>
+
+
+<span class="k">def</span> <span class="nf">set_polydata_normals</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">normals</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; set polydata normals with a numpy array (ndarrays Nx3 int)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+<span class="sd">    normals : normals, represented as 2D ndarrays (Nx3) (one per vertex)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_normals</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetNormals</span><span class="p">(</span><span class="n">vtk_normals</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polydata</span>
+
+
+<span class="k">def</span> <span class="nf">set_polydata_colors</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">colors</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; set polydata colors with a numpy array (ndarrays Nx3 int)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+<span class="sd">    colors : colors, represented as 2D ndarrays (Nx3)</span>
+<span class="sd">        colors are uint8 [0,255] RGB for each points</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                            <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">)</span>
+    <span class="n">vtk_colors</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">vtk_colors</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polydata</span>
+
+
+<span class="k">def</span> <span class="nf">update_polydata_normals</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; generate and update polydata normals</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normals_gen</span> <span class="o">=</span> <span class="n">set_input</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataNormals</span><span class="p">(),</span> <span class="n">polydata</span><span class="p">)</span>
+    <span class="n">normals_gen</span><span class="o">.</span><span class="n">ComputePointNormalsOn</span><span class="p">()</span>
+    <span class="n">normals_gen</span><span class="o">.</span><span class="n">ComputeCellNormalsOn</span><span class="p">()</span>
+    <span class="n">normals_gen</span><span class="o">.</span><span class="n">SplittingOff</span><span class="p">()</span>
+    <span class="c1"># normals_gen.FlipNormalsOn()</span>
+    <span class="c1"># normals_gen.ConsistencyOn()</span>
+    <span class="c1"># normals_gen.AutoOrientNormalsOn()</span>
+    <span class="n">normals_gen</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+
+    <span class="n">vtk_normals</span> <span class="o">=</span> <span class="n">normals_gen</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetNormals</span><span class="p">()</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetNormals</span><span class="p">(</span><span class="n">vtk_normals</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_polymapper_from_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get vtkPolyDataMapper from a vtkPolyData</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    poly_mapper : vtkPolyDataMapper</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poly_mapper</span> <span class="o">=</span> <span class="n">set_input</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">(),</span> <span class="n">polydata</span><span class="p">)</span>
+    <span class="n">poly_mapper</span><span class="o">.</span><span class="n">ScalarVisibilityOn</span><span class="p">()</span>
+    <span class="n">poly_mapper</span><span class="o">.</span><span class="n">InterpolateScalarsBeforeMappingOn</span><span class="p">()</span>
+    <span class="n">poly_mapper</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">poly_mapper</span><span class="o">.</span><span class="n">StaticOn</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">poly_mapper</span>
+
+
+<span class="k">def</span> <span class="nf">get_actor_from_polymapper</span><span class="p">(</span><span class="n">poly_mapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get vtkActor from a vtkPolyDataMapper</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    poly_mapper : vtkPolyDataMapper</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    actor : vtkActor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkActor</span><span class="p">()</span>
+    <span class="n">actor</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">poly_mapper</span><span class="p">)</span>
+    <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">BackfaceCullingOn</span><span class="p">()</span>
+    <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetInterpolationToPhong</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">actor</span>
+
+
+<span class="k">def</span> <span class="nf">get_actor_from_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; get vtkActor from a vtkPolyData</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polydata : vtkPolyData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    actor : vtkActor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poly_mapper</span> <span class="o">=</span> <span class="n">get_polymapper_from_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_actor_from_polymapper</span><span class="p">(</span><span class="n">poly_mapper</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="apply_affine"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.apply_affine">[docs]</a><span class="k">def</span> <span class="nf">apply_affine</span><span class="p">(</span><span class="n">aff</span><span class="p">,</span> <span class="n">pts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply affine matrix `aff` to points `pts`.</span>
+
+<span class="sd">    Returns result of application of `aff` to the *right* of `pts`.  The</span>
+<span class="sd">    coordinate dimension of `pts` should be the last.</span>
+<span class="sd">    For the 3D case, `aff` will be shape (4,4) and `pts` will have final axis</span>
+<span class="sd">    length 3 - maybe it will just be N by 3. The return value is the</span>
+<span class="sd">    transformed points, in this case::</span>
+<span class="sd">    res = np.dot(aff[:3,:3], pts.T) + aff[:3,3:4]</span>
+<span class="sd">    transformed_pts = res.T</span>
+<span class="sd">    This routine is more general than 3D, in that `aff` can have any shape</span>
+<span class="sd">    (N,N), and `pts` can have any shape, as long as the last dimension is for</span>
+<span class="sd">    the coordinates, and is therefore length N-1.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    aff : (N, N) array-like</span>
+<span class="sd">        Homogenous affine, for 3D points, will be 4 by 4. Contrary to first</span>
+<span class="sd">        appearance, the affine will be applied on the left of `pts`.</span>
+<span class="sd">    pts : (..., N-1) array-like</span>
+<span class="sd">        Points, where the last dimension contains the coordinates of each</span>
+<span class="sd">        point.  For 3D, the last dimension will be length 3.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    transformed_pts : (..., N-1) array</span>
+<span class="sd">        transformed points</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Copied from nibabel to remove dependency.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; aff = np.array([[0,2,0,10],[3,0,0,11],[0,0,4,12],[0,0,0,1]])</span>
+<span class="sd">    &gt;&gt;&gt; pts = np.array([[1,2,3],[2,3,4],[4,5,6],[6,7,8]])</span>
+<span class="sd">    &gt;&gt;&gt; apply_affine(aff, pts) #doctest: +ELLIPSIS</span>
+<span class="sd">    array([[14, 14, 24],</span>
+<span class="sd">           [16, 17, 28],</span>
+<span class="sd">           [20, 23, 36],</span>
+<span class="sd">           [24, 29, 44]]...)</span>
+<span class="sd">    Just to show that in the simple 3D case, it is equivalent to:</span>
+<span class="sd">    &gt;&gt;&gt; (np.dot(aff[:3,:3], pts.T) + aff[:3,3:4]).T #doctest: +ELLIPSIS</span>
+<span class="sd">    array([[14, 14, 24],</span>
+<span class="sd">           [16, 17, 28],</span>
+<span class="sd">           [20, 23, 36],</span>
+<span class="sd">           [24, 29, 44]]...)</span>
+<span class="sd">    But `pts` can be a more complicated shape:</span>
+<span class="sd">    &gt;&gt;&gt; pts = pts.reshape((2,2,3))</span>
+<span class="sd">    &gt;&gt;&gt; apply_affine(aff, pts) #doctest: +ELLIPSIS</span>
+<span class="sd">    array([[[14, 14, 24],</span>
+<span class="sd">            [16, 17, 28]],</span>
+<span class="sd">    &lt;BLANKLINE&gt;</span>
+<span class="sd">           [[20, 23, 36],</span>
+<span class="sd">            [24, 29, 44]]]...)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">aff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">aff</span><span class="p">)</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">pts</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="c1"># rzs == rotations, zooms, shears</span>
+    <span class="n">rzs</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">trans</span> <span class="o">=</span> <span class="n">aff</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">pts</span><span class="p">,</span> <span class="n">rzs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">trans</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="asbytes"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.asbytes">[docs]</a><span class="k">def</span> <span class="nf">asbytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">s</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;latin1&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2018, FURY.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0.post25.dev0+g7caf823',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/copybutton.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+  
+
+</body>
+</html>

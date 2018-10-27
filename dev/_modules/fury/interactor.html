@@ -1,0 +1,537 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fury.interactor &mdash; FURY 0.1.0.post25.dev0+g7caf823 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0.post25.dev0+g7caf823
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing_link.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors_link.html">Credits</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fury.interactor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fury.interactor</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Custom Interactor Style.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">vtk</span>
+
+
+<span class="k">class</span> <span class="nc">Event</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Event class.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort_flag</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">abort_flag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abort.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_abort_flag</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_name</span><span class="p">,</span> <span class="n">interactor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update current event information.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">event_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">interactor</span><span class="o">.</span><span class="n">GetEventPosition</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">interactor</span><span class="o">.</span><span class="n">GetKeySym</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alt_key</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">interactor</span><span class="o">.</span><span class="n">GetAltKey</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shift_key</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">interactor</span><span class="o">.</span><span class="n">GetShiftKey</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrl_key</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">interactor</span><span class="o">.</span><span class="n">GetControlKey</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort_flag</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Reset abort flag</span>
+
+    <span class="k">def</span> <span class="nf">abort</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Abort the event i.e. do not propagate it any further.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort_flag</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Done with the current event. Reset the attributes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_abort_flag</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="CustomInteractorStyle"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle">[docs]</a><span class="k">class</span> <span class="nc">CustomInteractorStyle</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleUser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manipulate the camera and interact with objects in the scene.</span>
+
+<span class="sd">    This interactor style allows the user to interactively manipulate (pan,</span>
+<span class="sd">    rotate and zoom) the camera. It also allows the user to interact (click,</span>
+<span class="sd">    scroll, etc.) with objects in the scene.</span>
+
+<span class="sd">    Several events handling methods from :class:`vtkInteractorStyleUser` have</span>
+<span class="sd">    been overloaded to allow the propagation of the events to the objects the</span>
+<span class="sd">    user is interacting with.</span>
+
+<span class="sd">    In summary, while interacting with the scene, the mouse events are as</span>
+<span class="sd">    follows::</span>
+
+<span class="sd">        - Left mouse button: rotates the camera</span>
+<span class="sd">        - Right mouse button: dollys the camera</span>
+<span class="sd">        - Mouse wheel: dollys the camera</span>
+<span class="sd">        - Middle mouse button: pans the camera</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CustomInteractorStyle.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Init.&quot;&quot;&quot;</span>
+        <span class="c1"># Default interactor is responsible for moving the camera.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleTrackballCamera</span><span class="p">()</span>
+        <span class="c1"># The picker allows us to know which object/actor is under the mouse.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">picker</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPropPicker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chosen_element</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
+
+        <span class="c1"># Define some interaction states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_props</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;left_button&quot;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+                               <span class="s2">&quot;right_button&quot;</span><span class="p">:</span> <span class="nb">set</span><span class="p">(),</span>
+                               <span class="s2">&quot;middle_button&quot;</span><span class="p">:</span> <span class="nb">set</span><span class="p">()}</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.add_active_prop"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.add_active_prop">[docs]</a>    <span class="k">def</span> <span class="nf">add_active_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.remove_active_prop"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.remove_active_prop">[docs]</a>    <span class="k">def</span> <span class="nf">remove_active_prop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.get_prop_at_event_position"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.get_prop_at_event_position">[docs]</a>    <span class="k">def</span> <span class="nf">get_prop_at_event_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the prop that lays at the event position.&quot;&quot;&quot;</span>
+        <span class="c1"># TODO: return a list of items (i.e. each level of the assembly path).</span>
+        <span class="n">event_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">()</span><span class="o">.</span><span class="n">GetEventPosition</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">picker</span><span class="o">.</span><span class="n">Pick</span><span class="p">(</span><span class="n">event_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">event_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">GetCurrentRenderer</span><span class="p">())</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">picker</span><span class="o">.</span><span class="n">GetPath</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">node</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">GetLastNode</span><span class="p">()</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">GetViewProp</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">prop</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.propagate_event"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.propagate_event">[docs]</a>    <span class="k">def</span> <span class="nf">propagate_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="n">props</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">prop</span> <span class="ow">in</span> <span class="n">props</span><span class="p">:</span>
+            <span class="c1"># Propagate event to the prop.</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">InvokeEvent</span><span class="p">(</span><span class="n">evt</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+                <span class="k">return</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_left_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_left_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_left_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_button_down</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnLeftButtonDown</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_left_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_left_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_left_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnLeftButtonUp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_right_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_right_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_button_down</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnRightButtonDown</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_right_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_right_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnRightButtonUp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_middle_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_middle_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_middle_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_button_down</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">prop</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMiddleButtonDown</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_middle_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_middle_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_middle_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">middle_button_down</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMiddleButtonUp</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_mouse_move"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;On mouse move.&quot;&quot;&quot;</span>
+        <span class="c1"># Only propagate events to active or selected props.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span> <span class="o">|</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">]</span> <span class="o">|</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">]</span> <span class="o">|</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseMove</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_mouse_wheel_forward"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_wheel_forward">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_wheel_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;On mouse wheel forward.&quot;&quot;&quot;</span>
+        <span class="c1"># First, propagate mouse wheel event to underneath prop.</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+        <span class="c1"># Then, to the active props.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span>
+
+        <span class="c1"># Finally, to the default interactor.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseWheelForward</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_mouse_wheel_backward"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_wheel_backward">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_wheel_backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;On mouse wheel backward.&quot;&quot;&quot;</span>
+        <span class="c1"># First, propagate mouse wheel event to underneath prop.</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
+
+        <span class="c1"># Then, to the active props.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span>
+
+        <span class="c1"># Finally, to the default interactor.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseWheelBackward</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_char"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_char">[docs]</a>    <span class="k">def</span> <span class="nf">on_char</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_key_press"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_key_press">[docs]</a>    <span class="k">def</span> <span class="nf">on_key_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.on_key_release"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_key_release">[docs]</a>    <span class="k">def</span> <span class="nf">on_key_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.SetInteractor"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.SetInteractor">[docs]</a>    <span class="k">def</span> <span class="nf">SetInteractor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define new interactor.&quot;&quot;&quot;</span>
+        <span class="c1"># Internally, `InteractorStyle` objects need a handle to a</span>
+        <span class="c1"># `vtkWindowInteractor` object and this is done via `SetInteractor`.</span>
+        <span class="c1"># However, this has the side effect of adding directly all their</span>
+        <span class="c1"># observers to the `interactor`!</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">interactor</span><span class="p">)</span>
+
+        <span class="c1"># Remove all observers *most likely* (cannot guarantee that the</span>
+        <span class="c1"># interactor did not already have these observers) added by</span>
+        <span class="c1"># `vtkInteractorStyleTrackballCamera`, i.e. our `default_interactor`.</span>
+        <span class="c1">#</span>
+        <span class="c1"># Note: Be sure that no observer has been manually added to the</span>
+        <span class="c1"># `interactor` before setting the InteractorStyle.</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;TimerEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;EnterEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;LeaveEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;ExposeEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;ConfigureEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;CharEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;KeyReleaseEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;RightButtonPressEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;MiddleButtonPressEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;RightButtonReleaseEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;MiddleButtonReleaseEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;MouseWheelForwardEvent&quot;</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">RemoveObservers</span><span class="p">(</span><span class="s2">&quot;MouseWheelBackwardEvent&quot;</span><span class="p">)</span>
+
+        <span class="c1"># This class is a `vtkClass` (instead of `object`), so `super()`</span>
+        <span class="c1"># cannot be used. Also the method `SetInteractor` is not overridden in</span>
+        <span class="c1"># `vtkInteractorStyleUser` so we have to call directly the one from</span>
+        <span class="c1"># `vtkInteractorStyle`. In addition to setting the interactor, the</span>
+        <span class="c1"># following line adds the necessary hooks to listen to this </span>
+        <span class="c1"># observers instances.</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyle</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactor</span><span class="p">)</span>
+
+        <span class="c1"># Keyboard events.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;CharEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_char</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_key_press</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_key_release</span><span class="p">)</span>
+
+        <span class="c1"># Mouse events.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_move</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_down</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_up</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_down</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_up</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_down</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_up</span><span class="p">)</span>
+
+        <span class="c1"># Windows and special events.</span>
+        <span class="c1"># TODO: we ever find them useful we could support them.</span>
+        <span class="c1"># self.AddObserver(&quot;TimerEvent&quot;, self.on_timer)</span>
+        <span class="c1"># self.AddObserver(&quot;EnterEvent&quot;, self.on_enter)</span>
+        <span class="c1"># self.AddObserver(&quot;LeaveEvent&quot;, self.on_leave)</span>
+        <span class="c1"># self.AddObserver(&quot;ExposeEvent&quot;, self.on_expose)</span>
+        <span class="c1"># self.AddObserver(&quot;ConfigureEvent&quot;, self.on_configure)</span>
+
+        <span class="c1"># These observers need to be added directly to the interactor because</span>
+        <span class="c1"># `vtkInteractorStyleUser` does not support wheel events prior 7.1. See</span>
+        <span class="c1"># https://github.com/Kitware/VTK/commit/373258ed21f0915c425eddb996ce6ac13404be28</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelForwardEvent&quot;</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_forward</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelBackwardEvent&quot;</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_backward</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.force_render"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.force_render">[docs]</a>    <span class="k">def</span> <span class="nf">force_render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Causes the renderer to refresh.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">()</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CustomInteractorStyle.add_callback"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.add_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Add a callback associated to a specific event for a VTK prop.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prop : vtkProp</span>
+<span class="sd">        event_type : event code</span>
+<span class="sd">        callback : function</span>
+<span class="sd">        priority : int</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event_name</span><span class="p">):</span>
+            <span class="c1"># Update event information.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">())</span>
+            <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="n">prop</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">_callback</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2018, FURY.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0.post25.dev0+g7caf823',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/copybutton.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+  
+
+</body>
+</html>
