@@ -1,0 +1,559 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fury.widget &mdash; FURY 0.1.0.post34+g9e87086 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0.post34+g9e87086
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing_link.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors_link.html">Credits</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>fury.widget</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fury.widget</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Widgets are different than actors in that they can interact with events.</span>
+
+<span class="sd">To do so they need as input a vtkRenderWindowInteractor also known as iren.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">vtk</span>
+
+
+<div class="viewcode-block" id="slider"><a class="viewcode-back" href="../../reference/fury.widget.html#fury.widget.slider">[docs]</a><span class="k">def</span> <span class="nf">slider</span><span class="p">(</span><span class="n">iren</span><span class="p">,</span> <span class="n">ren</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">125</span><span class="p">,</span>
+           <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Slider&quot;</span><span class="p">,</span>
+           <span class="n">right_normalized_pos</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+           <span class="n">label_format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%0.0lf</span><span class="s2">&quot;</span><span class="p">,</span>
+           <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+           <span class="n">selected_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; A 2D slider widget</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iren : vtkRenderWindowInteractor</span>
+<span class="sd">        Used to process events and handle them to the slider. Can also be given</span>
+<span class="sd">        by the attribute ``ShowManager.iren``.</span>
+<span class="sd">    ren :  vtkRenderer or Renderer</span>
+<span class="sd">        Used to update the slider&#39;s position when the window changes. Can also</span>
+<span class="sd">        be given by the ``ShowManager.ren`` attribute.</span>
+<span class="sd">    callback : function</span>
+<span class="sd">        Function that has at least ``obj`` and ``event`` as parameters. It will</span>
+<span class="sd">        be called when the slider&#39;s bar has changed.</span>
+<span class="sd">    min_value : float</span>
+<span class="sd">        Minimum value of slider.</span>
+<span class="sd">    max_value : float</span>
+<span class="sd">        Maximum value of slider.</span>
+<span class="sd">    value :</span>
+<span class="sd">        Default value of slider.</span>
+<span class="sd">    label : str</span>
+<span class="sd">        Slider&#39;s caption.</span>
+<span class="sd">    right_normalized_pos : tuple</span>
+<span class="sd">        2d tuple holding the normalized right (X, Y) position of the slider.</span>
+<span class="sd">    size: tuple</span>
+<span class="sd">        2d tuple holding the size of the slider in pixels.</span>
+<span class="sd">    label_format: str</span>
+<span class="sd">        Formating in which the slider&#39;s value will appear for example &quot;%0.2lf&quot;</span>
+<span class="sd">        allows for 2 decimal values.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    slider : SliderObject</span>
+<span class="sd">        This object inherits from vtkSliderWidget and has additional method</span>
+<span class="sd">        called ``place`` which allows to update the position of the slider</span>
+<span class="sd">        when for example the window is resized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">slider_rep</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSliderRepresentation2D</span><span class="p">()</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetMinimumValue</span><span class="p">(</span><span class="n">min_value</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetMaximumValue</span><span class="p">(</span><span class="n">max_value</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetTitleText</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint2Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetCoordinateSystemToNormalizedDisplay</span><span class="p">()</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint2Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="o">*</span><span class="n">right_normalized_pos</span><span class="p">)</span>
+
+    <span class="n">coord2</span> <span class="o">=</span> <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint2Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">GetComputedDisplayValue</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint1Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetCoordinateSystemToDisplay</span><span class="p">()</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint1Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">coord2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                              <span class="n">coord2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">initial_window_size</span> <span class="o">=</span> <span class="n">ren</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
+    <span class="n">length</span> <span class="o">=</span> <span class="mf">0.04</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="mf">0.04</span>
+    <span class="n">cap_length</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">cap_width</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">tube_width</span> <span class="o">=</span> <span class="mf">0.005</span>
+
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetSliderLength</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetSliderWidth</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetEndCapLength</span><span class="p">(</span><span class="n">cap_length</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetEndCapWidth</span><span class="p">(</span><span class="n">cap_width</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetTubeWidth</span><span class="p">(</span><span class="n">tube_width</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetLabelFormat</span><span class="p">(</span><span class="n">label_format</span><span class="p">)</span>
+
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetLabelProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetTubeProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetCapProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetTitleProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetSelectedProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">selected_color</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetSliderProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetLabelProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetShadow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetTitleProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetShadow</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">SliderWidget</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkSliderWidget</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ren</span><span class="p">):</span>
+
+            <span class="n">slider_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetRepresentation</span><span class="p">()</span>
+            <span class="n">coord2_norm</span> <span class="o">=</span> <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint2Coordinate</span><span class="p">()</span>
+            <span class="n">coord2_norm</span><span class="o">.</span><span class="n">SetCoordinateSystemToNormalizedDisplay</span><span class="p">()</span>
+            <span class="n">coord2_norm</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="o">*</span><span class="n">right_normalized_pos</span><span class="p">)</span>
+
+            <span class="n">coord2</span> <span class="o">=</span> <span class="n">coord2_norm</span><span class="o">.</span><span class="n">GetComputedDisplayValue</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+            <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint1Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetCoordinateSystemToDisplay</span><span class="p">()</span>
+            <span class="n">slider_rep</span><span class="o">.</span><span class="n">GetPoint1Coordinate</span><span class="p">()</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">coord2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                      <span class="n">coord2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="n">window_size</span> <span class="o">=</span> <span class="n">ren</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
+            <span class="n">length</span> <span class="o">=</span> <span class="n">initial_window_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.04</span> <span class="o">/</span> <span class="n">window_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="n">initial_window_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.04</span> <span class="o">/</span> <span class="n">window_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetSliderLength</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+            <span class="n">slider_rep</span><span class="o">.</span><span class="n">SetSliderWidth</span><span class="p">(</span><span class="n">width</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetSliderRepresentation</span><span class="p">()</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetSliderRepresentation</span><span class="p">()</span><span class="o">.</span><span class="n">GetValue</span><span class="p">()</span>
+
+    <span class="n">slider</span> <span class="o">=</span> <span class="n">SliderWidget</span><span class="p">()</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">iren</span><span class="p">)</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">SetRepresentation</span><span class="p">(</span><span class="n">slider_rep</span><span class="p">)</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">SetAnimationModeToAnimate</span><span class="p">()</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">KeyPressActivationOff</span><span class="p">()</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;InteractionEvent&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+    <span class="n">slider</span><span class="o">.</span><span class="n">SetEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Place widget after window resizing.</span>
+    <span class="k">def</span> <span class="nf">_place_widget</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">slider</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">StartEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">ModifiedEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">slider</span></div>
+
+
+<div class="viewcode-block" id="button_display_coordinates"><a class="viewcode-back" href="../../reference/fury.widget.html#fury.widget.button_display_coordinates">[docs]</a><span class="k">def</span> <span class="nf">button_display_coordinates</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="n">normalized_display_position</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="n">upperRight</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCoordinate</span><span class="p">()</span>
+    <span class="n">upperRight</span><span class="o">.</span><span class="n">SetCoordinateSystemToNormalizedDisplay</span><span class="p">()</span>
+    <span class="n">upperRight</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="n">normalized_display_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="n">normalized_display_position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">bds</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
+    <span class="n">bds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">upperRight</span><span class="o">.</span><span class="n">GetComputedDisplayValue</span><span class="p">(</span><span class="n">renderer</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">bds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">upperRight</span><span class="o">.</span><span class="n">GetComputedDisplayValue</span><span class="p">(</span><span class="n">renderer</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">bds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">bds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">bds</span></div>
+
+
+<div class="viewcode-block" id="button"><a class="viewcode-back" href="../../reference/fury.widget.html#fury.widget.button">[docs]</a><span class="k">def</span> <span class="nf">button</span><span class="p">(</span><span class="n">iren</span><span class="p">,</span> <span class="n">ren</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">right_normalized_pos</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">98</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">),</span>
+           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot; A textured two state button widget</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iren : vtkRenderWindowInteractor</span>
+<span class="sd">        Used to process events and handle them to the button. Can also be given</span>
+<span class="sd">        by the attribute ``ShowManager.iren``.</span>
+<span class="sd">    ren :  vtkRenderer or Renderer</span>
+<span class="sd">        Used to update the slider&#39;s position when the window changes. Can also</span>
+<span class="sd">        be given by the ``ShowManager.ren`` attribute.</span>
+<span class="sd">    callback : function</span>
+<span class="sd">        Function that has at least ``obj`` and ``event`` as parameters. It will</span>
+<span class="sd">        be called when the button is pressed.</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        PNG file path of the icon used for the button.</span>
+<span class="sd">    right_normalized_pos : tuple</span>
+<span class="sd">        2d tuple holding the normalized right (X, Y) position of the slider.</span>
+<span class="sd">    size: tuple</span>
+<span class="sd">        2d tuple holding the size of the slider in pixels.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    button : ButtonWidget</span>
+<span class="sd">        This object inherits from vtkButtonWidget and has an additional  method</span>
+<span class="sd">        called ``place`` which allows to update the position of the slider</span>
+<span class="sd">        if necessary. For example when the renderer size changes.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    ------</span>
+<span class="sd">    The button and slider widgets have similar positioning system. This enables</span>
+<span class="sd">    the developers to create a HUD-like collections of buttons and sliders on</span>
+<span class="sd">    the right side of the window that always stays in place when the dimensions</span>
+<span class="sd">    of the window change.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">image1</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">()</span>
+    <span class="n">image1</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">image1</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+
+    <span class="n">button_rep</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTexturedButtonRepresentation2D</span><span class="p">()</span>
+    <span class="n">button_rep</span><span class="o">.</span><span class="n">SetNumberOfStates</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">button_rep</span><span class="o">.</span><span class="n">SetButtonTexture</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">image1</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">())</span>
+    <span class="n">button_rep</span><span class="o">.</span><span class="n">SetButtonTexture</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">image1</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">())</span>
+
+    <span class="k">class</span> <span class="nc">ButtonWidget</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkButtonWidget</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer</span><span class="p">):</span>
+
+            <span class="n">bds</span> <span class="o">=</span> <span class="n">button_display_coordinates</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span> <span class="n">right_normalized_pos</span><span class="p">,</span>
+                                             <span class="n">size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetRepresentation</span><span class="p">()</span><span class="o">.</span><span class="n">SetPlaceFactor</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetRepresentation</span><span class="p">()</span><span class="o">.</span><span class="n">PlaceWidget</span><span class="p">(</span><span class="n">bds</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">On</span><span class="p">()</span>
+
+    <span class="n">button</span> <span class="o">=</span> <span class="n">ButtonWidget</span><span class="p">()</span>
+    <span class="n">button</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">iren</span><span class="p">)</span>
+    <span class="n">button</span><span class="o">.</span><span class="n">SetRepresentation</span><span class="p">(</span><span class="n">button_rep</span><span class="p">)</span>
+    <span class="n">button</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">StateChangedEvent</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+
+    <span class="c1"># Place widget after window resizing.</span>
+    <span class="k">def</span> <span class="nf">_place_widget</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">StartEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">ModifiedEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">button</span></div>
+
+
+<div class="viewcode-block" id="text"><a class="viewcode-back" href="../../reference/fury.widget.html#fury.widget.text">[docs]</a><span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="n">iren</span><span class="p">,</span> <span class="n">ren</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="s2">&quot;FURY&quot;</span><span class="p">,</span>
+         <span class="n">left_down_pos</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">right_top_pos</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+         <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">0</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; 2D text that can be clicked and process events</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    iren : vtkRenderWindowInteractor</span>
+<span class="sd">        Used to process events and handle them to the button. Can also be given</span>
+<span class="sd">        by the attribute ``ShowManager.iren``.</span>
+<span class="sd">    ren :  vtkRenderer or Renderer</span>
+<span class="sd">        Used to update the slider&#39;s position when the window changes. Can also</span>
+<span class="sd">        be given by the ``ShowManager.ren`` attribute.</span>
+<span class="sd">    callback : function</span>
+<span class="sd">        Function that has at least ``obj`` and ``event`` as parameters. It will</span>
+<span class="sd">        be called when the button is pressed.</span>
+<span class="sd">    message : str</span>
+<span class="sd">        Message to be shown in the text widget</span>
+<span class="sd">    left_down_pos : tuple</span>
+<span class="sd">        Coordinates for left down corner of text. If float are provided,</span>
+<span class="sd">        the normalized coordinate system is used, otherwise the coordinates</span>
+<span class="sd">        represent pixel positions. Default is (0.8, 0.5).</span>
+<span class="sd">    right_top_pos : tuple</span>
+<span class="sd">        Coordinates for right top corner of text. If float are provided,</span>
+<span class="sd">        the normalized coordinate system is used, otherwise the coordinates</span>
+<span class="sd">        represent pixel positions. Default is (0.9, 0.5).</span>
+<span class="sd">    color : tuple</span>
+<span class="sd">        Foreground RGB color of text. Default is (1., .5, .0).</span>
+<span class="sd">    opacity : float</span>
+<span class="sd">        Takes values from 0 to 1. Default is 1.</span>
+<span class="sd">    border : bool</span>
+<span class="sd">        Show text border. Default is False.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    text : TextWidget</span>
+<span class="sd">        This object inherits from ``vtkTextWidget`` has an additional method</span>
+<span class="sd">        called ``place`` which allows to update the position of the text if</span>
+<span class="sd">        necessary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Create the TextActor</span>
+    <span class="n">text_actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTextActor</span><span class="p">()</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+
+    <span class="c1"># Create the text representation. Used for positioning the text_actor</span>
+    <span class="n">text_rep</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTextRepresentation</span><span class="p">()</span>
+    <span class="n">text_rep</span><span class="o">.</span><span class="n">SetTextActor</span><span class="p">(</span><span class="n">text_actor</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">border</span><span class="p">:</span>
+        <span class="n">text_rep</span><span class="o">.</span><span class="n">SetShowBorderToOn</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">text_rep</span><span class="o">.</span><span class="n">SetShowBorderToOff</span><span class="p">()</span>
+
+    <span class="k">class</span> <span class="nc">TextWidget</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkTextWidget</span><span class="p">):</span>
+
+        <span class="k">def</span> <span class="nf">place</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">renderer</span><span class="p">):</span>
+            <span class="n">text_rep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetRepresentation</span><span class="p">()</span>
+
+            <span class="n">position</span> <span class="o">=</span> <span class="n">text_rep</span><span class="o">.</span><span class="n">GetPositionCoordinate</span><span class="p">()</span>
+            <span class="n">position2</span> <span class="o">=</span> <span class="n">text_rep</span><span class="o">.</span><span class="n">GetPosition2Coordinate</span><span class="p">()</span>
+
+            <span class="c1"># The dtype of `left_down_pos` determines coordinate system type.</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">left_down_pos</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+                <span class="n">position</span><span class="o">.</span><span class="n">SetCoordinateSystemToDisplay</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">position</span><span class="o">.</span><span class="n">SetCoordinateSystemToNormalizedDisplay</span><span class="p">()</span>
+
+            <span class="c1"># The dtype of `right_top_pos` determines coordinate system type.</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">right_top_pos</span><span class="p">)</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+                <span class="n">position2</span><span class="o">.</span><span class="n">SetCoordinateSystemToDisplay</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">position2</span><span class="o">.</span><span class="n">SetCoordinateSystemToNormalizedDisplay</span><span class="p">()</span>
+
+            <span class="n">position</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="o">*</span><span class="n">left_down_pos</span><span class="p">)</span>
+            <span class="n">position2</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="o">*</span><span class="n">right_top_pos</span><span class="p">)</span>
+
+    <span class="n">text_widget</span> <span class="o">=</span> <span class="n">TextWidget</span><span class="p">()</span>
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">SetRepresentation</span><span class="p">(</span><span class="n">text_rep</span><span class="p">)</span>
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">iren</span><span class="p">)</span>
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">SelectableOn</span><span class="p">()</span>
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">ResizableOff</span><span class="p">()</span>
+
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">WidgetActivateEvent</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+
+    <span class="c1"># Place widget after window resizing.</span>
+    <span class="k">def</span> <span class="nf">_place_widget</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">text_widget</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">StartEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+    <span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">ModifiedEvent</span><span class="p">,</span> <span class="n">_place_widget</span><span class="p">)</span>
+
+    <span class="n">text_widget</span><span class="o">.</span><span class="n">On</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">text_widget</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2018, FURY.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0.post34+g9e87086',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/copybutton.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+  
+
+</body>
+</html>

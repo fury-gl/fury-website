@@ -1,0 +1,507 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>fury.data.fetcher &mdash; FURY 0.1.0.post34+g9e87086 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/gallery.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0.post34+g9e87086
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../auto_examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing_link.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../authors_link.html">Credits</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>fury.data.fetcher</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for fury.data.fetcher</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Fetcher based on dipy.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">contextlib</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="k">import</span> <span class="n">copyfileobj</span>
+
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="k">import</span> <span class="n">urlopen</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">urlopen</span>
+
+<span class="c1"># Set a user-writeable file-system location to put files:</span>
+<span class="k">if</span> <span class="s1">&#39;FURY_HOME&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+    <span class="n">fury_home</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;FURY_HOME&#39;</span><span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">fury_home</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.fury&#39;</span><span class="p">)</span>
+
+<span class="c1"># The URL to the University of Washington Researchworks repository:</span>
+<span class="n">UW_RW_URL</span> <span class="o">=</span> \
+  <span class="s2">&quot;https://digital.lib.washington.edu/researchworks/bitstream/handle/&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">FetcherError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="update_progressbar"><a class="viewcode-back" href="../../../reference/fury.data.html#fury.data.update_progressbar">[docs]</a><span class="k">def</span> <span class="nf">update_progressbar</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">total_length</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Show progressbar.</span>
+
+<span class="sd">    Takes a number between 0 and 1 to indicate progress from 0 to 100%.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Try to set the bar_length according to the console size</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">popen</span><span class="p">(</span><span class="s1">&#39;tput cols&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">bar_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">46</span>
+        <span class="k">if</span><span class="p">(</span><span class="ow">not</span> <span class="p">(</span><span class="n">bar_length</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">bar_length</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># Default value if determination of console size fails</span>
+        <span class="n">bar_length</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">block</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">bar_length</span> <span class="o">*</span> <span class="n">progress</span><span class="p">))</span>
+    <span class="n">size_string</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0:.2f}</span><span class="s2"> MB&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">total_length</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">))</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\r</span><span class="s2">Download Progress: [</span><span class="si">{0}</span><span class="s2">] </span><span class="si">{1:.2f}%  o</span><span class="s2">f </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="s2">&quot;#&quot;</span> <span class="o">*</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">bar_length</span> <span class="o">-</span> <span class="n">block</span><span class="p">),</span> <span class="n">progress</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="n">size_string</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="copyfileobj_withprogress"><a class="viewcode-back" href="../../../reference/fury.data.html#fury.data.copyfileobj_withprogress">[docs]</a><span class="k">def</span> <span class="nf">copyfileobj_withprogress</span><span class="p">(</span><span class="n">fsrc</span><span class="p">,</span> <span class="n">fdst</span><span class="p">,</span> <span class="n">total_length</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">16</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">):</span>
+    <span class="n">copied</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">buf</span> <span class="o">=</span> <span class="n">fsrc</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">length</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">buf</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">fdst</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="n">copied</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+        <span class="n">progress</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">copied</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">total_length</span><span class="p">)</span>
+        <span class="n">update_progressbar</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">total_length</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_already_there_msg</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Print a message indicating that a certain data-set is already in place.&quot;&quot;&quot;</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Dataset is already in place. If you want to fetch it again &#39;</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;please first remove the folder </span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> <span class="n">folder</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_file_md5</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the md5 checksum of a file&quot;&quot;&quot;</span>
+    <span class="n">md5_data</span> <span class="o">=</span> <span class="n">md5</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">128</span> <span class="o">*</span> <span class="n">md5_data</span><span class="o">.</span><span class="n">block_size</span><span class="p">),</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+            <span class="n">md5_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">md5_data</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="check_md5"><a class="viewcode-back" href="../../../reference/fury.data.html#fury.data.check_md5">[docs]</a><span class="k">def</span> <span class="nf">check_md5</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">stored_md5</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the md5 of filename.</span>
+
+<span class="sd">    check if it matches with the supplied string md5</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : string</span>
+<span class="sd">        Path to a file.</span>
+<span class="sd">    md5 : string</span>
+<span class="sd">        Known md5 of filename to check against. If None (default), checking is</span>
+<span class="sd">        skipped</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">stored_md5</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">computed_md5</span> <span class="o">=</span> <span class="n">_get_file_md5</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stored_md5</span> <span class="o">!=</span> <span class="n">computed_md5</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;The downloaded file, </span><span class="si">%s</span><span class="s2">, does not have the expected md5</span>
+<span class="s2">   checksum of &quot;</span><span class="si">%s</span><span class="s2">&quot;. Instead, the md5 checksum was: &quot;</span><span class="si">%s</span><span class="s2">&quot;. This could mean that</span>
+<span class="s2">   something is wrong with the file or that the upstream file has been updated.</span>
+<span class="s2">   You can try downloading the file again or updating to the newest version of</span>
+<span class="s2">   Fury.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">stored_md5</span><span class="p">,</span>
+               <span class="n">computed_md5</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">FetcherError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_file_data</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">))</span> <span class="k">as</span> <span class="n">opener</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response_size</span> <span class="o">=</span> <span class="n">opener</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s1">&#39;content-length&#39;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">response_size</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">data</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">response_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="n">copyfileobj</span><span class="p">(</span><span class="n">opener</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">copyfileobj_withprogress</span><span class="p">(</span><span class="n">opener</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">response_size</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="fetch_data"><a class="viewcode-back" href="../../../reference/fury.data.html#fury.data.fetch_data">[docs]</a><span class="k">def</span> <span class="nf">fetch_data</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">data_size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Downloads files to folder and checks their md5 checksums.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    files : dictionary</span>
+<span class="sd">        For each file in `files` the value should be (url, md5). The file will</span>
+<span class="sd">        be downloaded from url if the file does not already exist or if the</span>
+<span class="sd">        file exists but the md5 checksum does not match.</span>
+<span class="sd">    folder : str</span>
+<span class="sd">        The directory where to save the file, the directory will be created if</span>
+<span class="sd">        it does not already exist.</span>
+<span class="sd">    data_size : str, optional</span>
+<span class="sd">        A string describing the size of the data (e.g. &quot;91 MB&quot;) to be logged to</span>
+<span class="sd">        the screen. Default does not produce any information about data size.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FetcherError</span>
+<span class="sd">        Raises if the md5 checksum of the file does not match the expected</span>
+<span class="sd">        value. The downloaded file is not deleted when this error is raised.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating new folder </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">folder</span><span class="p">))</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data size is approximately </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">data_size</span><span class="p">)</span>
+
+    <span class="n">all_skip</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">md5</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
+        <span class="n">fullpath</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">_get_file_md5</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span> <span class="o">==</span> <span class="n">md5</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">all_skip</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Downloading &quot;</span><span class="si">%s</span><span class="s1">&quot; to </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">folder</span><span class="p">))</span>
+        <span class="n">_get_file_data</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="n">check_md5</span><span class="p">(</span><span class="n">fullpath</span><span class="p">,</span> <span class="n">md5</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">all_skip</span><span class="p">:</span>
+        <span class="n">_already_there_msg</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Files successfully downloaded to </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">folder</span><span class="p">))</span></div>
+
+
+<span class="k">def</span> <span class="nf">_make_fetcher</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">baseurl</span><span class="p">,</span> <span class="n">remote_fnames</span><span class="p">,</span> <span class="n">local_fnames</span><span class="p">,</span>
+                  <span class="n">md5_list</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">data_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                  <span class="n">unzip</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a new fetcher.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        The name of the fetcher function.</span>
+<span class="sd">    folder : str</span>
+<span class="sd">        The full path to the folder in which the files would be placed locally.</span>
+<span class="sd">        Typically, this is something like &#39;pjoin(fury_home, &#39;foo&#39;)&#39;</span>
+<span class="sd">    baseurl : str</span>
+<span class="sd">        The URL from which this fetcher reads files</span>
+<span class="sd">    remote_fnames : list of strings</span>
+<span class="sd">        The names of the files in the baseurl location</span>
+<span class="sd">    local_fnames : list of strings</span>
+<span class="sd">        The names of the files to be saved on the local filesystem</span>
+<span class="sd">    md5_list : list of strings, optional</span>
+<span class="sd">        The md5 checksums of the files. Used to verify the content of the</span>
+<span class="sd">        files. Default: None, skipping checking md5.</span>
+<span class="sd">    doc : str, optional.</span>
+<span class="sd">        Documentation of the fetcher.</span>
+<span class="sd">    data_size : str, optional.</span>
+<span class="sd">        If provided, is sent as a message to the user before downloading</span>
+<span class="sd">        starts.</span>
+<span class="sd">    msg : str, optional.</span>
+<span class="sd">        A message to print to screen when fetching takes place. Default (None)</span>
+<span class="sd">        is to print nothing</span>
+<span class="sd">    unzip : bool, optional</span>
+<span class="sd">        Whether to unzip the file(s) after downloading them. Supports zip, gz,</span>
+<span class="sd">        and tar.gz files.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    fetcher : function</span>
+<span class="sd">        A function that, when called, fetches data according to the designated</span>
+<span class="sd">        inputs</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">fetcher</span><span class="p">():</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">remote_fnames</span><span class="p">,</span> <span class="n">local_fnames</span><span class="p">)):</span>
+            <span class="n">files</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">baseurl</span> <span class="o">+</span> <span class="n">f</span><span class="p">,</span> <span class="n">md5_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">if</span>
+                        <span class="n">md5_list</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">fetch_data</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">folder</span><span class="p">,</span> <span class="n">data_size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unzip</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">local_fnames</span><span class="p">:</span>
+                <span class="n">split_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">split_ext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.gz&#39;</span> <span class="ow">or</span> <span class="n">split_ext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.bz2&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">split_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">])[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.tar&#39;</span><span class="p">:</span>
+                        <span class="n">ar</span> <span class="o">=</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">pjoin</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
+                        <span class="n">ar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">folder</span><span class="p">)</span>
+                        <span class="n">ar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;File extension is not recognized&#39;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">split_ext</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;.zip&#39;</span><span class="p">:</span>
+                    <span class="n">z</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">pjoin</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">f</span><span class="p">),</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="n">z</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+                    <span class="n">z</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;File extension is not recognized&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">files</span><span class="p">,</span> <span class="n">folder</span>
+
+    <span class="n">fetcher</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">name</span>
+    <span class="n">fetcher</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">doc</span>
+    <span class="k">return</span> <span class="n">fetcher</span>
+
+
+<span class="n">fetch_viz_icons</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span><span class="s2">&quot;fetch_viz_icons&quot;</span><span class="p">,</span>
+                                <span class="n">pjoin</span><span class="p">(</span><span class="n">fury_home</span><span class="p">,</span> <span class="s2">&quot;icons&quot;</span><span class="p">),</span>
+                                <span class="n">UW_RW_URL</span> <span class="o">+</span> <span class="s2">&quot;1773/38478/&quot;</span><span class="p">,</span>
+                                <span class="p">[</span><span class="s1">&#39;icomoon.tar.gz&#39;</span><span class="p">],</span>
+                                <span class="p">[</span><span class="s1">&#39;icomoon.tar.gz&#39;</span><span class="p">],</span>
+                                <span class="p">[</span><span class="s1">&#39;94a07cba06b4136b6687396426f1e380&#39;</span><span class="p">],</span>
+                                <span class="n">data_size</span><span class="o">=</span><span class="s2">&quot;12KB&quot;</span><span class="p">,</span>
+                                <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download icons for fury&quot;</span><span class="p">,</span>
+                                <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="read_viz_icons"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.data.read_viz_icons">[docs]</a><span class="k">def</span> <span class="nf">read_viz_icons</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;icomoon&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;infinity.png&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read specific icon from specific style.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    style : str</span>
+<span class="sd">        Current icon style. Default is icomoon.</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        Filename of icon. This should be found in folder HOME/.fury/style/.</span>
+<span class="sd">        Default is infinity.png.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    --------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        Complete path of icon.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">fury_home</span><span class="p">,</span> <span class="s1">&#39;icons&#39;</span><span class="p">,</span> <span class="n">style</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2018, FURY.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0.post34+g9e87086',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>  
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+  
+
+</body>
+</html>
