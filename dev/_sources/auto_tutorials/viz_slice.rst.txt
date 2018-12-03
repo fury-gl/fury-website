@@ -59,17 +59,17 @@ Let's download and load a T1.
  .. code-block:: none
 
     Data size is approximately 234MB
-    Dataset is already in place. If you want to fetch it again please first remove the folder /Users/koudoro/.dipy/exp_bundles_and_maps
+    Dataset is already in place. If you want to fetch it again please first remove the folder /home/travis/.dipy/exp_bundles_and_maps
 
 
-Create a Renderer object which holds all the actors which we want to visualize.
+Create a Scene object which holds all the actors which we want to visualize.
 
 
 .. code-block:: python
 
 
-    renderer = window.Renderer()
-    renderer.background((0.5, 0.5, 0.5))
+    scene = window.Scene()
+    scene.background((0.5, 0.5, 0.5))
 
 
 
@@ -118,7 +118,7 @@ The ``slice_actor`` contains an axial slice.
 .. code-block:: python
 
 
-    renderer.add(slice_actor)
+    scene.add(slice_actor)
 
 
 
@@ -151,10 +151,10 @@ plane.
 
     slice_actor2.display(slice_actor2.shape[0]//2, None, None)
 
-    renderer.add(slice_actor2)
+    scene.add(slice_actor2)
 
-    renderer.reset_camera()
-    renderer.zoom(1.4)
+    scene.reset_camera()
+    scene.zoom(1.4)
 
 
 
@@ -168,7 +168,7 @@ In order to interact with the data you will need to uncomment the line below.
 .. code-block:: python
 
 
-    # window.show(renderer, size=(600, 600), reset_camera=False)
+    # window.show(scene, size=(600, 600), reset_camera=False)
 
 
 
@@ -182,7 +182,7 @@ Otherwise, you can save a screenshot using the following command.
 .. code-block:: python
 
 
-    window.record(renderer, out_path='slices.png', size=(600, 600),
+    window.record(scene, out_path='slices.png', size=(600, 600),
                   reset_camera=False)
 
 
@@ -201,8 +201,9 @@ Render slices from FA with your colormap
 .. code-block:: python
 
 
-    # It is also possible to set the colormap of your preference. Here we are loading
-    # an FA image and showing it in a non-standard way using an HSV colormap.
+    # It is also possible to set the colormap of your preference. Here we are
+    # loading an FA image and showing it in a non-standard way using an HSV
+    # colormap.
 
     fname_fa = os.path.join(os.path.expanduser('~'), '.dipy',
                             'exp_bundles_and_maps', 'bundles_2_subjects',
@@ -244,15 +245,15 @@ to (0, 255).
 
     fa_actor = actor.slicer(fa, affine, lookup_colormap=lut)
 
-    renderer.clear()
-    renderer.add(fa_actor)
+    scene.clear()
+    scene.add(fa_actor)
 
-    renderer.reset_camera()
-    renderer.zoom(1.4)
+    scene.reset_camera()
+    scene.zoom(1.4)
 
-    # window.show(renderer, size=(600, 600), reset_camera=False)
+    # window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(renderer, out_path='slices_lut.png', size=(600, 600),
+    window.record(scene, out_path='slices_lut.png', size=(600, 600),
                   reset_camera=False)
 
 
@@ -266,15 +267,16 @@ to (0, 255).
 
 Now we would like to add the ability to click on a voxel and show its value
 on a panel in the window. The panel is a UI element which requires access to
-different areas of the visualization pipeline and therefore we don't recommend
-using it with ``window.show``. The more appropriate way is to use the
-``ShowManager`` object, which allows accessing the pipeline in different areas.
+different areas of the visualization pipeline and therefore we don't
+recommend using it with ``window.show``. The more appropriate way is to use
+the ``ShowManager`` object, which allows accessing the pipeline in different
+areas.
 
 
 .. code-block:: python
 
 
-    show_m = window.ShowManager(renderer, size=(1200, 900))
+    show_m = window.ShowManager(scene, size=(1200, 900))
     show_m.initialize()
 
 
@@ -307,7 +309,7 @@ We'll start by creating the panel and adding it to the ``ShowManager``
     panel_picking.add_element(result_position, (0.45, 0.55))
     panel_picking.add_element(result_value, (0.45, 0.25))
 
-    show_m.ren.add(panel_picking)
+    show_m.scene.add(panel_picking)
 
 
 
@@ -315,8 +317,8 @@ We'll start by creating the panel and adding it to the ``ShowManager``
 
 
 
-Add a left-click callback to the slicer. Also disable interpolation so you can
-see what you are picking.
+Add a left-click callback to the slicer. Also disable interpolation so you
+can see what you are picking.
 
 
 .. code-block:: python
@@ -330,7 +332,7 @@ see what you are picking.
         obj.picker.Pick(event_pos[0],
                         event_pos[1],
                         0,
-                        show_m.ren)
+                        show_m.scene)
 
         i, j, k = obj.picker.GetPointIJK()
         result_position.message = '({}, {}, {})'.format(str(i), str(j), str(k))
@@ -354,20 +356,20 @@ Create a mosaic
 By using the ``copy`` and ``display`` method of the ``slice_actor`` becomes
 easy and efficient to create a mosaic of all the slices.
 
-So, let's clear the renderer and change the projection from perspective to
+So, let's clear the scene and change the projection from perspective to
 parallel. We'll also need a new show manager and an associated callback.
 
 
 .. code-block:: python
 
 
-    renderer.clear()
-    renderer.projection('parallel')
+    scene.clear()
+    scene.projection('parallel')
 
     result_position.message = ''
     result_value.message = ''
 
-    show_m_mosaic = window.ShowManager(renderer, size=(1200, 900))
+    show_m_mosaic = window.ShowManager(scene, size=(1200, 900))
     show_m_mosaic.initialize()
 
 
@@ -378,7 +380,7 @@ parallel. We'll also need a new show manager and an associated callback.
         obj.picker.Pick(event_pos[0],
                         event_pos[1],
                         0,
-                        show_m_mosaic.ren)
+                        show_m_mosaic.scene)
 
         i, j, k = obj.picker.GetPointIJK()
         result_position.message = '({}, {}, {})'.format(str(i), str(j), str(k))
@@ -392,7 +394,7 @@ parallel. We'll also need a new show manager and an associated callback.
 
 
 Now we need to create two nested for loops which will set the positions of
-the grid of the mosaic and add the new actors to the renderer. We are going
+the grid of the mosaic and add the new actors to the scene. We are going
 to use 15 columns and 10 rows but you can adjust those with your datasets.
 
 
@@ -418,17 +420,17 @@ to use 15 columns and 10 rows but you can adjust those with your datasets.
             slice_mosaic.AddObserver('LeftButtonPressEvent',
                                      left_click_callback_mosaic,
                                      1.0)
-            renderer.add(slice_mosaic)
+            scene.add(slice_mosaic)
             cnt += 1
             if cnt > Z:
                 break
         if cnt > Z:
             break
 
-    renderer.reset_camera()
-    renderer.zoom(1.0)
+    scene.reset_camera()
+    scene.zoom(1.0)
 
-    # show_m_mosaic.ren.add(panel_picking)
+    # show_m_mosaic.scene.add(panel_picking)
     # show_m_mosaic.start()
 
 
@@ -446,7 +448,7 @@ zoom in/out using the scroll wheel, and pick voxels with left click.
 
 
 
-    window.record(renderer, out_path='mosaic.png', size=(900, 600),
+    window.record(scene, out_path='mosaic.png', size=(900, 600),
                   reset_camera=False)
 
 
@@ -457,7 +459,10 @@ zoom in/out using the scroll wheel, and pick voxels with left click.
 
 
 
-**Total running time of the script:** ( 0 minutes  4.268 seconds)
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** ( 0 minutes  8.966 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_viz_slice.py:

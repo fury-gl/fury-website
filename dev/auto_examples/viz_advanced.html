@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Advanced interactive visualization &mdash; FURY 0.1.4 documentation</title>
+  <title>Advanced interactive visualization &mdash; FURY 0.1.4.post31+g696ea9c documentation</title>
   
 
   
@@ -29,8 +29,6 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -64,7 +62,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.4.post31+g696ea9c
               </div>
             
           
@@ -188,9 +186,9 @@ the main functions using the following modules.</p>
 </div>
 <p>In <code class="docutils literal notranslate"><span class="pre">window</span></code> we have all the objects that connect what needs to be rendered
 to the display or the disk e.g., for saving screenshots. So, there you will
-find key objects and functions like the <code class="docutils literal notranslate"><span class="pre">Renderer</span></code> class which holds and
+find key objects and functions like the <code class="docutils literal notranslate"><span class="pre">Scene</span></code> class which holds and
 provides access to all the actors and the <code class="docutils literal notranslate"><span class="pre">show</span></code> function which displays
-what is in the renderer on a window. Also, this module provides access to
+what is in the scene on a window. Also, this module provides access to
 functions for opening/saving dialogs and printing screenshots
 (see <code class="docutils literal notranslate"><span class="pre">snapshot</span></code>).</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">actor</span></code> module we can find all the different primitives e.g.,
@@ -209,7 +207,7 @@ a <code class="docutils literal notranslate"><span class="pre">LineSlider2D</spa
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Data size is approximately 234MB
-Dataset is already in place. If you want to fetch it again please first remove the folder /Users/koudoro/.dipy/exp_bundles_and_maps
+Dataset is already in place. If you want to fetch it again please first remove the folder /home/travis/.dipy/exp_bundles_and_maps
 </pre></div>
 </div>
 <p>The following function outputs a dictionary with the required bundles e.g.
@@ -241,9 +239,9 @@ native space using the inverse of the affine.</p>
     <span class="n">streamlines</span> <span class="o">=</span> <span class="n">transform_streamlines</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.inv.html#numpy.linalg.inv" title="View documentation for numpy.linalg.inv"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span></a><span class="p">(</span><span class="n">affine</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Now we create, a <code class="docutils literal notranslate"><span class="pre">Renderer</span></code> object and add the streamlines using the
+<p>Now we create, a <code class="docutils literal notranslate"><span class="pre">Scene</span></code> object and add the streamlines using the
 <code class="docutils literal notranslate"><span class="pre">line</span></code> function and an image plane using the <code class="docutils literal notranslate"><span class="pre">slice</span></code> function.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ren</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Renderer" title="View documentation for fury.window.Renderer"><span class="n">window</span><span class="o">.</span><span class="n">Renderer</span></a><span class="p">()</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 <span class="n">stream_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">streamlines</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="ow">not</span> <span class="n">world_coords</span><span class="p">:</span>
@@ -277,11 +275,11 @@ native space using the inverse of the affine.</p>
                              <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Connect the actors with the Renderer.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">stream_actor</span><span class="p">)</span>
-<span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_z</span><span class="p">)</span>
-<span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_x</span><span class="p">)</span>
-<span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_y</span><span class="p">)</span>
+<p>Connect the actors with the Scene.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">stream_actor</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_z</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_x</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">image_actor_y</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now we would like to change the position of each <code class="docutils literal notranslate"><span class="pre">image_actor</span></code> using a
@@ -289,7 +287,7 @@ slider. The sliders are widgets which require access to different areas of
 the visualization pipeline and therefore we don’t recommend using them with
 <code class="docutils literal notranslate"><span class="pre">show</span></code>. The more appropriate way is to use them with the <code class="docutils literal notranslate"><span class="pre">ShowManager</span></code>
 object which allows accessing the pipeline in different areas. Here is how:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">show_m</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="View documentation for fury.window.ShowManager"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">ren</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">))</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">show_m</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="View documentation for fury.window.ShowManager"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">))</span>
 <span class="n">show_m</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -386,7 +384,7 @@ sliders to move the slices and change their opacity.</p>
 <span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">opacity_slider_label</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
 <span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">opacity_slider</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.38</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
 
-<span class="n">show_m</span><span class="o">.</span><span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">panel</span><span class="p">)</span>
+<span class="n">show_m</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">panel</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Then, we can render all the widgets and everything else in the screen and
@@ -395,7 +393,7 @@ start the interaction using <code class="docutils literal notranslate"><span cla
 position properly. The solution to this issue is to update the position of
 the panel using its <code class="docutils literal notranslate"><span class="pre">re_align</span></code> method every time the window size changes.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">global</span> <span class="n">size</span>
-<span class="n">size</span> <span class="o">=</span> <span class="n">ren</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
+<span class="n">size</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">win_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
@@ -414,8 +412,8 @@ the panel using its <code class="docutils literal notranslate"><span class="pre"
 datasets in 3D.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">interactive</span> <span class="o">=</span> <span class="bp">False</span>
 
-<span class="n">ren</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
-<span class="n">ren</span><span class="o">.</span><span class="n">reset_clipping_range</span><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">1.5</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">reset_clipping_range</span><span class="p">()</span>
 
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
 
@@ -425,19 +423,19 @@ datasets in 3D.</p>
 
 <span class="k">else</span><span class="p">:</span>
 
-    <a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">ren</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundles_and_3_slices.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">),</span>
+    <a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundles_and_3_slices.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1200</span><span class="p">,</span> <span class="mi">900</span><span class="p">),</span>
                   <span class="n">reset_camera</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 
 <span class="k">del</span> <span class="n">show_m</span>
 </pre></div>
 </div>
 <img alt="../_images/sphx_glr_viz_advanced_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_advanced_001.png" />
-<p><strong>Total running time of the script:</strong> ( 0 minutes  3.972 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  9.159 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-viz-advanced-py">
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/ad9796e0fb974820bde2fd53521483af/viz_advanced.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_advanced.py</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/47532e049e718423424615c20d5c502b/viz_advanced.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_advanced.py</span></code></a></div>
 <div class="sphx-glr-download docutils container">
-<a class="reference download internal" download="" href="../_downloads/e2a83c793b803b4015bf8f8b3b0a3634/viz_advanced.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_advanced.ipynb</span></code></a></div>
+<a class="reference download internal" download="" href="../_downloads/1648bc913e1e77a0fa329f0692aedd39/viz_advanced.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_advanced.ipynb</span></code></a></div>
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.readthedocs.io">Gallery generated by Sphinx-Gallery</a></p>
 </div>
@@ -462,7 +460,7 @@ datasets in 3D.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2018, FURY.
+        &copy; Copyright 2010-2018, FURY
 
     </p>
   </div>
@@ -481,25 +479,15 @@ datasets in 3D.</p>
 
   
 
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.1.4',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/copybutton.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
 
   
 
