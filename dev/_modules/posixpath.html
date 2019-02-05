@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>posixpath &mdash; FURY 0.1.4.post58+g837cf75 documentation</title>
+  <title>posixpath &mdash; FURY 0.1.4.post59+g2cd4100 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                0.1.4.post58+g837cf75
+                0.1.4.post59+g2cd4100
               </div>
             
           
@@ -405,7 +405,12 @@
     <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">if</span> <span class="s1">&#39;HOME&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">pwd</span>
-            <span class="n">userhome</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwuid</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">())</span><span class="o">.</span><span class="n">pw_dir</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">userhome</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwuid</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getuid</span><span class="p">())</span><span class="o">.</span><span class="n">pw_dir</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="c1"># bpo-10496: if the current user identifier doesn&#39;t exist in the</span>
+                <span class="c1"># password database, return the path unchanged</span>
+                <span class="k">return</span> <span class="n">path</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">userhome</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;HOME&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
@@ -416,6 +421,8 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">pwent</span> <span class="o">=</span> <span class="n">pwd</span><span class="o">.</span><span class="n">getpwnam</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="c1"># bpo-10496: if the user name from the path doesn&#39;t exist in the</span>
+            <span class="c1"># password database, return the path unchanged</span>
             <span class="k">return</span> <span class="n">path</span>
         <span class="n">userhome</span> <span class="o">=</span> <span class="n">pwent</span><span class="o">.</span><span class="n">pw_dir</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
