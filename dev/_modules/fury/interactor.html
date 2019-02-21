@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.interactor &mdash; FURY 0.1.4.post60+gf549fd1 documentation</title>
+  <title>fury.interactor &mdash; FURY 0.1.4.post100+gb585d34 documentation</title>
   
 
   
@@ -19,34 +19,38 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -60,7 +64,7 @@
             
             
               <div class="version">
-                0.1.4.post60+gf549fd1
+                0.1.4.post100+gb585d34
               </div>
             
           
@@ -222,8 +226,13 @@
 
 <div class="viewcode-block" id="CustomInteractorStyle.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init.&quot;&quot;&quot;</span>
-        <span class="c1"># Default interactor is responsible for moving the camera.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleTrackballCamera</span><span class="p">()</span>
+        <span class="c1"># Interactor responsible for moving the camera.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleTrackballCamera</span><span class="p">()</span>
+        <span class="c1"># Interactor responsible for moving/rotating a selected actor.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleTrackballActor</span><span class="p">()</span>
+        <span class="c1"># Interactor responsible for panning/zooming the camera.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleImage</span><span class="p">()</span>
+
         <span class="c1"># The picker allows us to know which object/actor is under the mouse.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">picker</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPropPicker</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chosen_element</span> <span class="o">=</span> <span class="kc">None</span>
@@ -268,6 +277,34 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
                 <span class="k">return</span></div>
 
+    <span class="k">def</span> <span class="nf">_process_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_down</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_up</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;RightButtonPressEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_down</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;RightButtonReleaseEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_up</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;MiddleButtonPressEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_down</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;MiddleButtonReleaseEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_up</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_move</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;CharEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_char</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_key_press</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;KeyReleaseEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_key_release</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;MouseWheelForwardEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_forward</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">evt</span> <span class="o">==</span> <span class="s2">&quot;MouseWheelBackwardEvent&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_backward</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>  <span class="c1"># Event fully processed.</span>
+
 <div class="viewcode-block" id="CustomInteractorStyle.on_left_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_left_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_left_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">left_button_down</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">prop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_prop_at_event_position</span><span class="p">()</span>
@@ -276,13 +313,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnLeftButtonDown</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnLeftButtonDown</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_left_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_left_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_left_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">left_button_down</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnLeftButtonUp</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnLeftButtonUp</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_right_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_right_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right_button_down</span> <span class="o">=</span> <span class="kc">True</span>
@@ -292,13 +329,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnRightButtonDown</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnRightButtonDown</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_right_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_right_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_right_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right_button_down</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnRightButtonUp</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnRightButtonUp</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_middle_button_down"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_middle_button_down">[docs]</a>    <span class="k">def</span> <span class="nf">on_middle_button_down</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">middle_button_down</span> <span class="o">=</span> <span class="kc">True</span>
@@ -308,13 +345,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="n">prop</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMiddleButtonDown</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnMiddleButtonDown</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_middle_button_up"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_middle_button_up">[docs]</a>    <span class="k">def</span> <span class="nf">on_middle_button_up</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">middle_button_down</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMiddleButtonUp</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnMiddleButtonUp</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_mouse_move"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_move">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_move</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;On mouse move.&quot;&quot;&quot;</span>
@@ -323,7 +360,8 @@
                                     <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;left_button&quot;</span><span class="p">]</span> <span class="o">|</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;right_button&quot;</span><span class="p">]</span> <span class="o">|</span>
                                     <span class="bp">self</span><span class="o">.</span><span class="n">selected_props</span><span class="p">[</span><span class="s2">&quot;middle_button&quot;</span><span class="p">]))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseMove</span><span class="p">()</span></div>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnMouseMove</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_mouse_wheel_forward"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_wheel_forward">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_wheel_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;On mouse wheel forward.&quot;&quot;&quot;</span>
@@ -338,9 +376,7 @@
 
         <span class="c1"># Finally, to the default interactor.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseWheelForward</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnMouseWheelForward</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_mouse_wheel_backward"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_mouse_wheel_backward">[docs]</a>    <span class="k">def</span> <span class="nf">on_mouse_wheel_backward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;On mouse wheel backward.&quot;&quot;&quot;</span>
@@ -355,9 +391,7 @@
 
         <span class="c1"># Finally, to the default interactor.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort_flag</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">OnMouseWheelBackward</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">OnMouseWheelBackward</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.on_char"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.on_char">[docs]</a>    <span class="k">def</span> <span class="nf">on_char</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">evt</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">propagate_event</span><span class="p">(</span><span class="n">evt</span><span class="p">,</span> <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">active_props</span><span class="p">)</span></div>
@@ -374,11 +408,13 @@
         <span class="c1"># `vtkWindowInteractor` object and this is done via `SetInteractor`.</span>
         <span class="c1"># However, this has the side effect of adding directly all their</span>
         <span class="c1"># observers to the `interactor`!</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_interactor</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">interactor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_actor</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">interactor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">interactor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trackball_camera</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="n">interactor</span><span class="p">)</span>
 
         <span class="c1"># Remove all observers *most likely* (cannot guarantee that the</span>
         <span class="c1"># interactor did not already have these observers) added by</span>
-        <span class="c1"># `vtkInteractorStyleTrackballCamera`, i.e. our `default_interactor`.</span>
+        <span class="c1"># `vtkInteractorStyleTrackballCamera`, i.e. our `trackball_camera`.</span>
         <span class="c1">#</span>
         <span class="c1"># Note: Be sure that no observer has been manually added to the</span>
         <span class="c1"># `interactor` before setting the InteractorStyle.</span>
@@ -409,34 +445,32 @@
         <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyle</span><span class="o">.</span><span class="n">SetInteractor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interactor</span><span class="p">)</span>
 
         <span class="c1"># Keyboard events.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;CharEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_char</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_key_press</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_key_release</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;CharEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;KeyReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
 
         <span class="c1"># Mouse events.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_move</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_down</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_left_button_up</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_down</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_right_button_up</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_down</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_middle_button_up</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;RightButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonPressEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MiddleButtonReleaseEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
 
         <span class="c1"># Windows and special events.</span>
         <span class="c1"># TODO: we ever find them useful we could support them.</span>
-        <span class="c1"># self.AddObserver(&quot;TimerEvent&quot;, self.on_timer)</span>
-        <span class="c1"># self.AddObserver(&quot;EnterEvent&quot;, self.on_enter)</span>
-        <span class="c1"># self.AddObserver(&quot;LeaveEvent&quot;, self.on_leave)</span>
-        <span class="c1"># self.AddObserver(&quot;ExposeEvent&quot;, self.on_expose)</span>
-        <span class="c1"># self.AddObserver(&quot;ConfigureEvent&quot;, self.on_configure)</span>
+        <span class="c1"># self.AddObserver(&quot;TimerEvent&quot;, self._process_event)</span>
+        <span class="c1"># self.AddObserver(&quot;EnterEvent&quot;, self._process_event)</span>
+        <span class="c1"># self.AddObserver(&quot;LeaveEvent&quot;, self._process_event)</span>
+        <span class="c1"># self.AddObserver(&quot;ExposeEvent&quot;, self._process_event)</span>
+        <span class="c1"># self.AddObserver(&quot;ConfigureEvent&quot;, self._process_event)</span>
 
         <span class="c1"># These observers need to be added directly to the interactor because</span>
         <span class="c1"># `vtkInteractorStyleUser` does not support wheel events prior 7.1. See</span>
         <span class="c1"># https://github.com/Kitware/VTK/commit/373258ed21f0915c425eddb996ce6ac13404be28</span>
-        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelForwardEvent&quot;</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_forward</span><span class="p">)</span>
-        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelBackwardEvent&quot;</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">on_mouse_wheel_backward</span><span class="p">)</span></div>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelForwardEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span>
+        <span class="n">interactor</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s2">&quot;MouseWheelBackwardEvent&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_event</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CustomInteractorStyle.force_render"><a class="viewcode-back" href="../../reference/fury.window.html#fury.ui.CustomInteractorStyle.force_render">[docs]</a>    <span class="k">def</span> <span class="nf">force_render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Causes the scene to refresh.&quot;&quot;&quot;</span>
@@ -451,12 +485,17 @@
 <span class="sd">        event_type : event code</span>
 <span class="sd">        callback : function</span>
 <span class="sd">        priority : int</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event_name</span><span class="p">):</span>
             <span class="c1"># Update event information.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">())</span>
-            <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">interactor_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">interactor_</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">event_name</span><span class="p">,</span> <span class="n">interactor_</span><span class="p">)</span>
+                <span class="n">callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;interactor is none&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;event name is&#39;</span><span class="p">,</span> <span class="n">event_name</span><span class="p">)</span>
 
         <span class="n">prop</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">event_type</span><span class="p">,</span> <span class="n">_callback</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span></div></div>
 </pre></div>
@@ -488,28 +527,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-        <script type="text/javascript" src="../../_static/copybutton.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
     <style>
     /* Sidebar header (and topbar for mobile) */
     .wy-side-nav-search, .wy-nav-top {

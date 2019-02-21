@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.colormap &mdash; FURY 0.1.4.post60+gf549fd1 documentation</title>
+  <title>fury.colormap &mdash; FURY 0.1.4.post100+gb585d34 documentation</title>
   
 
   
@@ -19,34 +19,38 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -60,7 +64,7 @@
             
             
               <div class="version">
-                0.1.4.post60+gf549fd1
+                0.1.4.post100+gb585d34
               </div>
             
           
@@ -509,6 +513,269 @@
     <span class="n">rgba</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
     <span class="n">rgb</span> <span class="o">=</span> <span class="n">rgba</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">rgb</span></div>
+
+
+<span class="k">def</span> <span class="nf">_lab_delta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">dL</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">l</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">l</span>
+    <span class="n">dA</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">a</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">a</span>
+    <span class="n">dB</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">b</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dL</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dA</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">dB</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_rgb_lab_delta</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="n">labX</span> <span class="o">=</span> <span class="n">_rgb2lab</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">labY</span> <span class="o">=</span> <span class="n">_rgb2lab</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_lab_delta</span><span class="p">(</span><span class="n">labX</span><span class="p">,</span> <span class="n">labY</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_rgb2xyz</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
+    <span class="n">var_R</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>  <span class="c1"># R from 0 to 255</span>
+    <span class="n">var_G</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>  <span class="c1"># G from 0 to 255</span>
+    <span class="n">var_B</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span>  <span class="c1"># B from 0 to 255</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
+    <span class="n">var_R</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">var_R</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.4</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_R</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_R</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="mf">12.92</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_G</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
+    <span class="n">var_G</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">var_G</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.4</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_G</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_G</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="mf">12.92</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_B</span> <span class="o">&gt;</span> <span class="mf">0.04045</span>
+    <span class="n">var_B</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">((</span><span class="n">var_B</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.055</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.055</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.4</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_B</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_B</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">/</span> <span class="mf">12.92</span>
+
+    <span class="n">var_R</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">var_G</span> <span class="o">=</span> <span class="n">var_G</span> <span class="o">*</span> <span class="mi">100</span>
+    <span class="n">var_B</span> <span class="o">=</span> <span class="n">var_B</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="c1"># Observer. = Illuminant = D65</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">*</span> <span class="mf">0.4124</span> <span class="o">+</span> <span class="n">var_G</span> <span class="o">*</span> <span class="mf">0.3576</span> <span class="o">+</span> <span class="n">var_B</span> <span class="o">*</span> <span class="mf">0.1805</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">*</span> <span class="mf">0.2126</span> <span class="o">+</span> <span class="n">var_G</span> <span class="o">*</span> <span class="mf">0.7152</span> <span class="o">+</span> <span class="n">var_B</span> <span class="o">*</span> <span class="mf">0.0722</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">*</span> <span class="mf">0.0193</span> <span class="o">+</span> <span class="n">var_G</span> <span class="o">*</span> <span class="mf">0.1192</span> <span class="o">+</span> <span class="n">var_B</span> <span class="o">*</span> <span class="mf">0.9505</span>
+    <span class="c1"># xyz = XYZColor(X,Y,Z)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_xyz2lab</span><span class="p">(</span><span class="n">xyz</span><span class="p">):</span>
+    <span class="n">ref_X</span> <span class="o">=</span> <span class="mf">095.047</span>
+    <span class="n">ref_Y</span> <span class="o">=</span> <span class="mf">100.000</span>
+    <span class="n">ref_Z</span> <span class="o">=</span> <span class="mf">108.883</span>
+    <span class="n">var_X</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">ref_X</span>
+    <span class="n">var_Y</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">ref_Y</span>
+    <span class="n">var_Z</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">ref_Z</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
+    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mi">16</span> <span class="o">/</span> <span class="mi">116</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_Y</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
+    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mi">16</span> <span class="o">/</span> <span class="mi">116</span><span class="p">)</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">var_Z</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
+    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mi">16</span> <span class="o">/</span> <span class="mi">116</span><span class="p">)</span>
+
+    <span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mi">116</span> <span class="o">*</span> <span class="n">var_Y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">16</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="mi">500</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_X</span> <span class="o">-</span> <span class="n">var_Y</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="mi">200</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_Y</span> <span class="o">-</span> <span class="n">var_Z</span><span class="p">)</span>
+    <span class="c1"># lab = LabColor(L,A,B)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">L</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_lab2xyz</span><span class="p">(</span><span class="n">lab</span><span class="p">):</span>
+    <span class="n">var_Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">lab</span><span class="o">.</span><span class="n">l</span> <span class="o">+</span> <span class="mi">16</span><span class="p">)</span> <span class="o">/</span> <span class="mi">116</span>
+    <span class="n">var_X</span> <span class="o">=</span> <span class="n">lab</span><span class="o">.</span><span class="n">a</span> <span class="o">/</span> <span class="mi">500</span> <span class="o">+</span> <span class="n">var_Y</span>
+    <span class="n">var_Z</span> <span class="o">=</span> <span class="n">var_Y</span> <span class="o">-</span> <span class="n">lab</span><span class="o">.</span><span class="n">b</span> <span class="o">/</span> <span class="mi">200</span>
+
+    <span class="k">if</span> <span class="n">var_Y</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
+        <span class="n">var_Y</span> <span class="o">=</span> <span class="n">var_Y</span><span class="o">**</span><span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Y</span> <span class="o">-</span> <span class="mi">16</span><span class="o">/</span><span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+
+    <span class="k">if</span> <span class="n">var_X</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
+        <span class="n">var_X</span> <span class="o">=</span> <span class="n">var_X</span><span class="o">**</span><span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_X</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_X</span> <span class="o">-</span> <span class="mi">16</span><span class="o">/</span><span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+
+    <span class="k">if</span> <span class="n">var_Z</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
+        <span class="n">var_Z</span> <span class="o">=</span> <span class="n">var_Z</span><span class="o">**</span><span class="mi">3</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Z</span> <span class="o">-</span> <span class="mi">16</span><span class="o">/</span><span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+
+    <span class="n">ref_X</span> <span class="o">=</span> <span class="mf">095.047</span>
+    <span class="n">ref_Y</span> <span class="o">=</span> <span class="mf">100.000</span>
+    <span class="n">ref_Z</span> <span class="o">=</span> <span class="mf">108.883</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">ref_X</span> <span class="o">*</span> <span class="n">var_X</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">ref_Y</span> <span class="o">*</span> <span class="n">var_Y</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">ref_Z</span> <span class="o">*</span> <span class="n">var_Z</span>
+    <span class="n">xyz</span> <span class="o">=</span> <span class="n">XYZColor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">xyz</span>
+
+
+<span class="k">def</span> <span class="nf">_xyz2rgb</span><span class="p">(</span><span class="n">xyz</span><span class="p">):</span>
+    <span class="n">var_X</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">x</span> <span class="o">/</span> <span class="mi">100</span>  <span class="c1"># X from 0 to  95.047</span>
+    <span class="n">var_Y</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">y</span> <span class="o">/</span> <span class="mi">100</span>  <span class="c1"># Y from 0 to 100.000</span>
+    <span class="n">var_Z</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">z</span> <span class="o">/</span> <span class="mi">100</span>  <span class="c1"># Z from 0 to 108.883</span>
+
+    <span class="n">var_R</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">*</span> <span class="mf">03.2406</span> <span class="o">+</span> <span class="n">var_Y</span> <span class="o">*</span> <span class="o">-</span><span class="mf">1.5372</span> <span class="o">+</span> <span class="n">var_Z</span> <span class="o">*</span> <span class="o">-</span><span class="mf">0.4986</span>
+    <span class="n">var_G</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">*</span> <span class="o">-</span><span class="mf">0.9689</span> <span class="o">+</span> <span class="n">var_Y</span> <span class="o">*</span> <span class="mf">01.8758</span> <span class="o">+</span> <span class="n">var_Z</span> <span class="o">*</span> <span class="mf">00.0415</span>
+    <span class="n">var_B</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">*</span> <span class="mf">00.0557</span> <span class="o">+</span> <span class="n">var_Y</span> <span class="o">*</span> <span class="o">-</span><span class="mf">0.2040</span> <span class="o">+</span> <span class="n">var_Z</span> <span class="o">*</span> <span class="mf">01.0570</span>
+
+    <span class="k">if</span> <span class="n">var_R</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
+        <span class="n">var_R</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_R</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_R</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_R</span>
+
+    <span class="k">if</span> <span class="n">var_G</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
+        <span class="n">var_G</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_G</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_G</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_G</span>
+
+    <span class="k">if</span> <span class="n">var_B</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
+        <span class="n">var_B</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_B</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">var_B</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_B</span>
+
+    <span class="n">R</span> <span class="o">=</span> <span class="n">var_R</span> <span class="o">*</span> <span class="mi">255</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">var_G</span> <span class="o">*</span> <span class="mi">255</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">var_B</span> <span class="o">*</span> <span class="mi">255</span>
+    <span class="n">rgb</span> <span class="o">=</span> <span class="n">RGBColor</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rgb</span>
+
+
+<span class="k">def</span> <span class="nf">_rgb2lab</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">_rgb2xyz</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_xyz2lab</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_lab2rgb</span><span class="p">(</span><span class="n">lab</span><span class="p">):</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">_lab2xyz</span><span class="p">(</span><span class="n">lab</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_xyz2rgb</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LabColor"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.LabColor">[docs]</a><span class="k">class</span> <span class="nc">LabColor</span><span class="p">:</span>
+<div class="viewcode-block" id="LabColor.__init__"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.LabColor.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">l</span> <span class="o">=</span> <span class="n">l</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">a</span> <span class="o">=</span> <span class="n">a</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span></div></div>
+
+
+<div class="viewcode-block" id="RGBColor"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.RGBColor">[docs]</a><span class="k">class</span> <span class="nc">RGBColor</span><span class="p">:</span>
+<div class="viewcode-block" id="RGBColor.__init__"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.RGBColor.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="n">r</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">b</span></div></div>
+
+
+<div class="viewcode-block" id="XYZColor"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.XYZColor">[docs]</a><span class="k">class</span> <span class="nc">XYZColor</span><span class="p">:</span>
+<div class="viewcode-block" id="XYZColor.__init__"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.XYZColor.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span></div></div>
+
+
+<div class="viewcode-block" id="distinguishable_colormap"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.distinguishable_colormap">[docs]</a><span class="k">def</span> <span class="nf">distinguishable_colormap</span><span class="p">(</span><span class="n">bg</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[],</span> <span class="n">nb_colors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generates colors that are maximally perceptually distinct.</span>
+
+<span class="sd">    This function generates a set of colors which are distinguishable</span>
+<span class="sd">    by reference to the &quot;Lab&quot; color space, which more closely matches</span>
+<span class="sd">    human color perception than RGB. Given an initial large list of possible</span>
+<span class="sd">    colors, it iteratively chooses the entry in the list that is farthest (in</span>
+<span class="sd">    Lab space) from all previously-chosen entries. While this &quot;greedy&quot;</span>
+<span class="sd">    algorithm does not yield a global maximum, it is simple and efficient.</span>
+<span class="sd">    Moreover, the sequence of colors is consistent no matter how many you</span>
+<span class="sd">    request, which facilitates the users&#39; ability to learn the color order</span>
+<span class="sd">    and avoids major changes in the appearance of plots when adding or</span>
+<span class="sd">    removing lines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    bg : tuple (optional)</span>
+<span class="sd">        Background RGB color, to make sure that your colors are also</span>
+<span class="sd">        distinguishable from the background. Default: (0, 0, 0).</span>
+<span class="sd">    exclude : list of tuples (optional)</span>
+<span class="sd">        Additional RGB colors to be distinguishable from.</span>
+<span class="sd">    nb_colors : int (optional)</span>
+<span class="sd">        Number of colors desired. Default: generate as many colors as needed.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    iterable of ndarray</span>
+<span class="sd">        If `nb_colors` is provided, returns a list of RBG colors.</span>
+<span class="sd">        Otherwise, yields the next RBG color maximally perceptually</span>
+<span class="sd">        distinct from previous ones.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from dipy.viz.colormap import distinguishable_colormap</span>
+<span class="sd">    &gt;&gt;&gt; # Generate 5 colors</span>
+<span class="sd">    &gt;&gt;&gt; [c for i, c in zip(range(5), distinguishable_colormap())]</span>
+<span class="sd">    [array([ 0.,  1.,  0.]),</span>
+<span class="sd">     array([ 1.,  0.,  1.]),</span>
+<span class="sd">     array([ 1.        ,  0.75862069,  0.03448276]),</span>
+<span class="sd">     array([ 0.        ,  1.        ,  0.89655172]),</span>
+<span class="sd">     array([ 0.        ,  0.17241379,  1.        ])]</span>
+
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Code was initially in matlab and was rewritten in Python for dipy by</span>
+<span class="sd">    the Dipy Team. Thank you Tim Holy for putting this online. Visit</span>
+<span class="sd">    http://www.mathworks.com/matlabcentral/fileexchange/29702 for the</span>
+<span class="sd">    original implementation (v1.2), 14 Dec 2010 (Updated 07 Feb 2011).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">NB_DIVISIONS</span> <span class="o">=</span> <span class="mi">30</span>  <span class="c1"># This constant come from the original code.</span>
+
+    <span class="c1"># Generate a sizable number of RGB triples. This represents our space of</span>
+    <span class="c1"># possible choices. By starting in RGB space, we ensure that all of the</span>
+    <span class="c1"># colors can be generated by the monitor.</span>
+
+    <span class="n">colors_to_exclude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bg</span><span class="p">]</span> <span class="o">+</span> <span class="n">exclude</span><span class="p">)</span>
+    <span class="c1"># Divisions along each axis in RGB space.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">NB_DIVISIONS</span><span class="p">)</span>
+    <span class="n">R</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">c_</span><span class="p">[</span><span class="n">R</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">G</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">B</span><span class="o">.</span><span class="n">flatten</span><span class="p">()]</span>
+
+    <span class="n">lab</span> <span class="o">=</span> <span class="n">_rgb2lab</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+    <span class="n">bglab</span> <span class="o">=</span> <span class="n">_rgb2lab</span><span class="p">(</span><span class="n">colors_to_exclude</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_generate_next_color</span><span class="p">():</span>
+        <span class="n">lastlab</span> <span class="o">=</span> <span class="n">bglab</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">mindist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rgb</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">for</span> <span class="n">bglab_i</span> <span class="ow">in</span> <span class="n">bglab</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">lab</span><span class="o">-</span><span class="n">bglab_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># Dist2 to closest previously-chosen color.</span>
+            <span class="n">mindist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">dist2</span><span class="p">,</span> <span class="n">mindist2</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">dX</span> <span class="o">=</span> <span class="n">lab</span> <span class="o">-</span> <span class="n">lastlab</span>  <span class="c1"># Displacement of last from all colors on list.</span>
+            <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dX</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Square distance.</span>
+            <span class="c1"># Dist2 to closest previously-chosen color.</span>
+            <span class="n">mindist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">dist2</span><span class="p">,</span> <span class="n">mindist2</span><span class="p">)</span>
+            <span class="c1"># Find the entry farthest from all previously-chosen colors.</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">mindist2</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+            <span class="n">lastlab</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">nb_colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nb_colors</span><span class="p">),</span> <span class="n">_generate_next_color</span><span class="p">())]</span>
+
+    <span class="k">return</span> <span class="n">_generate_next_color</span><span class="p">()</span></div>
 </pre></div>
 
            </div>
@@ -538,28 +805,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-        <script type="text/javascript" src="../../_static/copybutton.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
     <style>
     /* Sidebar header (and topbar for mobile) */
     .wy-side-nav-search, .wy-nav-top {

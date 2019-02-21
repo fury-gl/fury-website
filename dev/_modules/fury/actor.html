@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.1.4.post60+gf549fd1 documentation</title>
+  <title>fury.actor &mdash; FURY 0.1.4.post100+gb585d34 documentation</title>
   
 
   
@@ -19,34 +19,38 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -60,7 +64,7 @@
             
             
               <div class="version">
-                0.1.4.post60+gf549fd1
+                0.1.4.post100+gb585d34
               </div>
             
           
@@ -164,10 +168,12 @@
 <span class="kn">from</span> <span class="nn">vtk.util</span> <span class="k">import</span> <span class="n">numpy_support</span>
 
 <span class="kn">import</span> <span class="nn">fury.shaders</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="k">import</span> <span class="n">layout</span>
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="k">import</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">create_colormap</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">lines_to_vtk_polydata</span><span class="p">,</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">apply_affine</span><span class="p">,</span>
                         <span class="n">numpy_to_vtk_points</span><span class="p">,</span> <span class="n">numpy_to_vtk_colors</span><span class="p">,</span>
                         <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="n">numpy_to_vtk_matrix</span><span class="p">,</span> <span class="n">shallow_copy</span>
 
 
 <div class="viewcode-block" id="slicer"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.slicer">[docs]</a><span class="k">def</span> <span class="nf">slicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
@@ -1553,6 +1559,356 @@
     <span class="n">texta</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">texta</span></div>
+
+
+<div class="viewcode-block" id="text_3d"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.text_3d">[docs]</a><span class="k">def</span> <span class="nf">text_3d</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span> <span class="n">justification</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+            <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+            <span class="n">bold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">italic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shadow</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Generate 2D text that lives in the 3D world</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    text : str</span>
+<span class="sd">    position : tuple</span>
+<span class="sd">    color : tuple</span>
+<span class="sd">    font_size : int</span>
+<span class="sd">    font_family : str</span>
+<span class="sd">    justification : str</span>
+<span class="sd">        Left, center or right (default left)</span>
+<span class="sd">    vertical_justification : str</span>
+<span class="sd">        Bottom, middle or top (default bottom)</span>
+<span class="sd">    bold : bool</span>
+<span class="sd">    italic : bool</span>
+<span class="sd">    shadow : bool</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    textActor3D</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">TextActor3D</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkTextActor3D</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_message</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_user_matrix</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">get_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">font_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetFontSize</span><span class="p">(</span><span class="mi">24</span><span class="p">)</span>
+            <span class="n">text_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">((</span><span class="mf">1.</span><span class="o">/</span><span class="mf">24.</span><span class="o">*</span><span class="n">size</span><span class="p">,)</span><span class="o">*</span><span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_user_matrix</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">font_family</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetFontFamilyToArial</span><span class="p">()</span>
+            <span class="c1"># self._update_user_matrix()</span>
+
+        <span class="k">def</span> <span class="nf">justification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">justification</span><span class="p">):</span>
+            <span class="n">tprop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetJustificationToLeft</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetJustificationToCentered</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetJustificationToRight</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown justification: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">justification</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_user_matrix</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">vertical_justification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">justification</span><span class="p">):</span>
+            <span class="n">tprop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;top&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetVerticalJustificationToTop</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;middle&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetVerticalJustificationToCentered</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">SetVerticalJustificationToBottom</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown vertical justification: &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span>
+                                 <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">justification</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_user_matrix</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">font_style</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">italic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shadow</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+            <span class="n">tprop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">bold</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">BoldOn</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">BoldOff</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">italic</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">ItalicOn</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">ItalicOff</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">shadow</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">ShadowOn</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tprop</span><span class="o">.</span><span class="n">ShadowOff</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_user_matrix</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">get_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetPosition</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">_update_user_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot; Text justification of vtkTextActor3D doesn&#39;t seem to be</span>
+<span class="sd">            working, so we do it manually. Yeah!</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">user_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+            <span class="n">text_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">GetBoundingBox</span><span class="p">(</span><span class="n">text_bounds</span><span class="p">)</span>
+
+            <span class="n">tprop</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_LEFT</span><span class="p">:</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_CENTERED</span><span class="p">:</span>
+                <span class="n">tm</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">text_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">tm</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_RIGHT</span><span class="p">:</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetVerticalJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_BOTTOM</span><span class="p">:</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetVerticalJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_CENTERED</span><span class="p">:</span>
+                <span class="n">tm</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">text_bounds</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">)</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tm</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">tprop</span><span class="o">.</span><span class="n">GetVerticalJustification</span><span class="p">()</span> <span class="o">==</span> <span class="n">vtk</span><span class="o">.</span><span class="n">VTK_TEXT_TOP</span><span class="p">:</span>
+                <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">text_bounds</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">user_matrix</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetScale</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SetUserMatrix</span><span class="p">(</span><span class="n">numpy_to_vtk_matrix</span><span class="p">(</span><span class="n">user_matrix</span><span class="p">))</span>
+
+    <span class="n">text_actor</span> <span class="o">=</span> <span class="n">TextActor3D</span><span class="p">()</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">message</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">font_size</span><span class="p">(</span><span class="n">font_size</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">font_family</span><span class="p">(</span><span class="n">font_family</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">font_style</span><span class="p">(</span><span class="n">bold</span><span class="p">,</span> <span class="n">italic</span><span class="p">,</span> <span class="n">shadow</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">color</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">justification</span><span class="p">(</span><span class="n">justification</span><span class="p">)</span>
+    <span class="n">text_actor</span><span class="o">.</span><span class="n">vertical_justification</span><span class="p">(</span><span class="n">vertical_justification</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">text_actor</span></div>
+
+
+<div class="viewcode-block" id="Container"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container">[docs]</a><span class="k">class</span> <span class="nc">Container</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Provides functionalities for grouping multiple actors using a given</span>
+<span class="sd">    layout.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    anchor : 3-tuple of float</span>
+<span class="sd">        Anchor of this container used when laying out items in a container.</span>
+<span class="sd">        The anchor point is relative to the center of the container.</span>
+<span class="sd">        Default: (0, 0, 0).</span>
+
+<span class="sd">    padding : 6-tuple of float</span>
+<span class="sd">        Padding around this container bounding box. The 6-tuple represents</span>
+<span class="sd">        (pad_x_neg, pad_x_pos, pad_y_neg, pad_y_pos, pad_z_neg, pad_z_pos).</span>
+<span class="sd">        Default: (0, 0, 0, 0, 0, 0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Container.__init__"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="o">.</span><span class="n">Layout</span><span class="p">()):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        layout : ``fury.layout.Layout`` object</span>
+<span class="sd">            Items of this container will be arranged according to `layout`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visibility</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anchor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span>
+
+<div class="viewcode-block" id="Container.add"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds some items to this container.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        items : `vtkProp3D` objects</span>
+<span class="sd">            Items to add to this container.</span>
+<span class="sd">        borrow : bool</span>
+<span class="sd">            If True the items are added as-is, otherwise a shallow copy is</span>
+<span class="sd">            made first. If you intend to reuse the items elsewhere you</span>
+<span class="sd">            should set `borrow=False`. Default: True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;borrow&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">shallow_copy</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.clear"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.clear">[docs]</a>    <span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Clears all items of this container. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_items</span><span class="p">[:]</span></div>
+
+<div class="viewcode-block" id="Container.update"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Updates the position of the items of this container. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_items</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Container.add_to_scene"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.add_to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ren</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Adds the items of this container to a given renderer. &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ren</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.GetBounds"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.GetBounds">[docs]</a>    <span class="k">def</span> <span class="nf">GetBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the bounds of the container. &quot;&quot;&quot;</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>    <span class="c1"># x1, x2, y1, y2, z1, z2</span>
+        <span class="n">bounds</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>    <span class="c1"># x1, y1, z1</span>
+        <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>  <span class="c1"># x2, y2, z2</span>
+
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item_bounds</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">GetBounds</span><span class="p">()</span>
+            <span class="n">bounds</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">bounds</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">item_bounds</span><span class="p">[::</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="n">item_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="c1"># Add padding, if any.</span>
+        <span class="n">bounds</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.GetVisibility"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.GetVisibility">[docs]</a>    <span class="k">def</span> <span class="nf">GetVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visibility</span></div>
+
+<div class="viewcode-block" id="Container.SetVisibility"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.SetVisibility">[docs]</a>    <span class="k">def</span> <span class="nf">SetVisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visibility</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visibility</span> <span class="o">=</span> <span class="n">visibility</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">SetVisibility</span><span class="p">(</span><span class="n">visibility</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.GetPosition"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.GetPosition">[docs]</a>    <span class="k">def</span> <span class="nf">GetPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_position</span></div>
+
+<div class="viewcode-block" id="Container.AddPosition"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.AddPosition">[docs]</a>    <span class="k">def</span> <span class="nf">AddPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">+=</span> <span class="n">position</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">AddPosition</span><span class="p">(</span><span class="n">position</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.SetPosition"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.SetPosition">[docs]</a>    <span class="k">def</span> <span class="nf">SetPosition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AddPosition</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">position</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_position</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.GetCenter"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.GetCenter">[docs]</a>    <span class="k">def</span> <span class="nf">GetCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the center of the bounding box. &quot;&quot;&quot;</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetBounds</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">((</span><span class="n">x1</span><span class="o">+</span><span class="n">x2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="p">(</span><span class="n">y1</span><span class="o">+</span><span class="n">y2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">,</span> <span class="p">(</span><span class="n">z1</span><span class="o">+</span><span class="n">z2</span><span class="p">)</span><span class="o">/</span><span class="mf">2.</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.GetLength"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.GetLength">[docs]</a>    <span class="k">def</span> <span class="nf">GetLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the length of bounding box diagonal. &quot;&quot;&quot;</span>
+        <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetBounds</span><span class="p">()</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">depth</span> <span class="o">=</span> <span class="n">x2</span><span class="o">-</span><span class="n">x1</span><span class="p">,</span> <span class="n">y2</span><span class="o">-</span><span class="n">y1</span><span class="p">,</span> <span class="n">z2</span><span class="o">-</span><span class="n">z1</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">width</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">height</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">depth</span><span class="o">**</span><span class="mi">2</span><span class="p">]))</span></div>
+
+<div class="viewcode-block" id="Container.NewInstance"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.NewInstance">[docs]</a>    <span class="k">def</span> <span class="nf">NewInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Container</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Container.ShallowCopy"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.ShallowCopy">[docs]</a>    <span class="k">def</span> <span class="nf">ShallowCopy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_position</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">_position</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_anchor</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">_anchor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="n">other</span><span class="o">.</span><span class="n">_items</span><span class="p">,</span> <span class="n">borrow</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_items</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="grid"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.actor.grid">[docs]</a><span class="k">def</span> <span class="nf">grid</span><span class="p">(</span><span class="n">actors</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">cell_padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+         <span class="n">cell_shape</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">16</span><span class="o">/</span><span class="mf">9.</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Creates a grid of actors that lies in the xy-plane.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    actors : list of `vtkProp3D` objects</span>
+<span class="sd">        Actors to be layout in a grid manner.</span>
+<span class="sd">    captions : list of `vtkProp3D` objects</span>
+<span class="sd">        Objects serving as captions (can be any `vtkProp3D` object, not</span>
+<span class="sd">        necessarily text). There should be one caption per actor. By</span>
+<span class="sd">        default, there are no captions.</span>
+<span class="sd">    caption_offset : tuple of float (optional)</span>
+<span class="sd">        Tells where to position the caption w.r.t. the center of its</span>
+<span class="sd">        associated actor. Default: (0, -100, 0).</span>
+<span class="sd">    cell_padding : tuple of 2 floats or float</span>
+<span class="sd">        Each grid cell will be padded according to (pad_x, pad_y) i.e.</span>
+<span class="sd">        horizontally and vertically. Padding is evenly distributed on each</span>
+<span class="sd">        side of the cell. If a single float is provided then both pad_x and</span>
+<span class="sd">        pad_y will have the same value.</span>
+<span class="sd">    cell_shape : str</span>
+<span class="sd">        Specifies the desired shape of every grid cell.</span>
+<span class="sd">        &#39;rect&#39; ensures the cells are the tightest.</span>
+<span class="sd">        &#39;square&#39; ensures the cells are as wide as high.</span>
+<span class="sd">        &#39;diagonal&#39; ensures the content of the cells can be rotated without</span>
+<span class="sd">        colliding with content of the neighboring cells.</span>
+<span class="sd">    aspect_ratio : float</span>
+<span class="sd">        Aspect ratio of the grid (width/height). Default: 16:9.</span>
+<span class="sd">    dim : tuple of int</span>
+<span class="sd">        Dimension (nb_rows, nb_cols) of the grid. If provided,</span>
+<span class="sd">        `aspect_ratio` will be ignored.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ``fury.actor.Container`` object</span>
+<span class="sd">        Object that represents the grid containing all the actors and</span>
+<span class="sd">        captions, if any.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grid_layout</span> <span class="o">=</span> <span class="n">layout</span><span class="o">.</span><span class="n">GridLayout</span><span class="p">(</span><span class="n">cell_padding</span><span class="o">=</span><span class="n">cell_padding</span><span class="p">,</span>
+                                    <span class="n">cell_shape</span><span class="o">=</span><span class="n">cell_shape</span><span class="p">,</span>
+                                    <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">Container</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="n">grid_layout</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">captions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">actors_with_caption</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">actor</span><span class="p">,</span> <span class="n">caption</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">actors</span><span class="p">,</span> <span class="n">captions</span><span class="p">):</span>
+
+            <span class="n">actor_center</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">actor</span><span class="o">.</span><span class="n">GetCenter</span><span class="p">())</span>
+
+            <span class="c1"># Offset accordingly the caption w.r.t.</span>
+            <span class="c1"># the center of the associated actor.</span>
+            <span class="n">caption</span> <span class="o">=</span> <span class="n">shallow_copy</span><span class="p">(</span><span class="n">caption</span><span class="p">)</span>
+            <span class="n">caption</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">actor_center</span> <span class="o">+</span> <span class="n">caption_offset</span><span class="p">)</span>
+
+            <span class="n">actor_with_caption</span> <span class="o">=</span> <span class="n">Container</span><span class="p">()</span>
+            <span class="n">actor_with_caption</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">caption</span><span class="p">)</span>
+
+            <span class="c1"># We change the anchor of the container so</span>
+            <span class="c1"># the actor will be centered in the</span>
+            <span class="c1"># grid cell.</span>
+            <span class="n">actor_with_caption</span><span class="o">.</span><span class="n">anchor</span> <span class="o">=</span> <span class="n">actor_center</span> <span class="o">-</span> \
+                <span class="n">actor_with_caption</span><span class="o">.</span><span class="n">GetCenter</span><span class="p">()</span>
+            <span class="n">actors_with_caption</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor_with_caption</span><span class="p">)</span>
+
+        <span class="n">actors</span> <span class="o">=</span> <span class="n">actors_with_caption</span>
+
+    <span class="n">grid</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="n">actors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">grid</span></div>
 </pre></div>
 
            </div>
@@ -1582,28 +1938,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-        <script type="text/javascript" src="../../_static/copybutton.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
     <style>
     /* Sidebar header (and topbar for mobile) */
     .wy-side-nav-search, .wy-nav-top {
