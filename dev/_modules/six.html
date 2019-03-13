@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>six &mdash; FURY 0.2.0 documentation</title>
+  <title>six &mdash; FURY 0.2.0.post28+g238b334 documentation</title>
   
 
   
@@ -19,37 +19,39 @@
   
 
   
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" type="text/css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom_github.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
-
-  
-  <script src="../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -63,7 +65,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.0.post28+g238b334
               </div>
             
           
@@ -160,7 +162,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for six</h1><div class="highlight"><pre>
-<span></span><span class="c1"># Copyright (c) 2010-2017 Benjamin Peterson</span>
+<span></span><span class="c1"># Copyright (c) 2010-2018 Benjamin Peterson</span>
 <span class="c1">#</span>
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -191,7 +193,7 @@
 <span class="kn">import</span> <span class="nn">types</span>
 
 <span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Benjamin Peterson &lt;benjamin@python.org&gt;&quot;</span>
-<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.11.0&quot;</span>
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;1.12.0&quot;</span>
 
 
 <span class="c1"># Useful for very coarse version differentiation.</span>
@@ -1006,8 +1008,69 @@
                 <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">slots_var</span><span class="p">)</span>
         <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__dict__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">orig_vars</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;__weakref__&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="s1">&#39;__qualname__&#39;</span><span class="p">):</span>
+            <span class="n">orig_vars</span><span class="p">[</span><span class="s1">&#39;__qualname__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__qualname__</span>
         <span class="k">return</span> <span class="n">metaclass</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__bases__</span><span class="p">,</span> <span class="n">orig_vars</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">wrapper</span>
+
+
+<span class="k">def</span> <span class="nf">ensure_binary</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Coerce **s** to six.binary_type.</span>
+
+<span class="sd">    For Python 2:</span>
+<span class="sd">      - `unicode` -&gt; encoded to `str`</span>
+<span class="sd">      - `str` -&gt; `str`</span>
+
+<span class="sd">    For Python 3:</span>
+<span class="sd">      - `str` -&gt; encoded to `bytes`</span>
+<span class="sd">      - `bytes` -&gt; `bytes`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text_type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;not expecting type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">ensure_str</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Coerce *s* to `str`.</span>
+
+<span class="sd">    For Python 2:</span>
+<span class="sd">      - `unicode` -&gt; encoded to `str`</span>
+<span class="sd">      - `str` -&gt; `str`</span>
+
+<span class="sd">    For Python 3:</span>
+<span class="sd">      - `str` -&gt; `str`</span>
+<span class="sd">      - `bytes` -&gt; decoded to `str`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="p">(</span><span class="n">text_type</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;not expecting type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">PY2</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text_type</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">PY3</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+
+<span class="k">def</span> <span class="nf">ensure_text</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Coerce *s* to six.text_type.</span>
+
+<span class="sd">    For Python 2:</span>
+<span class="sd">      - `unicode` -&gt; `unicode`</span>
+<span class="sd">      - `str` -&gt; `unicode`</span>
+
+<span class="sd">    For Python 3:</span>
+<span class="sd">      - `str` -&gt; `str`</span>
+<span class="sd">      - `bytes` -&gt; decoded to `str`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">binary_type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">encoding</span><span class="p">,</span> <span class="n">errors</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">text_type</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;not expecting type &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+
 
 
 <span class="k">def</span> <span class="nf">python_2_unicode_compatible</span><span class="p">(</span><span class="n">klass</span><span class="p">):</span>
@@ -1063,7 +1126,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2019, FURY.
+        &copy; Copyright 2010-2019, FURY
 
     </p>
   </div>
@@ -1087,7 +1150,7 @@
       <dl>
         
             
-            <li><dd><a href="../dev/_modules/six">fury dev</a></dd></li>
+            <li><dt>fury dev</dt></li>
             
         
             
@@ -1095,11 +1158,11 @@
             
         
             
-            <li><dt>fury v0.2.x</dt></li>
+            <li><dd><a href="../v0.1.x/_modules/six">fury v0.1.x</a></dd></li>
             
         
             
-            <li><dd><a href="../v0.1.x/_modules/six">fury v0.1.x</a></dd></li>
+            <li><dd><a href="../v0.2.x/_modules/six">fury v0.2.x</a></dd></li>
             
         
       </dl>
@@ -1107,37 +1170,16 @@
   </div>
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../',
-            VERSION:'0.2.0',
-            LANGUAGE:'None',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../_static/jquery.js"></script>
-      <script type="text/javascript" src="../_static/underscore.js"></script>
-      <script type="text/javascript" src="../_static/doctools.js"></script>
-      <script type="text/javascript" src="../_static/copybutton.js"></script>
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@1/dist/clipboard.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
-      <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  <script type="text/javascript" src="../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>  
+  </script>
+
+  
+  
+    
+    
     <style>
     /* Sidebar header (and topbar for mobile) */
     .wy-side-nav-search, .wy-nav-top {
