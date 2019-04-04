@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.2.0.post28+g238b334 documentation</title>
+  <title>fury.actor &mdash; FURY 0.2.0.post46+ga7764b7 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.2.0.post28+g238b334
+                0.2.0.post46+ga7764b7
               </div>
             
           
@@ -172,7 +172,7 @@
 
 <span class="kn">import</span> <span class="nn">fury.shaders</span>
 <span class="kn">from</span> <span class="nn">fury</span> <span class="k">import</span> <span class="n">layout</span>
-<span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="k">import</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">create_colormap</span>
+<span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="k">import</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">create_colormap</span><span class="p">,</span> <span class="n">orient2rgb</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">lines_to_vtk_polydata</span><span class="p">,</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">apply_affine</span><span class="p">,</span>
                         <span class="n">numpy_to_vtk_points</span><span class="p">,</span> <span class="n">numpy_to_vtk_colors</span><span class="p">,</span>
                         <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">)</span>
@@ -1013,8 +1013,9 @@
 <span class="sd">    radial_scale : bool</span>
 <span class="sd">        Scale sphere points according to odf values.</span>
 <span class="sd">    colormap : None or str</span>
-<span class="sd">        If None then white color is used. Otherwise the name of colormap is</span>
-<span class="sd">        given. Matplotlib colormaps are supported (e.g., &#39;inferno&#39;).</span>
+<span class="sd">        If None then sphere vertices are used to compute orientation-based</span>
+<span class="sd">        color. Otherwise the name of colormap is given. Matplotlib colormaps</span>
+<span class="sd">        are supported (e.g., &#39;inferno&#39;).</span>
 <span class="sd">    global_cm : bool</span>
 <span class="sd">        If True the colormap will be applied in all ODFs. If False</span>
 <span class="sd">        it will be applied individually at each voxel (default False).</span>
@@ -1078,33 +1079,37 @@
     <span class="n">cells</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCellArray</span><span class="p">()</span>
     <span class="n">cells</span><span class="o">.</span><span class="n">SetCells</span><span class="p">(</span><span class="n">ncells</span><span class="p">,</span> <span class="n">all_faces_vtk</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">global_cm</span><span class="p">:</span>
-            <span class="n">cols</span> <span class="o">=</span> <span class="n">create_colormap</span><span class="p">(</span><span class="n">all_ms</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">colormap</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">global_cm</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;if global_cm=True, colormap must be defined&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ijk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="o">+</span> <span class="n">sphere</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
-                            <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f4&#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ijk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">create_colormap</span><span class="p">(</span><span class="n">all_ms</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">colormap</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ijk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],)</span> <span class="o">+</span> <span class="n">sphere</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f4&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ijk</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="n">create_colormap</span><span class="p">(</span><span class="n">all_ms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">colormap</span><span class="p">)</span>
-                <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">orient2rgb</span><span class="p">(</span><span class="n">sphere</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span>
+            <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-            <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                           <span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f4&#39;</span><span class="p">)</span>
+        <span class="n">cols</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="p">(</span><span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                       <span class="n">cols</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f4&#39;</span><span class="p">)</span>
 
-        <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols</span><span class="p">),</span>
-            <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">)</span>
+    <span class="n">vtk_colors</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">cols</span><span class="p">),</span>
+        <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">)</span>
 
-        <span class="n">vtk_colors</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;Colors&quot;</span><span class="p">)</span>
+    <span class="n">vtk_colors</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;Colors&quot;</span><span class="p">)</span>
 
     <span class="n">polydata</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
     <span class="n">polydata</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
     <span class="n">polydata</span><span class="o">.</span><span class="n">SetPolys</span><span class="p">(</span><span class="n">cells</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_colors</span><span class="p">)</span>
+    <span class="n">polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_colors</span><span class="p">)</span>
 
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">()</span>
     <span class="n">mapper</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">polydata</span><span class="p">)</span>
@@ -2047,15 +2052,15 @@
             
         
             
-            <li><dd><a href="../latest/_modules/fury/actor">fury latest</a></dd></li>
+            <li><dd><a href="/latest/_modules/fury/actor">fury latest</a></dd></li>
             
         
             
-            <li><dd><a href="../v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
             
         
             
-            <li><dd><a href="../v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
             
         
       </dl>
