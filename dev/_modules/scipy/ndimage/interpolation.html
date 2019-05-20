@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>scipy.ndimage.interpolation &mdash; FURY 0.2.0.post49+gfe24a08 documentation</title>
+  <title>scipy.ndimage.interpolation &mdash; FURY 0.2.0.post64+gebff099 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.2.0.post49+gfe24a08
+                0.2.0.post64+gebff099
               </div>
             
           
@@ -194,14 +194,14 @@
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
-<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_ni_support</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">_nd_image</span>
 <span class="kn">from</span> <span class="nn">._ni_docstrings</span> <span class="k">import</span> <span class="n">docdict</span>
-<span class="kn">from</span> <span class="nn">scipy.misc</span> <span class="k">import</span> <span class="n">doccer</span>
+<span class="kn">from</span> <span class="nn">scipy._lib</span> <span class="k">import</span> <span class="n">doccer</span>
 
 <span class="c1"># Change the default &#39;reflect&#39; to &#39;constant&#39; via modifying a copy of docdict</span>
 <span class="n">docdict_copy</span> <span class="o">=</span> <span class="n">docdict</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -234,7 +234,7 @@
 <span class="sd">        axis.</span>
 <span class="sd">    output : ndarray or dtype, optional</span>
 <span class="sd">        The array in which to place the output, or the dtype of the returned</span>
-<span class="sd">        array. Default is `numpy.float64`.</span>
+<span class="sd">        array. Default is ``numpy.float64``.</span>
 <span class="sd">    %(mode)s</span>
 
 <span class="sd">    Returns</span>
@@ -526,6 +526,12 @@
 <span class="sd">    is determined from the input image at position</span>
 <span class="sd">    ``np.dot(matrix, o) + offset``.</span>
 
+<span class="sd">    This does &#39;pull&#39; (or &#39;backward&#39;) resampling, transforming the output space</span>
+<span class="sd">    to the input to locate data. Affine transformations are often described in</span>
+<span class="sd">    the &#39;push&#39; (or &#39;forward&#39;) direction, transforming input to output. If you</span>
+<span class="sd">    have a matrix for the &#39;push&#39; transformation, use its inverse</span>
+<span class="sd">    (:func:`numpy.linalg.inv`) in this function.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    %(input)s</span>
@@ -782,18 +788,6 @@
     <span class="k">return</span> <span class="n">output</span>
 
 
-<span class="k">def</span> <span class="nf">_minmax</span><span class="p">(</span><span class="n">coor</span><span class="p">,</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-        <span class="n">minc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-        <span class="n">maxc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">coor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">minc</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">minc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">coor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">maxc</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">maxc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span>
-
-
 <span class="nd">@docfiller</span>
 <span class="k">def</span> <span class="nf">rotate</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">angle</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">reshape</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">cval</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">prefilter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -827,86 +821,100 @@
 <span class="sd">    rotate : ndarray</span>
 <span class="sd">        The rotated input.</span>
 
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from scipy import ndimage, misc</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; fig = plt.figure(figsize=(10, 3))</span>
+<span class="sd">    &gt;&gt;&gt; ax1, ax2, ax3 = fig.subplots(1, 3)</span>
+<span class="sd">    &gt;&gt;&gt; img = misc.ascent()</span>
+<span class="sd">    &gt;&gt;&gt; img_45 = ndimage.rotate(img, 45, reshape=False)</span>
+<span class="sd">    &gt;&gt;&gt; full_img_45 = ndimage.rotate(img, 45, reshape=True)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.imshow(img, cmap=&#39;gray&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax1.set_axis_off()</span>
+<span class="sd">    &gt;&gt;&gt; ax2.imshow(img_45, cmap=&#39;gray&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax2.set_axis_off()</span>
+<span class="sd">    &gt;&gt;&gt; ax3.imshow(full_img_45, cmap=&#39;gray&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; ax3.set_axis_off()</span>
+<span class="sd">    &gt;&gt;&gt; fig.set_tight_layout(True)</span>
+<span class="sd">    &gt;&gt;&gt; plt.show()</span>
+<span class="sd">    &gt;&gt;&gt; print(img.shape)</span>
+<span class="sd">    (512, 512)</span>
+<span class="sd">    &gt;&gt;&gt; print(img_45.shape)</span>
+<span class="sd">    (512, 512)</span>
+<span class="sd">    &gt;&gt;&gt; print(full_img_45.shape)</span>
+<span class="sd">    (724, 724)</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="nb">input</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+    <span class="n">input_arr</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="k">if</span> <span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;input array should be at least two-dimensional&#39;</span><span class="p">)</span>
+
     <span class="n">axes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
-    <span class="n">rank</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;axes should contain exactly two values&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span><span class="o">.</span><span class="n">is_integer</span><span class="p">()</span> <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">]):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;axes should contain only integer values&#39;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rank</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ndim</span>
     <span class="k">if</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rank</span>
-    <span class="k">if</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">rank</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">rank</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;invalid rotation plane specified&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">angle</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span> <span class="o">*</span> <span class="n">angle</span>
-    <span class="n">m11</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-    <span class="n">m12</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-    <span class="n">m21</span> <span class="o">=</span> <span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-    <span class="n">m22</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
-    <span class="n">matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m11</span><span class="p">,</span> <span class="n">m12</span><span class="p">],</span>
-                          <span class="p">[</span><span class="n">m21</span><span class="p">,</span> <span class="n">m22</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">iy</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-    <span class="n">ix</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">ndim</span>
+    <span class="k">if</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">ndim</span> <span class="ow">or</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">ndim</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;invalid rotation plane specified&#39;</span><span class="p">)</span>
+
+    <span class="n">axes</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="n">angle_rad</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">angle</span><span class="p">)</span>
+    <span class="n">c</span><span class="p">,</span> <span class="n">s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">angle_rad</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">angle_rad</span><span class="p">)</span>
+
+    <span class="n">rot_matrix</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">c</span><span class="p">,</span> <span class="n">s</span><span class="p">],</span>
+                              <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">,</span> <span class="n">c</span><span class="p">]])</span>
+
+    <span class="n">img_shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">input_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">in_plane_shape</span> <span class="o">=</span> <span class="n">img_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">reshape</span><span class="p">:</span>
-        <span class="n">mtrx</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">m11</span><span class="p">,</span> <span class="o">-</span><span class="n">m21</span><span class="p">],</span>
-                            <span class="p">[</span><span class="o">-</span><span class="n">m12</span><span class="p">,</span> <span class="n">m22</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="n">minc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">maxc</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mtrx</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ix</span><span class="p">])</span>
-        <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span> <span class="o">=</span> <span class="n">_minmax</span><span class="p">(</span><span class="n">coor</span><span class="p">,</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span><span class="p">)</span>
-        <span class="n">coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mtrx</span><span class="p">,</span> <span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-        <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span> <span class="o">=</span> <span class="n">_minmax</span><span class="p">(</span><span class="n">coor</span><span class="p">,</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span><span class="p">)</span>
-        <span class="n">coor</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">mtrx</span><span class="p">,</span> <span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="n">ix</span><span class="p">])</span>
-        <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span> <span class="o">=</span> <span class="n">_minmax</span><span class="p">(</span><span class="n">coor</span><span class="p">,</span> <span class="n">minc</span><span class="p">,</span> <span class="n">maxc</span><span class="p">)</span>
-        <span class="n">oy</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">minc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">ox</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">maxc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">minc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="c1"># Compute transformed input bounds</span>
+        <span class="n">iy</span><span class="p">,</span> <span class="n">ix</span> <span class="o">=</span> <span class="n">in_plane_shape</span>
+        <span class="n">out_bounds</span> <span class="o">=</span> <span class="n">rot_matrix</span> <span class="o">@</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">iy</span><span class="p">,</span> <span class="n">iy</span><span class="p">],</span>
+                                   <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">ix</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ix</span><span class="p">]]</span>
+        <span class="c1"># Compute the shape of the transformed input plane</span>
+        <span class="n">out_plane_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">out_bounds</span><span class="o">.</span><span class="n">ptp</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">oy</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">ox</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">oy</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">0.5</span>
-    <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ox</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">0.5</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">offset</span><span class="p">)</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-    <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">iy</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">0.5</span>
-    <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">ix</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">0.5</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="n">tmp</span> <span class="o">-</span> <span class="n">offset</span>
-    <span class="n">output_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-    <span class="n">output_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">oy</span>
-    <span class="n">output_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">ox</span>
+        <span class="n">out_plane_shape</span> <span class="o">=</span> <span class="n">img_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">]</span>
+
+    <span class="n">out_center</span> <span class="o">=</span> <span class="n">rot_matrix</span> <span class="o">@</span> <span class="p">((</span><span class="n">out_plane_shape</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">in_center</span> <span class="o">=</span> <span class="p">(</span><span class="n">in_plane_shape</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">in_center</span> <span class="o">-</span> <span class="n">out_center</span>
+
+    <span class="n">output_shape</span> <span class="o">=</span> <span class="n">img_shape</span>
+    <span class="n">output_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_plane_shape</span>
     <span class="n">output_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">output_shape</span><span class="p">)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">_ni_support</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="nb">input</span><span class="p">,</span>
-                                     <span class="n">shape</span><span class="o">=</span><span class="n">output_shape</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">affine_transform</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">output_shape</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">_ni_support</span><span class="o">.</span><span class="n">_get_output</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">input_arr</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">output_shape</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ndim</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">affine_transform</span><span class="p">(</span><span class="n">input_arr</span><span class="p">,</span> <span class="n">rot_matrix</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">output_shape</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span>
                          <span class="n">order</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cval</span><span class="p">,</span> <span class="n">prefilter</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">coordinates</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">size</span> <span class="o">//=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-        <span class="n">size</span> <span class="o">//=</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">ii</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">axes</span><span class="p">:</span>
-                <span class="n">coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">coordinates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-        <span class="n">iter_axes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">ndim</span><span class="p">))</span>
-        <span class="n">iter_axes</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
-        <span class="n">iter_axes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">iter_axes</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">os</span> <span class="o">=</span> <span class="p">(</span><span class="n">output_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">output_shape</span><span class="p">[</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
-        <span class="k">for</span> <span class="n">ii</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
-            <span class="n">ia</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)]</span>
-            <span class="n">oa</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">coordinates</span><span class="p">)]</span>
-            <span class="n">affine_transform</span><span class="p">(</span><span class="n">ia</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">os</span><span class="p">,</span> <span class="n">oa</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span>
-                             <span class="n">cval</span><span class="p">,</span> <span class="n">prefilter</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">jj</span> <span class="ow">in</span> <span class="n">iter_axes</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">coordinates</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nb">input</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">coordinates</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="k">break</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">coordinates</span><span class="p">[</span><span class="n">jj</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># If ndim &gt; 2, the rotation is applied over all the planes</span>
+        <span class="c1"># parallel to axes</span>
+        <span class="n">planes_coord</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">[[</span><span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)]</span> <span class="k">if</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span> <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="n">img_shape</span><span class="p">[</span><span class="n">ax</span><span class="p">])</span>
+              <span class="k">for</span> <span class="n">ax</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ndim</span><span class="p">)])</span>
+
+        <span class="n">out_plane_shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">out_plane_shape</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">coordinates</span> <span class="ow">in</span> <span class="n">planes_coord</span><span class="p">:</span>
+            <span class="n">ia</span> <span class="o">=</span> <span class="n">input_arr</span><span class="p">[</span><span class="n">coordinates</span><span class="p">]</span>
+            <span class="n">oa</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="n">coordinates</span><span class="p">]</span>
+            <span class="n">affine_transform</span><span class="p">(</span><span class="n">ia</span><span class="p">,</span> <span class="n">rot_matrix</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">out_plane_shape</span><span class="p">,</span>
+                             <span class="n">oa</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">cval</span><span class="p">,</span> <span class="n">prefilter</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">output</span>
 </pre></div>
 
