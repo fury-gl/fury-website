@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.2.0.post113+gf530a61 documentation</title>
+  <title>fury.actor &mdash; FURY 0.2.0.post131+g2f64d4c documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.2.0.post113+gf530a61
+                0.2.0.post131+g2f64d4c
               </div>
             
           
@@ -186,7 +186,8 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    data : array, shape (X, Y, Z) or (X, Y, Z, 3)</span>
-<span class="sd">        A grayscale or rgb 4D volume as a numpy array.</span>
+<span class="sd">        A grayscale or rgb 4D volume as a numpy array. If rgb then values</span>
+<span class="sd">        expected on the range [0, 255].</span>
 <span class="sd">    affine : array, shape (4, 4)</span>
 <span class="sd">        Grid to space (usually RAS 1mm) transformation matrix. Default is None.</span>
 <span class="sd">        If None then the identity matrix is used.</span>
@@ -215,6 +216,9 @@
 <span class="sd">        coordinates as calculated by the affine parameter.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">value_range</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
     <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
@@ -226,22 +230,23 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">nb_components</span> <span class="o">=</span> <span class="mi">1</span>
 
-    <span class="k">if</span> <span class="n">value_range</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">data</span><span class="o">.</span><span class="n">max</span><span class="p">()],</span> <span class="n">fp</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xp</span><span class="o">=</span><span class="p">[</span><span class="n">value_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">value_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="n">fp</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
-    <span class="n">vol</span> <span class="o">=</span> <span class="n">vol</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+    <span class="n">vol</span> <span class="o">=</span> <span class="n">data</span>
 
     <span class="n">im</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">()</span>
     <span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span> <span class="o">=</span> <span class="n">vol</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
     <span class="n">im</span><span class="o">.</span><span class="n">SetDimensions</span><span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">K</span><span class="p">)</span>
+    <span class="c1"># for now setting up for 1x1x1 but transformation comes later.</span>
     <span class="n">voxsz</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
     <span class="c1"># im.SetOrigin(0,0,0)</span>
     <span class="n">im</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="n">voxsz</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">voxsz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">voxsz</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">im</span><span class="o">.</span><span class="n">AllocateScalars</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">,</span> <span class="n">nb_components</span><span class="p">)</span>
+
+    <span class="n">vtk_type</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">get_vtk_array_type</span><span class="p">(</span><span class="n">vol</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">AllocateScalars</span><span class="p">(</span><span class="n">vtk_type</span><span class="p">,</span> <span class="n">nb_components</span><span class="p">)</span>
+    <span class="c1"># im.AllocateScalars(vtk.VTK_UNSIGNED_CHAR, nb_components)</span>
 
     <span class="c1"># copy data</span>
-    <span class="c1"># what I do below is the same as what is commented here but much faster</span>
+    <span class="c1"># what I do below is the same as what is</span>
+    <span class="c1"># commented here but much faster</span>
     <span class="c1"># for index in ndindex(vol.shape):</span>
     <span class="c1">#     i, j, k = index</span>
     <span class="c1">#     im.SetScalarComponentFromFloat(i, j, k, 0, vol[i, j, k])</span>
@@ -285,15 +290,40 @@
     <span class="n">image_resliced</span><span class="o">.</span><span class="n">SetInterpolationModeToLinear</span><span class="p">()</span>
     <span class="n">image_resliced</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
 
-    <span class="n">ex1</span><span class="p">,</span> <span class="n">ex2</span><span class="p">,</span> <span class="n">ey1</span><span class="p">,</span> <span class="n">ey2</span><span class="p">,</span> <span class="n">ez1</span><span class="p">,</span> <span class="n">ez2</span> <span class="o">=</span> <span class="n">image_resliced</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetExtent</span><span class="p">()</span>
+    <span class="n">vtk_resliced_data</span> <span class="o">=</span> <span class="n">image_resliced</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
+
+    <span class="n">ex1</span><span class="p">,</span> <span class="n">ex2</span><span class="p">,</span> <span class="n">ey1</span><span class="p">,</span> <span class="n">ey2</span><span class="p">,</span> <span class="n">ez1</span><span class="p">,</span> <span class="n">ez2</span> <span class="o">=</span> <span class="n">vtk_resliced_data</span><span class="o">.</span><span class="n">GetExtent</span><span class="p">()</span>
+
+    <span class="n">resliced</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span>
+        <span class="n">vtk_resliced_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">())</span>
+
+    <span class="c1"># swap axes here</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">resliced</span> <span class="o">=</span> <span class="n">resliced</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ez2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ey2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ex2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">resliced</span> <span class="o">=</span> <span class="n">resliced</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ez2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ey2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ex2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">ImageActor</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageActor</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">picker</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCellPicker</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">def</span> <span class="nf">input_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">):</span>
+
+            <span class="c1"># outline only</span>
+            <span class="n">outline</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkOutlineFilter</span><span class="p">()</span>
+            <span class="n">outline</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">vtk_resliced_data</span><span class="p">)</span>
+            <span class="n">outline_mapper</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">()</span>
+            <span class="n">outline_mapper</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">outline</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkActor</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">outline_mapper</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetLineWidth</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">outline_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetRenderLinesAsTubes</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># crucial</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">output</span> <span class="o">=</span> <span class="n">output</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ey2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ez2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
@@ -301,6 +331,10 @@
         <span class="k">def</span> <span class="nf">display_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">SetDisplayExtent</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetBounds</span><span class="p">()</span>
+            <span class="c1"># xmin, xmax, ymin, ymax, zmin, zmax = bounds</span>
+            <span class="c1"># line = np.array([[xmin, ymin, zmin]])</span>
+            <span class="c1"># self.outline_actor = actor.line()</span>
 
         <span class="k">def</span> <span class="nf">display</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">z</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -311,6 +345,21 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">display_extent</span><span class="p">(</span><span class="n">ex1</span><span class="p">,</span> <span class="n">ex2</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ez1</span><span class="p">,</span> <span class="n">ez2</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">display_extent</span><span class="p">(</span><span class="n">ex1</span><span class="p">,</span> <span class="n">ex2</span><span class="p">,</span> <span class="n">ey1</span><span class="p">,</span> <span class="n">ey2</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">resliced_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot; Returns resliced array as numpy array&quot;&quot;&quot;</span>
+            <span class="n">resliced</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span>
+                <span class="n">vtk_resliced_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">())</span>
+
+            <span class="c1"># swap axes here</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">resliced</span> <span class="o">=</span> <span class="n">resliced</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ez2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ey2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ex2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">resliced</span> <span class="o">=</span> <span class="n">resliced</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ez2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ey2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">ex2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">resliced</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">resliced</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">resliced</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">resliced</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resliced</span>
 
         <span class="k">def</span> <span class="nf">opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
@@ -331,12 +380,18 @@
                 <span class="n">im_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">BorderOn</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">im_actor</span>
 
+        <span class="k">def</span> <span class="nf">shallow_copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="c1"># TODO rename copy to shallow_copy</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="n">r1</span><span class="p">,</span> <span class="n">r2</span> <span class="o">=</span> <span class="n">value_range</span>
+
     <span class="n">image_actor</span> <span class="o">=</span> <span class="n">ImageActor</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">nb_components</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">lut</span> <span class="o">=</span> <span class="n">lookup_colormap</span>
         <span class="k">if</span> <span class="n">lookup_colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># Create a black/white lookup table.</span>
-            <span class="n">lut</span> <span class="o">=</span> <span class="n">colormap_lookup_table</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">lut</span> <span class="o">=</span> <span class="n">colormap_lookup_table</span><span class="p">((</span><span class="n">r1</span><span class="p">,</span> <span class="n">r2</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="n">plane_colors</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageMapToColors</span><span class="p">()</span>
         <span class="n">plane_colors</span><span class="o">.</span><span class="n">SetLookupTable</span><span class="p">(</span><span class="n">lut</span><span class="p">)</span>
