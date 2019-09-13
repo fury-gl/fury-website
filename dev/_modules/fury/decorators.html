@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.decorators &mdash; FURY 0.3.0.post3+g612700d documentation</title>
+  <title>fury.decorators &mdash; FURY 0.3.0.post104+gd1a78c7 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.3.0.post3+g612700d
+                0.3.0.post104+gd1a78c7
               </div>
             
           
@@ -167,14 +167,17 @@
 <span></span><span class="sd">&quot;&quot;&quot;Decorators for FURY tests.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
 
 
-<span class="n">SKIP_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;(\s*&gt;&gt;&gt;.*?)(\s*)#\s*skip\s+if\s+(.*)$&quot;</span><span class="p">)</span>
+<span class="n">skip_osx</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span>
+<span class="n">skip_win</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;windows&quot;</span>
+<span class="n">SKIP_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\s*&gt;&gt;&gt;.*?)(\s*)#\s*skip\s+if\s+(.*)$&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="doctest_skip_parser"><a class="viewcode-back" href="../../reference/fury.decorators.html#fury.decorators.doctest_skip_parser">[docs]</a><span class="k">def</span> <span class="nf">doctest_skip_parser</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Decorator replaces custom skip test markup in doctests.</span>
+
 <span class="sd">    Say a function has a docstring::</span>
 <span class="sd">    &gt;&gt;&gt; something # skip if not HAVE_AMODULE</span>
 <span class="sd">    &gt;&gt;&gt; something + else</span>
@@ -189,6 +192,7 @@
 <span class="sd">    &gt;&gt;&gt; something # doctest: +SKIP</span>
 <span class="sd">    &gt;&gt;&gt; something + else</span>
 <span class="sd">    &gt;&gt;&gt; something</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">new_lines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -203,32 +207,6 @@
         <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
     <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_lines</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span></div>
-
-
-<span class="c1">###</span>
-<span class="c1"># In some cases (e.g., on Travis), we want to use a virtual frame-buffer for</span>
-<span class="c1"># testing. The following decorator runs the tests under xvfb (mediated by</span>
-<span class="c1"># xvfbwrapper) conditioned on an environment variable (that we set in</span>
-<span class="c1"># .travis.yml for these cases):</span>
-<span class="n">use_xvfb</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;TEST_WITH_XVFB&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="xvfb_it"><a class="viewcode-back" href="../../reference/fury.decorators.html#fury.decorators.xvfb_it">[docs]</a><span class="k">def</span> <span class="nf">xvfb_it</span><span class="p">(</span><span class="n">my_test</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Run a test with xvfbwrapper.&quot;&quot;&quot;</span>
-    <span class="c1"># When we use verbose testing we want the name:</span>
-    <span class="n">fname</span> <span class="o">=</span> <span class="n">my_test</span><span class="o">.</span><span class="vm">__name__</span>
-
-    <span class="k">def</span> <span class="nf">test_with_xvfb</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">use_xvfb</span><span class="p">:</span>
-            <span class="kn">from</span> <span class="nn">xvfbwrapper</span> <span class="k">import</span> <span class="n">Xvfb</span>
-            <span class="n">display</span> <span class="o">=</span> <span class="n">Xvfb</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="mi">1920</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1080</span><span class="p">)</span>
-            <span class="n">display</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="n">my_test</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">use_xvfb</span><span class="p">:</span>
-            <span class="n">display</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-    <span class="c1"># Plant it back in and return the new function:</span>
-    <span class="n">test_with_xvfb</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">fname</span>
-    <span class="k">return</span> <span class="n">test_with_xvfb</span></div>
 </pre></div>
 
            </div>
@@ -273,15 +251,15 @@
             
         
             
+            <li><dd><a href="/v0.2.x/_modules/fury/decorators">fury v0.2.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.1.x/_modules/fury/decorators">fury v0.1.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.3.x/_modules/fury/decorators">fury v0.3.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.2.x/_modules/fury/decorators">fury v0.2.x</a></dd></li>
             
         
       </dl>
