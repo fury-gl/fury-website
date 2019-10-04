@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.window &mdash; FURY 0.3.0.post152+g57cce56 documentation</title>
+  <title>fury.window &mdash; FURY 0.3.0.post164+g4889cb4 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.3.0.post152+g57cce56
+                0.3.0.post164+g4889cb4
               </div>
             
           
@@ -386,7 +386,19 @@
 <span class="sd">        focal point. This is usually the opposite of the ViewPlaneNormal, the</span>
 <span class="sd">        vector perpendicular to the screen, unless the view is oblique.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetActiveCamera</span><span class="p">()</span><span class="o">.</span><span class="n">GetDirectionOfProjection</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetActiveCamera</span><span class="p">()</span><span class="o">.</span><span class="n">GetDirectionOfProjection</span><span class="p">()</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">rtis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetLastRenderTimeInSeconds</span><span class="p">()</span>
+        <span class="n">fps</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">rtis</span>
+        <span class="k">return</span> <span class="n">fps</span>
+
+<div class="viewcode-block" id="Scene.fxaa_on"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.Scene.fxaa_on">[docs]</a>    <span class="k">def</span> <span class="nf">fxaa_on</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetUseFXAA</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Scene.fxaa_off"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.Scene.fxaa_off">[docs]</a>    <span class="k">def</span> <span class="nf">fxaa_off</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SetUseFXAA</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="Renderer"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.Renderer">[docs]</a><span class="k">class</span> <span class="nc">Renderer</span><span class="p">(</span><span class="n">Scene</span><span class="p">):</span>
@@ -511,7 +523,8 @@
 
 <div class="viewcode-block" id="ShowManager.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;FURY&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
                  <span class="n">png_magnify</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">interactor_style</span><span class="o">=</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">):</span>
+                 <span class="n">interactor_style</span><span class="o">=</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+                 <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Manage the visualization pipeline.</span>
 
 <span class="sd">        Parameters</span>
@@ -550,6 +563,14 @@
 <span class="sd">                &#39;right&#39;: Right eye only. \n</span>
 <span class="sd">                &#39;horizontal&#39;: Side-by-side.</span>
 
+<span class="sd">        multi_samples : int</span>
+<span class="sd">            Number of samples for anti-aliazing (Default 8).</span>
+<span class="sd">            For no anti-aliasing use 0.</span>
+<span class="sd">        max_peels : int</span>
+<span class="sd">            Maximum number of peels for depth peeling (Default 4).</span>
+<span class="sd">        occlusion_ratio : float</span>
+<span class="sd">            Occlusion ration for depth peeling (Default 0 - exact image).</span>
+
 <span class="sd">        Attributes</span>
 <span class="sd">        ----------</span>
 <span class="sd">        scene : Scene() or vtkRenderer()</span>
@@ -563,15 +584,6 @@
 <span class="sd">        render()</span>
 <span class="sd">        start()</span>
 <span class="sd">        add_window_callback()</span>
-
-<span class="sd">        Notes</span>
-<span class="sd">        -----</span>
-<span class="sd">        Default interaction keys for</span>
-
-<span class="sd">        * 3d navigation are with left, middle and right mouse dragging</span>
-<span class="sd">        * resetting the camera press &#39;r&#39;</span>
-<span class="sd">        * saving a screenshot press &#39;s&#39;</span>
-<span class="sd">        * for quiting press &#39;q&#39;</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -614,24 +626,8 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_transparent</span><span class="p">:</span>
 
-            <span class="c1"># Use a render window with alpha bits</span>
-            <span class="c1"># as default is 0 (false))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">SetAlphaBitPlanes</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-
-            <span class="c1"># Force to not pick a framebuffer with a multisample buffer</span>
-            <span class="c1"># (default is 8)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">SetMultiSamples</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-            <span class="c1"># Choose to use depth peeling (if supported)</span>
-            <span class="c1"># (default is 0 (false)):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">UseDepthPeelingOn</span><span class="p">()</span>
-
-            <span class="c1"># Set depth peeling parameters</span>
-            <span class="c1"># Set the maximum number of rendering passes (default is 4)</span>
-            <span class="n">scene</span><span class="o">.</span><span class="n">SetMaximumNumberOfPeels</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-
-            <span class="c1"># Set the occlusion ratio (initial value is 0.0, exact image):</span>
-            <span class="n">scene</span><span class="o">.</span><span class="n">SetOcclusionRatio</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">antialiasing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span>
+                         <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactor_style</span> <span class="o">==</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleImage</span><span class="p">()</span>
@@ -819,7 +815,8 @@
 
 
 <div class="viewcode-block" id="show"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;FURY&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">png_magnify</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-         <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">):</span>
+         <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+         <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Show window with current scene.</span>
 
 <span class="sd">    Parameters</span>
@@ -842,7 +839,7 @@
 <span class="sd">        actors according to their relative position to the camera. The default</span>
 <span class="sd">        option which is False will order the actors according to the order of</span>
 <span class="sd">        their addition to the Scene().</span>
-<span class="sd">    stereo: string</span>
+<span class="sd">    stereo : string</span>
 <span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
 <span class="sd">            &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
 <span class="sd">                      &#39;CrystalEyes&#39; by VTK. \n</span>
@@ -854,14 +851,13 @@
 <span class="sd">            &#39;right&#39;: Right eye only. \n</span>
 <span class="sd">            &#39;horizontal&#39;: Side-by-side.</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    Default interaction keys for</span>
-
-<span class="sd">    * 3d navigation are with left, middle and right mouse dragging</span>
-<span class="sd">    * resetting the camera press &#39;r&#39;</span>
-<span class="sd">    * saving a screenshot press &#39;s&#39;</span>
-<span class="sd">    * for quiting press &#39;q&#39;</span>
+<span class="sd">    multi_samples : int</span>
+<span class="sd">        Number of samples for anti-aliazing (Default 8).</span>
+<span class="sd">        For no anti-aliasing use 0.</span>
+<span class="sd">    max_peels : int</span>
+<span class="sd">        Maximum number of peels for depth peeling (Default 4).</span>
+<span class="sd">    occlusion_ratio : float</span>
+<span class="sd">        Occlusion ration for depth peeling (Default 0 - exact image).</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    ----------</span>
@@ -1019,8 +1015,47 @@
         <span class="n">ang</span> <span class="o">=</span> <span class="o">+</span><span class="n">az_ang</span></div>
 
 
+<div class="viewcode-block" id="antialiasing"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.antialiasing">[docs]</a><span class="k">def</span> <span class="nf">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">win</span><span class="p">,</span> <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Enable anti-aliasing and ordered transparency</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    scene : Scene</span>
+<span class="sd">    win : Window</span>
+<span class="sd">        Provided by Showmanager.window attribute.</span>
+<span class="sd">    multi_samples : int</span>
+<span class="sd">        Number of samples for anti-aliazing (Default 8).</span>
+<span class="sd">        For no anti-aliasing use 0.</span>
+<span class="sd">    max_peels : int</span>
+<span class="sd">        Maximum number of peels for depth peeling (Default 4).</span>
+<span class="sd">    occlusion_ratio : float</span>
+<span class="sd">        Occlusion ration for depth peeling (Default 0 - exact image).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Use a render window with alpha bits</span>
+    <span class="c1"># as default is 0 (false))</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">SetAlphaBitPlanes</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Force to not pick a framebuffer with a multisample buffer</span>
+    <span class="c1"># (default is 8)</span>
+    <span class="n">win</span><span class="o">.</span><span class="n">SetMultiSamples</span><span class="p">(</span><span class="n">multi_samples</span><span class="p">)</span>
+
+    <span class="c1"># Choose to use depth peeling (if supported)</span>
+    <span class="c1"># (default is 0 (false)):</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">UseDepthPeelingOn</span><span class="p">()</span>
+
+    <span class="c1"># Set depth peeling parameters</span>
+    <span class="c1"># Set the maximum number of rendering passes (default is 4)</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">SetMaximumNumberOfPeels</span><span class="p">(</span><span class="n">max_peels</span><span class="p">)</span>
+
+    <span class="c1"># Set the occlusion ratio (initial value is 0.0, exact image):</span>
+    <span class="n">scene</span><span class="o">.</span><span class="n">SetOcclusionRatio</span><span class="p">(</span><span class="n">occlusion_ratio</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="snapshot"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.snapshot">[docs]</a><span class="k">def</span> <span class="nf">snapshot</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">offscreen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-             <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">):</span>
+             <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+             <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+             <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a snapshot of the scene in a file or in memory.</span>
 
 <span class="sd">    Parameters</span>
@@ -1035,6 +1070,8 @@
 <span class="sd">        Default True. Go stealthmode no window should appear.</span>
 <span class="sd">    order_transparent : bool</span>
 <span class="sd">        Default False. Use depth peeling to sort transparent objects.</span>
+<span class="sd">        If True also enables anti-aliasing.</span>
+
 <span class="sd">    stereo: string</span>
 <span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
 <span class="sd">            &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
@@ -1047,6 +1084,14 @@
 <span class="sd">            &#39;right&#39;: Right eye only. \n</span>
 <span class="sd">            &#39;horizontal&#39;: Side-by-side.</span>
 
+<span class="sd">    multi_samples : int</span>
+<span class="sd">        Number of samples for anti-aliazing (Default 8).</span>
+<span class="sd">        For no anti-aliasing use 0.</span>
+<span class="sd">    max_peels : int</span>
+<span class="sd">        Maximum number of peels for depth peeling (Default 4).</span>
+<span class="sd">    occlusion_ratio : float</span>
+<span class="sd">        Occlusion ration for depth peeling (Default 0 - exact image).</span>
+
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    arr : ndarray</span>
@@ -1055,12 +1100,6 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">size</span>
-
-    <span class="k">if</span> <span class="n">offscreen</span><span class="p">:</span>
-        <span class="n">graphics_factory</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkGraphicsFactory</span><span class="p">()</span>
-        <span class="n">graphics_factory</span><span class="o">.</span><span class="n">SetOffScreenOnlyMode</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># TODO check if the line below helps in something</span>
-        <span class="c1"># graphics_factory.SetUseMesaClasses(1)</span>
 
     <span class="n">render_window</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkRenderWindow</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">offscreen</span><span class="p">:</span>
@@ -1071,25 +1110,8 @@
     <span class="n">render_window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">order_transparent</span><span class="p">:</span>
-
-        <span class="c1"># Use a render window with alpha bits</span>
-        <span class="c1"># as default is 0 (false))</span>
-        <span class="n">render_window</span><span class="o">.</span><span class="n">SetAlphaBitPlanes</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># Force to not pick a framebuffer with a multisample buffer</span>
-        <span class="c1"># (default is 8)</span>
-        <span class="n">render_window</span><span class="o">.</span><span class="n">SetMultiSamples</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="c1"># Choose to use depth peeling (if supported)</span>
-        <span class="c1"># (default is 0 (false)):</span>
-        <span class="n">scene</span><span class="o">.</span><span class="n">UseDepthPeelingOn</span><span class="p">()</span>
-
-        <span class="c1"># Set depth peeling parameters</span>
-        <span class="c1"># Set the maximum number of rendering passes (default is 4)</span>
-        <span class="n">scene</span><span class="o">.</span><span class="n">SetMaximumNumberOfPeels</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-
-        <span class="c1"># Set the occlusion ratio (initial value is 0.0, exact image):</span>
-        <span class="n">scene</span><span class="o">.</span><span class="n">SetOcclusionRatio</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">render_window</span><span class="p">,</span> <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span>
+                     <span class="n">occlusion_ratio</span><span class="p">)</span>
 
     <span class="n">render_window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
 
@@ -1308,11 +1330,11 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/window">fury v0.2.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/window">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
             
         
       </dl>
