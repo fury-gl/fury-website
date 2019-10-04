@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.3.0.post139+g8f47a4f documentation</title>
+  <title>fury.actor &mdash; FURY 0.3.0.post152+g57cce56 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.3.0.post139+g8f47a4f
+                0.3.0.post152+g57cce56
               </div>
             
           
@@ -175,8 +175,9 @@
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="k">import</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">create_colormap</span><span class="p">,</span> <span class="n">orient2rgb</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="p">(</span><span class="n">lines_to_vtk_polydata</span><span class="p">,</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">apply_affine</span><span class="p">,</span>
                         <span class="n">numpy_to_vtk_points</span><span class="p">,</span> <span class="n">numpy_to_vtk_colors</span><span class="p">,</span>
-                        <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="n">numpy_to_vtk_matrix</span><span class="p">,</span> <span class="n">shallow_copy</span>
+                        <span class="n">numpy_to_vtk_matrix</span><span class="p">,</span> <span class="n">shallow_copy</span><span class="p">,</span>
+                        <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">,</span>
+                        <span class="n">repeat_sources</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="slicer"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.slicer">[docs]</a><span class="k">def</span> <span class="nf">slicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value_range</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
@@ -904,25 +905,6 @@
     <span class="k">return</span> <span class="n">scalar_bar</span></div>
 
 
-<span class="k">def</span> <span class="nf">_arrow</span><span class="p">(</span><span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Internal function for generating arrow actors.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">arrow</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkArrowSource</span><span class="p">()</span>
-    <span class="c1"># arrow.SetTipLength(length)</span>
-
-    <span class="n">arrowm</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">()</span>
-    <span class="n">arrowm</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">arrow</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
-
-    <span class="n">arrowa</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkActor</span><span class="p">()</span>
-    <span class="n">arrowa</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">arrowm</span><span class="p">)</span>
-
-    <span class="n">arrowa</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
-    <span class="n">arrowa</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
-    <span class="n">arrowa</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">arrowa</span>
-
-
 <div class="viewcode-block" id="axes"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.axes">[docs]</a><span class="k">def</span> <span class="nf">axes</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">colorx</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colory</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colorz</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
          <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Create an actor with the coordinate&#39;s system axes where</span>
@@ -943,22 +925,17 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    vtkAssembly</span>
+<span class="sd">    vtkActor</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">arrowx</span> <span class="o">=</span> <span class="n">_arrow</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">colorx</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
-    <span class="n">arrowy</span> <span class="o">=</span> <span class="n">_arrow</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">colory</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
-    <span class="n">arrowz</span> <span class="o">=</span> <span class="n">_arrow</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">colorz</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">)</span>
+    <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">dirs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">colorx</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,),</span>
+                       <span class="n">colory</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,),</span>
+                       <span class="n">colorz</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,)])</span>
+    <span class="n">heights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
-    <span class="n">arrowy</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
-    <span class="n">arrowz</span><span class="o">.</span><span class="n">RotateY</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span>
-
-    <span class="n">ass</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkAssembly</span><span class="p">()</span>
-    <span class="n">ass</span><span class="o">.</span><span class="n">AddPart</span><span class="p">(</span><span class="n">arrowx</span><span class="p">)</span>
-    <span class="n">ass</span><span class="o">.</span><span class="n">AddPart</span><span class="p">(</span><span class="n">arrowy</span><span class="p">)</span>
-    <span class="n">ass</span><span class="o">.</span><span class="n">AddPart</span><span class="p">(</span><span class="n">arrowz</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">ass</span></div>
+    <span class="k">return</span> <span class="n">arrow</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="odf_slicer"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.odf_slicer">[docs]</a><span class="k">def</span> <span class="nf">odf_slicer</span><span class="p">(</span><span class="n">odfs</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sphere</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">2.2</span><span class="p">,</span>
@@ -1587,12 +1564,15 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Spheres positions</span>
 <span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
 <span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
 <span class="sd">    radii : float or ndarray, shape (N,)</span>
+<span class="sd">        Sphere radius</span>
 <span class="sd">    theta : int</span>
 <span class="sd">    phi : int</span>
 <span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the sphere.</span>
 <span class="sd">    faces : ndarray, shape (M, 3)</span>
 <span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
 <span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
@@ -1611,68 +1591,239 @@
 <span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSphereSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">radii</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-        <span class="n">radii</span> <span class="o">=</span> <span class="n">radii</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f8&#39;</span><span class="p">)</span>
-
-    <span class="n">pts</span> <span class="o">=</span> <span class="n">numpy_to_vtk_points</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">centers</span><span class="p">))</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
-    <span class="n">cols</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s1">&#39;colors&#39;</span><span class="p">)</span>
-
-    <span class="n">radii_fa</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">radii</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;f8&#39;</span><span class="p">)),</span> <span class="n">deep</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">radii_fa</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s1">&#39;rad&#39;</span><span class="p">)</span>
-
-    <span class="n">polydata_centers</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
-    <span class="n">polydata_sphere</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSphereSource</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetRadius</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetThetaResolution</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetPhiResolution</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
 
-    <span class="k">else</span><span class="p">:</span>
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                           <span class="n">active_scalars</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
 
-        <span class="n">set_polydata_vertices</span><span class="p">(</span><span class="n">polydata_sphere</span><span class="p">,</span> <span class="n">vertices</span><span class="p">)</span>
-        <span class="n">set_polydata_triangles</span><span class="p">(</span><span class="n">polydata_sphere</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">actor</span></div>
 
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">radii_fa</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetActiveScalars</span><span class="p">(</span><span class="s1">&#39;rad&#39;</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 
-    <span class="n">glyph</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkGlyph3D</span><span class="p">()</span>
+<div class="viewcode-block" id="cylinder"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.cylinder">[docs]</a><span class="k">def</span> <span class="nf">cylinder</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+             <span class="n">capped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many cylinder with different features.</span>
 
-    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceConnection</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceData</span><span class="p">(</span><span class="n">polydata_sphere</span><span class="p">)</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Cylinder positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the cylinder.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        cylinder radius, default: 1</span>
+<span class="sd">    heights : ndarray, shape (N)</span>
+<span class="sd">        The height of the arrow.</span>
+<span class="sd">    capped : bool</span>
+<span class="sd">        Turn on/off whether to cap cylinder with polygons. Default (False)</span>
+<span class="sd">    resolution: int</span>
+<span class="sd">        Number of facets used to define cylinder.</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the sphere.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
+<span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
 
-    <span class="n">glyph</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">polydata_centers</span><span class="p">)</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
 
-    <span class="n">mapper</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">()</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">())</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SetScalarModeToUsePointFieldData</span><span class="p">()</span>
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
+<span class="sd">    &gt;&gt;&gt; actor = actor.cylinder(centers, dirs, (1, 1, 1), heights=heights)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SelectColorArray</span><span class="p">(</span><span class="s1">&#39;colors&#39;</span><span class="p">)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCylinderSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="n">actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkActor</span><span class="p">()</span>
-    <span class="n">actor</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetCapping</span><span class="p">(</span><span class="n">capped</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetResolution</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetRadius</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
 
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                           <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                           <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">actor</span></div>
+
+
+<div class="viewcode-block" id="box"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.box">[docs]</a><span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many Box with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Box positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the box.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    size : tuple (3,)</span>
+<span class="sd">        Box lengths on each direction (x, y, z), default(1, 2, 3)</span>
+<span class="sd">    heights : ndarray, shape (N)</span>
+<span class="sd">        The height of the arrow.</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the sphere.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
+<span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
+<span class="sd">    &gt;&gt;&gt; box_actor = actor.box(centers, dirs, (1, 1, 1), heights=heights)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(box_actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCubeSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetXLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetYLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetZLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                           <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                           <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">actor</span></div>
+
+
+<div class="viewcode-block" id="cube"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.cube">[docs]</a><span class="k">def</span> <span class="nf">cube</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+         <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many cube with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Cube positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the cube.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    heights : ndarray, shape (N)</span>
+<span class="sd">        The height of the arrow.</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the sphere.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
+<span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
+<span class="sd">    &gt;&gt;&gt; cube_actor = actor.cube(centers, dirs, (1, 1, 1), heights=heights)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(cubeactor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">box</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+               <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="arrow"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.arrow">[docs]</a><span class="k">def</span> <span class="nf">arrow</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+          <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">tip_radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shaft_radius</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
+          <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many arrow with differents features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Arrow positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the arrow.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    heights : ndarray, shape (N)</span>
+<span class="sd">        The height of the arrow.</span>
+<span class="sd">    resolution : int</span>
+<span class="sd">        The resolution of the arrow.</span>
+<span class="sd">    tip_length : float</span>
+<span class="sd">        The tip size of the arrow (default: 0.35)</span>
+<span class="sd">    tip_radius : float</span>
+<span class="sd">        the tip radius of the arrow (default: 0.1)</span>
+<span class="sd">    shaft_radius : float</span>
+<span class="sd">        The shaft radius of the arrow (default: 0.03)</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the arrow.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        If faces is None then a arrow is created based on directions, heights</span>
+<span class="sd">        and resolution. If not then a arrow is created with the provided</span>
+<span class="sd">        vertices and faces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; directions = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
+<span class="sd">    &gt;&gt;&gt; arrow_actor = actor.arrow(centers, directions, (1, 1, 1), heights)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(arrow_actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkArrowSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetTipResolution</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetShaftResolution</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetTipLength</span><span class="p">(</span><span class="n">tip_length</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetTipRadius</span><span class="p">(</span><span class="n">tip_radius</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetShaftRadius</span><span class="p">(</span><span class="n">shaft_radius</span><span class="p">)</span>
+
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                           <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">actor</span></div>
 
 
 <div class="viewcode-block" id="cone"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.cone">[docs]</a><span class="k">def</span> <span class="nf">cone</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
          <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualize one or many cones with different colors and radii</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many cones with different features.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Cone positions</span>
 <span class="sd">    directions : ndarray, shape (N, 3)</span>
 <span class="sd">        The orientation vector of the cone.</span>
 <span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
@@ -1682,6 +1833,7 @@
 <span class="sd">    resolution : int</span>
 <span class="sd">        The resolution of the cone.</span>
 <span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the cone.</span>
 <span class="sd">    faces : ndarray, shape (M, 3)</span>
 <span class="sd">        If faces is None then a cone is created based on directions, heights</span>
 <span class="sd">        and resolution. If not then a cone is created with the provided</span>
@@ -1703,62 +1855,14 @@
 <span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">),</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkConeSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="n">pts</span> <span class="o">=</span> <span class="n">numpy_to_vtk_points</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">centers</span><span class="p">))</span>
-    <span class="n">cols</span> <span class="o">=</span> <span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
-    <span class="n">cols</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s1">&#39;colors&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">heights_fa</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">heights</span><span class="p">),</span>
-                                                <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                                <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_DOUBLE</span><span class="p">)</span>
-        <span class="n">heights_fa</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s1">&#39;heights&#39;</span><span class="p">)</span>
-    <span class="n">directions_fa</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">directions</span><span class="p">),</span>
-                                               <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                               <span class="n">array_type</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_DOUBLE</span><span class="p">)</span>
-    <span class="n">directions_fa</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s1">&#39;directions&#39;</span><span class="p">)</span>
-
-    <span class="n">polydata_centers</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
-    <span class="n">polydata_cone</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkConeSource</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetResolution</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-            <span class="n">src</span><span class="o">.</span><span class="n">SetHeight</span><span class="p">(</span><span class="n">heights</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">set_polydata_vertices</span><span class="p">(</span><span class="n">polydata_cone</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">))</span>
-        <span class="n">set_polydata_triangles</span><span class="p">(</span><span class="n">polydata_cone</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
 
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">pts</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">directions_fa</span><span class="p">)</span>
-    <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetActiveVectors</span><span class="p">(</span><span class="s1">&#39;directions&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">heights</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">heights_fa</span><span class="p">)</span>
-        <span class="n">polydata_centers</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetActiveScalars</span><span class="p">(</span><span class="s1">&#39;heights&#39;</span><span class="p">)</span>
-
-    <span class="n">glyph</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkGlyph3D</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceConnection</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceData</span><span class="p">(</span><span class="n">polydata_cone</span><span class="p">)</span>
-
-    <span class="n">glyph</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">polydata_centers</span><span class="p">)</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">SetOrient</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">SetScaleModeToScaleByScalar</span><span class="p">()</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">SetVectorModeToUseVector</span><span class="p">()</span>
-    <span class="n">glyph</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-
-    <span class="n">mapper</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper</span><span class="p">()</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">glyph</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">())</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SetScalarModeToUsePointFieldData</span><span class="p">()</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">SelectColorArray</span><span class="p">(</span><span class="s1">&#39;colors&#39;</span><span class="p">)</span>
-
-    <span class="n">actor</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkActor</span><span class="p">()</span>
-    <span class="n">actor</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">mapper</span><span class="p">)</span>
-
+    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                           <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">actor</span></div>
 
 
@@ -2205,7 +2309,7 @@
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
             
         
             
@@ -2213,7 +2317,7 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
             
         
       </dl>
