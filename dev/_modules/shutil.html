@@ -335,11 +335,15 @@
         <span class="k">pass</span>
 
 <span class="k">def</span> <span class="nf">copystat</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Copy all stat info (mode bits, atime, mtime, flags) from src to dst.</span>
+    <span class="sd">&quot;&quot;&quot;Copy file metadata</span>
 
-<span class="sd">    If the optional flag `follow_symlinks` is not set, symlinks aren&#39;t followed if and</span>
-<span class="sd">    only if both `src` and `dst` are symlinks.</span>
+<span class="sd">    Copy the permission bits, last access time, last modification time, and</span>
+<span class="sd">    flags from `src` to `dst`. On Linux, copystat() also copies the &quot;extended</span>
+<span class="sd">    attributes&quot; where possible. The file contents, owner, and group are</span>
+<span class="sd">    unaffected. `src` and `dst` are path names given as strings.</span>
 
+<span class="sd">    If the optional flag `follow_symlinks` is not set, symlinks aren&#39;t</span>
+<span class="sd">    followed if and only if both `src` and `dst` are symlinks.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">_nop</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">ns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">pass</span>
@@ -407,8 +411,10 @@
     <span class="k">return</span> <span class="n">dst</span>
 
 <span class="k">def</span> <span class="nf">copy2</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Copy data and all stat info (&quot;cp -p src dst&quot;). Return the file&#39;s</span>
-<span class="sd">    destination.&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Copy data and metadata. Return the file&#39;s destination.</span>
+
+<span class="sd">    Metadata is copied with copystat(). Please see the copystat function</span>
+<span class="sd">    for more information.</span>
 
 <span class="sd">    The destination may be a directory.</span>
 
@@ -526,25 +532,27 @@
 <span class="c1"># version vulnerable to race conditions</span>
 <span class="k">def</span> <span class="nf">_rmtree_unsafe</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">onerror</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="c1"># symlinks to directories are forbidden, see bug #1669</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Cannot call rmtree on a symbolic link&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">scandir_it</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scandir_it</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-        <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
-        <span class="c1"># can&#39;t continue even if onerror hook returns</span>
-        <span class="k">return</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-        <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-        <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">fullname</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">path</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">lstat</span><span class="p">(</span><span class="n">fullname</span><span class="p">)</span><span class="o">.</span><span class="n">st_mode</span>
+            <span class="n">is_dir</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(</span><span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISDIR</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="n">is_dir</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">is_dir</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_symlink</span><span class="p">():</span>
+                    <span class="c1"># This can only happen if someone replaces</span>
+                    <span class="c1"># a directory with a symlink after the call to</span>
+                    <span class="c1"># os.scandir or entry.is_dir above.</span>
+                    <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Cannot call rmtree on a symbolic link&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+                <span class="k">continue</span>
             <span class="n">_rmtree_unsafe</span><span class="p">(</span><span class="n">fullname</span><span class="p">,</span> <span class="n">onerror</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
@@ -558,22 +566,25 @@
 
 <span class="c1"># Version using fd-based APIs to protect against races</span>
 <span class="k">def</span> <span class="nf">_rmtree_safe_fd</span><span class="p">(</span><span class="n">topfd</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">onerror</span><span class="p">):</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">topfd</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">(</span><span class="n">topfd</span><span class="p">)</span> <span class="k">as</span> <span class="n">scandir_it</span><span class="p">:</span>
+            <span class="n">entries</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">scandir_it</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
         <span class="n">err</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">path</span>
-        <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
-    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
-        <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">scandir</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+        <span class="k">return</span>
+    <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">fullname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">orig_st</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">,</span> <span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="n">orig_st</span><span class="o">.</span><span class="n">st_mode</span>
+            <span class="n">is_dir</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_dir</span><span class="p">(</span><span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_dir</span><span class="p">:</span>
+                <span class="n">orig_st</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">follow_symlinks</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">is_dir</span> <span class="o">=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISDIR</span><span class="p">(</span><span class="n">orig_st</span><span class="o">.</span><span class="n">st_mode</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
-            <span class="n">mode</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_ISDIR</span><span class="p">(</span><span class="n">mode</span><span class="p">):</span>
+            <span class="n">is_dir</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">is_dir</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">dirfd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
+                <span class="n">dirfd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
                 <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
             <span class="k">else</span><span class="p">:</span>
@@ -581,14 +592,14 @@
                     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">samestat</span><span class="p">(</span><span class="n">orig_st</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">fstat</span><span class="p">(</span><span class="n">dirfd</span><span class="p">)):</span>
                         <span class="n">_rmtree_safe_fd</span><span class="p">(</span><span class="n">dirfd</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">onerror</span><span class="p">)</span>
                         <span class="k">try</span><span class="p">:</span>
-                            <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
                             <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">try</span><span class="p">:</span>
                             <span class="c1"># This can only happen if someone replaces</span>
                             <span class="c1"># a directory with a symlink after the call to</span>
-                            <span class="c1"># stat.S_ISDIR above.</span>
+                            <span class="c1"># os.scandir or stat.S_ISDIR above.</span>
                             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Cannot call rmtree on a symbolic &quot;</span>
                                           <span class="s2">&quot;link&quot;</span><span class="p">)</span>
                         <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
@@ -597,13 +608,13 @@
                     <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">dirfd</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dir_fd</span><span class="o">=</span><span class="n">topfd</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
                 <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">,</span> <span class="n">fullname</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
 
 <span class="n">_use_fd_functions</span> <span class="o">=</span> <span class="p">({</span><span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">}</span> <span class="o">&lt;=</span>
                      <span class="n">os</span><span class="o">.</span><span class="n">supports_dir_fd</span> <span class="ow">and</span>
-                     <span class="n">os</span><span class="o">.</span><span class="n">listdir</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">supports_fd</span> <span class="ow">and</span>
+                     <span class="n">os</span><span class="o">.</span><span class="n">scandir</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">supports_fd</span> <span class="ow">and</span>
                      <span class="n">os</span><span class="o">.</span><span class="n">stat</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">supports_follow_symlinks</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">rmtree</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">onerror</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -655,6 +666,14 @@
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="c1"># symlinks to directories are forbidden, see bug #1669</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Cannot call rmtree on a symbolic link&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="n">onerror</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">islink</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">())</span>
+            <span class="c1"># can&#39;t continue even if onerror hook returns</span>
+            <span class="k">return</span>
         <span class="k">return</span> <span class="n">_rmtree_unsafe</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">onerror</span><span class="p">)</span>
 
 <span class="c1"># Allow introspection of whether or not the hardening against symlink</span>
@@ -950,7 +969,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">format_info</span> <span class="o">=</span> <span class="n">_ARCHIVE_FORMATS</span><span class="p">[</span><span class="nb">format</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown archive format &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">format</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;unknown archive format &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">format</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">None</span>
 
     <span class="n">func</span> <span class="o">=</span> <span class="n">format_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">format_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -1122,11 +1141,14 @@
     <span class="k">if</span> <span class="n">extract_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">extract_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
 
+    <span class="n">extract_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">extract_dir</span><span class="p">)</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">format_info</span> <span class="o">=</span> <span class="n">_UNPACK_FORMATS</span><span class="p">[</span><span class="nb">format</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown unpack format &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">format</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown unpack format &#39;</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">format</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">None</span>
 
         <span class="n">func</span> <span class="o">=</span> <span class="n">format_info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">func</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">extract_dir</span><span class="p">,</span> <span class="o">**</span><span class="nb">dict</span><span class="p">(</span><span class="n">format_info</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
@@ -1363,15 +1385,15 @@
             
         
             
-            <li><dt>fury v0.4.x</dt></li>
-            
-        
-            
             <li><dd><a href="/v0.2.x/_modules/shutil">fury v0.2.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.3.x/_modules/shutil">fury v0.3.x</a></dd></li>
+            
+        
+            
+            <li><dt>fury v0.4.x</dt></li>
             
         
       </dl>
