@@ -1,0 +1,31 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`shaders`
+==============
+.. automodule:: fury.shaders
+
+.. currentmodule:: fury.shaders
+.. autosummary::
+
+   dirname
+   load
+   pjoin
+
+
+.. currentmodule:: fury.shaders
+
+dirname
+~~~~~~~
+
+.. autofunction:: dirname
+
+load
+~~~~
+
+.. autofunction:: load
+
+pjoin
+~~~~~
+
+.. autofunction:: pjoin
+

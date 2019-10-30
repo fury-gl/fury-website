@@ -1,0 +1,187 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`utils`
+============
+.. automodule:: fury.utils
+
+.. currentmodule:: fury.utils
+.. autosummary::
+
+   apply_affine
+   asbytes
+   get_actor_from_polydata
+   get_actor_from_polymapper
+   get_bounding_box_sizes
+   get_grid_cells_position
+   get_polydata_colors
+   get_polydata_lines
+   get_polydata_normals
+   get_polydata_triangles
+   get_polydata_vertices
+   get_polymapper_from_polydata
+   line_colors
+   lines_to_vtk_polydata
+   map_coordinates
+   map_coordinates_3d_4d
+   numpy_to_vtk_colors
+   numpy_to_vtk_matrix
+   numpy_to_vtk_points
+   repeat_sources
+   rotate
+   set_input
+   set_polydata_colors
+   set_polydata_normals
+   set_polydata_triangles
+   set_polydata_vertices
+   shallow_copy
+   update_polydata_normals
+   vtk_matrix_to_numpy
+
+
+.. currentmodule:: fury.utils
+
+apply_affine
+~~~~~~~~~~~~
+
+.. autofunction:: apply_affine
+
+asbytes
+~~~~~~~
+
+.. autofunction:: asbytes
+
+get_actor_from_polydata
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_actor_from_polydata
+
+get_actor_from_polymapper
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_actor_from_polymapper
+
+get_bounding_box_sizes
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_bounding_box_sizes
+
+get_grid_cells_position
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_grid_cells_position
+
+get_polydata_colors
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polydata_colors
+
+get_polydata_lines
+~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polydata_lines
+
+get_polydata_normals
+~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polydata_normals
+
+get_polydata_triangles
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polydata_triangles
+
+get_polydata_vertices
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polydata_vertices
+
+get_polymapper_from_polydata
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: get_polymapper_from_polydata
+
+line_colors
+~~~~~~~~~~~
+
+.. autofunction:: line_colors
+
+lines_to_vtk_polydata
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: lines_to_vtk_polydata
+
+map_coordinates
+~~~~~~~~~~~~~~~
+
+.. autofunction:: map_coordinates
+
+map_coordinates_3d_4d
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: map_coordinates_3d_4d
+
+numpy_to_vtk_colors
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_colors
+
+numpy_to_vtk_matrix
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_matrix
+
+numpy_to_vtk_points
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_points
+
+repeat_sources
+~~~~~~~~~~~~~~
+
+.. autofunction:: repeat_sources
+
+rotate
+~~~~~~
+
+.. autofunction:: rotate
+
+set_input
+~~~~~~~~~
+
+.. autofunction:: set_input
+
+set_polydata_colors
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_colors
+
+set_polydata_normals
+~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_normals
+
+set_polydata_triangles
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_triangles
+
+set_polydata_vertices
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_vertices
+
+shallow_copy
+~~~~~~~~~~~~
+
+.. autofunction:: shallow_copy
+
+update_polydata_normals
+~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: update_polydata_normals
+
+vtk_matrix_to_numpy
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: vtk_matrix_to_numpy
+

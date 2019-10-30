@@ -1,0 +1,230 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`actor`
+============
+.. automodule:: fury.actor
+
+.. currentmodule:: fury.actor
+.. autosummary::
+
+   Container
+   apply_affine
+   arrow
+   axes
+   box
+   colormap_lookup_table
+   cone
+   contour_from_roi
+   create_colormap
+   cube
+   cylinder
+   dots
+   grid
+   label
+   line
+   lines_to_vtk_polydata
+   numpy_to_vtk_colors
+   numpy_to_vtk_matrix
+   numpy_to_vtk_points
+   odf_slicer
+   orient2rgb
+   peak_slicer
+   point
+   repeat_sources
+   scalar_bar
+   set_input
+   set_polydata_triangles
+   set_polydata_vertices
+   shallow_copy
+   slicer
+   sphere
+   streamtube
+   surface
+   tensor_slicer
+   text_3d
+
+
+.. currentmodule:: fury.actor
+
+
+:class:`Container`
+~~~~~~~~~~~~~~~~~~
+
+
+.. autoclass:: Container
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
+  .. automethod:: __init__
+
+apply_affine
+~~~~~~~~~~~~
+
+.. autofunction:: apply_affine
+
+arrow
+~~~~~
+
+.. autofunction:: arrow
+
+axes
+~~~~
+
+.. autofunction:: axes
+
+box
+~~~
+
+.. autofunction:: box
+
+colormap_lookup_table
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: colormap_lookup_table
+
+cone
+~~~~
+
+.. autofunction:: cone
+
+contour_from_roi
+~~~~~~~~~~~~~~~~
+
+.. autofunction:: contour_from_roi
+
+create_colormap
+~~~~~~~~~~~~~~~
+
+.. autofunction:: create_colormap
+
+cube
+~~~~
+
+.. autofunction:: cube
+
+cylinder
+~~~~~~~~
+
+.. autofunction:: cylinder
+
+dots
+~~~~
+
+.. autofunction:: dots
+
+grid
+~~~~
+
+.. autofunction:: grid
+
+label
+~~~~~
+
+.. autofunction:: label
+
+line
+~~~~
+
+.. autofunction:: line
+
+lines_to_vtk_polydata
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: lines_to_vtk_polydata
+
+numpy_to_vtk_colors
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_colors
+
+numpy_to_vtk_matrix
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_matrix
+
+numpy_to_vtk_points
+~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: numpy_to_vtk_points
+
+odf_slicer
+~~~~~~~~~~
+
+.. autofunction:: odf_slicer
+
+orient2rgb
+~~~~~~~~~~
+
+.. autofunction:: orient2rgb
+
+peak_slicer
+~~~~~~~~~~~
+
+.. autofunction:: peak_slicer
+
+point
+~~~~~
+
+.. autofunction:: point
+
+repeat_sources
+~~~~~~~~~~~~~~
+
+.. autofunction:: repeat_sources
+
+scalar_bar
+~~~~~~~~~~
+
+.. autofunction:: scalar_bar
+
+set_input
+~~~~~~~~~
+
+.. autofunction:: set_input
+
+set_polydata_triangles
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_triangles
+
+set_polydata_vertices
+~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: set_polydata_vertices
+
+shallow_copy
+~~~~~~~~~~~~
+
+.. autofunction:: shallow_copy
+
+slicer
+~~~~~~
+
+.. autofunction:: slicer
+
+sphere
+~~~~~~
+
+.. autofunction:: sphere
+
+streamtube
+~~~~~~~~~~
+
+.. autofunction:: streamtube
+
+surface
+~~~~~~~
+
+.. autofunction:: surface
+
+tensor_slicer
+~~~~~~~~~~~~~
+
+.. autofunction:: tensor_slicer
+
+text_3d
+~~~~~~~
+
+.. autofunction:: text_3d
+
