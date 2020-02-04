@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.ui &mdash; FURY 0.4.0.post3+g9a69b24 documentation</title>
+  <title>fury.ui &mdash; FURY 0.4.0.post112+gbf87560 documentation</title>
   
 
   
@@ -27,8 +27,9 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/clipboard.min.js"></script>
         <script type="text/javascript" src="../../_static/copybutton.js"></script>
+        <script type="text/javascript">var copybuttonSkipText = '>>> ';</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                0.4.0.post3+g9a69b24
+                0.4.0.post112+gbf87560
               </div>
             
           
@@ -164,25 +165,24 @@
            <div itemprop="articleBody">
             
   <h1>Source code for fury.ui</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
-<span class="kn">from</span> <span class="nn">_warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span></span><span class="kn">from</span> <span class="nn">_warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">vtk</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">abc</span>
-<span class="kn">from</span> <span class="nn">six</span> <span class="k">import</span> <span class="n">with_metaclass</span>
 
-<span class="kn">from</span> <span class="nn">fury.data</span> <span class="k">import</span> <span class="n">read_viz_icons</span>
-<span class="kn">from</span> <span class="nn">fury.interactor</span> <span class="k">import</span> <span class="n">CustomInteractorStyle</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">rotate</span>
-<span class="kn">from</span> <span class="nn">fury.actor</span> <span class="k">import</span> <span class="n">grid</span>
+<span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">read_viz_icons</span>
+<span class="kn">from</span> <span class="nn">fury.interactor</span> <span class="kn">import</span> <span class="n">CustomInteractorStyle</span>
+<span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">rotate</span>
+<span class="kn">from</span> <span class="nn">fury.actor</span> <span class="kn">import</span> <span class="n">grid</span>
 
 
 <span class="n">TWO_PI</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
 
 
-<div class="viewcode-block" id="UI"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.UI">[docs]</a><span class="k">class</span> <span class="nc">UI</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">,</span> <span class="nb">object</span><span class="p">)):</span>
+<div class="viewcode-block" id="UI"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.UI">[docs]</a><span class="k">class</span> <span class="nc">UI</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;An umbrella class for all UI elements.</span>
 
 <span class="sd">    While adding UI elements to the scene, we go over all the sub-elements</span>
@@ -229,7 +229,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="UI.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.UI.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+<div class="viewcode-block" id="UI.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.UI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Init scene.</span>
 
 <span class="sd">        Parameters</span>
@@ -494,7 +494,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Button2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Button2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">icon_fnames</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)):</span>
+<div class="viewcode-block" id="Button2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Button2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">icon_fnames</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
 <span class="sd">        Parameters</span>
@@ -542,14 +542,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">icons</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">icon_name</span><span class="p">,</span> <span class="n">icon_fname</span> <span class="ow">in</span> <span class="n">icon_fnames</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">icon_fname</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;PNG&quot;</span><span class="p">]:</span>
-                <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;Skipping </span><span class="si">{}</span><span class="s2">: not in the PNG format.&quot;</span>
-                <span class="n">warn</span><span class="p">(</span><span class="ne">Warning</span><span class="p">(</span><span class="n">error_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">icon_fname</span><span class="p">)))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">png</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">()</span>
-                <span class="n">png</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">icon_fname</span><span class="p">)</span>
-                <span class="n">png</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-                <span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">icon_name</span><span class="p">,</span> <span class="n">png</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()))</span>
+            <span class="n">icons</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">icon_name</span><span class="p">,</span> <span class="n">load_image</span><span class="p">(</span><span class="n">icon_fname</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
 
         <span class="k">return</span> <span class="n">icons</span>
 
@@ -712,7 +705,7 @@
     <span class="sd">&quot;&quot;&quot; A 2D rectangle sub-classed from UI.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Rectangle2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Rectangle2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+<div class="viewcode-block" id="Rectangle2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Rectangle2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
                  <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initializes a rectangle.</span>
 
@@ -877,7 +870,7 @@
     <span class="sd">&quot;&quot;&quot; A 2D disk UI component.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Disk2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Disk2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<div class="viewcode-block" id="Disk2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Disk2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outer_radius</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Initializes a rectangle.</span>
 
@@ -1018,7 +1011,7 @@
 <span class="sd">        Alignment of the panel with respect to the overall screen.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Panel2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Panel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+<div class="viewcode-block" id="Panel2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Panel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
                  <span class="n">opacity</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -1244,7 +1237,7 @@
 <span class="sd">        Adds text shadow.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TextBlock2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.TextBlock2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Text Block&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span>
+<div class="viewcode-block" id="TextBlock2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.TextBlock2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Text Block&quot;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span>
                  <span class="n">justification</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
                  <span class="n">bold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">italic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shadow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">bg_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
@@ -1627,7 +1620,7 @@
 <span class="sd">    init : bool</span>
 <span class="sd">        Flag which says whether the textbox has just been initialized.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="TextBox2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.TextBox2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter Text&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+<div class="viewcode-block" id="TextBox2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.TextBox2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter Text&quot;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
                  <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span>
                  <span class="n">justification</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">bold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">italic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">shadow</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -1961,7 +1954,7 @@
 <span class="sd">    active_color : (float, float, float)</span>
 <span class="sd">        Color of the handle when it is pressed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="LineSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<div class="viewcode-block" id="LineSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">initial_value</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                  <span class="n">length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
                  <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">handle_side</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
@@ -2241,7 +2234,7 @@
 <span class="sd">        Color of the handles when they are pressed.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="LineDoubleSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="LineDoubleSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                  <span class="n">handle_side</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
                  <span class="n">initial_values</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
                  <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">text_template</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{value:.1f}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;disk&quot;</span><span class="p">):</span>
@@ -2640,7 +2633,7 @@
 <span class="sd">    active_color : (float, float, float)</span>
 <span class="sd">        Color of the handle when it is pressed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="RingSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RingSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<div class="viewcode-block" id="RingSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RingSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">initial_value</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">360</span><span class="p">,</span>
                  <span class="n">slider_inner_radius</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">slider_outer_radius</span><span class="o">=</span><span class="mi">44</span><span class="p">,</span>
                  <span class="n">handle_inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">handle_outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
@@ -2899,7 +2892,7 @@
 <span class="sd">        The line slider which sets the value</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-<div class="viewcode-block" id="RangeSlider.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RangeSlider.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+<div class="viewcode-block" id="RangeSlider.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RangeSlider.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                  <span class="n">handle_side</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">range_slider_center</span><span class="o">=</span><span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
                  <span class="n">value_slider_center</span><span class="o">=</span><span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">range_precision</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -3050,7 +3043,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ImageContainer2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ImageContainer2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_path</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<div class="viewcode-block" id="ImageContainer2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ImageContainer2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_path</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3062,41 +3055,9 @@
 <span class="sd">            Width and height in pixels of the image.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ImageContainer2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_build_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_path</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Converts image path to vtkImageDataGeometryFilters.</span>
-
-<span class="sd">        A pre-processing step to prevent re-read of image during every</span>
-<span class="sd">        state change.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        img_path : string</span>
-<span class="sd">            Path of the image</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        img : vtkImageDataGeometryFilters</span>
-<span class="sd">            The corresponding image .</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">imgExt</span> <span class="o">=</span> <span class="n">img_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">imgExt</span> <span class="o">==</span> <span class="s2">&quot;png&quot;</span><span class="p">:</span>
-            <span class="n">png</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">()</span>
-            <span class="n">png</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
-            <span class="n">png</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">png</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">imgExt</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">]:</span>
-            <span class="n">jpeg</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGReader</span><span class="p">()</span>
-            <span class="n">jpeg</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
-            <span class="n">jpeg</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-            <span class="n">img</span> <span class="o">=</span> <span class="n">jpeg</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;This file format is not supported by the Image Holder&quot;</span>
-            <span class="n">warn</span><span class="p">(</span><span class="ne">Warning</span><span class="p">(</span><span class="n">error_msg</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">img</span>
 
     <span class="k">def</span> <span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">lower_left_corner</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">texture_points</span><span class="o">.</span><span class="n">GetPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -3229,7 +3190,7 @@
 <span class="sd">            Font Size of the label.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Option.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Option.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
+<div class="viewcode-block" id="Option.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Option.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -3336,7 +3297,7 @@
 <span class="sd">        Distance between two adjacent options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Checkbox.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Checkbox.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+<div class="viewcode-block" id="Checkbox.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.Checkbox.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
                  <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -3459,7 +3420,7 @@
 <span class="sd">        Distance between two adjacent options</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="RadioButton.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RadioButton.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+<div class="viewcode-block" id="RadioButton.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.RadioButton.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
                  <span class="n">font_family</span><span class="o">=</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
@@ -3499,7 +3460,7 @@
 <span class="sd">        Callback function for when the selected items have changed.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ListBox2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ListBox2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<div class="viewcode-block" id="ListBox2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ListBox2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
                  <span class="n">multiselection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reverse_scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">line_spacing</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span>
                  <span class="n">text_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
@@ -3887,7 +3848,7 @@
 <div class="viewcode-block" id="ListBoxItem2D"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ListBoxItem2D">[docs]</a><span class="k">class</span> <span class="nc">ListBoxItem2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The text displayed in a listbox. &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ListBoxItem2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ListBoxItem2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_box</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span>
+<div class="viewcode-block" id="ListBoxItem2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.ListBoxItem2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_box</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span>
                  <span class="n">text_color</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
                  <span class="n">selected_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span>
                  <span class="n">unselected_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>
@@ -4016,7 +3977,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="FileMenu2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.FileMenu2D.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory_path</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<div class="viewcode-block" id="FileMenu2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.FileMenu2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory_path</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">multiselection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">reverse_scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">line_spacing</span><span class="o">=</span><span class="mf">1.4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -4241,7 +4202,7 @@
     <span class="sd">&quot;&quot;&quot; Add actors in a grid and interact with them individually.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GridUI.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.GridUI.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+<div class="viewcode-block" id="GridUI.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.GridUI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">actors</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">cell_padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                  <span class="n">cell_shape</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">16</span><span class="o">/</span><span class="mf">9.</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -4438,7 +4399,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2019, FURY
+        &copy; Copyright 2010-2020, FURY
 
     </p>
   </div>
@@ -4470,6 +4431,10 @@
             
         
             
+            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.2.x/_modules/fury/ui">fury v0.2.x</a></dd></li>
             
         
@@ -4479,10 +4444,6 @@
         
             
             <li><dd><a href="/v0.4.x/_modules/fury/ui">fury v0.4.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
             
         
       </dl>

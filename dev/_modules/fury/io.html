@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.io &mdash; FURY 0.4.0.post3+g9a69b24 documentation</title>
+  <title>fury.io &mdash; FURY 0.4.0.post112+gbf87560 documentation</title>
   
 
   
@@ -27,8 +27,9 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/clipboard.min.js"></script>
         <script type="text/javascript" src="../../_static/copybutton.js"></script>
+        <script type="text/javascript">var copybuttonSkipText = '>>> ';</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                0.4.0.post3+g9a69b24
+                0.4.0.post112+gbf87560
               </div>
             
           
@@ -166,78 +167,123 @@
   <h1>Source code for fury.io</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">vtk</span>
-<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="k">import</span> <span class="n">numpy_support</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="n">set_input</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="kn">import</span> <span class="n">numpy_support</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">set_input</span>
 
 
-<div class="viewcode-block" id="load_image"><a class="viewcode-back" href="../../reference/fury.io.html#fury.io.load_image">[docs]</a><span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="load_image"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.load_image">[docs]</a><span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_pillow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Load an image.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    file_name: string</span>
+<span class="sd">    filename: str</span>
 <span class="sd">        should be png, bmp, jpeg or jpg files</span>
+<span class="sd">    extension : str, optional</span>
+<span class="sd">        The image file format assumed for reading the data. If not</span>
+<span class="sd">        given, the format is deduced from the filename (By default, it</span>
+<span class="sd">        will try PNG deduction failed.)</span>
 <span class="sd">    as_vtktype: bool, optional</span>
-<span class="sd">        if True, return vtk output otherwise a ndarray. Default False.</span>
+<span class="sd">        if True, return vtk output otherwise an ndarray. Default False.</span>
+<span class="sd">    use_pillow: bool</span>
+<span class="sd">        Use pillow python library to load the files. Default True</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    image: ndarray or vtk output</span>
 <span class="sd">        desired image array</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">use_pillow</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">pil_image</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RGBA&#39;</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">]:</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pil_image</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;I;16&#39;</span><span class="p">):</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(</span><span class="s1">&#39;raw&#39;</span><span class="p">,</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span><span class="p">)</span>
+                <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;&gt;u2&#39;</span> <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;&lt;u2&#39;</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">raw</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">pil_image</span><span class="o">.</span><span class="n">size</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;=u2&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGBA&#39;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Unknown image mode </span><span class="si">{}</span><span class="s1">&#39;</span>
+                                       <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span><span class="p">))</span>
+                <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pil_image</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">as_vtktype</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;only 2D (L, RGB, RGBA) or 3D image available&quot;</span><span class="p">)</span>
+
+            <span class="n">vtk_image</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">()</span>
+            <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">vtk_image</span><span class="o">.</span><span class="n">AllocateScalars</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_UNSIGNED_CHAR</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+
+            <span class="c1"># width, height</span>
+            <span class="n">vtk_image</span><span class="o">.</span><span class="n">SetDimensions</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">vtk_image</span><span class="o">.</span><span class="n">SetExtent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">arr_tmp</span><span class="p">)</span>
+            <span class="n">uchar_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">arr_tmp</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">vtk_image</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">uchar_array</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">vtk_image</span>
+
+        <span class="k">return</span> <span class="n">image</span>
+
     <span class="n">d_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">,</span>
                 <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkBMPReader</span><span class="p">,</span>
                 <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGReader</span><span class="p">,</span>
                 <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGReader</span><span class="p">,</span>
                 <span class="s2">&quot;.tiff&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFReader</span><span class="p">,</span>
-                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFReader</span><span class="p">,</span>
-                <span class="p">}</span>
+                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFReader</span><span class="p">}</span>
 
-    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_reader</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Impossible to read the file </span><span class="si">{0}</span><span class="s2">: Unknown extension </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span>
-                      <span class="nb">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
+                      <span class="nb">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
 
     <span class="n">reader</span> <span class="o">=</span> <span class="n">d_reader</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="p">)()</span>
-    <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">reader</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
     <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">as_vtktype</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">as_vtktype</span><span class="p">:</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
+        <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">()</span>
 
-    <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
-    <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">()</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">vtk_array</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-    <span class="n">components</span> <span class="o">=</span> <span class="n">vtk_array</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">image</span></div>
+    <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span> <span class="k">if</span> <span class="n">as_vtktype</span> <span class="k">else</span> <span class="n">image</span></div>
 
 
-<div class="viewcode-block" id="save_image"><a class="viewcode-back" href="../../reference/fury.io.html#fury.io.save_image">[docs]</a><span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">compression_quality</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-               <span class="n">compression_type</span><span class="o">=</span><span class="s1">&#39;deflation&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="save_image"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.save_image">[docs]</a><span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">compression_quality</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
+               <span class="n">compression_type</span><span class="o">=</span><span class="s1">&#39;deflation&#39;</span><span class="p">,</span> <span class="n">use_pillow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a 2d or 3d image.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    arr: ndarray</span>
+<span class="sd">    arr : ndarray</span>
 <span class="sd">        array to save</span>
-<span class="sd">    file_name: string</span>
+<span class="sd">    filename : string</span>
 <span class="sd">        should be png, bmp, jpeg or jpg files</span>
-<span class="sd">    compression_quality: int</span>
+<span class="sd">    compression_quality : int</span>
 <span class="sd">        compression_quality for jpeg data.</span>
 <span class="sd">        0 = Low quality, 100 = High quality</span>
-<span class="sd">    compression_type: str</span>
+<span class="sd">    compression_type : str</span>
 <span class="sd">        compression type for tiff file</span>
 <span class="sd">        select between: None, lzw, deflation (default)</span>
-
+<span class="sd">    use_pillow : bool</span>
+<span class="sd">        Use imageio python library to save the files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Image Dimensions should be &lt;=3&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
     <span class="n">d_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGWriter</span><span class="p">,</span>
                 <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkBMPWriter</span><span class="p">,</span>
@@ -247,11 +293,19 @@
                 <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFWriter</span><span class="p">,</span>
                 <span class="p">}</span>
 
-    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d_writer</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Impossible to save the file </span><span class="si">{0}</span><span class="s2">: Unknown extension </span><span class="si">{1}</span><span class="s2">&quot;</span><span class="o">.</span>
-                      <span class="nb">format</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
+                      <span class="nb">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">use_pillow</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+        <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">compression_quality</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
     <span class="n">vtk_array_type</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">get_vtk_array_type</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">num_array</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -266,7 +320,7 @@
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span>
 
     <span class="n">writer</span> <span class="o">=</span> <span class="n">d_writer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">extension</span><span class="p">)()</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">vtk_data</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">]:</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">ProgressiveOn</span><span class="p">()</span>
@@ -282,15 +336,13 @@
     <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="load_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.io.load_polydata">[docs]</a><span class="k">def</span> <span class="nf">load_polydata</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">is_mni_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="load_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.load_polydata">[docs]</a><span class="k">def</span> <span class="nf">load_polydata</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Load a vtk polydata to a supported format file.</span>
-
-<span class="sd">    Supported file formats are OBJ, VTK, FIB, PLY, STL and XML</span>
+<span class="sd">    Supported file formats are VTK, VTP, FIB, PLY, STL XML and OBJ</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    file_name : string</span>
-<span class="sd">    is_mni_obj : bool</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -299,35 +351,32 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;vtk&quot;</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;fib&quot;</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;ply&quot;</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYReader</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;stl&quot;</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLReader</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;xml&quot;</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataReader</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span> <span class="ow">and</span> <span class="n">is_mni_obj</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkMNIObjectReader</span><span class="p">()</span>
+    <span class="n">poly_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">,</span>
+                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">,</span>
+                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYReader</span><span class="p">,</span>
+                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLReader</span><span class="p">,</span>
+                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataReader</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="n">poly_reader</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">poly_reader</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_extension</span><span class="p">)()</span>
     <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>  <span class="c1"># try to read as a normal obj</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkOBJReader</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># than try load a MNI obj format</span>
+        <span class="c1"># Special case, since there is two obj format</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkOBJReader</span><span class="p">()</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetNumberOfCells</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkMNIObjectReader</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;polydata &quot;</span> <span class="o">+</span> <span class="n">file_extension</span> <span class="o">+</span> <span class="s2">&quot; is not suported&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">file_extension</span> <span class="o">+</span> <span class="s2">&quot; is not supported by FURY&quot;</span><span class="p">)</span>
 
     <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
     <span class="n">reader</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="save_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.io.save_polydata">[docs]</a><span class="k">def</span> <span class="nf">save_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color_array_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                  <span class="n">is_mni_obj</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="save_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.save_polydata">[docs]</a><span class="k">def</span> <span class="nf">save_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color_array_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a vtk polydata to a supported format file.</span>
-
 <span class="sd">    Save formats can be VTK, FIB, PLY, STL and XML.</span>
 
 <span class="sd">    Parameters</span>
@@ -336,32 +385,29 @@
 <span class="sd">    file_name : string</span>
 <span class="sd">    binary : bool</span>
 <span class="sd">    color_array_name: ndarray</span>
-<span class="sd">    is_mni_obj : bool</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># get file extension (type)</span>
     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="n">poly_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;vtk&quot;</span><span class="p">:</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;fib&quot;</span><span class="p">:</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;ply&quot;</span><span class="p">:</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYWriter</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;stl&quot;</span><span class="p">:</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLWriter</span><span class="p">()</span>
-    <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;xml&quot;</span><span class="p">:</span>
-        <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="n">poly_writer</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">poly_writer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_extension</span><span class="p">)()</span>
     <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">is_mni_obj</span><span class="p">:</span>
+        <span class="c1"># Special case, since there is two obj format</span>
+        <span class="n">find_keyword</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;mni&quot;</span> <span class="ow">in</span> <span class="n">find_keyword</span> <span class="ow">or</span> <span class="s2">&quot;mnc&quot;</span> <span class="ow">in</span> <span class="n">find_keyword</span><span class="p">:</span>
             <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkMNIObjectWriter</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># vtkObjWriter not available on python</span>
-            <span class="c1"># vtk.vtkOBJWriter()</span>
-            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;OBJ Writer not available. MNI obj is the only&quot;</span>
-                          <span class="s2">&quot; available writer so set mni_tag option to True&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Wavefront obj requires a scene </span><span class="se">\n</span><span class="s2">&quot;</span>
+                          <span class="s2">&quot; for MNI obj, use &#39;.mni.obj&#39; extension&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unknown extension (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_extension</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">file_extension</span> <span class="o">+</span> <span class="s2">&quot; is not supported by FURY&quot;</span><span class="p">)</span>
 
     <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
     <span class="n">writer</span> <span class="o">=</span> <span class="n">set_input</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">polydata</span><span class="p">)</span>
@@ -384,7 +430,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2019, FURY
+        &copy; Copyright 2010-2020, FURY
 
     </p>
   </div>
@@ -416,6 +462,10 @@
             
         
             
+            <li><dd><a href="/v0.1.x/_modules/fury/io">fury v0.1.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.2.x/_modules/fury/io">fury v0.2.x</a></dd></li>
             
         
@@ -425,10 +475,6 @@
         
             
             <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.1.x/_modules/fury/io">fury v0.1.x</a></dd></li>
             
         
       </dl>
