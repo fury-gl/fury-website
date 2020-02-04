@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.data.fetcher &mdash; FURY 0.4.0.post3+g9a69b24 documentation</title>
+  <title>fury.data.fetcher &mdash; FURY 0.4.0.post112+gbf87560 documentation</title>
   
 
   
@@ -27,8 +27,9 @@
         <script type="text/javascript" src="../../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../../_static/doctools.js"></script>
         <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../../_static/clipboard.min.js"></script>
         <script type="text/javascript" src="../../../_static/copybutton.js"></script>
+        <script type="text/javascript">var copybuttonSkipText = '>>> ';</script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                0.4.0.post3+g9a69b24
+                0.4.0.post112+gbf87560
               </div>
             
           
@@ -170,17 +171,17 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
 
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="k">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
-<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">md5</span>
-<span class="kn">from</span> <span class="nn">shutil</span> <span class="k">import</span> <span class="n">copyfileobj</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="kn">import</span> <span class="n">md5</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfileobj</span>
 
 <span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">zipfile</span>
 
 <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="k">import</span> <span class="n">urlopen</span>
+    <span class="kn">from</span> <span class="nn">urllib2</span> <span class="kn">import</span> <span class="n">urlopen</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="k">import</span> <span class="n">urlopen</span>
+    <span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
 
 <span class="c1"># Set a user-writeable file-system location to put files:</span>
 <span class="k">if</span> <span class="s1">&#39;FURY_HOME&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
@@ -190,7 +191,10 @@
 
 <span class="c1"># The URL to the University of Washington Researchworks repository:</span>
 <span class="n">UW_RW_URL</span> <span class="o">=</span> \
-  <span class="s2">&quot;https://digital.lib.washington.edu/researchworks/bitstream/handle/&quot;</span>
+    <span class="s2">&quot;https://digital.lib.washington.edu/researchworks/bitstream/handle/&quot;</span>
+
+<span class="n">FURY_DATA_URL</span> <span class="o">=</span> \
+    <span class="s2">&quot;https://raw.githubusercontent.com/fury-gl/fury-data/master/examples/&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">FetcherError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -414,7 +418,26 @@
                                 <span class="p">[</span><span class="s1">&#39;94a07cba06b4136b6687396426f1e380&#39;</span><span class="p">],</span>
                                 <span class="n">data_size</span><span class="o">=</span><span class="s2">&quot;12KB&quot;</span><span class="p">,</span>
                                 <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download icons for fury&quot;</span><span class="p">,</span>
-                                <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                                <span class="n">unzip</span><span class="o">=</span><span class="kc">True</span>
+                                <span class="p">)</span>
+
+
+<span class="n">fetch_viz_wiki_nw</span> <span class="o">=</span> <span class="n">_make_fetcher</span><span class="p">(</span><span class="s2">&quot;fetch_viz_wiki_nw&quot;</span><span class="p">,</span>
+                                  <span class="n">pjoin</span><span class="p">(</span><span class="n">fury_home</span><span class="p">,</span> <span class="s2">&quot;examples&quot;</span><span class="p">,</span> <span class="s2">&quot;wiki_nw&quot;</span><span class="p">),</span>
+                                  <span class="n">FURY_DATA_URL</span><span class="p">,</span>
+                                  <span class="p">[</span><span class="s1">&#39;wiki_categories.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;wiki_edges.txt&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;wiki_positions.txt&#39;</span><span class="p">],</span>
+                                  <span class="p">[</span><span class="s1">&#39;wiki_categories.txt&#39;</span><span class="p">,</span> <span class="s1">&#39;wiki_edges.txt&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;wiki_positions.txt&#39;</span><span class="p">],</span>
+                                  <span class="p">[</span><span class="s1">&#39;465cac68c14fbda4f384ea6ae518b6b8&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;7d7a4aff581a54bc873eb617c156467d&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;607d628ec615f98db13640eb96428465&#39;</span><span class="p">],</span>
+                                  <span class="n">doc</span><span class="o">=</span><span class="s2">&quot;Download the following wiki information&quot;</span>
+                                      <span class="s2">&quot;Interdisciplinary map of the journals&quot;</span><span class="p">,</span>
+                                  <span class="n">msg</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;More information about complex &quot;</span>
+                                       <span class="s2">&quot;networks can be found in this papers:&quot;</span>
+                                       <span class="s2">&quot; https://arxiv.org/abs/0711.3199&quot;</span><span class="p">)</span>
+                                  <span class="p">)</span>
 
 
 <div class="viewcode-block" id="read_viz_icons"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.data.read_viz_icons">[docs]</a><span class="k">def</span> <span class="nf">read_viz_icons</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s1">&#39;icomoon&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;infinity.png&#39;</span><span class="p">):</span>
@@ -448,7 +471,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2019, FURY
+        &copy; Copyright 2010-2020, FURY
 
     </p>
   </div>
@@ -480,6 +503,10 @@
             
         
             
+            <li><dd><a href="/v0.1.x/_modules/fury/data/fetcher">fury v0.1.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.2.x/_modules/fury/data/fetcher">fury v0.2.x</a></dd></li>
             
         
@@ -489,10 +516,6 @@
         
             
             <li><dd><a href="/v0.4.x/_modules/fury/data/fetcher">fury v0.4.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.1.x/_modules/fury/data/fetcher">fury v0.1.x</a></dd></li>
             
         
       </dl>

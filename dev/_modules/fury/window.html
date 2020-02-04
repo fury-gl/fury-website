@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.window &mdash; FURY 0.4.0.post3+g9a69b24 documentation</title>
+  <title>fury.window &mdash; FURY 0.4.0.post112+gbf87560 documentation</title>
   
 
   
@@ -27,8 +27,9 @@
         <script type="text/javascript" src="../../_static/underscore.js"></script>
         <script type="text/javascript" src="../../_static/doctools.js"></script>
         <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/clipboard.min.js"></script>
         <script type="text/javascript" src="../../_static/copybutton.js"></script>
+        <script type="text/javascript">var copybuttonSkipText = '>>> ';</script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -65,7 +66,7 @@
             
             
               <div class="version">
-                0.4.0.post3+g9a69b24
+                0.4.0.post112+gbf87560
               </div>
             
           
@@ -165,21 +166,22 @@
             
   <h1>Source code for fury.window</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
 
 <span class="kn">import</span> <span class="nn">gzip</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="k">import</span> <span class="n">warn</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">ndimage</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">ndimage</span>
 <span class="kn">import</span> <span class="nn">vtk</span>
-<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="k">import</span> <span class="n">numpy_support</span><span class="p">,</span> <span class="n">colors</span>
+<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="kn">import</span> <span class="n">numpy_support</span><span class="p">,</span> <span class="n">colors</span>
 
-<span class="kn">from</span> <span class="nn">fury.tmpdirs</span> <span class="k">import</span> <span class="n">InTemporaryDirectory</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span> <span class="k">as</span> <span class="n">InTemporaryDirectory</span>
 
-<span class="kn">from</span> <span class="nn">fury</span> <span class="k">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">fury_version</span>
-<span class="kn">from</span> <span class="nn">fury.interactor</span> <span class="k">import</span> <span class="n">CustomInteractorStyle</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="k">import</span> <span class="n">asbytes</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">fury_version</span>
+<span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecate_with_version</span>
+<span class="kn">from</span> <span class="nn">fury.interactor</span> <span class="kn">import</span> <span class="n">CustomInteractorStyle</span>
+<span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">save_image</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">asbytes</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="n">basestring</span>
@@ -415,17 +417,20 @@
 <span class="sd">          class `Scene()`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Renderer.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.Renderer.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Renderer.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.Renderer.__init__">[docs]</a>    <span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;Renderer() deprecated, Please use Scene()&quot;</span>
+                            <span class="s2">&quot;instead&quot;</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init old class with a warning.&quot;&quot;&quot;</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Class &#39;fury.window.Renderer&#39; is deprecated, instead&quot;</span>
-             <span class="s2">&quot; use class &#39;fury.window.Scene&#39;. This class will be&quot;</span>
-             <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">,</span> <span class="ne">PendingDeprecationWarning</span><span class="p">)</span></div></div>
+        <span class="k">pass</span></div></div>
 
 
-<div class="viewcode-block" id="renderer"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.renderer">[docs]</a><span class="k">def</span> <span class="nf">renderer</span><span class="p">(</span><span class="n">background</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="renderer"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.renderer">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.renderer&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">renderer</span><span class="p">(</span><span class="n">background</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a Scene.</span>
 
-<span class="sd">    .. deprecated:: 0.6.0</span>
+<span class="sd">    .. deprecated:: 0.2.0</span>
 <span class="sd">          `renderer` will be removed in Fury 0.6.0, it is replaced by the</span>
 <span class="sd">          class `Scene()`</span>
 
@@ -450,11 +455,6 @@
 <span class="sd">    &gt;&gt;&gt; #window.show(r)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">deprecation_msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Method &#39;fury.window.renderer&#39; is deprecated, instead&quot;</span>
-                       <span class="s2">&quot; use class &#39;fury.window.Scene&#39;. It will be&quot;</span>
-                       <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">)</span>
-    <span class="n">warn</span><span class="p">(</span><span class="ne">PendingDeprecationWarning</span><span class="p">(</span><span class="n">deprecation_msg</span><span class="p">))</span>
-
     <span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">background</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">scene</span><span class="o">.</span><span class="n">SetBackground</span><span class="p">(</span><span class="n">background</span><span class="p">)</span>
@@ -462,7 +462,10 @@
     <span class="k">return</span> <span class="n">scene</span></div>
 
 
-<div class="viewcode-block" id="ren"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ren">[docs]</a><span class="k">def</span> <span class="nf">ren</span><span class="p">(</span><span class="n">background</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ren"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ren">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.ren&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">ren</span><span class="p">(</span><span class="n">background</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a Scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
@@ -472,62 +475,62 @@
     <span class="k">return</span> <span class="n">renderer</span><span class="p">(</span><span class="n">background</span><span class="o">=</span><span class="n">background</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.add">[docs]</a><span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="add"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.add">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.add&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene().add&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add a specific actor to the scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
 <span class="sd">          `ren` will be removed in Fury 0.6.0, it is replaced by</span>
 <span class="sd">          `Scene().add`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Class &#39;fury.window.add&#39; is deprecated, instead&quot;</span>
-         <span class="s2">&quot; use class &#39;fury.window.Scene.add&#39;. It will be&quot;</span>
-         <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">,</span> <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="rm"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.rm">[docs]</a><span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+<div class="viewcode-block" id="rm"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.rm">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.rm&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene().rm&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rm</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Remove a specific actor from the scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
 <span class="sd">          `ren` will be removed in Fury 0.6.0, it is replaced by</span>
 <span class="sd">          `Scene().rm`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Class &#39;fury.window.rm&#39; is deprecated, instead&quot;</span>
-         <span class="s2">&quot; use class &#39;fury.window.Scene.rm&#39;.It will be&quot;</span>
-         <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">,</span> <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">a</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="clear"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.clear">[docs]</a><span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
+<div class="viewcode-block" id="clear"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.clear">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.clear&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene().clear&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">clear</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Remove all actors from the scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
 <span class="sd">          `ren` will be removed in Fury 0.6.0, it is replaced by</span>
 <span class="sd">          `Scene().clear`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Class &#39;fury.window.clear&#39; is deprecated, instead&quot;</span>
-         <span class="s2">&quot; use class &#39;fury.window.Scene.clear&#39;. It will be&quot;</span>
-         <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">,</span> <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="rm_all"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.rm_all">[docs]</a><span class="k">def</span> <span class="nf">rm_all</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
+<div class="viewcode-block" id="rm_all"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.rm_all">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.rm_all()&#39; function deprecated, use &quot;</span>
+                        <span class="s2">&quot;&#39;fury.window.Scene().clear&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">rm_all</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Remove all actors from the scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
 <span class="sd">          `ren` will be removed in Fury 0.6.0, it is replaced by</span>
 <span class="sd">          `Scene().rm_all`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Class &#39;fury.window.rm_all&#39; is deprecated, instead&quot;</span>
-         <span class="s2">&quot; use class &#39;fury.window.Scene.rm_all&#39;. It will be&quot;</span>
-         <span class="s2">&quot; removed in FURY v0.6.0&quot;</span><span class="p">,</span> <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">rm_all</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="ShowManager"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager">[docs]</a><span class="k">class</span> <span class="nc">ShowManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class interface between the scene, the window and the interactor.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ShowManager.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;FURY&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+<div class="viewcode-block" id="ShowManager.__init__"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;FURY&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
                  <span class="n">png_magnify</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                  <span class="n">interactor_style</span><span class="o">=</span><span class="s1">&#39;custom&#39;</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
                  <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
@@ -558,16 +561,17 @@
 <span class="sd">            rotation) or if &#39;custom&#39; then CustomInteractorStyle is used.</span>
 <span class="sd">            Otherwise you can input your own interactor style.</span>
 <span class="sd">        stereo: string</span>
-<span class="sd">            Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
-<span class="sd">                &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
-<span class="sd">                          &#39;CrystalEyes&#39; by VTK. \n</span>
-<span class="sd">                &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to \</span>
-<span class="sd">                use different colors. \n</span>
-<span class="sd">                &#39;interlaced&#39;: Line interlaced. \n</span>
-<span class="sd">                &#39;checkerboard&#39;: Checkerboard interlaced. \n</span>
-<span class="sd">                &#39;left&#39;: Left eye only. \n</span>
-<span class="sd">                &#39;right&#39;: Right eye only. \n</span>
-<span class="sd">                &#39;horizontal&#39;: Side-by-side.</span>
+<span class="sd">            Set the stereo type. Default is &#39;off&#39;. Other types include:</span>
+
+<span class="sd">            * &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as</span>
+<span class="sd">              &#39;CrystalEyes&#39; by VTK.</span>
+<span class="sd">            * &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to</span>
+<span class="sd">              use different colors.</span>
+<span class="sd">            * &#39;interlaced&#39;: Line interlaced.</span>
+<span class="sd">            * &#39;checkerboard&#39;: Checkerboard interlaced.</span>
+<span class="sd">            * &#39;left&#39;: Left eye only.</span>
+<span class="sd">            * &#39;right&#39;: Right eye only.</span>
+<span class="sd">            * &#39;horizontal&#39;: Side-by-side.</span>
 
 <span class="sd">        multi_samples : int</span>
 <span class="sd">            Number of samples for anti-aliazing (Default 8).</span>
@@ -790,9 +794,10 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">play_events</span><span class="p">(</span><span class="n">events</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ShowManager.add_window_callback"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.add_window_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_window_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win_callback</span><span class="p">):</span>
+<div class="viewcode-block" id="ShowManager.add_window_callback"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.add_window_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_window_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">win_callback</span><span class="p">,</span>
+                            <span class="n">event</span><span class="o">=</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">ModifiedEvent</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Add window callbacks.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">ModifiedEvent</span><span class="p">,</span> <span class="n">win_callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">win_callback</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ShowManager.add_timer_callback"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.add_timer_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_timer_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">duration</span><span class="p">,</span> <span class="n">timer_callback</span><span class="p">):</span>
@@ -846,16 +851,17 @@
 <span class="sd">        option which is False will order the actors according to the order of</span>
 <span class="sd">        their addition to the Scene().</span>
 <span class="sd">    stereo : string</span>
-<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
-<span class="sd">            &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
-<span class="sd">                      &#39;CrystalEyes&#39; by VTK. \n</span>
-<span class="sd">            &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to \</span>
-<span class="sd">                        use different colors. \n</span>
-<span class="sd">            &#39;interlaced&#39;: Line interlaced. \n</span>
-<span class="sd">            &#39;checkerboard&#39;: Checkerboard interlaced. \n</span>
-<span class="sd">            &#39;left&#39;: Left eye only. \n</span>
-<span class="sd">            &#39;right&#39;: Right eye only. \n</span>
-<span class="sd">            &#39;horizontal&#39;: Side-by-side.</span>
+<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include:</span>
+
+<span class="sd">        * &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as</span>
+<span class="sd">          &#39;CrystalEyes&#39; by VTK.</span>
+<span class="sd">        * &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to</span>
+<span class="sd">          use different colors.</span>
+<span class="sd">        * &#39;interlaced&#39;: Line interlaced.</span>
+<span class="sd">        * &#39;checkerboard&#39;: Checkerboard interlaced.</span>
+<span class="sd">        * &#39;left&#39;: Left eye only.</span>
+<span class="sd">        * &#39;right&#39;: Right eye only.</span>
+<span class="sd">        * &#39;horizontal&#39;: Side-by-side.</span>
 
 <span class="sd">    multi_samples : int</span>
 <span class="sd">        Number of samples for anti-aliazing (Default 8).</span>
@@ -884,9 +890,11 @@
 <span class="sd">    fury.window.snapshot</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="n">show_manager</span> <span class="o">=</span> <span class="n">ShowManager</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">png_magnify</span><span class="p">,</span> <span class="n">reset_camera</span><span class="p">,</span>
-                               <span class="n">order_transparent</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="n">stereo</span><span class="p">)</span>
+                               <span class="n">order_transparent</span><span class="p">,</span> <span class="n">stereo</span><span class="o">=</span><span class="n">stereo</span><span class="p">,</span>
+                               <span class="n">multi_samples</span><span class="o">=</span><span class="n">multi_samples</span><span class="p">,</span>
+                               <span class="n">max_peels</span><span class="o">=</span><span class="n">max_peels</span><span class="p">,</span>
+                               <span class="n">occlusion_ratio</span><span class="o">=</span><span class="n">occlusion_ratio</span><span class="p">)</span>
     <span class="n">show_manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
     <span class="n">show_manager</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
     <span class="n">show_manager</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
@@ -931,16 +939,18 @@
 <span class="sd">        If True Call ``scene.reset_camera()``. Otherwise you need to set the</span>
 <span class="sd">         camera before calling this function.</span>
 <span class="sd">    stereo: string</span>
-<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
-<span class="sd">            &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
-<span class="sd">                      &#39;CrystalEyes&#39; by VTK. \n</span>
-<span class="sd">            &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to \</span>
-<span class="sd">                        use different colors. \n</span>
-<span class="sd">            &#39;interlaced&#39;: Line interlaced. \n</span>
-<span class="sd">            &#39;checkerboard&#39;: Checkerboard interlaced. \n</span>
-<span class="sd">            &#39;left&#39;: Left eye only. \n</span>
-<span class="sd">            &#39;right&#39;: Right eye only. \n</span>
-<span class="sd">            &#39;horizontal&#39;: Side-by-side.</span>
+<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include:</span>
+
+<span class="sd">        * &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as</span>
+<span class="sd">          &#39;CrystalEyes&#39; by VTK.</span>
+<span class="sd">        * &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to</span>
+<span class="sd">          use different colors.</span>
+<span class="sd">        * &#39;interlaced&#39;: Line interlaced.</span>
+<span class="sd">        * &#39;checkerboard&#39;: Checkerboard interlaced.</span>
+<span class="sd">        * &#39;left&#39;: Left eye only.</span>
+<span class="sd">        * &#39;right&#39;: Right eye only.</span>
+<span class="sd">        * &#39;horizontal&#39;: Side-by-side.</span>
+
 <span class="sd">    verbose : bool</span>
 <span class="sd">        print information about the camera. Default is False.</span>
 
@@ -952,7 +962,7 @@
 <span class="sd">    &gt;&gt;&gt; scene.add(a)</span>
 <span class="sd">    &gt;&gt;&gt; # uncomment below to record</span>
 <span class="sd">    &gt;&gt;&gt; # window.record(scene)</span>
-<span class="sd">    &gt;&gt;&gt; #check for new images in current directory</span>
+<span class="sd">    &gt;&gt;&gt; # check for new images in current directory</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">scene</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -978,7 +988,6 @@
     <span class="n">renderLarge</span><span class="o">.</span><span class="n">SetMagnification</span><span class="p">(</span><span class="n">magnification</span><span class="p">)</span>
     <span class="n">renderLarge</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
 
-    <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGWriter</span><span class="p">()</span>
     <span class="n">ang</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">if</span> <span class="n">cam_pos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1003,7 +1012,6 @@
         <span class="n">renderLarge</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
         <span class="n">renderLarge</span><span class="o">.</span><span class="n">SetMagnification</span><span class="p">(</span><span class="n">magnification</span><span class="p">)</span>
         <span class="n">renderLarge</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">renderLarge</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
 
         <span class="k">if</span> <span class="n">path_numbering</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">out_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1015,14 +1023,19 @@
                 <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;fury.png&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">filename</span> <span class="o">=</span> <span class="n">out_path</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span>
+
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">renderLarge</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span>
+                                         <span class="o">.</span><span class="n">GetScalars</span><span class="p">())</span>
+        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">renderLarge</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">renderLarge</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetNumberOfScalarComponents</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">components</span><span class="p">))</span>
+        <span class="n">save_image</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
         <span class="n">ang</span> <span class="o">=</span> <span class="o">+</span><span class="n">az_ang</span></div>
 
 
 <div class="viewcode-block" id="antialiasing"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.antialiasing">[docs]</a><span class="k">def</span> <span class="nf">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">win</span><span class="p">,</span> <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-                <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+                 <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Enable anti-aliasing and ordered transparency</span>
 
 <span class="sd">    Parameters</span>
@@ -1079,16 +1092,17 @@
 <span class="sd">        If True also enables anti-aliasing.</span>
 
 <span class="sd">    stereo: string</span>
-<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include: \n</span>
-<span class="sd">            &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
-<span class="sd">                      &#39;CrystalEyes&#39; by VTK. \n</span>
-<span class="sd">            &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to \</span>
-<span class="sd">                        use different colors. \n</span>
-<span class="sd">            &#39;interlaced&#39;: Line interlaced. \n</span>
-<span class="sd">            &#39;checkerboard&#39;: Checkerboard interlaced. \n</span>
-<span class="sd">            &#39;left&#39;: Left eye only. \n</span>
-<span class="sd">            &#39;right&#39;: Right eye only. \n</span>
-<span class="sd">            &#39;horizontal&#39;: Side-by-side.</span>
+<span class="sd">        Set the stereo type. Default is &#39;off&#39;. Other types include:</span>
+
+<span class="sd">        * &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as</span>
+<span class="sd">          &#39;CrystalEyes&#39; by VTK.</span>
+<span class="sd">        * &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to</span>
+<span class="sd">          use different colors.</span>
+<span class="sd">        * &#39;interlaced&#39;: Line interlaced.</span>
+<span class="sd">        * &#39;checkerboard&#39;: Checkerboard interlaced.</span>
+<span class="sd">        * &#39;left&#39;: Left eye only.</span>
+<span class="sd">        * &#39;right&#39;: Right eye only.</span>
+<span class="sd">        * &#39;horizontal&#39;: Side-by-side.</span>
 
 <span class="sd">    multi_samples : int</span>
 <span class="sd">        Number of samples for anti-aliazing (Default 8).</span>
@@ -1134,10 +1148,7 @@
     <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">arr</span>
 
-    <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGWriter</span><span class="p">()</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span>
+    <span class="n">save_image</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">arr</span></div>
 
 
@@ -1164,7 +1175,10 @@
     <span class="k">return</span> <span class="n">report</span></div>
 
 
-<div class="viewcode-block" id="analyze_renderer"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.analyze_renderer">[docs]</a><span class="k">def</span> <span class="nf">analyze_renderer</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
+<div class="viewcode-block" id="analyze_renderer"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.analyze_renderer">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span><span class="s2">&quot;&#39;fury.window.analyze_renderer&#39; function deprecated, &quot;</span>
+                        <span class="s2">&quot;use &#39;fury.window.analyze_scene&#39; instead&quot;</span><span class="p">,</span>
+                        <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.2.0&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.6.0&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">analyze_renderer</span><span class="p">(</span><span class="n">scene</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Report number of actors on the scene.</span>
 
 <span class="sd">    .. deprecated:: 0.2.0</span>
@@ -1201,17 +1215,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">basestring</span><span class="p">):</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">()</span>
-        <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
-        <span class="n">reader</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
-        <span class="n">vtk_im</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
-        <span class="n">vtk_ext</span> <span class="o">=</span> <span class="n">vtk_im</span><span class="o">.</span><span class="n">GetExtent</span><span class="p">()</span>
-        <span class="n">vtk_pd</span> <span class="o">=</span> <span class="n">vtk_im</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span>
-        <span class="n">vtk_comp</span> <span class="o">=</span> <span class="n">vtk_pd</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
-        <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">vtk_ext</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">vtk_ext</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-                 <span class="n">vtk_ext</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">vtk_ext</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">vtk_comp</span><span class="p">)</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_pd</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">ReportSnapshot</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
         <span class="n">objects</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1249,21 +1253,22 @@
 
 
 <div class="viewcode-block" id="enable_stereo"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.enable_stereo">[docs]</a><span class="k">def</span> <span class="nf">enable_stereo</span><span class="p">(</span><span class="n">renwin</span><span class="p">,</span> <span class="n">stereo_type</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Enable the given stereo type on the RenderWindow</span>
+    <span class="sd">&quot;&quot;&quot;Enable the given stereo type on the RenderWindow.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    renwin: vtkRenderWindow</span>
 <span class="sd">    stereo_type: string</span>
-<span class="sd">        &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as \</span>
-<span class="sd">                  &#39;CrystalEyes&#39; by VTK. \n</span>
-<span class="sd">        &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to \</span>
-<span class="sd">                    use different colors. \n</span>
-<span class="sd">        &#39;interlaced&#39;: Line interlaced. \n</span>
-<span class="sd">        &#39;checkerboard&#39;: Checkerboard interlaced. \n</span>
-<span class="sd">        &#39;left&#39;: Left eye only. \n</span>
-<span class="sd">        &#39;right&#39;: Right eye only. \n</span>
-<span class="sd">        &#39;horizontal&#39;: Side-by-side.</span>
+<span class="sd">        * &#39;opengl&#39;: OpenGL frame-sequential stereo. Referred to as</span>
+<span class="sd">          &#39;CrystalEyes&#39; by VTK.</span>
+<span class="sd">        * &#39;anaglyph&#39;: For use with red/blue glasses. See VTK docs to</span>
+<span class="sd">          use different colors.</span>
+<span class="sd">        * &#39;interlaced&#39;: Line interlaced.</span>
+<span class="sd">        * &#39;checkerboard&#39;: Checkerboard interlaced.</span>
+<span class="sd">        * &#39;left&#39;: Left eye only.</span>
+<span class="sd">        * &#39;right&#39;: Right eye only.</span>
+<span class="sd">        * &#39;horizontal&#39;: Side-by-side.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">renwin</span><span class="o">.</span><span class="n">GetStereoCapableWindow</span><span class="p">()</span>
     <span class="n">renwin</span><span class="o">.</span><span class="n">StereoCapableWindowOn</span><span class="p">()</span>
@@ -1300,7 +1305,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2010-2019, FURY
+        &copy; Copyright 2010-2020, FURY
 
     </p>
   </div>
@@ -1332,6 +1337,10 @@
             
         
             
+            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.2.x/_modules/fury/window">fury v0.2.x</a></dd></li>
             
         
@@ -1341,10 +1350,6 @@
         
             
             <li><dd><a href="/v0.4.x/_modules/fury/window">fury v0.4.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
             
         
       </dl>
