@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.io &mdash; FURY 0.4.0.post223+g930c624 documentation</title>
+  <title>fury.io &mdash; FURY 0.4.0.post233+g6385630 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.4.0.post223+g930c624
+                0.4.0.post233+g6385630
               </div>
             
           
@@ -189,8 +189,8 @@
 <span class="sd">    -------</span>
 <span class="sd">    image: ndarray or vtk output</span>
 <span class="sd">        desired image array</span>
-<span class="sd">    &quot;&quot;&quot;</span>
 
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">use_pillow</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">pil_image</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RGBA&#39;</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">]:</span>
@@ -249,12 +249,12 @@
     <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetArray</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;original&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">as_vtktype</span><span class="p">:</span>
-        <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
+        <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
         <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">()</span>
 
         <span class="n">components</span> <span class="o">=</span> <span class="n">vtk_array</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
-        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span> <span class="k">if</span> <span class="n">as_vtktype</span> <span class="k">else</span> <span class="n">image</span></div>
 
@@ -262,6 +262,9 @@
 <div class="viewcode-block" id="save_image"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.save_image">[docs]</a><span class="k">def</span> <span class="nf">save_image</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">compression_quality</span><span class="o">=</span><span class="mi">75</span><span class="p">,</span>
                <span class="n">compression_type</span><span class="o">=</span><span class="s1">&#39;deflation&#39;</span><span class="p">,</span> <span class="n">use_pillow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a 2d or 3d image.</span>
+
+<span class="sd">    Expect an image with the following shape: (H, W) or (H, W, 1) or</span>
+<span class="sd">    (H, W, 3) or (H, W, 4).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -277,6 +280,7 @@
 <span class="sd">        select between: None, lzw, deflation (default)</span>
 <span class="sd">    use_pillow : bool, optional</span>
 <span class="sd">        Use imageio python library to save the files.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Image Dimensions should be &lt;=3&quot;</span><span class="p">)</span>
@@ -303,14 +307,24 @@
     <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="p">]:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">vtk_array_type</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">get_vtk_array_type</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-    <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">num_array</span><span class="o">=</span><span class="n">arr</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">num_array</span><span class="o">=</span><span class="n">arr</span><span class="p">,</span>
+                                           <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                            <span class="n">array_type</span><span class="o">=</span><span class="n">vtk_array_type</span><span class="p">)</span>
 
     <span class="c1"># Todo, look the following link for managing png 16bit</span>
     <span class="c1"># https://stackoverflow.com/questions/15667947/vtkpngwriter-printing-out-black-images</span>
     <span class="n">vtk_data</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">()</span>
-    <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetDimensions</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetDimensions</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetExtent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                       <span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                       <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span>
@@ -462,15 +476,15 @@
             
         
             
+            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
+            
+        
+            
             <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.1.x/_modules/fury/io">fury v0.1.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
             
         
       </dl>
