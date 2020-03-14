@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.ui &mdash; FURY 0.4.0.post296+g7d162c5 documentation</title>
+  <title>fury.ui &mdash; FURY 0.4.0.post314+g85a0cc8 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.4.0.post296+g7d162c5
+                0.4.0.post314+g85a0cc8
               </div>
             
           
@@ -2319,7 +2319,8 @@
 <div class="viewcode-block" id="LineDoubleSlider2D.__init__"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">inner_radius</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">outer_radius</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                  <span class="n">handle_side</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">(</span><span class="mi">450</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
                  <span class="n">initial_values</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-                 <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">text_template</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{value:.1f}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;disk&quot;</span><span class="p">):</span>
+                 <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">text_template</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{value:.1f}</span><span class="s2">&quot;</span><span class="p">,</span>
+                 <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;horizontal&quot;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;disk&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2348,6 +2349,8 @@
 <span class="sd">            replacement fields: `{value:}`, `{ratio:}`.</span>
 <span class="sd">            If callable, this instance of `:class:LineDoubleSlider2D` will be</span>
 <span class="sd">            passed as argument to the text template function.</span>
+<span class="sd">        orientation : str</span>
+<span class="sd">            horizontal or vertical</span>
 <span class="sd">        shape : string</span>
 <span class="sd">            Describes the shape of the handle.</span>
 <span class="sd">            Currently supports &#39;disk&#39; and &#39;square&#39;.</span>
@@ -2356,10 +2359,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">orientation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">LineDoubleSlider2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">length</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">line_width</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">length</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">line_width</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;vertical&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">line_width</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown orientation&quot;</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">center</span>
         <span class="k">if</span> <span class="n">shape</span> <span class="o">==</span> <span class="s2">&quot;disk&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">inner_radius</span> <span class="o">=</span> <span class="n">inner_radius</span>
@@ -2383,11 +2394,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">left_disk_value</span> <span class="o">=</span> <span class="n">initial_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">right_disk_value</span> <span class="o">=</span> <span class="n">initial_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="c1"># This is required for correct initialization of the position</span>
-        <span class="c1"># of the handles</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="s1">&#39;f8&#39;</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_disk_value</span> <span class="o">=</span> <span class="n">initial_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_disk_value</span> <span class="o">=</span> <span class="n">initial_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Setup this UI component.</span>
@@ -2450,8 +2458,15 @@
 
     <span class="k">def</span> <span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Consider the handle&#39;s size when computing the slider&#39;s size.</span>
-        <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coords</span><span class="p">):</span>
@@ -2464,8 +2479,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Offset the slider line by the handle&#39;s radius.</span>
         <span class="n">track_position</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">/</span> <span class="mf">2.</span>
-        <span class="c1"># Offset the slider line height by half the slider line width.</span>
-        <span class="n">track_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="c1"># Offset the slider line height by half the slider line width.</span>
+            <span class="n">track_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Offset the slider line width by half the slider line height.</span>
+            <span class="n">track_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">track_position</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float64&#39;</span><span class="p">)</span>
@@ -2474,11 +2493,26 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">coords</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">coords</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span>
 
-        <span class="c1"># Position the text below the handles.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="c1"># Position the text below the handles.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Position the text to the left of the handles.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">35</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">35</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bottom_y_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">top_y_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">left_x_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2505,7 +2539,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        ratio : float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span> <span class="o">+</span> <span class="n">ratio</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span> <span class="o">+</span> <span class="n">ratio</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottom_y_position</span> <span class="o">+</span> <span class="n">ratio</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span></div>
 
 <div class="viewcode-block" id="LineDoubleSlider2D.coord_to_ratio"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.coord_to_ratio">[docs]</a>    <span class="k">def</span> <span class="nf">coord_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coord</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts the x coordinate of a disk to the ratio</span>
@@ -2514,7 +2550,9 @@
 <span class="sd">        ----------</span>
 <span class="sd">        coord : float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">coord</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">coord</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">width</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">coord</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottom_y_position</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">height</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LineDoubleSlider2D.ratio_to_value"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.ratio_to_value">[docs]</a>    <span class="k">def</span> <span class="nf">ratio_to_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ratio</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Converts the ratio to the value of the disk.</span>
@@ -2536,21 +2574,72 @@
 <span class="sd">        disk_number : int</span>
 <span class="sd">            The index of disk being moved.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">x_position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x_position</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">x_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="n">x_position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x_position</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-            <span class="n">x_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">x_position</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">x_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
 
-        <span class="n">x_position</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span><span class="p">)</span>
-        <span class="n">x_position</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_x_position</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">x_position</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="n">x_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">x_position</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_x_position</span><span class="p">)</span>
+            <span class="n">x_position</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_x_position</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> \
+                <span class="p">(</span><span class="n">x_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">y_position</span> <span class="o">=</span> <span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">y_position</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">y_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">disk_number</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">y_position</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">y_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+
+            <span class="n">y_position</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">y_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottom_y_position</span><span class="p">)</span>
+            <span class="n">y_position</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">y_position</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_y_position</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">track</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_position</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">disk_number</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bottom_disk_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the value of the bottom disk. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@bottom_disk_value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bottom_disk_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottom_disk_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets the value of the bottom disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bottom_disk_value : float</span>
+<span class="sd">            New value for the bottom disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_disk_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="n">bottom_disk_value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">top_disk_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the value of the top disk. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@top_disk_value</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">top_disk_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_disk_value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets the value of the top disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        top_disk_value : float</span>
+<span class="sd">            New value for the top disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">top_disk_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="n">top_disk_value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">left_disk_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2583,6 +2672,42 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">right_disk_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_to_ratio</span><span class="p">(</span><span class="n">right_disk_value</span><span class="p">)</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bottom_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the ratio of the bottom disk. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="nd">@bottom_disk_ratio</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bottom_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottom_disk_ratio</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets the ratio of the bottom disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bottom_disk_ratio : float</span>
+<span class="sd">            New ratio for the bottom disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">position_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">bottom_disk_ratio</span><span class="p">)</span>
+        <span class="n">position_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">bottom_disk_ratio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="n">position_y</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">top_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns the ratio of the top disk. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="nd">@top_disk_ratio</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">top_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_disk_ratio</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Sets the ratio of the top disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        top_disk_ratio : float</span>
+<span class="sd">            New ratio for the top disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">position_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">top_disk_ratio</span><span class="p">)</span>
+        <span class="n">position_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">top_disk_ratio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="n">position_y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">left_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the ratio of the left disk. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -2596,7 +2721,8 @@
 <span class="sd">        left_disk_ratio : New ratio for the left disk.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">position_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">left_disk_ratio</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">position_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">left_disk_ratio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="n">position_y</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">right_disk_ratio</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2612,7 +2738,8 @@
 <span class="sd">        right_disk_ratio : New ratio for the right disk.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">position_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">right_disk_ratio</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">position_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_coord</span><span class="p">(</span><span class="n">right_disk_ratio</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">position_x</span><span class="p">,</span> <span class="n">position_y</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
 
 <div class="viewcode-block" id="LineDoubleSlider2D.format_text"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.format_text">[docs]</a>    <span class="k">def</span> <span class="nf">format_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk_number</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns formatted text to display along the slider.</span>
@@ -2638,8 +2765,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Compute the ratio determined by the position of the slider disk.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_to_ratio</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_to_ratio</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ratio</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coord_to_ratio</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="c1"># Compute the selected value considering min_value and max_value.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_values</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ratio_to_value</span><span class="p">(</span>
@@ -2649,9 +2780,14 @@
         <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_text</span><span class="p">(</span><span class="n">disk_number</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">handles</span><span class="p">[</span><span class="n">disk_number</span><span class="p">]</span><span class="o">.</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="LineDoubleSlider2D.handle_move_callback"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.LineDoubleSlider2D.handle_move_callback">[docs]</a>    <span class="k">def</span> <span class="nf">handle_move_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">vtkactor</span><span class="p">,</span> <span class="n">_slider</span><span class="p">):</span>
@@ -4522,19 +4658,19 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
-            
-        
-            
             <li><dd><a href="/v0.4.x/_modules/fury/ui">fury v0.4.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/ui">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.2.x/_modules/fury/ui">fury v0.2.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/_modules/fury/ui">fury v0.3.x</a></dd></li>
             
         
       </dl>
