@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.utils &mdash; FURY 0.4.0.post294+gd7ec6fb documentation</title>
+  <title>fury.utils &mdash; FURY 0.4.0.post296+g7d162c5 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.4.0.post294+gd7ec6fb
+                0.4.0.post296+g7d162c5
               </div>
             
           
@@ -1062,6 +1062,90 @@
     <span class="n">norm</span><span class="p">[</span><span class="n">faces</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">n</span>
     <span class="n">normalize_v3</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">norm</span></div>
+
+
+<div class="viewcode-block" id="what_order"><a class="viewcode-back" href="../../reference/fury.utils.html#fury.actor.what_order">[docs]</a><span class="k">def</span> <span class="nf">what_order</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">tri</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Determines the winding order of a given set of vertices and a triangle</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ---------</span>
+<span class="sd">    verts: ndarray</span>
+<span class="sd">        array of vertices making up a shape</span>
+<span class="sd">    tri: ndarray</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    0 or 1: int</span>
+<span class="sd">        If the order is counter clockwise, returns 0.</span>
+<span class="sd">        Otherwise, returns 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="n">tri</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">v2</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="n">tri</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="n">v3</span> <span class="o">=</span> <span class="n">verts</span><span class="p">[</span><span class="n">tri</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">v2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">x3</span> <span class="o">=</span> <span class="n">v3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">y1</span> <span class="o">=</span> <span class="n">v1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">v2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">y3</span> <span class="o">=</span> <span class="n">v3</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">val</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x3</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y3</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">val</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="change_order"><a class="viewcode-back" href="../../reference/fury.utils.html#fury.actor.change_order">[docs]</a><span class="k">def</span> <span class="nf">change_order</span><span class="p">(</span><span class="n">tri</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Changes the order of a given triangle</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ---------</span>
+<span class="sd">    tri: ndarray</span>
+<span class="sd">        array of 3 vertices making up a triangle</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array(newVert): ndarray</span>
+<span class="sd">        new array of vertices making up a triangle in the opposite winding order</span>
+<span class="sd">        of the given parameter</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">newVert</span> <span class="o">=</span> <span class="p">[</span><span class="n">tri</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">tri</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tri</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">newVert</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_order"><a class="viewcode-back" href="../../reference/fury.utils.html#fury.actor.check_order">[docs]</a><span class="k">def</span> <span class="nf">check_order</span><span class="p">(</span><span class="n">vert</span><span class="p">,</span> <span class="n">triarr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameter</span>
+<span class="sd">    ---------</span>
+<span class="sd">    vert: ndarray</span>
+<span class="sd">        array of vertices corresponding to a shape</span>
+<span class="sd">    triarr: ndarray</span>
+<span class="sd">        array of triangles corresponding to a shape</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    correct_vert: ndarray</span>
+<span class="sd">        The corrected order of the vert parameter</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">shape</span> <span class="o">=</span> <span class="n">triarr</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">correct_vert</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">correct_order</span> <span class="o">=</span> <span class="n">what_order</span><span class="p">(</span><span class="n">vert</span><span class="p">,</span> <span class="n">triarr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">nb</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">triarr</span><span class="p">):</span>
+        <span class="n">order2</span> <span class="o">=</span> <span class="n">what_order</span><span class="p">(</span><span class="n">vert</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">correct_order</span> <span class="o">!=</span> <span class="n">order2</span><span class="p">:</span>
+            <span class="n">temp</span> <span class="o">=</span> <span class="n">change_order</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="n">correct_vert</span><span class="p">[</span><span class="n">nb</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">correct_vert</span><span class="p">[</span><span class="n">nb</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">correct_vert</span></div>
 </pre></div>
 
            </div>
@@ -1106,7 +1190,7 @@
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/utils">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/utils">fury v0.1.x</a></dd></li>
             
         
             
@@ -1114,11 +1198,11 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/utils">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/utils">fury v0.3.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/utils">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/utils">fury v0.2.x</a></dd></li>
             
         
       </dl>
