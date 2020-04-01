@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.primitive &mdash; FURY 0.4.0.post362+gb6cf376 documentation</title>
+  <title>fury.primitive &mdash; FURY 0.4.0.post370+g35b43ca documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.4.0.post362+gb6cf376
+                0.4.0.post370+g35b43ca
               </div>
             
           
@@ -182,10 +182,12 @@
            <div itemprop="articleBody">
             
   <h1>Source code for fury.primitive</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
+<span></span><span class="sd">&quot;&quot;&quot;Module dedicated for basic primitive.&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
 <span class="kn">from</span> <span class="nn">fury.transform</span> <span class="kn">import</span> <span class="n">cart2sphere</span><span class="p">,</span> <span class="n">euler_matrix</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">fix_winding_order</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">ConvexHull</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">transform</span>
 <span class="kn">import</span> <span class="nn">math</span>
@@ -460,9 +462,10 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No sphere called &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
-    <span class="n">verts</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span>
+    <span class="n">verts</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="n">faces</span> <span class="o">=</span> <span class="n">faces_from_sphere_vertices</span><span class="p">(</span><span class="n">verts</span><span class="p">)</span> <span class="k">if</span> <span class="n">gen_faces</span> <span class="k">else</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;faces&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span></div>
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">fix_winding_order</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span> <span class="n">faces</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;vertices&#39;</span><span class="p">],</span> <span class="n">faces</span></div>
 
 
 <div class="viewcode-block" id="prim_superquadric"><a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_superquadric">[docs]</a><span class="k">def</span> <span class="nf">prim_superquadric</span><span class="p">(</span><span class="n">roundness</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">sphere_name</span><span class="o">=</span><span class="s1">&#39;symmetric362&#39;</span><span class="p">):</span>
@@ -519,9 +522,9 @@
 
 
 <div class="viewcode-block" id="prim_tetrahedron"><a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_tetrahedron">[docs]</a><span class="k">def</span> <span class="nf">prim_tetrahedron</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    returns vertices and triangles to a tetrahedron</span>
-<span class="sd">    that has a side length of two units.</span>
+    <span class="sd">&quot;&quot;&quot;Return vertices and triangles for a tetrahedron.</span>
+
+<span class="sd">    This shape has a side length of two units.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -529,6 +532,7 @@
 <span class="sd">        4 vertices coordinates</span>
 <span class="sd">    triangles: numpy.ndarray</span>
 <span class="sd">        4 triangles representing the tetrahedron</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">pyramid_vert</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span>
@@ -545,8 +549,7 @@
 
 
 <div class="viewcode-block" id="prim_icosahedron"><a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_icosahedron">[docs]</a><span class="k">def</span> <span class="nf">prim_icosahedron</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    returns vertices and triangles to a icosahedron</span>
+    <span class="sd">&quot;&quot;&quot;Return vertices and triangles for icosahedron.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -554,6 +557,7 @@
 <span class="sd">        12 vertices coordinates to the icosahedron</span>
 <span class="sd">    icosahedron_mesh: numpy.ndarray</span>
 <span class="sd">        20 triangles representing the tetrahedron</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">phi</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.0</span>
 
@@ -640,11 +644,11 @@
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/primitive">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/primitive">fury v0.4.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/primitive">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/primitive">fury v0.2.x</a></dd></li>
             
         
             
