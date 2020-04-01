@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.4.0.post373+g606b22a documentation</title>
+  <title>fury.actor &mdash; FURY 0.4.0.post392+g3736955 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.4.0.post373+g606b22a
+                0.4.0.post392+g3736955
               </div>
             
           
@@ -626,6 +626,58 @@
     <span class="n">skin_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetColor</span><span class="p">(</span><span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">skin_actor</span></div>
+
+
+<div class="viewcode-block" id="contour_from_label"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.contour_from_label">[docs]</a><span class="k">def</span> <span class="nf">contour_from_label</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate surface actor from a labeled Array.</span>
+
+<span class="sd">    The color and opacity of individual surfaces can be customized.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data : array, shape (X, Y, Z)</span>
+<span class="sd">        A labeled array file that will be binarized and displayed.</span>
+<span class="sd">    affine : array, shape (4, 4)</span>
+<span class="sd">        Grid to space (usually RAS 1mm) transformation matrix. Default is None.</span>
+<span class="sd">        If None then the identity matrix is used.</span>
+<span class="sd">    color : (N, 3) or (N, 4) ndarray</span>
+<span class="sd">        RGB/RGBA values in [0,1]. Default is None.</span>
+<span class="sd">        If None then random colors are used.</span>
+<span class="sd">        Alpha channel is set to 1 by default.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    contour_assembly : vtkAssembly</span>
+<span class="sd">        Array surface object displayed in space</span>
+<span class="sd">        coordinates as calculated by the affine parameter</span>
+<span class="sd">        in the order of their roi ids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">unique_roi_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">nb_surfaces</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_roi_id</span><span class="p">)</span>
+
+    <span class="n">unique_roi_surfaces</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkAssembly</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">color</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">color</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect color array shape&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">color</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+        <span class="n">opacity</span> <span class="o">=</span> <span class="n">color</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">roi_id</span> <span class="ow">in</span> <span class="n">unique_roi_id</span><span class="p">:</span>
+        <span class="n">roi_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">roi_id</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">roi_surface</span> <span class="o">=</span> <span class="n">contour_from_roi</span><span class="p">(</span><span class="n">roi_data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span>
+                                       <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">roi_id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                                       <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">roi_id</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">unique_roi_surfaces</span><span class="o">.</span><span class="n">AddPart</span><span class="p">(</span><span class="n">roi_surface</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unique_roi_surfaces</span></div>
 
 
 <div class="viewcode-block" id="streamtube"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.streamtube">[docs]</a><span class="k">def</span> <span class="nf">streamtube</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s2">&quot;RGB&quot;</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">tube_sides</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span>
@@ -2632,11 +2684,11 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
             
         
             
