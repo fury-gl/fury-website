@@ -1,0 +1,587 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Visualize bundles and metrics on bundles &mdash; FURY 0.5.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom_github.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Advanced interactive visualization" href="viz_advanced.html" />
+    <link rel="prev" title="Visualization of ROI Surface Rendered with Streamlines" href="viz_roi_contour.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.5.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">About Fury</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../symlink/license.html">License</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Programming with Fury</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Demos</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="viz_network.html">Visualize Interdisciplinary map of the journals network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Visualize bundles and metrics on bundles</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-streamline-with-an-orientation-color">Show every streamline with an orientation color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-point-with-a-value-from-a-volume-with-default-colormap">Show every point with a value from a volume with default colormap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-point-with-a-value-from-a-volume-with-your-colormap">Show every point with a value from a volume with your colormap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-bundle-with-a-specific-color">Show every bundle with a specific color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-streamline-of-a-bundle-with-a-different-color">Show every streamline of a bundle with a different color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-every-point-of-every-streamline-with-a-different-color">Show every point of every streamline with a different color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#add-depth-cues-to-streamline-rendering">Add depth cues to streamline rendering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#render-streamlines-as-fake-tubes">Render streamlines as fake tubes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#combine-depth-cues-with-fake-tubes">Combine depth cues with fake tubes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#render-streamlines-as-tubes">Render streamlines as tubes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Demos</a> &raquo;</li>
+        
+      <li>Visualize bundles and metrics on bundles</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/auto_examples/viz_bundles.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-viz-bundles-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="visualize-bundles-and-metrics-on-bundles">
+<span id="sphx-glr-auto-examples-viz-bundles-py"></span><h1>Visualize bundles and metrics on bundles<a class="headerlink" href="#visualize-bundles-and-metrics-on-bundles" title="Permalink to this headline">¶</a></h1>
+<p>First, let’s download some available datasets. Here we are using a dataset
+which provides metrics and bundles.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span>
+<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">fetch_bundles_2_subjects</span><span class="p">,</span> <span class="n">read_bundles_2_subjects</span>
+<span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">transform_streamlines</span><span class="p">,</span> <span class="n">length</span>
+
+<a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># set to True to show the interactive display window</span>
+
+<span class="n">fetch_bundles_2_subjects</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">dix</span></a> <span class="o">=</span> <span class="n">read_bundles_2_subjects</span><span class="p">(</span><span class="n">subj_id</span><span class="o">=</span><span class="s1">&#39;subj_1&#39;</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;fa&#39;</span><span class="p">],</span>
+                              <span class="n">bundles</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;cg.left&#39;</span><span class="p">,</span> <span class="s1">&#39;cst.right&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Store fractional anisotropy.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">fa</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">dix</span></a><span class="p">[</span><span class="s1">&#39;fa&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Store grid to world transformation matrix.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">affine</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">dix</span></a><span class="p">[</span><span class="s1">&#39;affine&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Store the cingulum bundle. A bundle is a list of streamlines.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="View documentation for builtins.dict"><span class="n">dix</span></a><span class="p">[</span><span class="s1">&#39;cg.left&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It happened that this bundle is in world coordinates and therefore we need to
+transform it into native image coordinates so that it is in the same
+coordinate space as the <code class="docutils literal notranslate"><span class="pre">fa</span></code> image.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">bundle_native</span> <span class="o">=</span> <span class="n">transform_streamlines</span><span class="p">(</span><span class="n">bundle</span><span class="p">,</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.inv.html#numpy.linalg.inv" title="View documentation for numpy.linalg.inv"><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span></a><span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">affine</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="section" id="show-every-streamline-with-an-orientation-color">
+<h2>Show every streamline with an orientation color<a class="headerlink" href="#show-every-streamline-with-an-orientation-color" title="Permalink to this headline">¶</a></h2>
+<p>This is the default option when you are using <code class="docutils literal notranslate"><span class="pre">line</span></code> or <code class="docutils literal notranslate"><span class="pre">streamtube</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">176.42</span><span class="p">,</span> <span class="mf">118.52</span><span class="p">,</span> <span class="mf">128.20</span><span class="p">),</span>
+                 <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">113.30</span><span class="p">,</span> <span class="mf">128.31</span><span class="p">,</span> <span class="mf">76.56</span><span class="p">),</span>
+                 <span class="n">view_up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.18</span><span class="p">,</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">))</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle1.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_001.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_001.png" />
+<p>You may wonder how we knew how to set the camera. This is very easy. You just
+need to run <code class="docutils literal notranslate"><span class="pre">window.show</span></code> once see how you want to see the object and then
+close the window and call the <code class="docutils literal notranslate"><span class="pre">camera_info</span></code> method which prints the
+position, focal point and view up vectors of the camera.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">camera_info</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span># Active Camera
+   Position (-237.76, 115.97, 138.55)
+   Focal Point (112.80, 127.81, 76.06)
+   View Up (0.18, 0.00, 0.98)
+</pre></div>
+</div>
+</div>
+<div class="section" id="show-every-point-with-a-value-from-a-volume-with-default-colormap">
+<h2>Show every point with a value from a volume with default colormap<a class="headerlink" href="#show-every-point-with-a-value-from-a-volume-with-default-colormap" title="Permalink to this headline">¶</a></h2>
+<p>Here we will need to input the <code class="docutils literal notranslate"><span class="pre">fa</span></code> map in <code class="docutils literal notranslate"><span class="pre">streamtube</span></code> or <code class="docutils literal notranslate"><span class="pre">line</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor2</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">fa</span></a><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can also show the scalar bar.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.scalar_bar" title="View documentation for fury.actor.scalar_bar"><span class="n">actor</span><span class="o">.</span><span class="n">scalar_bar</span></a><span class="p">()</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor2</span></a><span class="p">)</span>
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle2.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_002.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_002.png" />
+</div>
+<div class="section" id="show-every-point-with-a-value-from-a-volume-with-your-colormap">
+<h2>Show every point with a value from a volume with your colormap<a class="headerlink" href="#show-every-point-with-a-value-from-a-volume-with-your-colormap" title="Permalink to this headline">¶</a></h2>
+<p>Here we will need to input the <code class="docutils literal notranslate"><span class="pre">fa</span></code> map in <code class="docutils literal notranslate"><span class="pre">streamtube</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">hue</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>  <span class="c1"># red only</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">saturation</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># white to red</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.colormap_lookup_table" title="View documentation for fury.actor.colormap_lookup_table"><span class="n">actor</span><span class="o">.</span><span class="n">colormap_lookup_table</span></a><span class="p">(</span><span class="n">hue_range</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">hue</span></a><span class="p">,</span>
+                                       <span class="n">saturation_range</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">saturation</span></a><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor3</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">fa</span></a><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                           <span class="n">lookup_colormap</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar2</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.scalar_bar" title="View documentation for fury.actor.scalar_bar"><span class="n">actor</span><span class="o">.</span><span class="n">scalar_bar</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor3</span></a><span class="p">)</span>
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar2</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle3.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_003.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_003.png" />
+</div>
+<div class="section" id="show-every-bundle-with-a-specific-color">
+<h2>Show every bundle with a specific color<a class="headerlink" href="#show-every-bundle-with-a-specific-color" title="Permalink to this headline">¶</a></h2>
+<p>You can have a bundle with a specific color. In this example, we are chosing
+orange.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor4</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor4</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle4.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_004.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_004.png" />
+</div>
+<div class="section" id="show-every-streamline-of-a-bundle-with-a-different-color">
+<h2>Show every streamline of a bundle with a different color<a class="headerlink" href="#show-every-streamline-of-a-bundle-with-a-different-color" title="Permalink to this headline">¶</a></h2>
+<p>Let’s make a colormap where every streamline of the bundle is colored by its
+length.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">lengths</span></a> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">bundle_native</span><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">hue</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>  <span class="c1"># blue only</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">saturation</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>  <span class="c1"># black to white</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.colormap_lookup_table" title="View documentation for fury.actor.colormap_lookup_table"><span class="n">actor</span><span class="o">.</span><span class="n">colormap_lookup_table</span></a><span class="p">(</span>
+    <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.min.html#numpy.ndarray.min" title="View documentation for numpy.ndarray.min"><span class="n">lengths</span><span class="o">.</span><span class="n">min</span></a><span class="p">(),</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.max.html#numpy.ndarray.max" title="View documentation for numpy.ndarray.max"><span class="n">lengths</span><span class="o">.</span><span class="n">max</span></a><span class="p">()),</span>
+    <span class="n">hue_range</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">hue</span></a><span class="p">,</span>
+    <span class="n">saturation_range</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="View documentation for builtins.tuple"><span class="n">saturation</span></a><span class="p">)</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor5</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">lengths</span></a><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                           <span class="n">lookup_colormap</span><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor5</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar3</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.scalar_bar" title="View documentation for fury.actor.scalar_bar"><span class="n">actor</span><span class="o">.</span><span class="n">scalar_bar</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">lut_cmap</span></a><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">bar3</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle5.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_005.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_005.png" />
+</div>
+<div class="section" id="show-every-point-of-every-streamline-with-a-different-color">
+<h2>Show every point of every streamline with a different color<a class="headerlink" href="#show-every-point-of-every-streamline-with-a-different-color" title="Permalink to this headline">¶</a></h2>
+<p>In this case in which we want to have a color per point and per streamline,
+we can create a list of the colors to correspond to the list of streamlines
+(bundles). Here in <code class="docutils literal notranslate"><span class="pre">colors</span></code> we will insert some random RGB colors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">colors</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="o">*</span><span class="n">streamline</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="n">bundle_native</span><span class="p">]</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor6</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">colors</span></a><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor6</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle6.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_006.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_006.png" />
+</div>
+<div class="section" id="add-depth-cues-to-streamline-rendering">
+<h2>Add depth cues to streamline rendering<a class="headerlink" href="#add-depth-cues-to-streamline-rendering" title="Permalink to this headline">¶</a></h2>
+<p>By default, lines are drawn with the same width on the screen, regardless of
+their distance from the camera. To increase realism, we can enable
+<code class="docutils literal notranslate"><span class="pre">depth_cue</span></code> to make the lines shrink with distance from the camera. We
+will return to the default color scheme from the first example. Note that
+<code class="docutils literal notranslate"><span class="pre">depth_cue</span></code> works best for <code class="docutils literal notranslate"><span class="pre">linewidth</span></code> &lt;= 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor7</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">depth_cue</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor7</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle7.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_007.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_007.png" />
+</div>
+<div class="section" id="render-streamlines-as-fake-tubes">
+<h2>Render streamlines as fake tubes<a class="headerlink" href="#render-streamlines-as-fake-tubes" title="Permalink to this headline">¶</a></h2>
+<p>We can simulate the look of streamtubes by adding shading to streamlines with
+<code class="docutils literal notranslate"><span class="pre">fake_tube</span></code>. Note that <code class="docutils literal notranslate"><span class="pre">fake_tube</span></code> requires <code class="docutils literal notranslate"><span class="pre">linewidth</span></code> &gt; 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor8</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fake_tube</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor8</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle8.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_008.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_008.png" />
+</div>
+<div class="section" id="combine-depth-cues-with-fake-tubes">
+<h2>Combine depth cues with fake tubes<a class="headerlink" href="#combine-depth-cues-with-fake-tubes" title="Permalink to this headline">¶</a></h2>
+<p>It is possible to fully simulate streamtubes by enabling both <code class="docutils literal notranslate"><span class="pre">depth_cue</span></code>
+and <code class="docutils literal notranslate"><span class="pre">fake_tube</span></code>. However, it can be challenging to choose a <code class="docutils literal notranslate"><span class="pre">linewidth</span></code>
+that demonstrates both techniques well.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor9</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                           <span class="n">depth_cue</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fake_tube</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor9</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle9.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_009.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_009.png" />
+</div>
+<div class="section" id="render-streamlines-as-tubes">
+<h2>Render streamlines as tubes<a class="headerlink" href="#render-streamlines-as-tubes" title="Permalink to this headline">¶</a></h2>
+<p>For yet more realism, we can use <code class="docutils literal notranslate"><span class="pre">streamtube</span></code>. Note that this actor
+generates much more geometry than <code class="docutils literal notranslate"><span class="pre">line</span></code>, so it is more computationally
+expensive. For large datasets, it may be better to approximate tubes using
+the methods described above.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor10</span></a> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.streamtube" title="View documentation for fury.actor.streamtube"><span class="n">actor</span><span class="o">.</span><span class="n">streamtube</span></a><span class="p">(</span><span class="n">bundle_native</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">stream_actor10</span></a><span class="p">)</span>
+
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<a href="../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;bundle10.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+</pre></div>
+</div>
+<img alt="../_images/sphx_glr_viz_bundles_010.png" class="sphx-glr-single-img" src="../_images/sphx_glr_viz_bundles_010.png" />
+<p>In summary, we showed that there are many useful ways for visualizing maps
+on bundles.</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  7.455 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-viz-bundles-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/91f88d14fe624ba255522df4fa11c4a4/viz_bundles.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_bundles.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/d1d698eb8e8498ee8c623174a60336f7/viz_bundles.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_bundles.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="viz_advanced.html" class="btn btn-neutral float-right" title="Advanced interactive visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="viz_roi_contour.html" class="btn btn-neutral float-left" title="Visualization of ROI Surface Rendered with Streamlines" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2010-2020, FURY
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Documentation Versions</span>
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        
+            
+            <li><dd><a href="/dev/auto_examples/viz_bundles">fury dev</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/latest/auto_examples/viz_bundles">fury latest</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/auto_examples/viz_bundles">fury v0.3.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.1.x/auto_examples/viz_bundles">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.2.x/auto_examples/viz_bundles">fury v0.2.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.4.x/auto_examples/viz_bundles">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dt>fury v0.5.x</dt></li>
+            
+        
+      </dl>
+    </div>
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+  
+
+</body>
+</html>
