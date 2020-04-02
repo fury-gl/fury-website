@@ -1,0 +1,19 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`fury`
+===========
+.. automodule:: fury
+
+.. currentmodule:: fury
+.. autosummary::
+
+   get_info
+
+
+.. currentmodule:: fury
+
+get_info
+~~~~~~~~
+
+.. autofunction:: get_info
+
