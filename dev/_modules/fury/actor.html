@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.5.1.post73+gefebe52 documentation</title>
+  <title>fury.actor &mdash; FURY 0.5.1.post105+gda86080 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post73+gefebe52
+                0.5.1.post105+gda86080
               </div>
             
           
@@ -1912,6 +1912,86 @@
     <span class="k">return</span> <span class="n">actor</span></div>
 
 
+<div class="viewcode-block" id="octagonalprism"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.octagonalprism">[docs]</a><span class="k">def</span> <span class="nf">octagonalprism</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                   <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many octagonal prisms with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Octagonal prism positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the octagonal prism.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    scale : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Octagonal prism size on each direction (x, y), default(1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(3, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(3, 3)</span>
+<span class="sd">    &gt;&gt;&gt; colors = np.random.rand(3, 3)*255</span>
+<span class="sd">    &gt;&gt;&gt; scales = np.random.rand(3, 1)</span>
+<span class="sd">    &gt;&gt;&gt; actor = actor.octagonalprism(centers, dirs, colors, scales)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_octagonalprism</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                              <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">oct_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">oct_actor</span></div>
+
+
+<div class="viewcode-block" id="frustum"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.frustum">[docs]</a><span class="k">def</span> <span class="nf">frustum</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many frustum pyramids with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Frustum pyramid positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the frustum pyramid.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    heights : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Frustum pyramid size on each direction (x, y), default(1)</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(4, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(4, 3)</span>
+<span class="sd">    &gt;&gt;&gt; colors = np.random.rand(4, 3)*255</span>
+<span class="sd">    &gt;&gt;&gt; scales = np.random.rand(4, 1)</span>
+<span class="sd">    &gt;&gt;&gt; actor = actor.frustum(centers, dirs, colors, scales)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_frustum</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                              <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">frustum_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">frustum_actor</span></div>
+
+
 <div class="viewcode-block" id="superquadric"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.superquadric">[docs]</a><span class="k">def</span> <span class="nf">superquadric</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">roundness</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                  <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Visualize one or many superquadrics with different features.</span>
@@ -2657,7 +2737,11 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/fury/actor">fury v0.5.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
             
         
             
@@ -2665,15 +2749,11 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/actor">fury v0.5.x</a></dd></li>
-            
-        
-            
             <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
             
         
       </dl>
