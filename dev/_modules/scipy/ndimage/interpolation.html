@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>scipy.ndimage.interpolation &mdash; FURY 0.5.1.post129+gb35fcdc documentation</title>
+  <title>scipy.ndimage.interpolation &mdash; FURY 0.5.1.post166+g946f6fb documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post129+gb35fcdc
+                0.5.1.post166+g946f6fb
               </div>
             
           
@@ -213,11 +213,11 @@
 <span class="c1"># NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS</span>
 <span class="c1"># SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
-
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy.core.multiarray</span> <span class="kn">import</span> <span class="n">normalize_axis_index</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_ni_support</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">_nd_image</span>
@@ -240,7 +240,7 @@
 <span class="k">def</span> <span class="nf">spline_filter1d</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
                     <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate a one-dimensional spline filter along the given axis.</span>
+<span class="sd">    Calculate a 1-D spline filter along the given axis.</span>
 
 <span class="sd">    The lines of the array along the given axis are filtered by a</span>
 <span class="sd">    spline filter. The order of the spline must be &gt;= 2 and &lt;= 5.</span>
@@ -266,14 +266,38 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    All functions in `ndimage.interpolation` do spline interpolation of</span>
-<span class="sd">    the input image. If using b-splines of `order &gt; 1`, the input image</span>
-<span class="sd">    values have to be converted to b-spline coefficients first, which is</span>
-<span class="sd">    done by applying this one-dimensional filter sequentially along all</span>
-<span class="sd">    axes of the input. All functions that require b-spline coefficients</span>
+<span class="sd">    the input image. If using B-splines of `order &gt; 1`, the input image</span>
+<span class="sd">    values have to be converted to B-spline coefficients first, which is</span>
+<span class="sd">    done by applying this 1-D filter sequentially along all</span>
+<span class="sd">    axes of the input. All functions that require B-spline coefficients</span>
 <span class="sd">    will automatically filter their inputs, a behavior controllable with</span>
 <span class="sd">    the `prefilter` keyword argument. For functions that accept a `mode`</span>
 <span class="sd">    parameter, the result will only be correct if it matches the `mode`</span>
 <span class="sd">    used when filtering.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    spline_filter : Multidimensional spline filter.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    We can filter an image using 1-D spline along the given axis:</span>
+
+<span class="sd">    &gt;&gt;&gt; from scipy.ndimage import spline_filter1d</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; orig_img = np.eye(20)  # create an image</span>
+<span class="sd">    &gt;&gt;&gt; orig_img[10, :] = 1.0</span>
+<span class="sd">    &gt;&gt;&gt; sp_filter_axis_0 = spline_filter1d(orig_img, axis=0)</span>
+<span class="sd">    &gt;&gt;&gt; sp_filter_axis_1 = spline_filter1d(orig_img, axis=1)</span>
+<span class="sd">    &gt;&gt;&gt; f, ax = plt.subplots(1, 3, sharex=True)</span>
+<span class="sd">    &gt;&gt;&gt; for ind, data in enumerate([[orig_img, &quot;original image&quot;],</span>
+<span class="sd">    ...             [sp_filter_axis_0, &quot;spline filter (axis=0)&quot;],</span>
+<span class="sd">    ...             [sp_filter_axis_1, &quot;spline filter (axis=1)&quot;]]):</span>
+<span class="sd">    ...     ax[ind].imshow(data[0], cmap=&#39;gray_r&#39;)</span>
+<span class="sd">    ...     ax[ind].set_title(data[1])</span>
+<span class="sd">    &gt;&gt;&gt; plt.tight_layout()</span>
+<span class="sd">    &gt;&gt;&gt; plt.show()</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">order</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;spline order not supported&#39;</span><span class="p">)</span>
@@ -285,28 +309,45 @@
         <span class="n">output</span><span class="p">[</span><span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">mode</span> <span class="o">=</span> <span class="n">_ni_support</span><span class="o">.</span><span class="n">_extend_mode_to_code</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
-        <span class="n">axis</span> <span class="o">=</span> <span class="n">_ni_support</span><span class="o">.</span><span class="n">_check_axis</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="n">axis</span> <span class="o">=</span> <span class="n">normalize_axis_index</span><span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="nb">input</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
         <span class="n">_nd_image</span><span class="o">.</span><span class="n">spline_filter1d</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">output</span>
 
 
 <span class="k">def</span> <span class="nf">spline_filter</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Multi-dimensional spline filter.</span>
+<span class="sd">    Multidimensional spline filter.</span>
 
 <span class="sd">    For more details, see `spline_filter1d`.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    spline_filter1d</span>
+<span class="sd">    spline_filter1d : Calculate a 1-D spline filter along the given axis.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The multi-dimensional filter is implemented as a sequence of</span>
-<span class="sd">    one-dimensional spline filters. The intermediate arrays are stored</span>
+<span class="sd">    The multidimensional filter is implemented as a sequence of</span>
+<span class="sd">    1-D spline filters. The intermediate arrays are stored</span>
 <span class="sd">    in the same data type as the output. Therefore, for output types</span>
 <span class="sd">    with a limited precision, the results may be imprecise because</span>
 <span class="sd">    intermediate results may be stored with insufficient precision.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    We can filter an image using multidimentional splines:</span>
+
+<span class="sd">    &gt;&gt;&gt; from scipy.ndimage import spline_filter</span>
+<span class="sd">    &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
+<span class="sd">    &gt;&gt;&gt; orig_img = np.eye(20)  # create an image</span>
+<span class="sd">    &gt;&gt;&gt; orig_img[10, :] = 1.0</span>
+<span class="sd">    &gt;&gt;&gt; sp_filter = spline_filter(orig_img, order=3)</span>
+<span class="sd">    &gt;&gt;&gt; f, ax = plt.subplots(1, 2, sharex=True)</span>
+<span class="sd">    &gt;&gt;&gt; for ind, data in enumerate([[orig_img, &quot;original image&quot;],</span>
+<span class="sd">    ...                             [sp_filter, &quot;spline filter&quot;]]):</span>
+<span class="sd">    ...     ax[ind].imshow(data[0], cmap=&#39;gray_r&#39;)</span>
+<span class="sd">    ...     ax[ind].set_title(data[1])</span>
+<span class="sd">    &gt;&gt;&gt; plt.tight_layout()</span>
+<span class="sd">    &gt;&gt;&gt; plt.show()</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">order</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="n">order</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
@@ -386,12 +427,12 @@
 <span class="sd">    callback function must return the coordinates at which the input must</span>
 <span class="sd">    be interpolated in ``input_coordinates``. The rank of the input and</span>
 <span class="sd">    output arrays are given by ``input_rank`` and ``output_rank``</span>
-<span class="sd">    respectively.  ``user_data`` is the data pointer provided</span>
+<span class="sd">    respectively. ``user_data`` is the data pointer provided</span>
 <span class="sd">    to `scipy.LowLevelCallable` as-is.</span>
 
 <span class="sd">    The callback function must return an integer error status that is zero</span>
 <span class="sd">    if something went wrong and one otherwise. If an error occurs, you should</span>
-<span class="sd">    normally set the python error status with an informative message</span>
+<span class="sd">    normally set the Python error status with an informative message</span>
 <span class="sd">    before returning, otherwise a default error message is set by the</span>
 <span class="sd">    calling function.</span>
 
@@ -564,7 +605,7 @@
 
 <span class="sd">            - ``(ndim, ndim)``: the linear transformation matrix for each</span>
 <span class="sd">              output coordinate.</span>
-<span class="sd">            - ``(ndim,)``: assume that the 2D transformation matrix is</span>
+<span class="sd">            - ``(ndim,)``: assume that the 2-D transformation matrix is</span>
 <span class="sd">              diagonal, with the diagonal specified by the given value. A more</span>
 <span class="sd">              efficient algorithm is then used that exploits the separability</span>
 <span class="sd">              of the problem.</span>
@@ -605,8 +646,8 @@
 
 <span class="sd">    .. versionchanged:: 0.18.0</span>
 <span class="sd">        Previously, the exact interpretation of the affine transformation</span>
-<span class="sd">        depended on whether the matrix was supplied as a one-dimensional or</span>
-<span class="sd">        two-dimensional array. If a one-dimensional array was supplied</span>
+<span class="sd">        depended on whether the matrix was supplied as a 1-D or a</span>
+<span class="sd">        2-D array. If a 1-D array was supplied</span>
 <span class="sd">        to the matrix parameter, the output pixel value at index ``o``</span>
 <span class="sd">        was determined from the input image at position</span>
 <span class="sd">        ``matrix * (o + offset)``.</span>
@@ -660,9 +701,9 @@
         <span class="n">offset</span> <span class="o">=</span> <span class="n">offset</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">matrix</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;The behaviour of affine_transform with a one-dimensional &quot;</span>
+            <span class="s2">&quot;The behavior of affine_transform with a 1-D &quot;</span>
             <span class="s2">&quot;array supplied for the matrix parameter has changed in &quot;</span>
-            <span class="s2">&quot;scipy 0.18.0.&quot;</span>
+            <span class="s2">&quot;SciPy 0.18.0.&quot;</span>
         <span class="p">)</span>
         <span class="n">_nd_image</span><span class="o">.</span><span class="n">zoom_shift</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">offset</span><span class="o">/</span><span class="n">matrix</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span>
                              <span class="n">mode</span><span class="p">,</span> <span class="n">cval</span><span class="p">)</span>
@@ -863,7 +904,7 @@
     <span class="n">ndim</span> <span class="o">=</span> <span class="n">input_arr</span><span class="o">.</span><span class="n">ndim</span>
 
     <span class="k">if</span> <span class="n">ndim</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;input array should be at least two-dimensional&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;input array should be at least 2D&#39;</span><span class="p">)</span>
 
     <span class="n">axes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
 
@@ -981,7 +1022,7 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/scipy/ndimage/interpolation">fury v0.5.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/scipy/ndimage/interpolation">fury v0.2.x</a></dd></li>
             
         
             
@@ -993,11 +1034,11 @@
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/scipy/ndimage/interpolation">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/scipy/ndimage/interpolation">fury v0.1.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/scipy/ndimage/interpolation">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/scipy/ndimage/interpolation">fury v0.5.x</a></dd></li>
             
         
       </dl>

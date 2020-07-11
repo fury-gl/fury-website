@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.window &mdash; FURY 0.5.1.post129+gb35fcdc documentation</title>
+  <title>fury.window &mdash; FURY 0.5.1.post166+g946f6fb documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post129+gb35fcdc
+                0.5.1.post166+g946f6fb
               </div>
             
           
@@ -198,6 +198,7 @@
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span> <span class="k">as</span> <span class="n">InTemporaryDirectory</span>
 
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">fury_version</span>
+<span class="kn">from</span> <span class="nn">fury.decorators</span> <span class="kn">import</span> <span class="n">is_osx</span>
 <span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecate_with_version</span>
 <span class="kn">from</span> <span class="nn">fury.interactor</span> <span class="kn">import</span> <span class="n">CustomInteractorStyle</span>
 <span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">save_image</span>
@@ -652,8 +653,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order_transparent</span><span class="p">:</span>
+            <span class="n">occlusion_ratio</span> <span class="o">=</span> <span class="n">occlusion_ratio</span> <span class="ow">or</span> <span class="mf">0.1</span>
             <span class="n">antialiasing</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">,</span>
-                         <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="p">)</span>
+                         <span class="n">multi_samples</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_peels</span><span class="o">=</span><span class="n">max_peels</span><span class="p">,</span>
+                         <span class="n">occlusion_ratio</span><span class="o">=</span><span class="n">occlusion_ratio</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactor_style</span> <span class="o">==</span> <span class="s1">&#39;image&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkInteractorStyleImage</span><span class="p">()</span>
@@ -844,10 +847,13 @@
 
 <div class="viewcode-block" id="ShowManager.exit"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Close window and terminate interactor.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_osx</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="p">:</span>
+            <span class="c1"># OSX seems to not destroy correctly timers</span>
+            <span class="c1"># segfault 11 appears sometimes if we do not do it manually.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">destroy_timers</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">GetRenderWindow</span><span class="p">()</span><span class="o">.</span><span class="n">Finalize</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">TerminateApp</span><span class="p">()</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">TerminateApp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div></div>
 
 
 <div class="viewcode-block" id="show"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.show">[docs]</a><span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s1">&#39;FURY&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">png_magnify</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -1370,7 +1376,7 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/window">fury v0.5.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/window">fury v0.2.x</a></dd></li>
             
         
             
@@ -1382,11 +1388,11 @@
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/window">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/window">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/fury/window">fury v0.5.x</a></dd></li>
             
         
       </dl>
