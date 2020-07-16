@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.5.1.post181+g47b0b26 documentation</title>
+  <title>fury.actor &mdash; FURY 0.5.1.post196+g4276902 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post181+g47b0b26
+                0.5.1.post196+g4276902
               </div>
             
           
@@ -195,6 +195,7 @@
 <span class="kn">import</span> <span class="nn">fury.shaders</span> <span class="k">as</span> <span class="nn">fs</span>
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">layout</span>
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">create_colormap</span><span class="p">,</span> <span class="n">orient2rgb</span>
+<span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecated_params</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="p">(</span><span class="n">lines_to_vtk_polydata</span><span class="p">,</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">apply_affine</span><span class="p">,</span>
                         <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">,</span>
                         <span class="n">numpy_to_vtk_matrix</span><span class="p">,</span> <span class="n">shallow_copy</span><span class="p">,</span> <span class="n">rgb_to_vtk</span><span class="p">,</span>
@@ -1708,27 +1709,94 @@
     <span class="k">return</span> <span class="n">actor</span></div>
 
 
-<div class="viewcode-block" id="box"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.box">[docs]</a><span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualize one or many Box with different features.</span>
+<div class="viewcode-block" id="square"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.square">[docs]</a><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many squares with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Square positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3), optional</span>
+<span class="sd">        The orientation vector of the square.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    scale : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Square size on each direction (x, y), default(1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; sq_actor = actor.square(centers, dirs)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(sq_actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_square</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                              <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">sq_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="n">sq_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">BackfaceCullingOff</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">sq_actor</span></div>
+
+
+<div class="viewcode-block" id="rectangle"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.rectangle">[docs]</a><span class="k">def</span> <span class="nf">rectangle</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+              <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many rectangles with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Rectangle positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3), optional</span>
+<span class="sd">        The orientation vector of the rectangle.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    scale : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Rectangle size on each direction (x, y), default(1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; rect_actor = actor.rectangle(centers, dirs)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(rect_actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">square</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                  <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="box"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.box">[docs]</a><span class="nd">@deprecated_params</span><span class="p">([</span><span class="s1">&#39;size&#39;</span><span class="p">,</span> <span class="s1">&#39;heights&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">],</span>
+                   <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.6&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">box</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many boxes with different features.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
 <span class="sd">        Box positions</span>
-<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">    directions : ndarray, shape (N, 3), optional</span>
 <span class="sd">        The orientation vector of the box.</span>
-<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
 <span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
-<span class="sd">    size : tuple (3,)</span>
-<span class="sd">        Box lengths on each direction (x, y, z), default(1, 2, 3)</span>
-<span class="sd">    heights : ndarray, shape (N)</span>
-<span class="sd">        The height of the arrow.</span>
-<span class="sd">    vertices : ndarray, shape (N, 3)</span>
-<span class="sd">        The point cloud defining the sphere.</span>
-<span class="sd">    faces : ndarray, shape (M, 3)</span>
-<span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
-<span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
+<span class="sd">    scale : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Box size on each direction (x, y), default(1)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1740,46 +1808,34 @@
 <span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
 <span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
 <span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
-<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
-<span class="sd">    &gt;&gt;&gt; box_actor = actor.box(centers, dirs, (1, 1, 1), heights=heights)</span>
+<span class="sd">    &gt;&gt;&gt; box_actor = actor.box(centers, dirs, (1, 1, 1))</span>
 <span class="sd">    &gt;&gt;&gt; scene.add(box_actor)</span>
 <span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCubeSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_box</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                              <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">src</span><span class="o">.</span><span class="n">SetXLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">src</span><span class="o">.</span><span class="n">SetYLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">src</span><span class="o">.</span><span class="n">SetZLength</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-
-    <span class="n">actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-                           <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
-                           <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
-                           <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">actor</span></div>
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">box_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">box_actor</span></div>
 
 
-<div class="viewcode-block" id="cube"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.cube">[docs]</a><span class="k">def</span> <span class="nf">cube</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-         <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualize one or many cube with different features.</span>
+<div class="viewcode-block" id="cube"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.cube">[docs]</a><span class="nd">@deprecated_params</span><span class="p">(</span><span class="s1">&#39;heights&#39;</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.6&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.8&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">cube</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many cubes with different features.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
 <span class="sd">        Cube positions</span>
-<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">    directions : ndarray, shape (N, 3), optional</span>
 <span class="sd">        The orientation vector of the cube.</span>
-<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
 <span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
-<span class="sd">    heights : ndarray, shape (N)</span>
-<span class="sd">        The height of the arrow.</span>
-<span class="sd">    vertices : ndarray, shape (N, 3)</span>
-<span class="sd">        The point cloud defining the sphere.</span>
-<span class="sd">    faces : ndarray, shape (M, 3)</span>
-<span class="sd">        If faces is None then a sphere is created based on theta and phi angles</span>
-<span class="sd">        If not then a sphere is created with the provided vertices and faces.</span>
+<span class="sd">    scale : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Cube size, default=1</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1791,20 +1847,19 @@
 <span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
 <span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
 <span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
-<span class="sd">    &gt;&gt;&gt; heights = np.random.rand(5)</span>
-<span class="sd">    &gt;&gt;&gt; cube_actor = actor.cube(centers, dirs, (1, 1, 1), heights=heights)</span>
+<span class="sd">    &gt;&gt;&gt; cube_actor = actor.cube(centers, dirs)</span>
 <span class="sd">    &gt;&gt;&gt; scene.add(cube_actor)</span>
 <span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">box</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-               <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">heights</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span></div>
+               <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="arrow"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.arrow">[docs]</a><span class="k">def</span> <span class="nf">arrow</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
           <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">tip_radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shaft_radius</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
           <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualize one or many arrow with differents features.</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many arrows with differents features.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -2749,11 +2804,11 @@
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.2.x/_modules/fury/actor">fury v0.2.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
             
         
       </dl>
