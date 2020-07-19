@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.5.1.post205+ge0d1240 documentation</title>
+  <title>fury.actor &mdash; FURY 0.5.1.post226+gf529fde documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post205+ge0d1240
+                0.5.1.post226+gf529fde
               </div>
             
           
@@ -2740,6 +2740,116 @@
     <span class="n">earthActor</span><span class="o">.</span><span class="n">SetTexture</span><span class="p">(</span><span class="n">atext</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">earthActor</span></div>
+
+
+<div class="viewcode-block" id="sdf"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.sdf">[docs]</a><span class="k">def</span> <span class="nf">sdf</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">primitives</span><span class="o">=</span><span class="s1">&#39;torus&#39;</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a SDF primitive based actor</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        SDF primitive positions</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the SDF primitive.</span>
+<span class="sd">    primitives : str</span>
+<span class="sd">        The primitive of choice to be rendered.</span>
+<span class="sd">        Options are sphere and torus. Default is torus</span>
+<span class="sd">    scale : float</span>
+<span class="sd">        The size of the SDF primitive</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">prims</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;sphere&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;torus&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;ellipsoid&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_box</span><span class="p">()</span>
+    <span class="n">repeated</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span>
+                                   <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                                   <span class="n">scale</span><span class="o">=</span><span class="n">scale</span><span class="p">)</span>
+
+    <span class="n">rep_verts</span><span class="p">,</span> <span class="n">rep_faces</span><span class="p">,</span> <span class="n">rep_colors</span><span class="p">,</span> <span class="n">rep_centers</span> <span class="o">=</span> <span class="n">repeated</span>
+    <span class="n">box_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">rep_verts</span><span class="p">,</span> <span class="n">rep_faces</span><span class="p">,</span> <span class="n">rep_colors</span><span class="p">)</span>
+
+    <span class="n">vtk_center</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">rep_centers</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vtk_center</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">vtk_center</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+    <span class="n">box_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">vtk_center</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">primitives</span><span class="p">,</span>  <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">primlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">prims</span><span class="p">[</span><span class="n">prim</span><span class="p">]</span> <span class="k">for</span> <span class="n">prim</span> <span class="ow">in</span> <span class="n">primitives</span><span class="p">]</span>
+        <span class="n">rep_prims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">primlist</span><span class="p">,</span> <span class="n">verts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rep_prims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">prims</span><span class="p">[</span><span class="n">primitives</span><span class="p">],</span> <span class="n">rep_centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">vtk_primitive</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">rep_prims</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vtk_primitive</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vtk_primitive</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;primitive&quot;</span><span class="p">)</span>
+    <span class="n">box_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">vtk_primitive</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)):</span>
+        <span class="n">rep_scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">verts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rep_scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">scale</span><span class="p">,</span> <span class="n">rep_centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">vtk_scale</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">rep_scales</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vtk_scale</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">vtk_scale</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">)</span>
+    <span class="n">box_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">vtk_scale</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">directions</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span> <span class="ow">and</span> \
+            <span class="nb">len</span><span class="p">(</span><span class="n">directions</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">rep_directions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">directions</span><span class="p">,</span> <span class="n">rep_centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rep_directions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">directions</span><span class="p">,</span> <span class="n">verts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="n">vtk_direction</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">rep_directions</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vtk_direction</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">vtk_direction</span><span class="o">.</span><span class="n">SetName</span><span class="p">(</span><span class="s2">&quot;direction&quot;</span><span class="p">)</span>
+    <span class="n">box_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">vtk_direction</span><span class="p">)</span>
+
+    <span class="n">vs_dec_code</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sdf_dec.vert&quot;</span><span class="p">)</span>
+    <span class="n">vs_impl_code</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sdf_impl.vert&quot;</span><span class="p">)</span>
+    <span class="n">fs_dec_code</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sdf_dec.frag&quot;</span><span class="p">)</span>
+    <span class="n">fs_impl_code</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sdf_impl.frag&quot;</span><span class="p">)</span>
+
+    <span class="n">mapper</span> <span class="o">=</span> <span class="n">box_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span>
+    <span class="n">mapper</span><span class="o">.</span><span class="n">MapDataArrayToVertexAttribute</span><span class="p">(</span>
+        <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkDataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">MapDataArrayToVertexAttribute</span><span class="p">(</span>
+        <span class="s2">&quot;primitive&quot;</span><span class="p">,</span> <span class="s2">&quot;primitive&quot;</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkDataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span>
+        <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">MapDataArrayToVertexAttribute</span><span class="p">(</span>
+        <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkDataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">MapDataArrayToVertexAttribute</span><span class="p">(</span>
+        <span class="s2">&quot;direction&quot;</span><span class="p">,</span> <span class="s2">&quot;direction&quot;</span><span class="p">,</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkDataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span>
+        <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkShader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span> <span class="s2">&quot;//VTK::ValuePass::Dec&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">vs_dec_code</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkShader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span> <span class="s2">&quot;//VTK::ValuePass::Impl&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">vs_impl_code</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkShader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">,</span> <span class="s2">&quot;//VTK::ValuePass::Dec&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fs_dec_code</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">mapper</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkShader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">,</span> <span class="s2">&quot;//VTK::Light::Impl&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fs_impl_code</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">box_actor</span></div>
 </pre></div>
 
            </div>
@@ -2792,15 +2902,15 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/actor">fury v0.5.x</a></dd></li>
-            
-        
-            
             <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.5.x/_modules/fury/actor">fury v0.5.x</a></dd></li>
             
         
             
@@ -2808,7 +2918,7 @@
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/actor">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
             
         
       </dl>
