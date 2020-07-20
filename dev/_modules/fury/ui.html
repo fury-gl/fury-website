@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.ui &mdash; FURY 0.5.1.post231+ga318194 documentation</title>
+  <title>fury.ui &mdash; FURY 0.5.1.post271+g2bf53c1 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.5.1.post231+ga318194
+                0.5.1.post271+g2bf53c1
               </div>
             
           
@@ -97,6 +97,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Programming with Fury</span></p>
 <ul>
@@ -202,6 +203,45 @@
 
 
 <span class="n">TWO_PI</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+
+<div class="viewcode-block" id="clip_overflow"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.clip_overflow">[docs]</a><span class="k">def</span> <span class="nf">clip_overflow</span><span class="p">(</span><span class="n">textblock</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clips overflowing text of TextBlock2D with respect to width.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    textblock : TextBlock2D</span>
+<span class="sd">        The textblock object whose text needs to be clipped.</span>
+<span class="sd">    width : int</span>
+<span class="sd">        Required width of the clipped text.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    clipped text : str</span>
+<span class="sd">        Clipped version of the text.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">original_str</span> <span class="o">=</span> <span class="n">textblock</span><span class="o">.</span><span class="n">message</span>
+    <span class="n">start_ptr</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_ptr</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">original_str</span><span class="p">)</span>
+    <span class="n">prev_bg</span> <span class="o">=</span> <span class="n">textblock</span><span class="o">.</span><span class="n">have_bg</span>
+    <span class="n">textblock</span><span class="o">.</span><span class="n">have_bg</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">width</span> <span class="ow">or</span> <span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">width</span><span class="p">:</span>
+        <span class="n">textblock</span><span class="o">.</span><span class="n">have_bg</span> <span class="o">=</span> <span class="n">prev_bg</span>
+        <span class="k">return</span> <span class="n">original_str</span>
+
+    <span class="k">while</span> <span class="n">start_ptr</span> <span class="o">&lt;</span> <span class="n">end_ptr</span><span class="p">:</span>
+        <span class="n">mid_ptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">start_ptr</span> <span class="o">+</span> <span class="n">end_ptr</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+        <span class="n">textblock</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">original_str</span><span class="p">[:</span><span class="n">mid_ptr</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+        <span class="k">if</span> <span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">width</span><span class="p">:</span>
+            <span class="n">start_ptr</span> <span class="o">=</span> <span class="n">mid_ptr</span>
+        <span class="k">elif</span> <span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">width</span><span class="p">:</span>
+            <span class="n">end_ptr</span> <span class="o">=</span> <span class="n">mid_ptr</span>
+
+        <span class="k">if</span> <span class="n">mid_ptr</span> <span class="o">==</span> <span class="p">(</span><span class="n">start_ptr</span> <span class="o">+</span> <span class="n">end_ptr</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span> <span class="ow">or</span>\
+           <span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">width</span><span class="p">:</span>
+            <span class="n">textblock</span><span class="o">.</span><span class="n">have_bg</span> <span class="o">=</span> <span class="n">prev_bg</span>
+            <span class="k">return</span> <span class="n">textblock</span><span class="o">.</span><span class="n">message</span></div>
 
 
 <div class="viewcode-block" id="UI"><a class="viewcode-back" href="../../reference/fury.ui.html#fury.ui.UI">[docs]</a><span class="k">class</span> <span class="nc">UI</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
@@ -1411,7 +1451,7 @@
             <span class="n">bg_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span>
             <span class="k">if</span> <span class="n">bb_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">bg_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bb_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">bg_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Font size exceeds background bounding box.&quot;</span>
-                <span class="s2">&quot; Font Size will not be updated.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
+                     <span class="s2">&quot; Font Size will not be updated.&quot;</span><span class="p">,</span> <span class="ne">RuntimeWarning</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetPosition2</span><span class="p">(</span><span class="o">*</span><span class="n">bg_size</span><span class="p">)</span>
 
@@ -1664,8 +1704,8 @@
                 <span class="k">return</span> <span class="n">size</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;TextBlock2D must be added to the scene before &quot;</span>
-                <span class="s2">&quot;querying its size while TextScaleMode is set to None.&quot;</span><span class="p">,</span> 
-                <span class="ne">RuntimeWarning</span><span class="p">)</span>
+                     <span class="s2">&quot;querying its size while TextScaleMode is set to None.&quot;</span><span class="p">,</span>
+                     <span class="ne">RuntimeWarning</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetPosition2</span><span class="p">()</span></div>
 
@@ -3928,6 +3968,8 @@
 <span class="sd">        scene : scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">:</span>
+            <span class="n">clip_overflow</span><span class="p">(</span><span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">size</span>
@@ -4071,16 +4113,9 @@
         <span class="c1"># Populate slots according to the view.</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">choice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values_to_show</span><span class="p">):</span>
             <span class="n">slot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">char_width</span> <span class="o">=</span> <span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
-            <span class="n">permissible_chars</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">)</span><span class="o">//</span><span class="n">char_width</span>
-            <span class="n">total_chars</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">choice</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">total_chars</span> <span class="o">&gt;</span> <span class="n">permissible_chars</span><span class="p">:</span>
-                <span class="n">excess_chars</span> <span class="o">=</span> <span class="n">total_chars</span> <span class="o">-</span> <span class="n">permissible_chars</span>
-                <span class="n">wrapped_choice</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">choice</span><span class="p">)[:(</span><span class="o">-</span><span class="n">excess_chars</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
-                <span class="n">slot</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">choice</span>
-                <span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">wrapped_choice</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">slot</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">choice</span>
+            <span class="n">slot</span><span class="o">.</span><span class="n">element</span> <span class="o">=</span> <span class="n">choice</span>
+            <span class="k">if</span> <span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">clip_overflow</span><span class="p">(</span><span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">)</span>
             <span class="n">slot</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">slot</span><span class="o">.</span><span class="n">element</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">selected</span><span class="p">:</span>
                 <span class="n">slot</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
@@ -4766,6 +4801,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_selection_ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="n">clip_overflow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -5049,11 +5086,11 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/ui">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/ui">fury v0.4.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/ui">fury v0.5.x</a></dd></li>
+            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
             
         
             
@@ -5061,11 +5098,11 @@
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/ui">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/ui">fury v0.3.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/ui">fury v0.1.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/fury/ui">fury v0.5.x</a></dd></li>
             
         
       </dl>
@@ -5083,6 +5120,7 @@
   
     
     
+    <link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
     <style>
     /* Sidebar header (and topbar for mobile) */
     .wy-side-nav-search, .wy-nav-top {
@@ -5093,6 +5131,14 @@
         background: #4A3C31;
     }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+      new Crate({
+        server: '695048505902891009',
+        channel: '695305679682011217',
+        shard: 'https://e.widgetbot.io',
+        // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+      })
+    </script>
   
 
 </body>
