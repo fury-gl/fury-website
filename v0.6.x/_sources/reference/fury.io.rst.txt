@@ -1,0 +1,43 @@
+.. AUTO-GENERATED FILE -- DO NOT EDIT!
+
+:mod:`io`
+=========
+.. automodule:: fury.io
+
+.. currentmodule:: fury.io
+.. autosummary::
+
+   load_image
+   load_polydata
+   save_image
+   save_polydata
+   set_input
+
+
+.. currentmodule:: fury.io
+
+load_image
+~~~~~~~~~~
+
+.. autofunction:: load_image
+
+load_polydata
+~~~~~~~~~~~~~
+
+.. autofunction:: load_polydata
+
+save_image
+~~~~~~~~~~
+
+.. autofunction:: save_image
+
+save_polydata
+~~~~~~~~~~~~~
+
+.. autofunction:: save_polydata
+
+set_input
+~~~~~~~~~
+
+.. autofunction:: set_input
+
