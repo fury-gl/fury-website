@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title type="text">Blog - Posts by Soham Biswas</title>
+  <id>https://fury.gl/blog/author/soham-biswas/atom.xml</id>
+  <updated>2020-08-02T00:00:00Z</updated>
+  <link href="https://fury.gl/" />
+  <link href="https://fury.gl/blog/author/soham-biswas/atom.xml" rel="self" />
+  <generator uri="https://ablog.readthedocs.org" version="0.10.6">ABlog</generator>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">Single Actor, Physics, Scrollbars.</title>
+    <id>https://fury.gl/posts/2020/2020-08-02-week-10-soham.html</id>
+    <updated>2020-08-02T00:00:00Z</updated>
+    <published>2020-08-02T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-08-02-week-10-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;single-actor-physics-scrollbars&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 10th weekly check-in. Second evaluation ended this week and now we move on to our 3rd and final coding period. In today’s check-in I will be sharing my progress with the single actor physics simulation that I facing some issues with and I will also be discussing my future plans regarding UI components. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I was able to figure out the uncontrollable spinning problem that I was facing while rendering physics simulations. Specifically the simulation where a brick wall was rendered by a single actor. The spinning problem was as follows:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/88485303-87476780-cf92-11ea-850c-cc63e1376ef8.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/88485303-87476780-cf92-11ea-850c-cc63e1376ef8.gif&quot; /&gt;
+&lt;p&gt;Here’s how the fixed simulation looks like:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/89126963-946ed400-d507-11ea-93cd-aad3a9f59ab0.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/89126963-946ed400-d507-11ea-93cd-aad3a9f59ab0.gif&quot; /&gt;
+&lt;p&gt;I was facing this particular issue because I was directly syncing the orientation of the objects in pyBullet world to the objects in the Fury world. So I decided to apply the change in orientation instead and it worked. In order to achieve this I had to keep track of the bricks’ orientation at each step of the simulation, sync the change and then update the tracked orientation. Thankfully, pybullet had convenient tools to achieve this. Here’s a snippet on how to update individual objects rendered by a single actor:&lt;/p&gt;
+&lt;div class=&quot;highlight-python notranslate&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sync_brick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;multibody&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orn&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getBasePositionAndOrientation&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;multibody&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;rot_mat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;reshape&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getMatrixFromQuaternion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;p&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getDifferenceQuaternion&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;orn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;brick_orns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])),&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; \
+        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;brick_centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;@rot_mat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pos&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;brick_centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pos&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;brick_orns&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;orn&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;system-message&quot;&gt;
+&lt;p class=&quot;system-message-title&quot;&gt;System Message: WARNING/2 (&lt;span class=&quot;docutils literal&quot;&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-08-02-week-10-soham.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href=&quot;#id1&quot;&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “here”.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;All the necessary information is updated &lt;a class=&quot;reference external&quot; href=&quot;https://docs.google.com/document/d/1XJcG1TL5ZRJZDyi8V76leYZt_maxGp0kOB7OZIxKsTA/edit?usp=sharing&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Currently, the scrollbars are native to &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; only. We are planning to separate scrollbars from &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; to create a standalone UI component. This was in progress previously but was later discontinued, so I was given the responsibility to complete it. After this we plan to improve File Dialog capabilities later on.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I did not face any major issues but it took me some time to understand and evaluate the existing discontinued &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/pull/222&quot;&gt;PR&lt;/a&gt; regarding scrollbar separation.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">Tab UI, TabPanel2D, Tab UI Tutorial.</title>
+    <id>https://fury.gl/posts/2020/2020-07-26-week-9-soham.html</id>
+    <updated>2020-07-26T00:00:00Z</updated>
+    <published>2020-07-26T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-07-26-week-9-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;tab-ui-tabpanel2d-tab-ui-tutorial&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 9th weekly check-in. I will be sharing my progress with &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TabUI&lt;/span&gt;&lt;/code&gt; and its corresponding tutorial. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I finished the basic implementation of &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TabUI&lt;/span&gt;&lt;/code&gt;. Apart from that I was also able to finish the tutorial which showcases different features of this said UI. With the help of this UI one can have multiple panels containing different UI elements within them. The basic implementation can be demonstrated as follows:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/88484746-87456880-cf8e-11ea-9e96-9cba111b90d3.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/88484746-87456880-cf8e-11ea-9e96-9cba111b90d3.gif&quot; /&gt;
+&lt;p&gt;After finishing with the basic implementation I moved on to create its tutorial. For that, I decided to combine 3 of the existing UI tutorials to be rendered with the help of Tab UI. I implemented the following in individual tabs:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;&lt;p&gt;Controlling a cube with the help of &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;LineSlider2D&lt;/span&gt;&lt;/code&gt; and &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;RingSlider2D&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Using a &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;CheckBox&lt;/span&gt;&lt;/code&gt; to render a cylinder or a sphere or both.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Using &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox&lt;/span&gt;&lt;/code&gt; to set the color of a label.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The above tutorial can be demonstrated as follows:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/88481324-6a9e3600-cf78-11ea-8c5b-e26bf158388a.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/88481324-6a9e3600-cf78-11ea-8c5b-e26bf158388a.gif&quot; /&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Next week I will continue working on the Physics engine integration. Previously we were facing a problem regarding the uncontrollable spinning of objects rendered by a single actor. There must be an issue with mismatching axes alignment of FURY and pyBullet. The spinning problem is as following:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/88485303-87476780-cf92-11ea-850c-cc63e1376ef8.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/88485303-87476780-cf92-11ea-850c-cc63e1376ef8.gif&quot; /&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I did get stuck with the collapsing functionality of Tab UI and the uncontrollable spinning of the bricks in the Physics simulation. Apart from that I did not face any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">ComboBox2D, TextBlock2D, Clipping Overflow.</title>
+    <id>https://fury.gl/posts/2020/2020-07-19-week-8-soham.html</id>
+    <updated>2020-07-19T00:00:00Z</updated>
+    <published>2020-07-19T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-07-19-week-8-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;combobox2d-textblock2d-clipping-overflow&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 8th weekly check-in. I will be sharing my progress with &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt; and &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; UI components. After solving &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; sizing issue, I was finally able to complete the implementation of combo box. I also faced some problems while refactoring &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt;. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I finished the implementation of &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; and &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt;. I also added necessary tests and tutorials to aid the implementation. It still needs some color design, which will be decided later on. Here’s an overview of the tutorial:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/87884567-a8f19d80-ca2c-11ea-8fd2-e7e37b30602f.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/87884567-a8f19d80-ca2c-11ea-8fd2-e7e37b30602f.gif&quot; /&gt;
+&lt;p&gt;Its a simple tutorial where I change the color of the label based on the option selected on the combo box.&lt;/p&gt;
+&lt;p&gt;Now while refactoring TextBlock2D, I noticed that the Text Overflow workaround on ListBox2D broke and started acting weird. This was mainly because the size implementation was changed and the code that I wrote a few months back wasn’t relevant anymore. So I removed the previous code and had to re-implement the same. I later found out that I would be needing such an implementation for most of my UI components so I decided to create a separate method for clipping overflowing texts.&lt;/p&gt;
+&lt;p&gt;I had to figure out a specific algorithm to achieve this as the height and width of each characters were different and the combined width of multiple characters were not equal to the sum of their widths. I decided to go for a binary search implementation as it was faster compared to a simple linear checking algorithm. The said algorithm works as expected and is more effective compared to its previous implementation. I tweaked the previous combo box example to showcase this algorithm.&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/87884568-aabb6100-ca2c-11ea-9ab8-b05bdb8b0631.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/87884568-aabb6100-ca2c-11ea-9ab8-b05bdb8b0631.gif&quot; /&gt;
+&lt;p&gt;The extremely long text is now clipped correctly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Next week, I have a couple of things to work on. Firstly, the single actor wall brick simulation is yet to be completed. Once I am done with that I will continue working on Tab UI and try to finish its skeletal implementation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I did get stuck regarding the previous implementation of Text Overflow in ListBox2D. Before the current implementation it looked something like this:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/87430848-6b8fa900-c603-11ea-87b8-327f6e7f2ee0.png&quot; src=&quot;https://user-images.githubusercontent.com/29832615/87430848-6b8fa900-c603-11ea-87b8-327f6e7f2ee0.png&quot; /&gt;
+&lt;p&gt;Apart from that, I did not face any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">Orientation, Sizing, Tab UI.</title>
+    <id>https://fury.gl/posts/2020/2020-07-12-week-7-soham.html</id>
+    <updated>2020-07-12T00:00:00Z</updated>
+    <published>2020-07-12T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-07-12-week-7-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;orientation-sizing-tab-ui&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 7th weekly check-in. I will be sharing my progress with single actor physics simulation and &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; sizing issue which was pending for quite a while now. I will also be sharing my thoughts regarding the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TAB&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;UI&lt;/span&gt;&lt;/code&gt; component. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I was working with the orientation problem I mentioned in my previous check-in. I did have some problems regarding it, but thanks to my mentor I was able to figure it out and implement it with the help of scipy’s Quaternion to Rotation Matrix &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/scipy/scipy/blob/v1.5.1/scipy/spatial/transform/rotation.py#L174-L1978&quot;&gt;method&lt;/a&gt;. After understanding the orientation implementation, I spent some time regarding the design of the TAB UI component. I expect the design to be something similar as follows:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/87254337-906b0b80-c49f-11ea-93f3-3af0f2d8de10.png&quot; src=&quot;https://user-images.githubusercontent.com/29832615/87254337-906b0b80-c49f-11ea-93f3-3af0f2d8de10.png&quot; /&gt;
+&lt;p&gt;Fortunately, we have good news this week. The &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; sizing issue that we were facing for quite a while has now been fixed. We simply have to keep track of the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;scene&lt;/span&gt;&lt;/code&gt; parameter in the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;_add_to_scene&lt;/span&gt;&lt;/code&gt; method of each UI component. This scene parameter inherits &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;vtkViewport&lt;/span&gt;&lt;/code&gt;, hence it allows us to determine the necessary details about the environment of the 3D objects.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;As the sizing issue regarding &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; has been fixed, I am very much eager to finish the remaining work left. &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt; and &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; were left incomplete because of the issue. Therefore, my main objective next week would be to finish them first. Once I am done with it, I will move on to &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Tab&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;UI&lt;/span&gt;&lt;/code&gt;. If not, I will continue with the physics simulation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Apart from the orientation and sizing problem, I did not face any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">Translation, Reposition, Rotation.</title>
+    <id>https://fury.gl/posts/2020/2020-07-05-week-6-soham.html</id>
+    <updated>2020-07-05T00:00:00Z</updated>
+    <published>2020-07-05T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-07-05-week-6-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;translation-reposition-rotation&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 6th weekly check-in. The first evaluation period officially ends and I am very excited to move on to the second coding period. I will be sharing my progress with handling specific object’s properties among various multiple objects rendered by a single actor. I am mainly focusing on making it easier to translate, rotate and reposition a particular object, so that I can use them to render physics simulations more efficiently. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;Last week I worked on physics simulations rendered in FURY with the help of pyBullet. Now the simulations were highly un-optimized, specially the brick wall simulation as each brick was rendered by its own actor. In other words, 1 brick = 1 actor. Now my objective was to render all the bricks using a single actor, but before jumping into the simulation I had to figure out how to modify specific properties of an individual object. Thanks to my mentor’s &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/pull/233&quot;&gt;PR&lt;/a&gt;, I was able to experiment my implementations quickly.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;translation&quot;&gt;
+&lt;h3&gt;Translation:&lt;/h3&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/86536066-5085b080-bf02-11ea-9bcd-9e555adc2ca1.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/86536066-5085b080-bf02-11ea-9bcd-9e555adc2ca1.gif&quot; /&gt;
+&lt;p&gt;The algorithm behind translation is to first identify the vertices of the object, then bring the vertices to the origin by subtracting their centers and then adding the displacement vector. The said operation can be achieved by the following snippet:&lt;/p&gt;
+&lt;div class=&quot;highlight-python notranslate&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;# Update vertices positions&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; \
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;transln_vector&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;system-message&quot;&gt;
+&lt;p class=&quot;system-message-title&quot;&gt;System Message: WARNING/2 (&lt;span class=&quot;docutils literal&quot;&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-07-05-week-6-soham.rst&lt;/span&gt;, line 28)&lt;/p&gt;
+&lt;p&gt;Explicit markup ends without a blank line; unexpected unindent.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;​&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;rotation&quot;&gt;
+&lt;h3&gt;Rotation:&lt;/h3&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/86536065-4fed1a00-bf02-11ea-815d-f7f297165c53.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/86536065-4fed1a00-bf02-11ea-815d-f7f297165c53.gif&quot; /&gt;
+&lt;p&gt;The algorithm behind rotation is to first calculate the difference between the vertices and the center of the object. Once we get the resultant matrix, we matrix multiply it with the rotation matrix and then we further add the centers back to it so that we preserve the position of the object. Rotation matrix can be defined as:&lt;/p&gt;
+&lt;img alt=&quot;https://wikimedia.org/api/rest_v1/media/math/render/svg/242deb7010fd504134a6cacab3d0ef4ce02e7613&quot; src=&quot;https://wikimedia.org/api/rest_v1/media/math/render/svg/242deb7010fd504134a6cacab3d0ef4ce02e7613&quot; /&gt;
+&lt;p&gt;where gamma, beta and alpha corresponds to the angle of rotation along Z-axis, Y-axis and X-axis.&lt;/p&gt;
+&lt;div class=&quot;highlight-python notranslate&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;get_R&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;sd&quot;&gt;&amp;quot;&amp;quot;&amp;quot; Returns rotational matrix.&lt;/span&gt;
+&lt;span class=&quot;sd&quot;&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],&lt;/span&gt;
+        &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beta&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cos&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;gamma&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)]&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; \
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;@get_R&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;reposition&quot;&gt;
+&lt;h3&gt;Reposition:&lt;/h3&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/86536063-4ebbed00-bf02-11ea-8592-a695d7b91426.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/86536063-4ebbed00-bf02-11ea-8592-a695d7b91426.gif&quot; /&gt;
+&lt;p&gt;Repositioning is similar to that of translation, except in this case, while repositioning we update centers with the new position value.&lt;/p&gt;
+&lt;div class=&quot;highlight-python notranslate&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;new_pos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;np&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;# Update vertices positions&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; \
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vertices&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sec&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new_pos&lt;/span&gt;
+
+&lt;span class=&quot;n&quot;&gt;centers&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;object_index&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;new_pos&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Currently, I am yet to figure out the orientation problem. Once I figure that out I will be ready to implement simulations without any major issues. I am also tasked with creating a wrecking ball simulation and a quadruped robot simulation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I did face some problems while rotating objects. My mentors suggested me to implement it via rotation matrix. I still haven’t figured out the orientation problem, which I plan to work on next. Apart from these I did not face any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">May the Force be with you!!</title>
+    <id>https://fury.gl/posts/2020/2020-06-28-week-5-soham.html</id>
+    <updated>2020-06-28T00:00:00Z</updated>
+    <published>2020-06-28T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-06-28-week-5-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;may-the-force-be-with-you&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 5th weekly check-in, I will be sharing my progress of pyBullet Physics Engine Integration with FURY. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;div class=&quot;system-message&quot;&gt;
+&lt;p class=&quot;system-message-title&quot;&gt;System Message: WARNING/2 (&lt;span class=&quot;docutils literal&quot;&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-06-28-week-5-soham.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href=&quot;#id1&quot;&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “here”.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;Last week due to the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;vtkTextActor&lt;/span&gt;&lt;/code&gt; sizing issue I was not able to continue my work with &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt; UI element. Thus, I decided to work on the “Physics Engine Integration” part of my project. It took me quite a while to understand the terminology of various methods and algorithms used for detection and physics simulation. Nevertheless, I was able to create a couple of rigid body examples to showcase the integration procedure. For physics calculations we used pyBullet and for rendering we used FURY. In other words, pyBullet will handle the backend part of the simulation and FURY will handle the frontend. I have documented the entire integration process &lt;a class=&quot;reference external&quot; href=&quot;https://docs.google.com/document/d/1XJcG1TL5ZRJZDyi8V76leYZt_maxGp0kOB7OZIxKsTA/edit?usp=sharing&quot;&gt;here&lt;/a&gt; in detail.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;ball-collision-simulation&quot;&gt;
+&lt;h3&gt;Ball Collision Simulation:&lt;/h3&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/85949638-988e5b80-b975-11ea-85ba-16c1f78dec89.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/85949638-988e5b80-b975-11ea-85ba-16c1f78dec89.gif&quot; /&gt;
+&lt;p&gt;For the first example, I created a simple collision between two balls in which two spheres were created both in FURY and pyBullet world and then both the worlds are connected by syncing the position and orientation of the said bodies. Timer callback is created to update the positions and to simulate Physics for each step.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;brick-wall-simulation&quot;&gt;
+&lt;h3&gt;Brick Wall Simulation:&lt;/h3&gt;
+&lt;img alt=&quot;https://raw.githubusercontent.com/Nibba2018/testing-fury/master/2020-06-26_21-15-47.gif&quot; src=&quot;https://raw.githubusercontent.com/Nibba2018/testing-fury/master/2020-06-26_21-15-47.gif&quot; /&gt;
+&lt;p&gt;For the second example I tried to increase the complexity of the simulations by increasing the number of dynamic objects. Here a brick-wall is created using 100 bricks and then a ball is thrown at it. The rest of it is simulated. The same concepts from the first example is used to render the second one. Timer callback is created to update position of all the objects and to simulate Physics for each step.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;In the above examples I used a separate actor for each object which is highly un-optimized. Thus, my mentor suggested me to render all the bricks using a single actor, so that the simulation is more optimized. I am not very confident in changing the position and orientation of different objects rendered by a single actor. Therefore, I will have to research a bit more about it. Apart from that I will also try to work on Constraint based simulation examples if possible.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;The pyBullet documentation isn’t well written for cross rendering, hence it was a bit of a challenge for me to implement the integration. I also faced a problem regarding the offset of actors between the FURY world and pyBullet world. Both use different coordinate systems for rendering and simulation because of which I had a constant offset between the objects during simulations. I was able to fix it by converting one coordinate system to the other. Apart from this I did not have any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">TextBlock2D Progress!!</title>
+    <id>https://fury.gl/posts/2020/2020-06-21-week-4-soham.html</id>
+    <updated>2020-06-21T00:00:00Z</updated>
+    <published>2020-06-21T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-06-21-week-4-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;textblock2d-progress&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my 4th weekly check-in, I will be sharing my progress with TextBlock2D UI component. The official repository of my sub-org, FURY can always be found &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week my objective was to work on the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; resizing feature and also work on the scrollbar bug in &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt; UI component. The &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; component makes use of &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;vtkTextActor&lt;/span&gt;&lt;/code&gt; and its methods available in VTK for handling all Text related properties such as font size, color, background color etc. Now, going through the official &lt;a class=&quot;reference external&quot; href=&quot;https://vtk.org/doc/nightly/html/classvtkTextActor.html&quot;&gt;docs&lt;/a&gt; I figured out that the there were three different scaling modes for the said actor:&lt;/p&gt;
+&lt;ul class=&quot;simple&quot;&gt;
+&lt;li&gt;&lt;p&gt;TEXT_SCALE_MODE_NONE&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;TEXT_SCALE_MODE_PROP&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;TEXT_SCALE_MODE_VIEWPORT&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The first scaling mode was currently implemented in FURY’s &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; code base. This was done mainly because the only way for the user to create a text block was by providing the font size as parameter. We couldn’t use the third option as the FURY API tries to maintain abstraction by not exposing &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;vtkViewport&lt;/span&gt;&lt;/code&gt; parameter. Now in order to allow size as a parameter I had to use the second scaling option which is &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TEXT_SCALE_MODE_PROP&lt;/span&gt;&lt;/code&gt;. With  this mode one can set the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Position2&lt;/span&gt;&lt;/code&gt; parameter to the desired value of height and width. But the problem is I cannot use this for the combobox element as the background size will be inconsistent with respect to font size and text length.&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/85226809-12af6500-b3f7-11ea-8a75-7e86d40701d1.png&quot; src=&quot;https://user-images.githubusercontent.com/29832615/85226809-12af6500-b3f7-11ea-8a75-7e86d40701d1.png&quot; /&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/85226812-14792880-b3f7-11ea-8edd-1df25382a48f.png&quot; src=&quot;https://user-images.githubusercontent.com/29832615/85226812-14792880-b3f7-11ea-8edd-1df25382a48f.png&quot; /&gt;
+&lt;p&gt;Therefore, as a solution we agreed to add a separate Rectangle2D UI component as the background for Text Block along with vtkTextActor. With this implementation one can easily manipulate the background irrespective of the text properties. But this had another issue, the user now had 2 different ways of initializing a TextBlock2D. Therefore, when the user uses size a constructor parameter, then everything works in sync, but the same is not true for the font size parameter. This is mainly because we do not have a specific way of determining the size of the actor based on font size. My mentors have agreed to look into this problem and advised me to focus on something else instead.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Next week I am planning to start with Physics engine integration of FURY with pyBullet. My main focus would be to create simple simulations first before initiating the integration process. If the size issue is solved before I move into Physics engine then I would complete the ComboBox UI and start with Tab UI instead. I have also fixed the scrollbar bug.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;The main problem that I faced so far was regarding the variable background size of the Text Block component. Also the &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;GetPosition2&lt;/span&gt;&lt;/code&gt; method of &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;vtkTextActor&lt;/span&gt;&lt;/code&gt; would always return the same value irrespective of the font size parameter passed as a constructor argument. Therefore, it was not possible for me to determine the actual size or bounding box of the said text actor.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">ComboBox2D Progress!!</title>
+    <id>https://fury.gl/posts/2020/2020-06-14-week-3-soham.html</id>
+    <updated>2020-06-14T00:00:00Z</updated>
+    <published>2020-06-14T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-06-14-week-3-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;combobox2d-progress&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my third weekly check-in, I will be sharing my progress with the project so far. In case you wondered, the sub-org that I am affiliated to is FURY. Make sure to check out the official repository &lt;a class=&quot;reference external&quot; href=&quot;https://github.com/fury-gl/fury/&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week my objective was to work on the sizing and positioning issue regarding the sub-components of the ComboBox2D UI element. After countless debugging sessions and my mentor’s support, I was successfully able to fix the issue. I also developed helpful methods and callbacks for this element to allow users to interact with them in a user friendly manner. I also wrote tests for the same. So far the said progress can be summarized via this gif:&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/84592637-cc8d5b00-ae64-11ea-9ff3-c1ce2095f7f2.gif&quot; src=&quot;https://user-images.githubusercontent.com/29832615/84592637-cc8d5b00-ae64-11ea-9ff3-c1ce2095f7f2.gif&quot; /&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Unfortunately, one of the sub-components &lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt;, didn’t have a resizing feature that I could make use of for this new UI component. Thus, I need to add that feature on a different PR. This feature will also be required while building other UI elements therefore adding this feature is currently my top priority. There’s also a bug regarding the scrollbar that needs to be fixed. The scrollbar overshoots the specified combobox area after new items are appended to the combobox’s list of items during runtime. Hopefully I will be able to get them done by next week.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I was really confused with the coordinate system of Panel2D that was the main reason why components were misplaced. I also faced some issues regarding the scrollbar callback as it wasn’t scrolling the elements properly, the items were stuck in place. So far I was able to fix them. Apart from these, I didn’t face any major issues.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">First week of coding!!</title>
+    <id>https://fury.gl/posts/2020/2020-06-07-week-2-soham.html</id>
+    <updated>2020-06-07T00:00:00Z</updated>
+    <published>2020-06-07T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-06-07-week-2-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;first-week-of-coding&quot;&gt;
+
+&lt;p&gt;Hello and welcome to my second weekly check-in, I will be sharing my progress for the first week of coding.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-this-week&quot;&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week my objective was to create the skeleton model for ComboBox2D UI element along with its required sub-components and their respective default callbacks. So far, I have successfully been able to implement them. Apart from some issues that I was facing regarding the sizing and position of the sub-components.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Next week, my main focus will be on fixing the sizing issue and I will also be working on respective default and specialized class methods required by the component and its sub-components for proper functioning. I will also create tests for the same.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;did-you-get-stuck-anywhere&quot;&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;The main problem that I faced while coding the UI element was regarding the sizing and positioning of the sub-components. The sub-components appeared flipped and the TextBlock2D element had no option to resize based on a particular width &amp;amp; height definition.&lt;/p&gt;
+&lt;img alt=&quot;https://user-images.githubusercontent.com/29832615/82089691-b713fc80-9711-11ea-8d72-efaeaac1044c.png&quot; src=&quot;https://user-images.githubusercontent.com/29832615/82089691-b713fc80-9711-11ea-8d72-efaeaac1044c.png&quot; /&gt;
+&lt;p&gt;As you can see, the ComboBox UI element doesn’t look the way its supposed to. Along with this issue the scrollbars callback doesn’t work either. Hopefully, I will be able to get these issues fixed by next week.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;Thank&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;reading,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;see&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry xml:base="https://fury.gl/blog/author/soham-biswas/atom.xml">
+    <title type="text">Welcome to my GSoC Blog!!!</title>
+    <id>https://fury.gl/posts/2020/2020-05-30-week-1-soham.html</id>
+    <updated>2020-05-30T00:00:00Z</updated>
+    <published>2020-05-30T00:00:00Z</published>
+    <link href="https://fury.gl/posts/2020/2020-05-30-week-1-soham.html" />
+    <author>
+      <name>Soham Biswas</name>
+    </author>
+    <content type="html">&lt;div class=&quot;section&quot; id=&quot;welcome-to-my-gsoc-blog&quot;&gt;
+
+&lt;p&gt;Hello Everyone, this is &lt;strong&gt;Soham Biswas&lt;/strong&gt; currently in 2nd year pursuing my Bachelor’s(B.Tech) degree in Computer Science &amp;amp; Engineering from Institute of Engineering &amp;amp; Management, Kolkata. I have been selected for GSoC’ 20 at sub-org &lt;strong&gt;FURY&lt;/strong&gt; under the umbrella organization of &lt;strong&gt;Python Software Foundation&lt;/strong&gt;. I will be working on building sci-fi-like 2D and 3D interfaces and provide physics engine integration under project titled “Create new UI widgets &amp;amp; Physics Engine Integration”.&lt;/p&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-did-you-do-during-the-community-bonding-period&quot;&gt;
+&lt;h2&gt;What did you do during the Community Bonding Period?&lt;/h2&gt;
+&lt;p&gt;Due to the pandemic outbreak and the country wide lockdown in India, many places including my university were closed and therefore I decided to get a head start and start with the project early. During the community bonding period, we had video conference meetings with our mentors and the project’s core team. We interacted with each other and discussed the implementation details and their respective deadlines for the entire event period. We will be having such meetings every week on Wednesday in order to update ourselves about the progress of our respective tasks.&lt;/p&gt;
+&lt;p&gt;I completed the remaining Pull Requests that I had pending before the GSoC students announcement. I also reviewed other issues and pull requests to make sure everything remains up-to-date.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;section&quot; id=&quot;what-is-coming-up-next-week&quot;&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;Currently, I am focusing on building the ComboBox2D UI element. I will try to get the skeleton model, required sub-components and their respective default callbacks done by next week.&lt;/p&gt;
+&lt;p&gt;While working with my previous PR related to &lt;em&gt;Double Click&lt;/em&gt; callbacks, I faced an issue where I was unable to create and implement User Events properly in VTK. Thankfully, my mentors helped me out I was able to implement double click callbacks for all three mouse buttons successfully.&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;docutils literal notranslate&quot;&gt;&lt;span class=&quot;pre&quot;&gt;See&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;you&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;next&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;week,&lt;/span&gt; &lt;span class=&quot;pre&quot;&gt;cheers!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+</feed>
