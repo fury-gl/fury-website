@@ -24,7 +24,7 @@ First, a bunch of imports.
 
 
     from fury import window, ui, io, utils
-    import vtk
+    from fury.shaders import shader_to_actor, add_shader_callback
 
 
 
@@ -87,57 +87,35 @@ Specify fragment shader using vtkShader.Fragment
 
 .. code-block:: default
 
-
-
-    mapper.AddShaderReplacement(
-        vtk.vtkShader.Vertex,
-        "//VTK::ValuePass::Dec",
-        True,
+    vertex_shader_code_decl = \
         """
-        //VTK::ValuePass::Dec
         out vec4 myVertexVC;
-        """,
-        False
-    )
-
-    mapper.AddShaderReplacement(
-        vtk.vtkShader.Vertex,
-        "//VTK::ValuePass::Impl",
-        True,
         """
-        //VTK::ValuePass::Impl
+
+    vertex_shader_code_impl = \
+        """
         myVertexVC = vertexMC;
-        """,
-        False
-    )
-
-    mapper.AddShaderReplacement(
-        vtk.vtkShader.Fragment,
-        "//VTK::Light::Dec",
-        True,
         """
-        //VTK::Light::Dec
+
+    fragment_shader_code_decl = \
+        """
         uniform float time;
-        varying vec4 myVertexVC;
-        """,
-        False
-    )
-
-
-    mapper.AddShaderReplacement(
-        vtk.vtkShader.Fragment,
-        '//VTK::Light::Impl',
-        True,
+        out vec4 myVertexVC;
         """
-        //VTK::Light::Impl
+
+    fragment_shader_code_impl = \
+        """
         vec2 iResolution = vec2(1024,720);
         vec2 uv = myVertexVC.xy/iResolution;
         vec3 col = 0.5 + 0.5 * cos((time/30) + uv.xyx + vec3(0, 2, 4));
         fragOutput0 = vec4(col, 1.0);
-        """,
-        False
-    )
+        """
 
+    shader_to_actor(utah, "vertex", impl_code=vertex_shader_code_impl,
+                    decl_code=vertex_shader_code_decl)
+    shader_to_actor(utah, "fragment", decl_code=fragment_shader_code_decl)
+    shader_to_actor(utah, "fragment", impl_code=fragment_shader_code_impl,
+                    block="light")
 
 
 
@@ -185,15 +163,14 @@ The timer will call this user defined callback every 30 milliseconds.
 
 
 
-We can use a decorator to callback to the shader.
+The shader callback will update the color of our utah pot via the update of
+the timer variable.
 
 
 .. code-block:: default
 
 
-
-    @window.vtk.calldata_type(window.vtk.VTK_OBJECT)
-    def vtk_shader_callback(caller, event, calldata=None):
+    def shader_callback(_caller, _event, calldata=None):
         program = calldata
         global timer
         if program is not None:
@@ -203,6 +180,7 @@ We can use a decorator to callback to the shader.
                 pass
 
 
+    add_shader_callback(utah, shader_callback)
 
 
 
@@ -238,31 +216,6 @@ Change the property of the actor
 
 
 
-
-
-
-Invoke callbacks to any VTK object
-
-
-.. code-block:: default
-
-
-    mapper.AddObserver(window.vtk.vtkCommand.UpdateShaderEvent,
-                       vtk_shader_callback)
-
-
-
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-
-    1
 
 
 
@@ -303,7 +256,7 @@ manager.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  0.306 seconds)
+   **Total running time of the script:** ( 0 minutes  0.289 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_04_shaders_viz_shader.py:
