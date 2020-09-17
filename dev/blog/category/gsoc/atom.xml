@@ -2,188 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>http://lernfunk.de/media/654321</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2020-09-10T19:15:19.512988+00:00</updated>
+  <updated>2020-09-17T16:19:22.069184+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml"/>
-  <generator uri="https://ablog.readthedocs.org" version="0.10.8">ABlog</generator>
-  <entry>
-    <id>https://fury.gl/posts/2020/2020-07-05-week-6-lenix.html</id>
-    <title>Spherical harmonics, Continued.</title>
-    <updated>2020-07-05T00:00:00+00:00</updated>
-    <author>
-      <name>Lenix Lobo</name>
-    </author>
-    <content type="html">&lt;div class="section" id="spherical-harmonics-continued"&gt;
-
-&lt;p&gt;Make sure to check out Project &lt;a class="reference external" href="https://github.com/fury-gl/fury"&gt;FURY&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Hey !
-Spherical harmonics, Continued!&lt;/p&gt;
-&lt;div class="section" id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;Last week I added a basic implementation of Spherical harmonics based actors. However, the implementation was quite restricted and we needed to add support for more accurate generation of spherical harmonics. So the task assigned this week was to implement the spherical harmonics function within the shader rather than passing variables as uniforms. This was quite an challenging task as it involved understanding of mathematical formulae and implementing them using existing GLSL functions.
-The output of the implementation is shown below :&lt;/p&gt;
-&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-6.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-6.gif" /&gt;
-&lt;p&gt;While , i was able to complete the task the frame rate for the generated output was quite lower than expected.
-The code for the above render is available at the &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/Spherical-Harmonics"&gt;branch&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;The next task is to discuss possible performance improvements with the mentors and also look into alternative ideas to add spherical harmonics as actors in FURY.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Spherical harmonics involve a lot of complicated math behind the hood as a result the generated output has a very poor frame rate. Currently, we are looking into improving this.&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</content>
-    <link href="https://fury.gl/posts/2020/2020-07-05-week-6-lenix.html" rel="alternate"/>
-    <published>2020-07-05T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2020/2020-07-05-week-6-soham.html</id>
-    <title>Translation, Reposition, Rotation.</title>
-    <updated>2020-07-05T00:00:00+00:00</updated>
-    <author>
-      <name>Soham Biswas</name>
-    </author>
-    <content type="html">&lt;div class="section" id="translation-reposition-rotation"&gt;
-
-&lt;p&gt;Hello and welcome to my 6th weekly check-in. The first evaluation period officially ends and I am very excited to move on to the second coding period. I will be sharing my progress with handling specific object’s properties among various multiple objects rendered by a single actor. I am mainly focusing on making it easier to translate, rotate and reposition a particular object, so that I can use them to render physics simulations more efficiently. The official repository of my sub-org, FURY can always be found &lt;a class="reference external" href="https://github.com/fury-gl/fury/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="section" id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;Last week I worked on physics simulations rendered in FURY with the help of pyBullet. Now the simulations were highly un-optimized, specially the brick wall simulation as each brick was rendered by its own actor. In other words, 1 brick = 1 actor. Now my objective was to render all the bricks using a single actor, but before jumping into the simulation I had to figure out how to modify specific properties of an individual object. Thanks to my mentor’s &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/233"&gt;PR&lt;/a&gt;, I was able to experiment my implementations quickly.&lt;/p&gt;
-&lt;div class="section" id="translation"&gt;
-&lt;h3&gt;Translation:&lt;/h3&gt;
-&lt;img alt="https://user-images.githubusercontent.com/29832615/86536066-5085b080-bf02-11ea-9bcd-9e555adc2ca1.gif" src="https://user-images.githubusercontent.com/29832615/86536066-5085b080-bf02-11ea-9bcd-9e555adc2ca1.gif" /&gt;
-&lt;p&gt;The algorithm behind translation is to first identify the vertices of the object, then bring the vertices to the origin by subtracting their centers and then adding the displacement vector. The said operation can be achieved by the following snippet:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Update vertices positions&lt;/span&gt;
-&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; \
-    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;
-    &lt;span class="n"&gt;centers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;transln_vector&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-07-05-week-6-soham.rst&lt;/span&gt;, line 28)&lt;/p&gt;
-&lt;p&gt;Explicit markup ends without a blank line; unexpected unindent.&lt;/p&gt;
-&lt;/div&gt;
-&lt;p&gt;​&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="rotation"&gt;
-&lt;h3&gt;Rotation:&lt;/h3&gt;
-&lt;img alt="https://user-images.githubusercontent.com/29832615/86536065-4fed1a00-bf02-11ea-815d-f7f297165c53.gif" src="https://user-images.githubusercontent.com/29832615/86536065-4fed1a00-bf02-11ea-815d-f7f297165c53.gif" /&gt;
-&lt;p&gt;The algorithm behind rotation is to first calculate the difference between the vertices and the center of the object. Once we get the resultant matrix, we matrix multiply it with the rotation matrix and then we further add the centers back to it so that we preserve the position of the object. Rotation matrix can be defined as:&lt;/p&gt;
-&lt;img alt="https://wikimedia.org/api/rest_v1/media/math/render/svg/242deb7010fd504134a6cacab3d0ef4ce02e7613" src="https://wikimedia.org/api/rest_v1/media/math/render/svg/242deb7010fd504134a6cacab3d0ef4ce02e7613" /&gt;
-&lt;p&gt;where gamma, beta and alpha corresponds to the angle of rotation along Z-axis, Y-axis and X-axis.&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_R&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-    &lt;span class="sd"&gt;&amp;quot;&amp;quot;&amp;quot; Returns rotational matrix.&lt;/span&gt;
-&lt;span class="sd"&gt;    &amp;quot;&amp;quot;&amp;quot;&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
-        &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-        &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)],&lt;/span&gt;
-        &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt;
-        &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;alpha&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)],&lt;/span&gt;
-        &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;beta&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;cos&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;gamma&lt;/span&gt;&lt;span class="p"&gt;)]&lt;/span&gt;
-    &lt;span class="p"&gt;]&lt;/span&gt;
-    &lt;span class="n"&gt;r&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;r&lt;/span&gt;
-
-&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; \
-    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;
-    &lt;span class="n"&gt;centers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;&lt;span class="nd"&gt;@get_R&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;pi&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;centers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="section" id="reposition"&gt;
-&lt;h3&gt;Reposition:&lt;/h3&gt;
-&lt;img alt="https://user-images.githubusercontent.com/29832615/86536063-4ebbed00-bf02-11ea-8592-a695d7b91426.gif" src="https://user-images.githubusercontent.com/29832615/86536063-4ebbed00-bf02-11ea-8592-a695d7b91426.gif" /&gt;
-&lt;p&gt;Repositioning is similar to that of translation, except in this case, while repositioning we update centers with the new position value.&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;new_pos&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;np&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;array&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt;
-
-&lt;span class="c1"&gt;# Update vertices positions&lt;/span&gt;
-&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; \
-    &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;object_index&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;sec&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;
-    &lt;span class="n"&gt;centers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt;&lt;span class="p"&gt;])&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;new_pos&lt;/span&gt;
-
-&lt;span class="n"&gt;centers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;object_index&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;new_pos&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-&lt;div class="section" id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;Currently, I am yet to figure out the orientation problem. Once I figure that out I will be ready to implement simulations without any major issues. I am also tasked with creating a wrecking ball simulation and a quadruped robot simulation.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;I did face some problems while rotating objects. My mentors suggested me to implement it via rotation matrix. I still haven’t figured out the orientation problem, which I plan to work on next. Apart from these I did not face any major issues.&lt;/p&gt;
-&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Thank&lt;/span&gt; &lt;span class="pre"&gt;you&lt;/span&gt; &lt;span class="pre"&gt;for&lt;/span&gt; &lt;span class="pre"&gt;reading,&lt;/span&gt; &lt;span class="pre"&gt;see&lt;/span&gt; &lt;span class="pre"&gt;you&lt;/span&gt; &lt;span class="pre"&gt;next&lt;/span&gt; &lt;span class="pre"&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</content>
-    <link href="https://fury.gl/posts/2020/2020-07-05-week-6-soham.html" rel="alternate"/>
-    <published>2020-07-05T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2020/2020-07-12-week-7-soham.html</id>
-    <title>Orientation, Sizing, Tab UI.</title>
-    <updated>2020-07-12T00:00:00+00:00</updated>
-    <author>
-      <name>Soham Biswas</name>
-    </author>
-    <content type="html">&lt;div class="section" id="orientation-sizing-tab-ui"&gt;
-
-&lt;p&gt;Hello and welcome to my 7th weekly check-in. I will be sharing my progress with single actor physics simulation and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; sizing issue which was pending for quite a while now. I will also be sharing my thoughts regarding the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TAB&lt;/span&gt; &lt;span class="pre"&gt;UI&lt;/span&gt;&lt;/code&gt; component. The official repository of my sub-org, FURY can always be found &lt;a class="reference external" href="https://github.com/fury-gl/fury/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;div class="section" id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;This week I was working with the orientation problem I mentioned in my previous check-in. I did have some problems regarding it, but thanks to my mentor I was able to figure it out and implement it with the help of scipy’s Quaternion to Rotation Matrix &lt;a class="reference external" href="https://github.com/scipy/scipy/blob/v1.5.1/scipy/spatial/transform/rotation.py#L174-L1978"&gt;method&lt;/a&gt;. After understanding the orientation implementation, I spent some time regarding the design of the TAB UI component. I expect the design to be something similar as follows:&lt;/p&gt;
-&lt;img alt="https://user-images.githubusercontent.com/29832615/87254337-906b0b80-c49f-11ea-93f3-3af0f2d8de10.png" src="https://user-images.githubusercontent.com/29832615/87254337-906b0b80-c49f-11ea-93f3-3af0f2d8de10.png" /&gt;
-&lt;p&gt;Fortunately, we have good news this week. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; sizing issue that we were facing for quite a while has now been fixed. We simply have to keep track of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;scene&lt;/span&gt;&lt;/code&gt; parameter in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;_add_to_scene&lt;/span&gt;&lt;/code&gt; method of each UI component. This scene parameter inherits &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;vtkViewport&lt;/span&gt;&lt;/code&gt;, hence it allows us to determine the necessary details about the environment of the 3D objects.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;As the sizing issue regarding &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; has been fixed, I am very much eager to finish the remaining work left. &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ComboBox2D&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; were left incomplete because of the issue. Therefore, my main objective next week would be to finish them first. Once I am done with it, I will move on to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Tab&lt;/span&gt; &lt;span class="pre"&gt;UI&lt;/span&gt;&lt;/code&gt;. If not, I will continue with the physics simulation.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Apart from the orientation and sizing problem, I did not face any major issues.&lt;/p&gt;
-&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Thank&lt;/span&gt; &lt;span class="pre"&gt;you&lt;/span&gt; &lt;span class="pre"&gt;for&lt;/span&gt; &lt;span class="pre"&gt;reading,&lt;/span&gt; &lt;span class="pre"&gt;see&lt;/span&gt; &lt;span class="pre"&gt;you&lt;/span&gt; &lt;span class="pre"&gt;next&lt;/span&gt; &lt;span class="pre"&gt;week!!&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</content>
-    <link href="https://fury.gl/posts/2020/2020-07-12-week-7-soham.html" rel="alternate"/>
-    <published>2020-07-12T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2020/2020-07-13-week-7-lenix.html</id>
-    <title>Multiple SDF primitives.</title>
-    <updated>2020-07-13T00:00:00+00:00</updated>
-    <author>
-      <name>Lenix Lobo</name>
-    </author>
-    <content type="html">&lt;div class="section" id="multiple-sdf-primitives"&gt;
-
-&lt;p&gt;Make sure to check out Project &lt;a class="reference external" href="https://github.com/fury-gl/fury"&gt;FURY&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;Hey Everyone!
-This week, multiple SDF primitives.&lt;/p&gt;
-&lt;div class="section" id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;The objective of this week was to understand the capabilities of the multiple SDF primitives within the same cube project. To get a clearer understanding of what we can achieve with this approach, i added support for real time rotating primitives. The output of 2 cubes with rotating SDFs is shown below.&lt;/p&gt;
-&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-7.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-7.gif" /&gt;
-&lt;p&gt;The code for the above render is available at the &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/SDF-Experiments"&gt;branch&lt;/a&gt;&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;The task for next week is to implement features in the SDF actor and also to fix minor bugs within the shaders. Once everything is done as planned, the PR will be merged for users to access the features.&lt;/p&gt;
-&lt;/div&gt;
-&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No issues this week&lt;/p&gt;
-&lt;/div&gt;
-&lt;/div&gt;
-</content>
-    <link href="https://fury.gl/posts/2020/2020-07-13-week-7-lenix.html" rel="alternate"/>
-    <published>2020-07-13T00:00:00+00:00</published>
-  </entry>
+  <generator uri="https://ablog.readthedocs.org" version="0.10.9">ABlog</generator>
   <entry>
     <id>https://fury.gl/posts/2020/2020-07-19-week-8-soham.html</id>
     <title>ComboBox2D, TextBlock2D, Clipping Overflow.</title>
@@ -408,5 +230,282 @@ This week, More Shaders!&lt;/p&gt;
 </content>
     <link href="https://fury.gl/posts/2020/2020-08-02-week-10-soham.html" rel="alternate"/>
     <published>2020-08-02T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2020/2020-08-09-week-11-lenix.html</id>
+    <title>More Shaders!!</title>
+    <updated>2020-08-09T00:00:00+00:00</updated>
+    <author>
+      <name>Lenix Lobo</name>
+    </author>
+    <content type="html">&lt;div class="section" id="more-shaders"&gt;
+
+&lt;p&gt;Make sure to check out Project &lt;a class="reference external" href="https://github.com/fury-gl/fury"&gt;FURY&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Hey !
+This week, More Shaders!&lt;/p&gt;
+&lt;div class="section" id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;The task assigned for this week was to explore more shader techniques which could be implemented using FURY and which would demonstrate the capability of FURY shader system. So i decided to work on implementing shading examples such as Gooch shading and reflection shader using textures.&lt;/p&gt;
+&lt;p&gt;Below are the outputs of the techniques i worked on :&lt;/p&gt;
+&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11a.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11a.gif" /&gt;
+&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11b.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11b.gif" /&gt;
+&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11c.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-11c.gif" /&gt;
+&lt;p&gt;The shader demos are available &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/shader-demos"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;The next week will involve working on more such demos which can demonstrate the capabilities of FURY&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No issues were faced this week&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://fury.gl/posts/2020/2020-08-09-week-11-lenix.html" rel="alternate"/>
+    <published>2020-08-09T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2020/2020-08-17-week-12-lenix.html</id>
+    <title>Outline Picker</title>
+    <updated>2020-08-17T00:00:00+00:00</updated>
+    <author>
+      <name>Lenix Lobo</name>
+    </author>
+    <content type="html">&lt;div class="section" id="outline-picker"&gt;
+
+&lt;p&gt;Make sure to check out Project &lt;a class="reference external" href="https://github.com/fury-gl/fury"&gt;FURY&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Hey !
+This week, Picking Outline!&lt;/p&gt;
+&lt;div class="section" id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;We needed a Outline feature in FURY to indicate which model we choose in the scene. So the task assigned was to find options to achieve this. There were two ways to do this, 1. Using shader and 2. Using Vtk PolyData Silhouette. Despite trying multiple implementation methods the shader approach was not working . I also tried using VTKs inbuilt function , but there is a bug when i use some models. When i choose a model, it renders outline for every polygon , which is not what we want to achieve. The bug is shown below:&lt;/p&gt;
+&lt;p&gt;Below are the outputs of the techniques i worked on :&lt;/p&gt;
+&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-12.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-12.gif" /&gt;
+&lt;p&gt;The shader demos are available &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/shader-demos"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;With the end of GSoC approaching soon, the next task is to create a PR which can help new users to test different shaders using UI to get started.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I still was not able to figure out how we can achieve the outline effect. Am currently looking into other approaches we could use&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://fury.gl/posts/2020/2020-08-17-week-12-lenix.html" rel="alternate"/>
+    <published>2020-08-17T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2020/2020-08-24-final-work-lenix.html</id>
+    <title>Google Summer of Code 2020 Final Work Product</title>
+    <updated>2020-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Lenix Lobo</name>
+    </author>
+    <content type="html">&lt;img alt="https://developers.google.com/open-source/gsoc/resources/downloads/GSoC-logo-horizontal.svg" class="align-center" height="50" src="https://developers.google.com/open-source/gsoc/resources/downloads/GSoC-logo-horizontal.svg" /&gt;&lt;img alt="https://www.python.org/static/community_logos/python-logo.png" src="https://www.python.org/static/community_logos/python-logo.png" style="width: 40%;" /&gt;
+&lt;img alt="https://python-gsoc.org/logos/FURY.png" src="https://python-gsoc.org/logos/FURY.png" style="height: 30px;" /&gt;
+&lt;div class="section" id="google-summer-of-code-2020-final-work-product"&gt;
+
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Name:&lt;/strong&gt; Lenix Lobo&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Organisation:&lt;/strong&gt; Python Software Foundation&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sub-Organisation:&lt;/strong&gt; FURY&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Project:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/wiki/Google-Summer-of-Code-2020"&gt;FURY - Improve Shader Framework&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-08-24-final-work-lenix.rst&lt;/span&gt;, line 25)&lt;/p&gt;
+&lt;p&gt;Bullet list ends without a blank line; unexpected unindent.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="introduction"&gt;
+&lt;h2&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;The current shader framework for FURY is based on VTK and lacks documentation to get started which can be overwhelming for new users. The objective of this project is to enable users to be easily able to understand and use the shader framework to render stunning visual representations of data. The project involves programming vertex and fragment shaders to generate effects for more immersive visualization.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="proposed-objectives"&gt;
+&lt;h2&gt;Proposed Objectives&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Adding SDF actor to the API&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;This actor uses raymarching to model actors using SDF. The method provides several actors including &lt;cite&gt;ellipsoid&lt;/cite&gt;, &lt;cite&gt;sphere&lt;/cite&gt; and &lt;cite&gt;torus&lt;/cite&gt;.&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;div class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-08-24-final-work-lenix.rst&lt;/span&gt;, line 34)&lt;/p&gt;
+&lt;p&gt;Block quote ends without a blank line; unexpected unindent.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;Shader demos&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;Use the FURY shader system to create and visualize different shading algorithms. Implementations include &lt;cite&gt;SphereMap&lt;/cite&gt;, &lt;cite&gt;Toon&lt;/cite&gt;, &lt;cite&gt;Gooch&lt;/cite&gt; and &lt;cite&gt;Vertex Noise&lt;/cite&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="unsubmitted-functionalities"&gt;
+&lt;h2&gt;Unsubmitted Functionalities&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Spherical Harmonics using Shaders.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The spherical harmonics algorithm is used to generate spherical surfaces using biases and coefficients computed. The general approach to achieve this is computationally expensive. The idea proposed was to leverage the GPU hardware using shaders to provide a faster more efficient alternative to the current implementations. The second month of the coding period was devoted to the same task but unfortunately, the observed performance was quite unsatisfactory than the expected performance. Moreover, the output shape of the geometry was distorted. It was then decided to continue the work after the GSoC period and prioritize the task at hand.&lt;/p&gt;
+&lt;p&gt;The Work in Progress can be accessed here. &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/Spherical-Harmonics"&gt;https://github.com/lenixlobo/fury/tree/Spherical-Harmonics&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Dynamic Texture using Geometry Shader&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Geometry Shaders provide a lot of flexibility to users to create custom geometry behaviors such as instancing. The idea was to create a dynamic Fur/Hair effect on top of a FURY actor. Unfortunately due to missing documentation on VTK geometry shaders and lack of resources, the project was not completed during the GSoC period. However, I will continue to try to solve the issue.&lt;/p&gt;
+&lt;p&gt;The source code for the current progress can be accessed here. &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/Dynamic-Texture"&gt;https://github.com/lenixlobo/fury/tree/Dynamic-Texture&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="objectives-completed"&gt;
+&lt;h2&gt;Objectives Completed&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;SDF based Actor&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;The objective here was to provide an alternative approach to users to use SDF modeled actors in the scene. This actor is modeled using the raymarching algorithm which provides much better performance than conventional polygon-based actors. Currently, the shapes supported include ellipsoid, sphere and torus&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;
+&lt;strong&gt;SDF Actor method:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/250"&gt;https://github.com/fury-gl/fury/pull/250&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Multiple SDF Actor&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;The objective was to create a method through which multiple SDF primitives are rendered within a single cube. This task helped us explore the limitations of the shader system and also benchmarking the performance.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;
+&lt;strong&gt;MultiSDF Shader:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/master/docs/experimental/viz_multisdf.py"&gt;https://github.com/fury-gl/fury/blob/master/docs/experimental/viz_multisdf.py&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;Shader Demos&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;The task here was to create a pull request showcasing the capabilities of the FURY shader system and to also provide examples or new users to get started with integrating custom shaders into the scenes.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;
+&lt;strong&gt;Shader Demos:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/296"&gt;https://github.com/fury-gl/fury/pull/296&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div class="section" id="other-objectives"&gt;
+&lt;h2&gt;Other Objectives&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Tutorials&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;p&gt;Create Tutorials for new users to get familiar with the Shader System&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;
+- &lt;strong&gt;Shader UI Tutorial&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/296"&gt;https://github.com/fury-gl/fury/pull/296&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;-&lt;strong&gt;SDF Actor Tutorial&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/267"&gt;https://github.com/fury-gl/fury/pull/267&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;GSoC weekly Blogs&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Weekly blogs were added for FURY’s Website.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;
+- &lt;strong&gt;First &amp;amp; Second Evaluation:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/250"&gt;https://github.com/fury-gl/fury/pull/250&lt;/a&gt;
+&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/267"&gt;https://github.com/fury-gl/fury/pull/267&lt;/a&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Third Evaluation:&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/travis/build/fury-gl/fury/docs/source/posts/2020/2020-08-24-final-work-lenix.rst&lt;/span&gt;, line 104)&lt;/p&gt;
+&lt;p&gt;Bullet list ends without a blank line; unexpected unindent.&lt;/p&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/296"&gt;https://github.com/fury-gl/fury/pull/296&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div class="section" id="timeline"&gt;
+&lt;h2&gt;Timeline&lt;/h2&gt;
+&lt;table class="docutils align-default"&gt;
+&lt;colgroup&gt;
+&lt;col style="width: 11%" /&gt;
+&lt;col style="width: 34%" /&gt;
+&lt;col style="width: 55%" /&gt;
+&lt;/colgroup&gt;
+&lt;thead&gt;
+&lt;tr class="row-odd"&gt;&lt;th class="head"&gt;&lt;p&gt;Date&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Description&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Blog Link&lt;/p&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 1(30-05-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Welcome to my GSoC Blog!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/gsoc-blog-week-1/"&gt;Weekly Check-in #1&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 2(07-06-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Geometry Shaders!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-2/"&gt;Weekly Check-in #2&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 3(14-06-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Ray Marching!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-3/"&gt;Weekly Check-in #3&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 4(21-06-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;RayMarching Continued&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-4/"&gt;Weekly Check-in #4&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 5(28-06-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Spherical Harmonics&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-5/"&gt;Weekly Check-in #5&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 6(05-07-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Spherical Harmonics Continued&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-6/"&gt;Weekly Check-in #6&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 7(12-07-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Multiple SDF Primitives&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-7/"&gt;Weekly Check-in #7&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 8(19-07-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Improvements in SDF primitives&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-8/"&gt;Weekly Check-in #8&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 9(26-07-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Merging SDF Actor and Benchmarks!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-9/"&gt;Weekly Check-in #9&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 10(02-08-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;More Shaders&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-10/"&gt;Weekly Check-in #10&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 11(08-08-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Even More Shaders&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-11/"&gt;Weekly Check-in #11&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 12(16-08-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Picking Outline&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-12/"&gt;Weekly Check-in #12&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 13(23-08-2020)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Final Week&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/weekly-check-in-week-13/"&gt;Weekly Check-in #13&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Detailed weekly tasks and work done can be found
+&lt;a class="reference external" href="https://blogs.python-gsoc.org/en/lenixlobos-blog/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://fury.gl/posts/2020/2020-08-24-final-work-lenix.html" rel="alternate"/>
+    <published>2020-08-24T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2020/2020-08-24-week-13-lenix.html</id>
+    <title>Outline Picker</title>
+    <updated>2020-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Lenix Lobo</name>
+    </author>
+    <content type="html">&lt;div class="section" id="outline-picker"&gt;
+
+&lt;p&gt;Make sure to check out Project &lt;a class="reference external" href="https://github.com/fury-gl/fury"&gt;FURY&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Hey Everyone!
+Today marked the official end of the coding period for Google Summer of Code 2020. On this day I would like to take the opportunity to thank all my mentors and Soham who have shown immense support during this time and helped me grow not only to be a better programmer but also to be a better team member. While the GSoC period ends, I will try my best to be active and contribute to the project and help it grow.
+Cheers!&lt;/p&gt;
+&lt;div class="section" id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This being the final week of GSoC , my task was to create a PR which showcases not only the shader capabilities of the project but also to create a example which integrates both the UI and shader system of project FURY. This example can help new users to get familiar with both the UI and shaders.
+Apart from this i also worked on a Toon Shader.&lt;/p&gt;
+&lt;p&gt;The output for the above task is given below :&lt;/p&gt;
+&lt;img alt="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-13.gif" src="https://raw.githubusercontent.com/lenixlobo/fury-outputs/master/blog-week-13.gif" /&gt;
+&lt;p&gt;The shader demos are available &lt;a class="reference external" href="https://github.com/lenixlobo/fury/tree/shader-demos"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;p&gt;The next week I will work on the final GSoC documentation which explains what I worked on throughout the GSoC period. In case of any changes are requested by the mentors I will also try to implement them.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class="section" id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;With the help of Soham and the mentors this week went smoothly.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</content>
+    <link href="https://fury.gl/posts/2020/2020-08-24-week-13-lenix.html" rel="alternate"/>
+    <published>2020-08-24T00:00:00+00:00</published>
   </entry>
 </feed>
