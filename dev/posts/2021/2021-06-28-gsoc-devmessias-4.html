@@ -1,0 +1,532 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>SOLID, monkey patching a python issue and network vizualization through WebRTC &mdash; FURY 0.7.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom_github.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.7.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">About Fury</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Programming with Fury</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+      <li>SOLID, monkey patching  a python issue and  network vizualization through WebRTC</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/posts/2021/2021-06-28-gsoc-devmessias-4.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="solid-monkey-patching-a-python-issue-and-network-vizualization-through-webrtc">
+<h1>SOLID, monkey patching  a python issue and  network vizualization through WebRTC<a class="headerlink" href="#solid-monkey-patching-a-python-issue-and-network-vizualization-through-webrtc" title="Permalink to this headline">¶</a></h1>
+<p>These past two weeks I’ve spent most of my time in the <a class="reference external" href="https://github.com/fury-gl/fury/pull/437">Streaming System
+PR</a> and the <a class="reference external" href="https://github.com/fury-gl/helios/pull/1/">Network Layout
+PR</a> . In this post I’ll
+focus on the most relevant things I’ve made for those PRs.</p>
+<div class="section" id="streaming-system">
+<h2>Streaming System<a class="headerlink" href="#streaming-system" title="Permalink to this headline">¶</a></h2>
+<p><strong>Pull
+request</strong> : <a class="reference external" href="https://github.com/fury-gl/fury/pull/437/">fury-gl/fury/pull/437</a>.</p>
+<div class="section" id="code-refactoring">
+<h3>Code Refactoring<a class="headerlink" href="#code-refactoring" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="abstract-class-and-solid">
+<h4>Abstract class and SOLID<a class="headerlink" href="#abstract-class-and-solid" title="Permalink to this headline">¶</a></h4>
+<p>The past weeks I’ve spent some time refactoring the code to see what
+I’ve done let’ s take a look into this
+<a class="reference external" href="https://github.com/devmessias/fury/blob/b1e985bd6a0088acb4a116684577c4733395c9b3/fury/stream/client.py#L20">fury/blob/b1e985…/fury/stream/client.py#L20</a>,
+the FuryStreamClient Object before the refactoring.</p>
+<p>The code is a mess. To see why this code is not good according to SOLID
+principles let’s just list all the responsibilities of FuryStreamClient:</p>
+<ul class="simple">
+<li><p>Creates a RawArray or SharedMemory to store the n-buffers</p></li>
+<li><p>Creates a RawArray or SharedMemory to store the information about
+each buffer</p></li>
+<li><p>Cleanup the shared memory resources if the SharedMemory was used</p></li>
+<li><p>Write the vtk buffer into the shared memory resource</p></li>
+<li><p>Creates the vtk callbacks to update the vtk-buffer</p></li>
+</ul>
+<p>That’s a lot and those responsibilities are not even related to each
+other. How can we be more SOLID[1]? An obvious solution is to create a
+specific object to deal with the shared memory resources. But it’s not
+good enough because we still have a poor generalization since this new
+object still needs to deal with different memory management systems:
+rawarray or shared memory (maybe sockets in the future). Fortunately, we
+can use the python Abstract Classes[2] to organize the code.</p>
+<p>To use the ABC from python I first listed all the behaviors that should
+be mandatory in the new abstract class. If we are using SharedMemory or
+RawArrays we need first to create the memory resource in a proper way.
+Therefore, the GenericImageBufferManager must have a abstract method
+create_mem_resource. Now take a look into the ImageBufferManager inside
+of
+<a class="reference external" href="https://github.com/devmessias/fury/blob/c196cf43c0135dada4e2c5d59d68bcc009542a6c/fury/stream/server/server.py#L40">stream/server/server.py</a>,
+sometimes it is necessary to load the memory resource in a proper way.
+Because of that, the GenericImageBufferManager needs to have a
+load_mem_resource abstract method. Finally, each type of
+ImageBufferManager should have a different cleanup method. The code
+below presents the sketch of the abstract class</p>
+<p>Now we can look for those behaviors inside of FuryStreamClient.py and
+ImageBufferManger.py that does not depend if we are using the
+SharedMemory or RawArrays. These behaviors should be methods inside of
+the new GenericImageBufferManager.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code at: https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L491</span>
+
+<span class="k">class</span> <span class="nc">GenericImageBufferManager</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">max_window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">use_shared_mem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_window_size</span> <span class="o">=</span> <span class="n">max_window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_buffers</span> <span class="o">=</span> <span class="n">num_buffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_size</span> <span class="o">=</span> <span class="n">num_buffers</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span> <span class="o">=</span> <span class="n">use_shared_mem</span>
+         <span class="c1"># omitted code</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">next_buffer_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">index</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">buffer_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">index</span>
+    <span class="k">def</span> <span class="nf">write_into</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">np_arr</span><span class="p">):</span>
+        <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">buffer_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="o">*</span><span class="n">w</span><span class="p">)</span>
+        <span class="n">next_buffer_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_buffer_index</span>
+         <span class="c1"># omitted code</span>
+
+    <span class="k">def</span> <span class="nf">get_current_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span><span class="p">:</span>
+        <span class="c1"># omitted code</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_buffer_repr</span>
+
+    <span class="k">def</span> <span class="nf">get_jpeg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_frame</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span><span class="p">:</span>
+        <span class="c1"># omitted code</span>
+        <span class="k">return</span> <span class="n">image_encoded</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_jpeg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
+       <span class="c1"># omitted code</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">load_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Pass</span>
+</pre></div>
+</div>
+<p>With the
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L491">GenericImageBufferManager</a>
+the
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L609">RawArrayImageBufferManager</a>
+and
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L681">SharedMemImageBufferManager</a>
+is now implemented with less duplication of code (DRY principle). This
+makes the code more readable and easier to find bugs. In addition, later
+we can implement other memory management systems in the streaming system
+without modifying the behavior of FuryStreamClient or the code inside of
+server.py.</p>
+<p>I’ve also applied the same SOLID principles to improve the CircularQueue
+object. Although the CircularQueue and FuryStreamInteraction were not
+violating the S from SOLID, the head-tail buffer from the CircularQueue
+must have a way to lock the write/read if the memory resource is busy.
+Meanwhile the
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Array">multiprocessing.Arrays</a>
+already has a context which allows lock (.get_lock()) SharedMemory
+dosen’t[2]. The use of abstract class allowed me to deal with those
+peculiarities. <a class="reference external" href="https://github.com/fury-gl/fury/pull/437/commits/358402ea2f06833f66f45f3818ccc3448b2da9cd">commit
+358402e</a></p>
+</div>
+<div class="section" id="using-namedtuples-to-grant-immutability-and-to-avoid-silent-bugs">
+<h4>Using namedtuples to grant immutability and to avoid silent bugs<a class="headerlink" href="#using-namedtuples-to-grant-immutability-and-to-avoid-silent-bugs" title="Permalink to this headline">¶</a></h4>
+<p>The circular queue and the user interaction are implemented in the
+streaming system using numbers to identify the type of event (mouse
+click, mouse weel, …) and where to store the specific values
+associated with the event , for example if the ctrl key is pressed or
+not. Therefore, those numbers appear in different files and locations:
+tests/test_stream.py, stream/client.py, steam/server/app_async.py. This
+can be problematic because a typo can create a silent bug. One
+possibility to mitigate this is to use a python dictionary to store the
+constant values, for example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">EVENT_IDS</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;mouse_move&quot;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;mouse_weel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">#...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>But this solution has another issue, anywhere in the code we can change
+the values of EVENT_IDS and this will produce a new silent bug. To avoid
+this I chose to use
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple">namedtuples</a>
+to create an immutable object which holds all the constant values
+associated with the user interactions.
+<a class="reference external" href="https://github.com/devmessias/fury/blob/b1e985bd6a0088acb4a116684577c4733395c9b3/fury/stream/constants.py#L59">stream/constants.py</a></p>
+<p>The namedtuple has several advantages when compared to dictionaries for
+this specific situation. In addition, it has a better performance. A
+good tutorial about namedtuples it’s available here
+<a class="reference external" href="https://realpython.com/python-namedtuple/">https://realpython.com/python-namedtuple/</a></p>
+</div>
+</div>
+<div class="section" id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
+<p>My mentors asked me to write tests for this PR. Therefore, this past
+week I’ve implemented the most important tests for the streaming system:
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/tests/test_stream.py">/fury/tests/test_stream.py</a></p>
+</div>
+<div class="section" id="most-relevant-bugs">
+<h3>Most relevant bugs<a class="headerlink" href="#most-relevant-bugs" title="Permalink to this headline">¶</a></h3>
+<p>As I discussed in my <a class="reference external" href="https://blogs.python-gsoc.org/en/demvessiass-blog/weekly-check-in-3-15/">third
+week</a>
+check-in there is an open issue related to SharedMemory in python.
+This”bug” happens in the streaming system through the following scenario</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1</span>-Process A creates a shared memory X
+<span class="m">2</span>-Process A creates a subprocess B using popen <span class="o">(</span><span class="nv">shell</span><span class="o">=</span>False<span class="o">)</span>
+<span class="m">3</span>-Process B reads X
+<span class="m">4</span>-Process B closes X
+<span class="m">5</span>-Process A kills B
+<span class="m">4</span>-Process A closes  X
+<span class="m">5</span>-Process A unlink<span class="o">()</span> the shared memory resource
+</pre></div>
+</div>
+<p>In python, this scenario translates to</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">shared_memory</span> <span class="k">as</span> <span class="n">sh</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">shm_a</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">command_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;from multiprocessing import shared_memory as sh;import time;shm_b = sh.SharedMemory(&#39;</span><span class="si">{</span><span class="n">shm_a</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;);shm_b.close();&quot;</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">command_string</span><span class="p">],</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STDOUT&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=======</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STDERR&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=======</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">shm_a</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">shm_a</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Fortunately, I could use a monkey-patching[3] solution to fix that;
+meanwhile we’re waiting for the python-core team to fix the
+resource_tracker (38119) issue [4].</p>
+</div>
+</div>
+<div class="section" id="network-layout-helios-fury">
+<h2>Network Layout (Helios-FURY)<a class="headerlink" href="#network-layout-helios-fury" title="Permalink to this headline">¶</a></h2>
+<p><strong>Pull
+request</strong><a class="reference external" href="https://github.com/fury-gl/helios/pull/1/">fury-gl/helios/pull/1</a></p>
+<p>Finally, the first version of FURY network layout is working as you can
+see in the video below.</p>
+<p>In addition, this already can be used with the streaming system allowing
+user interactions across the internet with WebRTC protocol.</p>
+<p>One of the issues that I had to solve to achieve the result presented in
+the video above was to find a way to update the positions of the vtk
+objects without blocking the main thread and at the same time allowing
+the vtk events calls. My solution was to define an interval timer using
+the python threading module:
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L776">/fury/stream/tools.py#L776</a>,
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/client.py#L112">/fury/stream/client.py#L112</a>
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/client.py#L296">/fury/stream/client.py#L296</a></p>
+</div>
+<div class="section" id="refs">
+<h2>Refs:<a class="headerlink" href="#refs" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>[1] A. Souly,”5 Principles to write SOLID Code (examples in Python),”
+Medium, Apr. 26, 2021.
+<a class="reference external" href="https://towardsdatascience.com/5-principles-to-write-solid-code-examples-in-python-9062272e6bdc">https://towardsdatascience.com/5-principles-to-write-solid-code-examples-in-python-9062272e6bdc</a>
+(accessed Jun. 28, 2021).</p></li>
+<li><p>[2]”[Python-ideas] Re: How to prevent shared memory from being
+corrupted ?”
+<a class="reference external" href="https://www.mail-archive.com/python-ideas&#64;python.org/msg22935.html">https://www.mail-archive.com/python-ideas&#64;python.org/msg22935.html</a>
+(accessed Jun. 28, 2021).</p></li>
+<li><p>[3]“Message 388287 - Python tracker.”
+<a class="reference external" href="https://bugs.python.org/msg388287">https://bugs.python.org/msg388287</a> (accessed Jun. 28, 2021).</p></li>
+<li><p>[4]“bpo-38119: Fix shmem resource tracking by vinay0410 · Pull
+Request #21516 · python/cpython,” GitHub.
+<a class="reference external" href="https://github.com/python/cpython/pull/21516">https://github.com/python/cpython/pull/21516</a> (accessed Jun. 28,
+2021).</p></li>
+</ul>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2021, FURY
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Documentation Versions</span>
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        
+            
+            <li><dd><a href="/dev/posts/2021/2021-06-28-gsoc-devmessias-4">fury dev</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/latest/posts/2021/2021-06-28-gsoc-devmessias-4">fury latest</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.3.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.1.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dt>fury v0.7.x</dt></li>
+            
+        
+            
+            <li><dd><a href="/v0.2.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.2.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.4.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.6.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.5.x/posts/2021/2021-06-28-gsoc-devmessias-4">fury v0.5.x</a></dd></li>
+            
+        
+      </dl>
+    </div>
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+    <link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+      new Crate({
+        server: '695048505902891009',
+        channel: '695305679682011217',
+        shard: 'https://e.widgetbot.io',
+        // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+      })
+    </script>
+  
+
+</body>
+</html>
