@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Solar System Animation &mdash; FURY 0.7.0 documentation</title>
+  <title>Solar System Animation &mdash; FURY 0.7.1 documentation</title>
   
 
   
@@ -42,8 +42,8 @@
   <link rel="stylesheet" href="../../_static/css/custom_github.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Simple Shapes" href="../02_ui/viz_shapes.html" />
-    <link rel="prev" title="Simple volume slicing" href="viz_slice.html" /> 
+    <link rel="next" title="Simple volume slicing" href="viz_slice.html" />
+    <link rel="prev" title="Earth Coordinate Conversion" href="viz_earth_coordinates.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -107,11 +107,12 @@
 <li class="toctree-l3"><a class="reference internal" href="viz_timers.html">Using a timer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="viz_spiky.html">Spiky Sphere</a></li>
 <li class="toctree-l3"><a class="reference internal" href="viz_surfaces.html">Visualize surfaces</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viz_selection.html">Selecting multiple objects</a></li>
 <li class="toctree-l3"><a class="reference internal" href="viz_picking.html">Simple picking</a></li>
 <li class="toctree-l3"><a class="reference internal" href="viz_earth_animation.html">Texture Sphere Animation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="viz_earth_coordinates.html">Earth Coordinate Conversion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="viz_slice.html">Simple volume slicing</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Solar System Animation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viz_slice.html">Simple volume slicing</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../index.html#user-interface-elements">User Interface Elements</a></li>
@@ -221,46 +222,66 @@ to simulate orbital motion.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 </pre></div>
 </div>
-<p>Load in a texture for each of the actors. To do this, we will create
-a function called <code class="docutils literal notranslate"><span class="pre">init_planet</span></code>, which will initialize each planet actor
-given its corresponding filename and actor name. It will also add each
-actor to the scene that has already been created.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_filenames</span></a> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;8k_mercury.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;8k_venus_surface.jpg&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;1_earth_8k.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;8k_mars.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;jupiter.jpg&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;8k_saturn.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;8k_saturn_ring_alpha.png&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;2k_uranus.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;2k_neptune.jpg&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;8k_sun.jpg&quot;</span><span class="p">]</span>
+<p>Define information relevant for each planet actor including its
+texture name, relative position, and scale.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planets_data</span></a> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_mercury.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_venus_surface.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="o">.</span><span class="mi">6</span><span class="p">,</span> <span class="o">.</span><span class="mi">6</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;1_earth_8k.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">,</span> <span class="o">.</span><span class="mi">4</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_mars.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;jupiter.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_saturn.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_saturn_ring_alpha.png&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;2k_uranus.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;2k_neptune.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)},</span>
+                <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;8k_sun.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)}]</span>
 <a href="../../reference/fury.data.html#fury.data.fetch_viz_textures" title="View documentation for fury.data.fetch_viz_textures"><span class="n">fetch_viz_textures</span></a><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">init_planet</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Initialize a planet actor.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    filename : str</span>
-<span class="sd">        The filename for the corresponding planet texture.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    planet_actor: actor</span>
-<span class="sd">        The corresponding sphere actor with texture applied.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">planet_file</span> <span class="o">=</span> <a href="../../reference/fury.data.html#fury.data.read_viz_textures" title="View documentation for fury.data.read_viz_textures"><span class="n">read_viz_textures</span></a><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-    <span class="n">planet_image</span> <span class="o">=</span> <a href="../../reference/fury.io.html#fury.io.load_image" title="View documentation for fury.io.load_image"><span class="n">io</span><span class="o">.</span><span class="n">load_image</span></a><span class="p">(</span><span class="n">planet_file</span><span class="p">)</span>
-    <span class="n">planet_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.texture_on_sphere" title="View documentation for fury.actor.texture_on_sphere"><span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span></a><span class="p">(</span><span class="n">planet_image</span><span class="p">)</span>
-    <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">planet_actor</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">planet_actor</span>
 </pre></div>
 </div>
 <p class="sphx-glr-script-out">Out:</p>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder /Users/koudoro/.fury/textures
 </pre></div>
 </div>
+<p>To take advantage of the previously defined data structure we are going to
+create an auxiliary function that will load and apply the respective
+texture, set its respective properties (relative position and scale),
+and add the actor to a previously created scene.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">init_planet</span><span class="p">(</span><span class="n">planet_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Initialize a planet actor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    planet_data : dict</span>
+<span class="sd">        The planet_data is a dictionary, and the keys are filename(texture),</span>
+<span class="sd">        position and scale.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    planet_actor: actor</span>
+<span class="sd">        The corresponding sphere actor with texture applied.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">planet_file</span> <span class="o">=</span> <a href="../../reference/fury.data.html#fury.data.read_viz_textures" title="View documentation for fury.data.read_viz_textures"><span class="n">read_viz_textures</span></a><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">])</span>
+    <span class="n">planet_image</span> <span class="o">=</span> <a href="../../reference/fury.io.html#fury.io.load_image" title="View documentation for fury.io.load_image"><span class="n">io</span><span class="o">.</span><span class="n">load_image</span></a><span class="p">(</span><span class="n">planet_file</span><span class="p">)</span>
+    <span class="n">planet_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.texture_on_sphere" title="View documentation for fury.actor.texture_on_sphere"><span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span></a><span class="p">(</span><span class="n">planet_image</span><span class="p">)</span>
+    <span class="n">planet_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">planet_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">])</span>
+    <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">planet_actor</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">planet_actor</span>
+</pre></div>
+</div>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">map</span></code> function to create actors for each of the texture files
 in the <code class="docutils literal notranslate"><span class="pre">planet_files</span></code> list. Then, assign each actor to its corresponding
 actor in the list.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actor_list</span></a> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">init_planet</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_filenames</span></a><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actor_list</span></a> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">init_planet</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planets_data</span></a><span class="p">))</span>
 
 <span class="n">mercury_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actor_list</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">venus_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actor_list</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -277,52 +298,17 @@ actor in the list.</p>
 <a href="../../reference/fury.utils.html#fury.utils.rotate" title="View documentation for fury.utils.rotate"><span class="n">utils</span><span class="o">.</span><span class="n">rotate</span></a><span class="p">(</span><span class="n">jupiter_actor</span><span class="p">,</span> <span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>Next, change the positions and scales of the planets according to their
-position and size within the solar system (relatively). For the purpose
-of this tutorial, planet sizes and positions will not be completely
-accurate.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sun_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
-<span class="n">mercury_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
-<span class="n">venus_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">)</span>
-<span class="n">earth_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
-<span class="n">mars_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)</span>
-<span class="n">jupiter_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">saturn_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">saturn_rings_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-<span class="n">uranus_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-<span class="n">neptune_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">mercury_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">venus_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">earth_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">mars_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">jupiter_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">saturn_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">saturn_rings_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">uranus_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-<span class="n">neptune_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="mi">25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-</pre></div>
-</div>
 <p>Define the gravitational constant G, the orbital radii of each of the
-planets, and the central mass of the sun. The gravity and mass will be used
-to calculate the orbital position, so multiply these two together to create
-a new constant, which we will call miu.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_mercury</span></a> <span class="o">=</span> <span class="mi">7</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_venus</span></a> <span class="o">=</span> <span class="mi">9</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_earth</span></a> <span class="o">=</span> <span class="mi">11</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_mars</span></a> <span class="o">=</span> <span class="mi">13</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_jupiter</span></a> <span class="o">=</span> <span class="mi">16</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_saturn</span></a> <span class="o">=</span> <span class="mi">19</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_uranus</span></a> <span class="o">=</span> <span class="mi">22</span>
-<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_neptune</span></a> <span class="o">=</span> <span class="mi">25</span>
-
-<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_exponent</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.float_power.html#numpy.float_power" title="View documentation for numpy.float_power"><span class="n">np</span><span class="o">.</span><span class="n">float_power</span></a><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">)</span>
+planets, and the central mass of the sun. The gravity and mass will be
+used to calculate the orbital position, so multiply these two together to
+create a new constant, which we will call miu.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_exponent</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.float_power.html#numpy.float_power" title="View documentation for numpy.float_power"><span class="n">np</span><span class="o">.</span><span class="n">float_power</span></a><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">)</span>
 <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_constant</span></a> <span class="o">=</span> <span class="mf">6.673</span><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_exponent</span></a>
 
-<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="View documentation for numpy.int64"><span class="n">m_exponent</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.power.html#numpy.power" title="View documentation for numpy.power"><span class="n">np</span><span class="o">.</span><span class="n">power</span></a><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">m_constant</span></a> <span class="o">=</span> <span class="mf">1.989</span><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="View documentation for numpy.int64"><span class="n">m_exponent</span></a>
+<a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">m_exponent</span></a> <span class="o">=</span> <span class="mi">1073741824</span>   <span class="c1"># np.power(10, 30)</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="View documentation for builtins.float"><span class="n">m_constant</span></a> <span class="o">=</span> <span class="mf">1.989</span><span class="o">*</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">m_exponent</span></a>
 
-<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">miu</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">m_constant</span></a><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_constant</span></a>
+<a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">miu</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="View documentation for builtins.float"><span class="n">m_constant</span></a><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">g_constant</span></a>
 </pre></div>
 </div>
 <p>Let’s define two functions that will help us calculate the position of each
@@ -330,14 +316,14 @@ planet as it orbits around the sun: <code class="docutils literal notranslate"><
 <code class="docutils literal notranslate"><span class="pre">get_orbital_position</span></code>, using the constant miu and the orbital radii
 of each planet.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_orbit_period</span><span class="p">(</span><span class="n">radius</span><span class="p">):</span>
-    <span class="k">return</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sqrt.html#numpy.sqrt" title="View documentation for numpy.sqrt"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="mi">2</span><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/constants.html#numpy.pi" title="View documentation for numpy.pi"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.power.html#numpy.power" title="View documentation for numpy.power"><span class="n">np</span><span class="o">.</span><span class="n">power</span></a><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">/</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">miu</span></a><span class="p">)</span>
+    <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/constants.html#numpy.pi" title="View documentation for numpy.pi"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sqrt.html#numpy.sqrt" title="View documentation for numpy.sqrt"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.power.html#numpy.power" title="View documentation for numpy.power"><span class="n">np</span><span class="o">.</span><span class="n">power</span></a><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">/</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="View documentation for numpy.float64"><span class="n">miu</span></a><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">get_orbital_position</span><span class="p">(</span><span class="n">radius</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
     <span class="n">orbit_period</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_period</span></a><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.cos.html#numpy.cos" title="View documentation for numpy.cos"><span class="n">np</span><span class="o">.</span><span class="n">cos</span></a><span class="p">((</span><span class="mi">2</span><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/constants.html#numpy.pi" title="View documentation for numpy.pi"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a><span class="o">*</span><span class="n">time</span><span class="p">)</span><span class="o">/</span><span class="n">orbit_period</span><span class="p">)</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">radius</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sin.html#numpy.sin" title="View documentation for numpy.sin"><span class="n">np</span><span class="o">.</span><span class="n">sin</span></a><span class="p">((</span><span class="mi">2</span><span class="o">*</span><a href="https://numpy.org/doc/stable/reference/constants.html#numpy.pi" title="View documentation for numpy.pi"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a><span class="o">*</span><span class="n">time</span><span class="p">)</span><span class="o">/</span><span class="n">orbit_period</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
 </pre></div>
 </div>
 <p>Let’s change the camera position to visualize the planets better.</p>
@@ -357,129 +343,61 @@ Use itertools to avoid global variables.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">counter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
 </pre></div>
 </div>
-<p>To track and visualize the orbital paths of the planets, we will create
-several new variables to map each planet’s orbits using <code class="docutils literal notranslate"><span class="pre">actor.dots</span></code>.
-It is important to define the track variable for each planet as global,
-allowing it to be used within the <code class="docutils literal notranslate"><span class="pre">timer_callback</span></code> function. To do this,
-create a function called <code class="docutils literal notranslate"><span class="pre">get_orbit_actor</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_orbit_actor</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">):</span>
-    <span class="n">orbit_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.dots" title="View documentation for fury.actor.dots"><span class="n">actor</span><span class="o">.</span><span class="n">dots</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                             <span class="n">opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">dot_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">orbit_actor</span>
-</pre></div>
-</div>
-<p>All of the planets will have the same initial positions, so assign each of
-those to the positions variables for each planet. These variables will be
-updated within the <code class="docutils literal notranslate"><span class="pre">timer_callback</span></code> function. Initialize and add the
-orbit actors into the scene. Also initialize the track variables for each
-planet.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="View documentation for numpy.zeros"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;f8&#39;</span><span class="p">)</span>
-
-<span class="n">mercury_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mercury_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_mercury</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">mercury_orbit_actor</span><span class="p">)</span>
-
-<span class="n">venus_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">venus_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_venus</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">venus_orbit_actor</span><span class="p">)</span>
-
-<span class="n">earth_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">earth_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_earth</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">earth_orbit_actor</span><span class="p">)</span>
-
-<span class="n">mars_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mars_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_mars</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">mars_orbit_actor</span><span class="p">)</span>
-
-<span class="n">jupiter_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">jupiter_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_jupiter</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">jupiter_orbit_actor</span><span class="p">)</span>
-
-<span class="n">saturn_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">saturn_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_saturn</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">saturn_orbit_actor</span><span class="p">)</span>
-
-<span class="n">uranus_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">uranus_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_uranus</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">uranus_orbit_actor</span><span class="p">)</span>
-
-<span class="n">neptune_orbit_actor</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbit_actor</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">orbit_points</span></a><span class="p">)</span>
-<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">neptune_orbit_actor</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_neptune</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.vertices_from_actor" title="View documentation for fury.utils.vertices_from_actor"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">neptune_orbit_actor</span><span class="p">)</span>
-
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mercury_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">venus_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">earth_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mars_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">jupiter_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">saturn_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">uranus_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">neptune_track</span></a> <span class="o">=</span> <span class="p">[]</span>
-</pre></div>
-</div>
-<p>Define two new functions to use in <code class="docutils literal notranslate"><span class="pre">timer_callback</span></code> to update the planet
-positions and their tracks to visualize their orbit: <code class="docutils literal notranslate"><span class="pre">update_track</span></code> and
-<code class="docutils literal notranslate"><span class="pre">update_planet_position</span></code>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update_planet_position</span><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">planet_actor</span><span class="p">,</span> <span class="n">planet_track</span><span class="p">,</span> <span class="n">cnt</span><span class="p">):</span>
+<p>Define one new function to use in <code class="docutils literal notranslate"><span class="pre">timer_callback</span></code> to update the planet
+positions <code class="docutils literal notranslate"><span class="pre">update_planet_position</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update_planet_position</span><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">planet_actor</span><span class="p">,</span> <span class="n">cnt</span><span class="p">):</span>
     <span class="n">pos_planet</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbital_position</span></a><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
     <span class="n">planet_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">pos_planet</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pos_planet</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">planet_track</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">pos_planet</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pos_planet</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
     <span class="k">return</span> <span class="n">pos_planet</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">calculate_path</span></code> function is for calculating the path/orbit
+of every planet.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">calculate_path</span><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="n">planet_track</span> <span class="o">=</span> <span class="p">[[</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbital_position</span></a><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span>
+                     <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">get_orbital_position</span></a><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">i</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">c</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">planet_track</span>
+</pre></div>
+</div>
+<p>First we are making a list that will contain radius from <cite>planets_data</cite>.
+Here we are not taking the radius of orbit/path for sun and saturn ring.
+And <cite>planet_actors</cite> will contain all the planet actors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">r_planets</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">p_data</span><span class="p">[</span><span class="s1">&#39;position&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p_data</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planets_data</span></a>
+             <span class="k">if</span> <span class="s1">&#39;sun&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p_data</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span>
+             <span class="k">if</span> <span class="s1">&#39;saturn_ring&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">p_data</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]]</span>
 
-
-<span class="k">def</span> <span class="nf">update_track</span><span class="p">(</span><span class="n">positions_planet</span><span class="p">,</span> <span class="n">planet_track</span><span class="p">,</span> <span class="n">planet_orbit_actor</span><span class="p">):</span>
-    <span class="n">positions_planet</span><span class="p">[:]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="View documentation for numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">planet_track</span><span class="p">)</span>
-    <a href="../../reference/fury.utils.html#fury.utils.update_actor" title="View documentation for fury.utils.update_actor"><span class="n">utils</span><span class="o">.</span><span class="n">update_actor</span></a><span class="p">(</span><span class="n">planet_orbit_actor</span><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actors</span></a> <span class="o">=</span> <span class="p">[</span><span class="n">mercury_actor</span><span class="p">,</span> <span class="n">venus_actor</span><span class="p">,</span> <span class="n">earth_actor</span><span class="p">,</span> <span class="n">mars_actor</span><span class="p">,</span>
+                 <span class="n">jupiter_actor</span><span class="p">,</span> <span class="n">saturn_actor</span><span class="p">,</span> <span class="n">uranus_actor</span><span class="p">,</span> <span class="n">neptune_actor</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Here we are calculating and updating the path/orbit before animation starts.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_tracks</span></a> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">calculate_path</span></a><span class="p">(</span><span class="n">rplanet</span><span class="p">,</span> <span class="n">rplanet</span><span class="o">*</span><span class="mi">85</span><span class="p">)</span> <span class="k">for</span> <span class="n">rplanet</span> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">r_planets</span></a><span class="p">]</span>
+</pre></div>
+</div>
+<p>This is for orbit visualization. We are using line actor for orbits.
+After creating an actor we add it to the scene.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">orbit_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.line" title="View documentation for fury.actor.line"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_tracks</span></a><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">orbit_actor</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Define the <code class="docutils literal notranslate"><span class="pre">timer_callback</span></code> function, which controls what events happen
-at certain times, using the counter. Redefine the position of each planet
-actor using <code class="docutils literal notranslate"><span class="pre">get_orbital_position,</span></code> assigning the x and y values of
-each planet’s position with the newly calculated ones. Append each new
-planet position to its corresponding track array.</p>
+at certain times, using the counter. Update the position of each planet
+actor using <code class="docutils literal notranslate"><span class="pre">update_planet_position,</span></code> assigning the x and y values of
+each planet’s position with the newly calculated ones.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">timer_callback</span><span class="p">(</span><span class="n">_obj</span><span class="p">,</span> <span class="n">_event</span><span class="p">):</span>
     <span class="n">cnt</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
     <a href="../../reference/fury.window.html#fury.window.ShowManager" title="View documentation for fury.window.ShowManager"><span class="n">showm</span></a><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 
-    <span class="k">global</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mercury_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">venus_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">earth_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mars_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">jupiter_track</span></a>
-    <span class="k">global</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">saturn_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">uranus_track</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">neptune_track</span></a>
+    <span class="k">for</span> <span class="n">r_planet</span><span class="p">,</span> <span class="n">planet_actor</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">r_planets</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">planet_actors</span></a><span class="p">):</span>
+        <span class="c1"># if the planet is saturn then we also need to update the position</span>
+        <span class="c1"># of its rings.</span>
+        <span class="k">if</span> <span class="n">planet_actor</span> <span class="o">==</span> <span class="n">saturn_actor</span><span class="p">:</span>
+            <span class="n">pos_saturn</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><span class="mi">19</span><span class="p">,</span> <span class="n">saturn_actor</span><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
+            <span class="n">saturn_rings_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">pos_saturn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pos_saturn</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><span class="n">r_planet</span><span class="p">,</span> <span class="n">planet_actor</span><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
 
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_mercury</span></a><span class="p">,</span> <span class="n">mercury_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mercury_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_venus</span></a><span class="p">,</span> <span class="n">venus_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">venus_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_earth</span></a><span class="p">,</span> <span class="n">earth_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">earth_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_mars</span></a><span class="p">,</span> <span class="n">mars_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mars_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_jupiter</span></a><span class="p">,</span> <span class="n">jupiter_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">jupiter_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <span class="n">pos_saturn</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_saturn</span></a><span class="p">,</span> <span class="n">saturn_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">saturn_track</span></a><span class="p">,</span>
-                                        <span class="n">cnt</span><span class="p">)</span>
-    <span class="n">saturn_rings_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">pos_saturn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">pos_saturn</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_uranus</span></a><span class="p">,</span> <span class="n">uranus_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">uranus_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_planet_position</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">r_neptune</span></a><span class="p">,</span> <span class="n">neptune_actor</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">neptune_track</span></a><span class="p">,</span> <span class="n">cnt</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">999</span><span class="p">:</span>
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_mercury</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mercury_track</span></a><span class="p">,</span> <span class="n">mercury_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_venus</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">venus_track</span></a><span class="p">,</span> <span class="n">venus_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_earth</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">earth_track</span></a><span class="p">,</span> <span class="n">earth_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_mars</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">mars_track</span></a><span class="p">,</span> <span class="n">mars_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_jupiter</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">jupiter_track</span></a><span class="p">,</span> <span class="n">jupiter_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_saturn</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">saturn_track</span></a><span class="p">,</span> <span class="n">saturn_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_uranus</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">uranus_track</span></a><span class="p">,</span> <span class="n">uranus_orbit_actor</span><span class="p">)</span>
-
-        <a href="https://docs.python.org/3/library/functions.html#object" title="View documentation for builtins.object"><span class="n">update_track</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="View documentation for numpy.ndarray"><span class="n">positions_neptune</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">neptune_track</span></a><span class="p">,</span> <span class="n">neptune_orbit_actor</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">1500</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">2000</span><span class="p">:</span>
         <a href="../../reference/fury.window.html#fury.window.ShowManager" title="View documentation for fury.window.ShowManager"><span class="n">showm</span></a><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -493,7 +411,7 @@ planet position to its corresponding track array.</p>
 </pre></div>
 </div>
 <img alt="../../_images/sphx_glr_viz_solar_system_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_viz_solar_system_001.png" />
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 2 minutes  59.862 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  26.645 seconds)</p>
 <div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-01-introductory-viz-solar-system-py">
 <div class="sphx-glr-download docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/dd710b13a3e505fa61a3041ba789e420/viz_solar_system.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_solar_system.py</span></code></a></p>
@@ -513,10 +431,10 @@ planet position to its corresponding track array.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../02_ui/viz_shapes.html" class="btn btn-neutral float-right" title="Simple Shapes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="viz_slice.html" class="btn btn-neutral float-right" title="Simple volume slicing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="viz_slice.html" class="btn btn-neutral float-left" title="Simple volume slicing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="viz_earth_coordinates.html" class="btn btn-neutral float-left" title="Earth Coordinate Conversion" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -557,7 +475,7 @@ planet position to its corresponding track array.</p>
             
         
             
-            <li><dd><a href="/v0.4.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.3.x</a></dd></li>
             
         
             
@@ -565,7 +483,7 @@ planet position to its corresponding track array.</p>
             
         
             
-            <li><dd><a href="/v0.6.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.6.x</a></dd></li>
+            <li><dt>fury v0.7.x</dt></li>
             
         
             
@@ -573,15 +491,15 @@ planet position to its corresponding track array.</p>
             
         
             
-            <li><dd><a href="/v0.3.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.6.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.5.x/auto_tutorials/01_introductory/viz_solar_system">fury v0.5.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
             
         
       </dl>
