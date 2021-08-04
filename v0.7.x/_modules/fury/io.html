@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.io &mdash; FURY 0.7.0 documentation</title>
+  <title>fury.io &mdash; FURY 0.7.1 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -188,6 +188,7 @@
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">from</span> <span class="nn">vtk.util</span> <span class="kn">import</span> <span class="n">numpy_support</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">set_input</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
 
 
 <div class="viewcode-block" id="load_image"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.load_image">[docs]</a><span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_pillow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -208,6 +209,18 @@
 <span class="sd">        desired image array</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">is_url</span> <span class="o">=</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span><span class="p">)</span> \
+        <span class="ow">or</span> <span class="n">filename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+        <span class="n">image_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">image_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1"> is not a valid image URL&#39;</span><span class="p">)</span>
+
+        <span class="n">urlretrieve</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">image_name</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">image_name</span>
+
     <span class="k">if</span> <span class="n">use_pillow</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">pil_image</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;RGBA&#39;</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">,</span> <span class="s1">&#39;L&#39;</span><span class="p">]:</span>
@@ -248,6 +261,8 @@
             <span class="n">vtk_image</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">uchar_array</span><span class="p">)</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">vtk_image</span>
 
+        <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image</span>
 
     <span class="n">d_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">,</span>
@@ -276,6 +291,8 @@
         <span class="n">image</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span> <span class="k">if</span> <span class="n">as_vtktype</span> <span class="k">else</span> <span class="n">image</span></div>
 
 
@@ -492,7 +509,7 @@
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
             
         
             
@@ -500,7 +517,7 @@
             
         
             
-            <li><dd><a href="/v0.6.x/_modules/fury/io">fury v0.6.x</a></dd></li>
+            <li><dt>fury v0.7.x</dt></li>
             
         
             
@@ -508,15 +525,15 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/_modules/fury/io">fury v0.6.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.5.x/_modules/fury/io">fury v0.5.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
             
         
       </dl>

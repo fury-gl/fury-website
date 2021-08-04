@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.actor &mdash; FURY 0.7.0 documentation</title>
+  <title>fury.actor &mdash; FURY 0.7.1 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -187,6 +187,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">os.path</span> <span class="k">as</span> <span class="nn">op</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">vtk</span>
 <span class="kn">from</span> <span class="nn">vtk.util</span> <span class="kn">import</span> <span class="n">numpy_support</span>
 
@@ -199,7 +200,7 @@
                         <span class="n">set_polydata_vertices</span><span class="p">,</span> <span class="n">set_polydata_triangles</span><span class="p">,</span>
                         <span class="n">shallow_copy</span><span class="p">,</span> <span class="n">rgb_to_vtk</span><span class="p">,</span> <span class="n">numpy_to_vtk_matrix</span><span class="p">,</span>
                         <span class="n">repeat_sources</span><span class="p">,</span> <span class="n">get_actor_from_primitive</span><span class="p">,</span>
-                        <span class="n">fix_winding_order</span><span class="p">)</span>
+                        <span class="n">fix_winding_order</span><span class="p">,</span> <span class="n">numpy_to_vtk_colors</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
 <span class="kn">from</span> <span class="nn">fury.actors.odf_slicer</span> <span class="kn">import</span> <span class="n">OdfSlicerActor</span>
 <span class="kn">import</span> <span class="nn">fury.primitive</span> <span class="k">as</span> <span class="nn">fp</span>
@@ -455,7 +456,7 @@
 <span class="sd">            It is an optional parameter, it is computed locally if None</span>
 <span class="sd">        colors : (N, 3) array</span>
 <span class="sd">            Specifies the colors associated with each vertex in the</span>
-<span class="sd">            vertices array.</span>
+<span class="sd">            vertices array. Range should be 0 to 1.</span>
 <span class="sd">            Optional parameter, if not passed, all vertices</span>
 <span class="sd">            are colored white</span>
 <span class="sd">        smooth : string - &quot;loop&quot; or &quot;butterfly&quot;</span>
@@ -482,7 +483,7 @@
 
     <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">triangle_poly_data</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span>\
-            <span class="n">SetScalars</span><span class="p">(</span><span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">colors</span><span class="p">))</span>
+            <span class="n">SetScalars</span><span class="p">(</span><span class="n">numpy_to_vtk_colors</span><span class="p">(</span><span class="mi">255</span> <span class="o">*</span> <span class="n">colors</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">tri</span> <span class="o">=</span> <span class="n">Delaunay</span><span class="p">(</span><span class="n">vertices</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
@@ -659,10 +660,10 @@
         <span class="n">opacity</span> <span class="o">=</span> <span class="n">color</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
+        <span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">roi_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_roi_id</span><span class="p">):</span>
-        <span class="n">roi_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">roi_id</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">)</span>
+        <span class="n">roi_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">roi_id</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
         <span class="n">roi_surface</span> <span class="o">=</span> <span class="n">contour_from_roi</span><span class="p">(</span><span class="n">roi_data</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span>
                                        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
                                        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
@@ -1135,9 +1136,9 @@
             <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">evecs</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="n">szx</span><span class="p">,</span> <span class="n">szy</span><span class="p">,</span> <span class="n">szz</span> <span class="o">=</span> <span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
 
@@ -1146,7 +1147,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mapper</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">def</span> <span class="nf">display_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
-            <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+            <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
             <span class="n">tmp_mask</span><span class="p">[</span><span class="n">x1</span><span class="p">:</span><span class="n">x2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y1</span><span class="p">:</span><span class="n">y2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z1</span><span class="p">:</span><span class="n">z2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">tmp_mask</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
 
@@ -1234,19 +1235,19 @@
     <span class="n">all_xyz</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">all_faces</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">center</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ijk</span><span class="p">):</span>
-        <span class="n">ea</span> <span class="o">=</span> <span class="n">evals</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))]</span>
+        <span class="n">ea</span> <span class="o">=</span> <span class="n">evals</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))]</span>
         <span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
             <span class="n">ea</span> <span class="o">/=</span> <span class="n">ea</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">ea</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">ea</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
-        <span class="n">ev</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">ev</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ev</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">ea</span><span class="p">,</span> <span class="n">vertices</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
 
         <span class="n">xyz</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">T</span>
         <span class="n">all_xyz</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scale</span> <span class="o">*</span> <span class="n">xyz</span> <span class="o">+</span> <span class="n">center</span><span class="p">)</span>
         <span class="n">all_faces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">faces</span> <span class="o">+</span> <span class="n">k</span> <span class="o">*</span> <span class="n">xyz</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">cfa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int</span><span class="p">))],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">cols</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">cfa</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">center</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">))],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
                                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;ubyte&#39;</span><span class="p">)</span>
 
     <span class="n">all_xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">all_xyz</span><span class="p">))</span>
@@ -1336,7 +1337,7 @@
     <span class="n">grid_shape</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">peaks_dirs</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
 
     <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">PeakSlicerActor</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkLODActor</span><span class="p">):</span>
         <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1344,7 +1345,7 @@
 
         <span class="k">def</span> <span class="nf">display_extent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
 
-            <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+            <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">grid_shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
             <span class="n">tmp_mask</span><span class="p">[</span><span class="n">x1</span><span class="p">:</span><span class="n">x2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">y1</span><span class="p">:</span><span class="n">y2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">z1</span><span class="p">:</span><span class="n">z2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">tmp_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">tmp_mask</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
 
@@ -1862,6 +1863,46 @@
     <span class="k">return</span> <span class="n">actor</span></div>
 
 
+<div class="viewcode-block" id="triangularprism"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.triangularprism">[docs]</a><span class="k">def</span> <span class="nf">triangularprism</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                    <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many regular triangular prisms with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Triangular prism positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector(s) of the triangular prism(s)</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    scales : int or ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Triangular prism size on each direction (x, y), default(1)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(3, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(3, 3)</span>
+<span class="sd">    &gt;&gt;&gt; colors = np.random.rand(3, 3)</span>
+<span class="sd">    &gt;&gt;&gt; scales = np.random.rand(3, 1)</span>
+<span class="sd">    &gt;&gt;&gt; actor = actor.triangularprism(centers, dirs, colors, scales)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(actor)</span>
+<span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_triangularprism</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
+                              <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="n">scales</span><span class="p">)</span>
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">tri_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tri_actor</span></div>
+
+
 <div class="viewcode-block" id="octagonalprism"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.octagonalprism">[docs]</a><span class="k">def</span> <span class="nf">octagonalprism</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                    <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Visualize one or many octagonal prisms with different features.</span>
@@ -2345,7 +2386,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_need_update</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="Container.add_to_scene"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.Container.add_to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ren</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Adds the items of this container to a given renderer. &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot; Adds the items of this container to a given scene. &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Container</span><span class="p">):</span>
                 <span class="n">item</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">ren</span><span class="p">)</span>
@@ -2589,6 +2630,32 @@
     <span class="k">return</span> <span class="n">act</span></div>
 
 
+<div class="viewcode-block" id="texture_update"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.texture_update">[docs]</a><span class="k">def</span> <span class="nf">texture_update</span><span class="p">(</span><span class="n">texture_actor</span><span class="p">,</span> <span class="n">arr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates texture of an actor by updating the vtkImageData</span>
+<span class="sd">    assigned to the vtkTexture object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    texture_actor: vtkActor</span>
+<span class="sd">        Actor whose texture is to be updated.</span>
+<span class="sd">    arr : ndarray</span>
+<span class="sd">        Input 2D image in the form of RGB or RGBA array.</span>
+<span class="sd">        This is the new image to be rendered on the actor.</span>
+<span class="sd">        Dtype should be uint8.</span>
+
+<span class="sd">    Implementation</span>
+<span class="sd">    --------------</span>
+<span class="sd">    Check docs/examples/viz_video_on_plane.py</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">texture_actor</span><span class="o">.</span><span class="n">GetTexture</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">img_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flip</span><span class="p">(</span><span class="n">arr</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>\
+                 <span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dim</span><span class="p">),</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;F&#39;</span><span class="p">)</span>
+    <span class="n">vtkarr</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">img_data</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">grid</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">vtkarr</span><span class="p">)</span></div>
+
+
 <span class="k">def</span> <span class="nf">_textured_sphere_source</span><span class="p">(</span><span class="n">theta</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
     <span class="n">tss</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTexturedSphereSource</span><span class="p">()</span>
     <span class="n">tss</span><span class="o">.</span><span class="n">SetThetaResolution</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
@@ -2616,6 +2683,73 @@
     <span class="k">return</span> <span class="n">earthActor</span></div>
 
 
+<div class="viewcode-block" id="texture_2d"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.texture_2d">[docs]</a><span class="k">def</span> <span class="nf">texture_2d</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">interp</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Create 2D texture from array</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rgb : ndarray</span>
+<span class="sd">        Input 2D RGB or RGBA array. Dtype should be uint8.</span>
+<span class="sd">    interp : bool</span>
+<span class="sd">        Interpolate between grid centers. Default True.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkTexturedActor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">arr</span> <span class="o">=</span> <span class="n">rgb</span>
+    <span class="n">Y</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">rgb_to_vtk</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
+
+    <span class="n">texture_polydata</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyData</span><span class="p">()</span>
+    <span class="n">texture_points</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPoints</span><span class="p">()</span>
+    <span class="n">texture_points</span><span class="o">.</span><span class="n">SetNumberOfPoints</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="n">polys</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCellArray</span><span class="p">()</span>
+    <span class="n">polys</span><span class="o">.</span><span class="n">InsertNextCell</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">polys</span><span class="o">.</span><span class="n">InsertCellPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">polys</span><span class="o">.</span><span class="n">InsertCellPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">polys</span><span class="o">.</span><span class="n">InsertCellPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">polys</span><span class="o">.</span><span class="n">InsertCellPoint</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">texture_polydata</span><span class="o">.</span><span class="n">SetPolys</span><span class="p">(</span><span class="n">polys</span><span class="p">)</span>
+
+    <span class="n">tc</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkFloatArray</span><span class="p">()</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">SetNumberOfComponents</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">SetNumberOfTuples</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">tc</span><span class="o">.</span><span class="n">InsertComponent</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">texture_polydata</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetTCoords</span><span class="p">(</span><span class="n">tc</span><span class="p">)</span>
+
+    <span class="n">texture_points</span><span class="o">.</span><span class="n">SetPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">texture_points</span><span class="o">.</span><span class="n">SetPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">texture_points</span><span class="o">.</span><span class="n">SetPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">texture_points</span><span class="o">.</span><span class="n">SetPoint</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">texture_polydata</span><span class="o">.</span><span class="n">SetPoints</span><span class="p">(</span><span class="n">texture_points</span><span class="p">)</span>
+
+    <span class="n">texture_mapper</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataMapper2D</span><span class="p">()</span>
+    <span class="n">texture_mapper</span> <span class="o">=</span> <span class="n">set_input</span><span class="p">(</span><span class="n">texture_mapper</span><span class="p">,</span>
+                               <span class="n">texture_polydata</span><span class="p">)</span>
+
+    <span class="n">act</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTexturedActor2D</span><span class="p">()</span>
+    <span class="n">act</span><span class="o">.</span><span class="n">SetMapper</span><span class="p">(</span><span class="n">texture_mapper</span><span class="p">)</span>
+
+    <span class="n">tex</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTexture</span><span class="p">()</span>
+    <span class="n">tex</span><span class="o">.</span><span class="n">SetInputDataObject</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interp</span><span class="p">:</span>
+        <span class="n">tex</span><span class="o">.</span><span class="n">InterpolateOn</span><span class="p">()</span>
+    <span class="n">tex</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+    <span class="n">act</span><span class="o">.</span><span class="n">SetTexture</span><span class="p">(</span><span class="n">tex</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">act</span></div>
+
+
 <div class="viewcode-block" id="sdf"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.sdf">[docs]</a><span class="k">def</span> <span class="nf">sdf</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">primitives</span><span class="o">=</span><span class="s1">&#39;torus&#39;</span><span class="p">,</span>
         <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a SDF primitive based actor</span>
@@ -2624,7 +2758,7 @@
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
 <span class="sd">        SDF primitive positions</span>
-<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
 <span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
 <span class="sd">    directions : ndarray, shape (N, 3)</span>
 <span class="sd">        The orientation vector of the SDF primitive.</span>
@@ -2687,6 +2821,109 @@
     <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">box_actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span>
                     <span class="n">block</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">box_actor</span></div>
+
+
+<div class="viewcode-block" id="markers"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.markers">[docs]</a><span class="k">def</span> <span class="nf">markers</span><span class="p">(</span>
+        <span class="n">centers</span><span class="p">,</span>
+        <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span>
+        <span class="n">marker_opacity</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">edge_width</span><span class="o">=.</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">edge_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="n">edge_opacity</span><span class="o">=.</span><span class="mi">8</span>
+        <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a marker actor with different shapes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    scales : ndarray, shape (N) or (N,3) or float or int, optional</span>
+<span class="sd">    marker : str or a list</span>
+<span class="sd">        Available markers are: &#39;3d&#39;, &#39;o&#39;, &#39;s&#39;, &#39;d&#39;, &#39;^&#39;, &#39;p&#39;, &#39;h&#39;, &#39;s6&#39;,</span>
+<span class="sd">        &#39;x&#39;, &#39;+&#39;, optional</span>
+<span class="sd">    marker_opacity : float, optional</span>
+<span class="sd">    edge_width : int, optional</span>
+<span class="sd">    edge_color : ndarray, shape (3), optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vtkActor</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n_markers</span> <span class="o">=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_square</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span><span class="n">verts</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                              <span class="n">scales</span><span class="o">=</span><span class="n">scales</span><span class="p">)</span>
+
+    <span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">,</span> <span class="n">big_centers</span> <span class="o">=</span> <span class="n">res</span>
+    <span class="n">sq_actor</span> <span class="o">=</span> <span class="n">get_actor_from_primitive</span><span class="p">(</span><span class="n">big_verts</span><span class="p">,</span> <span class="n">big_faces</span><span class="p">,</span> <span class="n">big_colors</span><span class="p">)</span>
+    <span class="n">sq_actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">SetVBOShiftScaleMethod</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">sq_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">BackfaceCullingOff</span><span class="p">()</span>
+
+    <span class="n">attribute_to_actor</span><span class="p">(</span><span class="n">sq_actor</span><span class="p">,</span> <span class="n">big_centers</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)</span>
+    <span class="n">marker2id</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;o&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+            <span class="s1">&#39;h&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">&#39;s6&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+
+    <span class="n">vs_dec_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;billboard_dec.vert&quot;</span><span class="p">)</span>
+    <span class="n">vs_dec_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;marker_billboard_dec.vert&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">vs_impl_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s2">&quot;billboard_impl.vert&quot;</span><span class="p">)</span>
+    <span class="n">vs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;marker_billboard_impl.vert&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+
+    <span class="n">fs_dec_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;billboard_dec.frag&#39;</span><span class="p">)</span>
+    <span class="n">fs_dec_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;marker_billboard_dec.frag&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">fs_impl_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;billboard_impl.frag&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">marker</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
+        <span class="n">fs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;billboard_spheres_impl.frag&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">fs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;marker_billboard_impl.frag&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">marker</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">list_of_markers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">n_markers</span><span class="p">)</span><span class="o">*</span><span class="n">marker2id</span><span class="p">[</span><span class="n">marker</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">list_of_markers</span> <span class="o">=</span> <span class="p">[</span><span class="n">marker2id</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">marker</span><span class="p">]</span>
+
+        <span class="n">list_of_markers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">list_of_markers</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;float&#39;</span><span class="p">)</span>
+        <span class="n">attribute_to_actor</span><span class="p">(</span>
+            <span class="n">sq_actor</span><span class="p">,</span>
+            <span class="n">list_of_markers</span><span class="p">,</span> <span class="s1">&#39;marker&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span>
+        <span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">uniform_type</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="n">uniform_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+        <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">program</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;SetUniform</span><span class="si">{</span><span class="n">uniform_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)(</span>
+                <span class="n">uniform_name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="n">add_shader_callback</span><span class="p">(</span>
+            <span class="n">sq_actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span>
+                <span class="n">callback</span><span class="p">,</span> <span class="n">uniform_type</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="n">uniform_name</span><span class="o">=</span><span class="s1">&#39;edgeWidth&#39;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">edge_width</span><span class="p">))</span>
+    <span class="n">add_shader_callback</span><span class="p">(</span>
+            <span class="n">sq_actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span>
+                <span class="n">callback</span><span class="p">,</span> <span class="n">uniform_type</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="n">uniform_name</span><span class="o">=</span><span class="s1">&#39;markerOpacity&#39;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">marker_opacity</span><span class="p">))</span>
+    <span class="n">add_shader_callback</span><span class="p">(</span>
+            <span class="n">sq_actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span>
+                <span class="n">callback</span><span class="p">,</span> <span class="n">uniform_type</span><span class="o">=</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="n">uniform_name</span><span class="o">=</span><span class="s1">&#39;edgeOpacity&#39;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">edge_opacity</span><span class="p">))</span>
+    <span class="n">add_shader_callback</span><span class="p">(</span>
+            <span class="n">sq_actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span>
+                <span class="n">callback</span><span class="p">,</span> <span class="n">uniform_type</span><span class="o">=</span><span class="s1">&#39;3f&#39;</span><span class="p">,</span> <span class="n">uniform_name</span><span class="o">=</span><span class="s1">&#39;edgeColor&#39;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">edge_color</span><span class="p">))</span>
+
+    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">sq_actor</span><span class="p">,</span> <span class="s2">&quot;vertex&quot;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">vs_impl_code</span><span class="p">,</span>
+                    <span class="n">decl_code</span><span class="o">=</span><span class="n">vs_dec_code</span><span class="p">)</span>
+    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">sq_actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec_code</span><span class="p">)</span>
+    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">sq_actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span>
+                    <span class="n">block</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sq_actor</span></div>
 </pre></div>
 
            </div>
@@ -2731,7 +2968,7 @@
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
             
         
             
@@ -2739,7 +2976,7 @@
             
         
             
-            <li><dd><a href="/v0.6.x/_modules/fury/actor">fury v0.6.x</a></dd></li>
+            <li><dt>fury v0.7.x</dt></li>
             
         
             
@@ -2747,15 +2984,15 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/actor">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/actor">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/_modules/fury/actor">fury v0.6.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.5.x/_modules/fury/actor">fury v0.5.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
             
         
       </dl>

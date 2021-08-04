@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>shaders &mdash; FURY 0.7.0 documentation</title>
+  <title>shaders &mdash; FURY 0.7.1 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -231,7 +231,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fury.shaders.add_shader_callback" title="fury.shaders.add_shader_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_shader_callback</span></code></a>(actor, callback)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fury.shaders.add_shader_callback" title="fury.shaders.add_shader_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_shader_callback</span></code></a>(actor, callback[, priority])</p></td>
 <td><p>Add a shader callback to the actor.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fury.shaders.attribute_to_actor" title="fury.shaders.attribute_to_actor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attribute_to_actor</span></code></a>(actor, arr, attr_name[, deep])</p></td>
@@ -262,7 +262,7 @@
 <col style="width: 90%" />
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fury.shaders.base.add_shader_callback" title="fury.shaders.base.add_shader_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_shader_callback</span></code></a>(actor, callback)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fury.shaders.base.add_shader_callback" title="fury.shaders.base.add_shader_callback"><code class="xref py py-obj docutils literal notranslate"><span class="pre">add_shader_callback</span></code></a>(actor, callback[, priority])</p></td>
 <td><p>Add a shader callback to the actor.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fury.shaders.base.attribute_to_actor" title="fury.shaders.base.attribute_to_actor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">attribute_to_actor</span></code></a>(actor, arr, attr_name[, deep])</p></td>
@@ -283,7 +283,7 @@
 <h3>add_shader_callback<a class="headerlink" href="#add-shader-callback" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="fury.shaders.add_shader_callback">
-<code class="sig-prename descclassname">fury.shaders.</code><code class="sig-name descname">add_shader_callback</code><span class="sig-paren">(</span><em class="sig-param">actor</em>, <em class="sig-param">callback</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/shaders/base.html#add_shader_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fury.shaders.add_shader_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fury.shaders.</code><code class="sig-name descname">add_shader_callback</code><span class="sig-paren">(</span><em class="sig-param">actor</em>, <em class="sig-param">callback</em>, <em class="sig-param">priority=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/shaders/base.html#add_shader_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fury.shaders.add_shader_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a shader callback to the actor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -291,9 +291,52 @@
 <li><p><strong>actor</strong> (<em>vtkActor</em>) – Rendered Object</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – function or class that contains 3 parameters: caller, event, calldata.
 This callback will be trigger at each <cite>UpdateShaderEvent</cite> event.</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Commands with a higher priority are called first.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>id_observer</strong> – An unsigned Int tag which can be used later to remove the event
+or retrieve the vtkCommand used in the observer.
+See more at: <a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkObject.html">https://vtk.org/doc/nightly/html/classvtkObject.html</a></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">func_call1</span><span class="p">)</span>
+<span class="n">id_observer</span> <span class="o">=</span> <span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">func_call2</span><span class="p">)</span>
+<span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">RemoveObserver</span><span class="p">(</span><span class="n">id_observer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Priority calls</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">def</span> <span class="nf">callbackLow</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">callbackHigh</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">999</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">callbackMean</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackHigh</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span>
+<span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackLow</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">id_mean</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackMean</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="c1"># test_values = [999, 500, 0, 999, 500, 0, ...]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -405,7 +448,7 @@ by default False</p></li>
 <h3>add_shader_callback<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="fury.shaders.base.add_shader_callback">
-<code class="sig-prename descclassname">fury.shaders.base.</code><code class="sig-name descname">add_shader_callback</code><span class="sig-paren">(</span><em class="sig-param">actor</em>, <em class="sig-param">callback</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/shaders/base.html#add_shader_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fury.shaders.base.add_shader_callback" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">fury.shaders.base.</code><code class="sig-name descname">add_shader_callback</code><span class="sig-paren">(</span><em class="sig-param">actor</em>, <em class="sig-param">callback</em>, <em class="sig-param">priority=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/shaders/base.html#add_shader_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fury.shaders.base.add_shader_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a shader callback to the actor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -413,9 +456,52 @@ by default False</p></li>
 <li><p><strong>actor</strong> (<em>vtkActor</em>) – Rendered Object</p></li>
 <li><p><strong>callback</strong> (<em>callable</em>) – function or class that contains 3 parameters: caller, event, calldata.
 This callback will be trigger at each <cite>UpdateShaderEvent</cite> event.</p></li>
+<li><p><strong>priority</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Commands with a higher priority are called first.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>id_observer</strong> – An unsigned Int tag which can be used later to remove the event
+or retrieve the vtkCommand used in the observer.
+See more at: <a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkObject.html">https://vtk.org/doc/nightly/html/classvtkObject.html</a></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
+</dd>
 </dl>
+<p class="rubric">Examples</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">func_call1</span><span class="p">)</span>
+<span class="n">id_observer</span> <span class="o">=</span> <span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">func_call2</span><span class="p">)</span>
+<span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">RemoveObserver</span><span class="p">(</span><span class="n">id_observer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Priority calls</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">test_values</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">def</span> <span class="nf">callbackLow</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">callbackHigh</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">999</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">callbackMean</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
+    <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">test_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackHigh</span><span class="p">,</span> <span class="mi">999</span><span class="p">)</span>
+<span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackLow</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">id_mean</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">add_shader_callback</span><span class="p">(</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">callbackMean</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="c1"># test_values = [999, 500, 0, 999, 500, 0, ...]</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -563,7 +649,7 @@ by default False</p></li>
             
         
             
-            <li><dd><a href="/v0.4.x/reference/fury.shaders">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/reference/fury.shaders">fury v0.3.x</a></dd></li>
             
         
             
@@ -571,7 +657,7 @@ by default False</p></li>
             
         
             
-            <li><dd><a href="/v0.6.x/reference/fury.shaders">fury v0.6.x</a></dd></li>
+            <li><dt>fury v0.7.x</dt></li>
             
         
             
@@ -579,15 +665,15 @@ by default False</p></li>
             
         
             
-            <li><dd><a href="/v0.3.x/reference/fury.shaders">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/reference/fury.shaders">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/reference/fury.shaders">fury v0.6.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.5.x/reference/fury.shaders">fury v0.5.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
             
         
       </dl>

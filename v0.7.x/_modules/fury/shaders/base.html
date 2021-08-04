@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.shaders.base &mdash; FURY 0.7.0 documentation</title>
+  <title>fury.shaders.base &mdash; FURY 0.7.1 documentation</title>
   
 
   
@@ -65,7 +65,7 @@
             
             
               <div class="version">
-                0.7.0
+                0.7.1
               </div>
             
           
@@ -311,7 +311,7 @@
     <span class="nb">getattr</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">function</span><span class="p">)(</span><span class="n">code</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_shader_callback"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.add_shader_callback">[docs]</a><span class="k">def</span> <span class="nf">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+<div class="viewcode-block" id="add_shader_callback"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.add_shader_callback">[docs]</a><span class="k">def</span> <span class="nf">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Add a shader callback to the actor.</span>
 
 <span class="sd">    Parameters</span>
@@ -321,14 +321,69 @@
 <span class="sd">    callback : callable</span>
 <span class="sd">        function or class that contains 3 parameters: caller, event, calldata.</span>
 <span class="sd">        This callback will be trigger at each `UpdateShaderEvent` event.</span>
+<span class="sd">    priority : float, optional</span>
+<span class="sd">        Commands with a higher priority are called first.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    id_observer : int</span>
+<span class="sd">        An unsigned Int tag which can be used later to remove the event</span>
+<span class="sd">        or retrieve the vtkCommand used in the observer.</span>
+<span class="sd">        See more at: https://vtk.org/doc/nightly/html/classvtkObject.html</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ---------</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        add_shader_callback(actor, func_call1)</span>
+<span class="sd">        id_observer = add_shader_callback(actor, func_call2)</span>
+<span class="sd">        actor.GetMapper().RemoveObserver(id_observer)</span>
+
+<span class="sd">    Priority calls</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        test_values = []</span>
+<span class="sd">        def callbackLow(_caller, _event, calldata=None):</span>
+<span class="sd">            program = calldata</span>
+<span class="sd">            if program is not None:</span>
+<span class="sd">                test_values.append(0)</span>
+
+<span class="sd">        def callbackHigh(_caller, _event, calldata=None):</span>
+<span class="sd">            program = calldata</span>
+<span class="sd">            if program is not None:</span>
+<span class="sd">                test_values.append(999)</span>
+
+<span class="sd">        def callbackMean(_caller, _event, calldata=None):</span>
+<span class="sd">            program = calldata</span>
+<span class="sd">            if program is not None:</span>
+<span class="sd">                test_values.append(500)</span>
+
+<span class="sd">        fs.add_shader_callback(</span>
+<span class="sd">                actor, callbackHigh, 999)</span>
+<span class="sd">        fs.add_shader_callback(</span>
+<span class="sd">                actor, callbackLow, 0)</span>
+<span class="sd">        id_mean = fs.add_shader_callback(</span>
+<span class="sd">                actor, callbackMean, 500)</span>
+
+<span class="sd">        showm.start()</span>
+<span class="sd">        # test_values = [999, 500, 0, 999, 500, 0, ...]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="nd">@vtk</span><span class="o">.</span><span class="n">calldata_type</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">VTK_OBJECT</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">cbk</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">callback</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">calldata</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priority</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            add_shader_callback priority argument shoud be a float/int&quot;&quot;&quot;</span><span class="p">)</span>
+
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span>
-    <span class="n">mapper</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">UpdateShaderEvent</span><span class="p">,</span> <span class="n">cbk</span><span class="p">)</span></div>
+    <span class="n">id_observer</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
+        <span class="n">vtk</span><span class="o">.</span><span class="n">vtkCommand</span><span class="o">.</span><span class="n">UpdateShaderEvent</span><span class="p">,</span> <span class="n">cbk</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">id_observer</span></div>
 
 
 <div class="viewcode-block" id="attribute_to_actor"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.attribute_to_actor">[docs]</a><span class="k">def</span> <span class="nf">attribute_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -400,7 +455,7 @@
             
         
             
-            <li><dd><a href="/v0.4.x/_modules/fury/shaders/base">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.3.x/_modules/fury/shaders/base">fury v0.3.x</a></dd></li>
             
         
             
@@ -408,7 +463,7 @@
             
         
             
-            <li><dd><a href="/v0.6.x/_modules/fury/shaders/base">fury v0.6.x</a></dd></li>
+            <li><dt>fury v0.7.x</dt></li>
             
         
             
@@ -416,15 +471,15 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/shaders/base">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.4.x/_modules/fury/shaders/base">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/_modules/fury/shaders/base">fury v0.6.x</a></dd></li>
             
         
             
             <li><dd><a href="/v0.5.x/_modules/fury/shaders/base">fury v0.5.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
             
         
       </dl>
