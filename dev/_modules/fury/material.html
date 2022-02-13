@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.material &mdash; FURY 0.7.1 documentation</title>
+  <title>fury.material &mdash; FURY 0.7.1.post500.dev0+gb3aa4d75 documentation</title>
   
 
   
@@ -23,12 +23,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -37,6 +37,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom_github.css" type="text/css" />
@@ -65,7 +67,7 @@
             
             
               <div class="version">
-                0.7.1
+                0.7.1.post500.dev0+gb3aa4d75
               </div>
             
           
@@ -89,13 +91,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">About Fury</span></p>
+              <p class="caption" role="heading"><span class="caption-text">About Fury</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Programming with Fury</span></p>
+<p class="caption" role="heading"><span class="caption-text">Programming with Fury</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
@@ -103,13 +105,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developers Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Join our community!</span></p>
+<p class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
@@ -182,73 +184,358 @@
            <div itemprop="articleBody">
             
   <h1>Source code for fury.material</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">vtk</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-
-<span class="n">VTK_9_PLUS</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkVersion</span><span class="o">.</span><span class="n">GetVTKMajorVersion</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">9</span>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
 
 
-<div class="viewcode-block" id="manifest_pbr"><a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_pbr">[docs]</a><span class="k">def</span> <span class="nf">manifest_pbr</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">metallicity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">roughness</span><span class="o">=.</span><span class="mi">5</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Apply the Physically Based Rendering properties to the selected actor.</span>
+<span class="kn">from</span> <span class="nn">fury.shaders</span> <span class="kn">import</span> <span class="n">add_shader_callback</span><span class="p">,</span> <span class="n">load</span><span class="p">,</span> <span class="n">shader_to_actor</span>
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">VTK_OBJECT</span><span class="p">,</span> <span class="n">calldata_type</span>
+
+
+<span class="k">class</span> <span class="nc">__PBRParams</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Helper class to manage PBR parameters.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    actor_properties : vtkProperty</span>
+<span class="sd">        The actor properties.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metallic : float</span>
+<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
+<span class="sd">        must be between 0.0 and 1.0.</span>
+<span class="sd">    roughness : float</span>
+<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
+<span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">    anisotropy : float</span>
+<span class="sd">        Isotropic or anisotropic material parameter. Values must be between</span>
+<span class="sd">        0.0 and 1.0.</span>
+<span class="sd">    anisotropy_rotation : float</span>
+<span class="sd">        Rotation of the anisotropy around the normal in a counter-clockwise</span>
+<span class="sd">        fashion. Values must be between 0.0 and 1.0. A value of 1.0 means a</span>
+<span class="sd">        rotation of 2 * pi.</span>
+<span class="sd">    coat_strength : float</span>
+<span class="sd">        Strength of the coat layer. Values must be between 0.0 and 1.0 (0.0</span>
+<span class="sd">        means no clear coat will be modeled).</span>
+<span class="sd">    coat_roughness : float</span>
+<span class="sd">        Roughness of the coat layer. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    base_ior : float</span>
+<span class="sd">        Index of refraction of the base material. Default is 1.5. Values must</span>
+<span class="sd">        be between 1.0 and 2.3.</span>
+<span class="sd">    coat_ior : float</span>
+<span class="sd">        Index of refraction of the coat material. Default is 1.5. Values must</span>
+<span class="sd">        be between 1.0 and 2.3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor_properties</span><span class="p">,</span> <span class="n">metallic</span><span class="p">,</span> <span class="n">roughness</span><span class="p">,</span>
+                 <span class="n">anisotropy</span><span class="p">,</span> <span class="n">anisotropy_rotation</span><span class="p">,</span> <span class="n">coat_strength</span><span class="p">,</span>
+                 <span class="n">coat_roughness</span><span class="p">,</span> <span class="n">base_ior</span><span class="p">,</span> <span class="n">coat_ior</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span> <span class="o">=</span> <span class="n">actor_properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetMetallic</span><span class="p">(</span><span class="n">metallic</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetRoughness</span><span class="p">(</span><span class="n">roughness</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropy</span><span class="p">(</span><span class="n">anisotropy</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropyRotation</span><span class="p">(</span>
+            <span class="n">anisotropy_rotation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatStrength</span><span class="p">(</span><span class="n">coat_strength</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatRoughness</span><span class="p">(</span><span class="n">coat_roughness</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetBaseIOR</span><span class="p">(</span><span class="n">base_ior</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatIOR</span><span class="p">(</span><span class="n">coat_ior</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">metallic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetMetallic</span><span class="p">()</span>
+
+    <span class="nd">@metallic</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">metallic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metallic</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetMetallic</span><span class="p">(</span><span class="n">metallic</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetRoughness</span><span class="p">()</span>
+
+    <span class="nd">@roughness</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roughness</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetRoughness</span><span class="p">(</span><span class="n">roughness</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">anisotropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetAnisotropy</span><span class="p">()</span>
+
+    <span class="nd">@anisotropy</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">anisotropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anisotropy</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropy</span><span class="p">(</span><span class="n">anisotropy</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">anisotropy_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetAnisotropyRotation</span><span class="p">()</span>
+
+    <span class="nd">@anisotropy_rotation</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">anisotropy_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anisotropy_rotation</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropyRotation</span><span class="p">(</span><span class="n">anisotropy_rotation</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coat_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatStrength</span><span class="p">()</span>
+
+    <span class="nd">@coat_strength</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">coat_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_strength</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatStrength</span><span class="p">(</span><span class="n">coat_strength</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coat_roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatRoughness</span><span class="p">()</span>
+
+    <span class="nd">@coat_roughness</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">coat_roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_roughness</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatRoughness</span><span class="p">(</span><span class="n">coat_roughness</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetBaseIOR</span><span class="p">()</span>
+
+    <span class="nd">@base_ior</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">base_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_ior</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetBaseIOR</span><span class="p">(</span><span class="n">base_ior</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">coat_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatIOR</span><span class="p">()</span>
+
+    <span class="nd">@coat_ior</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">coat_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_ior</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatIOR</span><span class="p">(</span><span class="n">coat_ior</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="manifest_pbr"><a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_pbr">[docs]</a><span class="k">def</span> <span class="nf">manifest_pbr</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">metallic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">roughness</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">anisotropy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">anisotropy_rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">coat_strength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">coat_roughness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                 <span class="n">base_ior</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">coat_ior</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply VTK&#39;s Physically Based Rendering properties to the selected actor.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    actor : actor</span>
-<span class="sd">    metallicity : float, optional</span>
+<span class="sd">    metallic : float, optional</span>
 <span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
 <span class="sd">        must be between 0.0 and 1.0.</span>
 <span class="sd">    roughness : float, optional</span>
 <span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
 <span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">    anisotropy : float, optional</span>
+<span class="sd">        Isotropic or anisotropic material parameter. Values must be between</span>
+<span class="sd">        0.0 and 1.0.</span>
+<span class="sd">    anisotropy_rotation : float, optional</span>
+<span class="sd">        Rotation of the anisotropy around the normal in a counter-clockwise</span>
+<span class="sd">        fashion. Values must be between 0.0 and 1.0. A value of 1.0 means a</span>
+<span class="sd">        rotation of 2 * pi.</span>
+<span class="sd">    coat_strength : float, optional</span>
+<span class="sd">        Strength of the coat layer. Values must be between 0.0 and 1.0 (0.0</span>
+<span class="sd">        means no clear coat will be modeled).</span>
+<span class="sd">    coat_roughness : float, optional</span>
+<span class="sd">        Roughness of the coat layer. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    base_ior : float, optional</span>
+<span class="sd">        Index of refraction of the base material. Default is 1.5. Values must</span>
+<span class="sd">        be between 1.0 and 2.3.</span>
+<span class="sd">    coat_ior : float, optional</span>
+<span class="sd">        Index of refraction of the coat material. Default is 1.5. Values must</span>
+<span class="sd">        be between 1.0 and 2.3.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">VTK_9_PLUS</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Your PBR effect can not be apply due to VTK version. &quot;</span>
-                      <span class="s2">&quot;Please upgrade your VTK version (should be &gt;= 9.0.0).&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPBR</span><span class="p">()</span>
 
-    <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPBR</span><span class="p">()</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetMetallic</span><span class="p">(</span><span class="n">metallicity</span><span class="p">)</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetRoughness</span><span class="p">(</span><span class="n">roughness</span><span class="p">)</span></div>
+            <span class="c1">#pbr_params = {&#39;metallic&#39;: metallic, &#39;roughness&#39;: roughness,</span>
+            <span class="c1">#              &#39;anisotropy&#39;: anisotropy,</span>
+            <span class="c1">#              &#39;anisotropy_rotation&#39;: anisotropy_rotation,</span>
+            <span class="c1">#              &#39;coat_strength&#39;: coat_strength,</span>
+            <span class="c1">#              &#39;coat_roughness&#39;: coat_roughness,</span>
+            <span class="c1">#              &#39;base_ior&#39;: base_ior, &#39;coat_ior&#39;: coat_ior}</span>
+
+            <span class="n">pbr_params</span> <span class="o">=</span> <span class="n">__PBRParams</span><span class="p">(</span><span class="n">prop</span><span class="p">,</span> <span class="n">metallic</span><span class="p">,</span> <span class="n">roughness</span><span class="p">,</span> <span class="n">anisotropy</span><span class="p">,</span>
+                                     <span class="n">anisotropy_rotation</span><span class="p">,</span> <span class="n">coat_strength</span><span class="p">,</span>
+                                     <span class="n">coat_roughness</span><span class="p">,</span> <span class="n">base_ior</span><span class="p">,</span> <span class="n">coat_ior</span><span class="p">)</span>
+            <span class="c1">#prop.SetMetallic(pbr_params[&#39;metallic&#39;])</span>
+            <span class="c1">#prop.SetRoughness(pbr_params[&#39;roughness&#39;])</span>
+            <span class="c1">#prop.SetAnisotropy(pbr_params[&#39;anisotropy&#39;])</span>
+            <span class="c1">#prop.SetAnisotropyRotation(pbr_params[&#39;anisotropy_rotation&#39;])</span>
+            <span class="c1">#prop.SetCoatStrength(pbr_params[&#39;coat_strength&#39;])</span>
+            <span class="c1">#prop.SetCoatRoughness(pbr_params[&#39;coat_roughness&#39;])</span>
+            <span class="c1">#prop.SetBaseIOR(pbr_params[&#39;base_ior&#39;])</span>
+            <span class="c1">#prop.SetCoatIOR(pbr_params[&#39;coat_ior&#39;])</span>
+            <span class="k">return</span> <span class="n">pbr_params</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s1">&#39;PBR interpolation cannot be applied to this actor. The &#39;</span>
+                <span class="s1">&#39;material will not be applied.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Actor does not have the attribute property. This &#39;</span>
+                      <span class="s1">&#39;material will not be applied.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="manifest_standard"><a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_standard">[docs]</a><span class="k">def</span> <span class="nf">manifest_standard</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">ambient_level</span><span class="o">=.</span><span class="mi">7</span><span class="p">,</span> <span class="n">diffuse_level</span><span class="o">=.</span><span class="mi">8</span><span class="p">,</span>
-                      <span class="n">specular_level</span><span class="o">=.</span><span class="mi">5</span><span class="p">,</span> <span class="n">specular_power</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-                      <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;phong&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="manifest_principled"><a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_principled">[docs]</a><span class="k">def</span> <span class="nf">manifest_principled</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">subsurface</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">subsurface_color</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="n">metallic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">specular</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">specular_tint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">roughness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">anisotropic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">anisotropic_direction</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">],</span>
+                        <span class="n">sheen</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sheen_tint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clearcoat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">clearcoat_gloss</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply the Principled Shading properties to the selected actor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    actor : actor</span>
+<span class="sd">    subsurface : float, optional</span>
+<span class="sd">        Subsurface scattering computation value. Values must be between 0.0 and</span>
+<span class="sd">        1.0.</span>
+<span class="sd">    subsurface_color : list, optional</span>
+<span class="sd">        Subsurface scattering RGB color where R, G and B should be in the range</span>
+<span class="sd">        [0, 1].</span>
+<span class="sd">    metallic : float, optional</span>
+<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
+<span class="sd">        must be between 0.0 and 1.0.</span>
+<span class="sd">    specular : float, optional</span>
+<span class="sd">        Specular lighting coefficient. Value must be between 0.0 and 1.0.</span>
+<span class="sd">    specular_tint : float, optional</span>
+<span class="sd">        Specular tint coefficient value. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    roughness : float, optional</span>
+<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
+<span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">    anisotropic : float, optional</span>
+<span class="sd">        Anisotropy coefficient. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    anisotropic_direction : list, optional</span>
+<span class="sd">        Anisotropy direction where X, Y and Z should be in the range [-1, 1].</span>
+<span class="sd">    sheen : float, optional</span>
+<span class="sd">        Sheen coefficient. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    sheen_tint : float, optional</span>
+<span class="sd">        Sheen tint coefficient value. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    clearcoat : float, optional</span>
+<span class="sd">        Clearcoat coefficient. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    clearcoat_gloss : float, optional</span>
+<span class="sd">        Clearcoat gloss coefficient value. Values must be between 0.0 and 1.0.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    principled_params : dict</span>
+<span class="sd">        Dictionary containing the Principled Shading parameters.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
+
+        <span class="n">principled_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;subsurface&#39;</span><span class="p">:</span> <span class="n">subsurface</span><span class="p">,</span> <span class="s1">&#39;subsurface_color&#39;</span><span class="p">:</span> <span class="n">subsurface_color</span><span class="p">,</span>
+            <span class="s1">&#39;metallic&#39;</span><span class="p">:</span> <span class="n">metallic</span><span class="p">,</span> <span class="s1">&#39;specular&#39;</span><span class="p">:</span> <span class="n">specular</span><span class="p">,</span>
+            <span class="s1">&#39;specular_tint&#39;</span><span class="p">:</span> <span class="n">specular_tint</span><span class="p">,</span> <span class="s1">&#39;roughness&#39;</span><span class="p">:</span> <span class="n">roughness</span><span class="p">,</span>
+            <span class="s1">&#39;anisotropic&#39;</span><span class="p">:</span> <span class="n">anisotropic</span><span class="p">,</span>
+            <span class="s1">&#39;anisotropic_direction&#39;</span><span class="p">:</span> <span class="n">anisotropic_direction</span><span class="p">,</span> <span class="s1">&#39;sheen&#39;</span><span class="p">:</span> <span class="n">sheen</span><span class="p">,</span>
+            <span class="s1">&#39;sheen_tint&#39;</span><span class="p">:</span> <span class="n">sheen_tint</span><span class="p">,</span> <span class="s1">&#39;clearcoat&#39;</span><span class="p">:</span> <span class="n">clearcoat</span><span class="p">,</span>
+            <span class="s1">&#39;clearcoat_gloss&#39;</span><span class="p">:</span> <span class="n">clearcoat_gloss</span>
+        <span class="p">}</span>
+
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecular</span><span class="p">(</span><span class="n">specular</span><span class="p">)</span>
+
+        <span class="nd">@calldata_type</span><span class="p">(</span><span class="n">VTK_OBJECT</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">uniforms_callback</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">calldata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;subsurface&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;subsurface&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;metallic&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;metallic&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;specularTint&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;specular_tint&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;roughness&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;roughness&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;anisotropic&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;anisotropic&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span><span class="s1">&#39;sheen&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;sheen&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;sheenTint&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;sheen_tint&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;clearcoat&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;clearcoat&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
+                    <span class="s1">&#39;clearcoatGloss&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;clearcoat_gloss&#39;</span><span class="p">])</span>
+
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniform3f</span><span class="p">(</span>
+                    <span class="s1">&#39;subsurfaceColor&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s1">&#39;subsurface_color&#39;</span><span class="p">])</span>
+                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniform3f</span><span class="p">(</span>
+                    <span class="s1">&#39;anisotropicDirection&#39;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span>
+                        <span class="s1">&#39;anisotropic_direction&#39;</span><span class="p">])</span>
+
+        <span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">uniforms_callback</span><span class="p">)</span>
+
+        <span class="n">fs_dec_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;bxdf_dec.frag&#39;</span><span class="p">)</span>
+        <span class="n">fs_impl_code</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="s1">&#39;bxdf_impl.frag&#39;</span><span class="p">)</span>
+
+        <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec_code</span><span class="p">)</span>
+        <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span>
+                        <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">principled_params</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Actor does not have the attribute property. This &#39;</span>
+                      <span class="s1">&#39;material will not be applied.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="manifest_standard"><a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_standard">[docs]</a><span class="k">def</span> <span class="nf">manifest_standard</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">ambient_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ambient_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                      <span class="n">diffuse_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">diffuse_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                      <span class="n">specular_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">specular_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                      <span class="n">specular_power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;gouraud&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Apply the standard material to the selected actor.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    actor : actor</span>
 <span class="sd">    ambient_level : float, optional</span>
-<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
-<span class="sd">        must be between 0.0 and 1.0.</span>
+<span class="sd">        Ambient lighting coefficient. Value must be between 0.0 and 1.0.</span>
+<span class="sd">    ambient_color : tuple (3,), optional</span>
+<span class="sd">        Ambient RGB color where R, G and B should be in the range [0, 1].</span>
 <span class="sd">    diffuse_level : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">        Diffuse lighting coefficient. Value must be between 0.0 and 1.0.</span>
+<span class="sd">    diffuse_color : tuple (3,), optional</span>
+<span class="sd">        Diffuse RGB color where R, G and B should be in the range [0, 1].</span>
 <span class="sd">    specular_level : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">        Specular lighting coefficient. Value must be between 0.0 and 1.0.</span>
+<span class="sd">    specular_color : tuple (3,), optional</span>
+<span class="sd">        Specular RGB color where R, G and B should be in the range [0, 1].</span>
 <span class="sd">    specular_power : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
-<span class="sd">    interpolation : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
+<span class="sd">        Parameter used to specify the intensity of the specular reflection.</span>
+<span class="sd">        Value must be between 0.0 and 128.0.</span>
+<span class="sd">    interpolation : string, optional</span>
+<span class="sd">        If &#39;flat&#39;, the actor will be shaded using flat interpolation. If</span>
+<span class="sd">        &#39;gouraud&#39; (default), then the shading will be calculated at the</span>
+<span class="sd">        vertex level. If &#39;phong&#39;, then the shading will be calculated at the</span>
+<span class="sd">        fragment level.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetAmbient</span><span class="p">(</span><span class="n">ambient_level</span><span class="p">)</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetDiffuse</span><span class="p">(</span><span class="n">diffuse_level</span><span class="p">)</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecular</span><span class="p">(</span><span class="n">specular_level</span><span class="p">)</span>
-    <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecularPower</span><span class="p">(</span><span class="n">specular_power</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;phong&#39;</span><span class="p">:</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPhong</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unknown interpolation. Ignoring &quot;</span><span class="si">{}</span><span class="s1">&quot; interpolation &#39;</span>
-                      <span class="s1">&#39;option.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interpolation</span><span class="p">))</span></div>
+        <span class="n">interpolation</span> <span class="o">=</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s1">&#39;flat&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToFlat</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s1">&#39;gouraud&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToGouraud</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s1">&#39;phong&#39;</span><span class="p">:</span>
+            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPhong</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Unknown interpolation. Ignoring &quot;</span><span class="si">{}</span><span class="s1">&quot; interpolation &#39;</span> \
+                      <span class="s1">&#39;option and using the default (&quot;</span><span class="si">{}</span><span class="s1">&quot;) option.&#39;</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interpolation</span><span class="p">,</span> <span class="s1">&#39;gouraud&#39;</span><span class="p">)</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetAmbient</span><span class="p">(</span><span class="n">ambient_level</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetAmbientColor</span><span class="p">(</span><span class="n">ambient_color</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetDiffuse</span><span class="p">(</span><span class="n">diffuse_level</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetDiffuseColor</span><span class="p">(</span><span class="n">diffuse_color</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecular</span><span class="p">(</span><span class="n">specular_level</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecularColor</span><span class="p">(</span><span class="n">specular_color</span><span class="p">)</span>
+        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecularPower</span><span class="p">(</span><span class="n">specular_power</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Actor does not have the attribute property. This &#39;</span>
+                      <span class="s1">&#39;material will not be applied.&#39;</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
 </pre></div>
 
            </div>
@@ -261,7 +548,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2021, FURY
+        &copy; Copyright 2018-2022, FURY
 
     </p>
   </div>
@@ -285,7 +572,7 @@
       <dl>
         
             
-            <li><dd><a href="/dev/_modules/fury/material">fury dev</a></dd></li>
+            <li><dt>fury dev</dt></li>
             
         
             
@@ -293,23 +580,11 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/material">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/fury/material">fury v0.5.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/material">fury v0.1.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
-            
-        
-            
-            <li><dd><a href="/v0.2.x/_modules/fury/material">fury v0.2.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.4.x/_modules/fury/material">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.7.1-zenodo/_modules/fury/material">fury v0.7.1-zenodo</a></dd></li>
             
         
             
@@ -317,7 +592,23 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/material">fury v0.5.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/material">fury v0.2.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.1.x/_modules/fury/material">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.7.x/_modules/fury/material">fury v0.7.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.4.x/_modules/fury/material">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/_modules/fury/material">fury v0.3.x</a></dd></li>
             
         
       </dl>

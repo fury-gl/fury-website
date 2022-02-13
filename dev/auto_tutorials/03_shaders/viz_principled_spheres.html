@@ -1,0 +1,434 @@
+
+
+  
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Principled BRDF shader on spheres &mdash; FURY 0.8.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom_github.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Varying Color" href="viz_shader.html" />
+    <link rel="prev" title="Visualize SDF Actor" href="viz_sdfactor.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> FURY
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">About Fury</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Programming with Fury</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#introductory">Introductory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#user-interface-elements">User Interface Elements</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#shaders">Shaders</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="viz_sdfactor.html">Visualize SDF Actor</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Principled BRDF shader on spheres</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viz_shader.html">Varying Color</a></li>
+<li class="toctree-l3"><a class="reference internal" href="viz_pbr_spheres.html">Physically-Based Rendering (PBR) on spheres</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">FURY</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Tutorials</a> &raquo;</li>
+        
+      <li>Principled BRDF shader on spheres</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/auto_tutorials/03_shaders/viz_principled_spheres.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p>Click <a class="reference internal" href="#sphx-glr-download-auto-tutorials-03-shaders-viz-principled-spheres-py"><span class="std std-ref">here</span></a> to download the full example code</p>
+</div>
+<div class="sphx-glr-example-title section" id="principled-brdf-shader-on-spheres">
+<span id="sphx-glr-auto-tutorials-03-shaders-viz-principled-spheres-py"></span><h1>Principled BRDF shader on spheres<a class="headerlink" href="#principled-brdf-shader-on-spheres" title="Permalink to this headline">¶</a></h1>
+<p>The Principled Bidirectional Reflectance Distribution Function ([BRDF]
+(<a class="reference external" href="https://en.wikipedia.org/wiki/Bidirectional_reflectance_distribution_function">https://en.wikipedia.org/wiki/Bidirectional_reflectance_distribution_function</a>)
+) was introduced by Brent Burley as part of the [SIGGRAPH 2012 Physically Based
+Shading course]
+(<a class="reference external" href="https://blog.selfshadow.com/publications/s2012-shading-course/">https://blog.selfshadow.com/publications/s2012-shading-course/</a>). Although it
+is not strictly physically based, it was designed so the parameters included
+could model materials in the [MERL 100](<a class="reference external" href="https://www.merl.com/brdf/">https://www.merl.com/brdf/</a>) (Material
+Exchange and Research Library) database. Moreover, each parameter was
+carefully chosen and limited to be easy to use and understand, so that
+blending multiple layers together would give intuitive results.</p>
+<p>In this demo, we showcase our implementation of the Principled BRDF in FURY.</p>
+<p>Let’s start by importing the necessary modules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="n">window</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<p>Now set up a new scene.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">background</span><span class="p">((</span><span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Let’s define the parameters needed for our demo. In this demo we will see the
+effect of each one of the 10 parameters defined by the Principled shader.
+For interpretability and usability purposes, each parameter is limited to
+values between the range 0 to 1.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">material_params</span></a> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;subsurface&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;subsurface_color&#39;</span><span class="p">:</span> <span class="p">[</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">]}],</span>
+    <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;metallic&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;specular&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+    <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;specular_tint&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;specular&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}],</span>
+    <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;roughness&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+    <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;anisotropic&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;metallic&#39;</span><span class="p">:</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span> <span class="s1">&#39;roughness&#39;</span><span class="p">:</span> <span class="o">.</span><span class="mi">5</span><span class="p">}],</span>
+    <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">],</span> <span class="p">{</span><span class="s1">&#39;sheen&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">5</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;sheen_tint&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;sheen&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}],</span>
+    <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;clearcoat&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}],</span>
+    <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">{</span><span class="s1">&#39;clearcoat_gloss&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">&#39;clearcoat&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>We can start to add our actors to the scene and see how different values of
+the parameters produce interesting effects.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">center</span></a> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">):</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">center</span></a><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">25</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a>
+        <span class="n">sphere</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.sphere" title="View documentation for fury.actor.sphere"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">center</span></a><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">material_params</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">radii</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                              <span class="n">theta</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">keys</span></a> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">material_params</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">material_params</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">][</span><span class="mi">1</span><span class="p">][</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">keys</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <a href="../../reference/fury.material.html#fury.material.manifest_principled" title="View documentation for fury.material.manifest_principled"><span class="n">material</span><span class="o">.</span><span class="n">manifest_principled</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <span class="o">**</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">material_params</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, let’s add some labels to guide us through our visualization.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">labels</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Subsurface&#39;</span><span class="p">,</span> <span class="s1">&#39;Metallic&#39;</span><span class="p">,</span> <span class="s1">&#39;Specular&#39;</span><span class="p">,</span> <span class="s1">&#39;Specular Tint&#39;</span><span class="p">,</span> <span class="s1">&#39;Roughness&#39;</span><span class="p">,</span>
+          <span class="s1">&#39;Anisotropic&#39;</span><span class="p">,</span> <span class="s1">&#39;Sheen&#39;</span><span class="p">,</span> <span class="s1">&#39;Sheen Tint&#39;</span><span class="p">,</span> <span class="s1">&#39;Clearcoat&#39;</span><span class="p">,</span> <span class="s1">&#39;Clearcoat Gloss&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">label</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.label" title="View documentation for fury.actor.label"><span class="n">actor</span><span class="o">.</span><span class="n">label</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">labels</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">i</span></a><span class="p">],</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">),</span>
+                        <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">26</span> <span class="o">+</span> <span class="mi">5</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">label</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.label" title="View documentation for fury.actor.label"><span class="n">actor</span><span class="o">.</span><span class="n">label</span></a><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="View documentation for builtins.int"><span class="n">j</span></a> <span class="o">*</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)),</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="View documentation for builtins.list"><span class="n">pos</span></a><span class="p">,</span>
+                        <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="sphx-glr-script-out">Out:</p>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/Users/koudoro/Software/fury/docs/tutorials/03_shaders/viz_principled_spheres.py:72: DeprecationWarning: Label function has been renamed vector_text
+
+* deprecated from version: 0.7.1
+* Will raise &lt;class &#39;fury.deprecator.ExpiredDeprecationError&#39;&gt; as of version: 0.9.0
+  color=(0, 0, 0))
+/Users/koudoro/Software/fury/docs/tutorials/03_shaders/viz_principled_spheres.py:78: DeprecationWarning: Label function has been renamed vector_text
+
+* deprecated from version: 0.7.1
+* Will raise &lt;class &#39;fury.deprecator.ExpiredDeprecationError&#39;&gt; as of version: 0.9.0
+  scale=(.8, .8, .8), color=(0, 0, 0))
+</pre></div>
+</div>
+<p>And visualize our demo.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="View documentation for builtins.bool"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../../reference/fury.window.html#fury.window.show" title="View documentation for fury.window.show"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">)</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="View documentation for fury.window.record"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../../reference/fury.window.html#fury.window.Scene" title="View documentation for fury.window.Scene"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_principled_spheres.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="../../_images/sphx_glr_viz_principled_spheres_001.png" class="sphx-glr-single-img" src="../../_images/sphx_glr_viz_principled_spheres_001.png" />
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  1.248 seconds)</p>
+<div class="sphx-glr-footer class sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-tutorials-03-shaders-viz-principled-spheres-py">
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/535917a74fe7b7e4941969fa5b954208/viz_principled_spheres.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_principled_spheres.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/5fcb29b482267c151b42e669f2d011e1/viz_principled_spheres.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_principled_spheres.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="viz_shader.html" class="btn btn-neutral float-right" title="Varying Color" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="viz_sdfactor.html" class="btn btn-neutral float-left" title="Visualize SDF Actor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018-2022, FURY
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Documentation Versions</span>
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        
+            
+            <li><dd><a href="/dev/auto_tutorials/03_shaders/viz_principled_spheres">fury dev</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/latest/auto_tutorials/03_shaders/viz_principled_spheres">fury latest</a></dd></li>
+            
+        
+            
+            <li><dt>fury v0.8.x</dt></li>
+            
+        
+            
+            <li><dd><a href="/v0.7.1-zenodo/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.7.1-zenodo</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.6.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.6.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.3.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.7.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.7.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.4.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.1.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.5.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.5.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.2.x/auto_tutorials/03_shaders/viz_principled_spheres">fury v0.2.x</a></dd></li>
+            
+        
+      </dl>
+    </div>
+  </div>
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+    <link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+        background: #990000;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+        background: #4A3C31;
+    }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+      new Crate({
+        server: '695048505902891009',
+        channel: '695305679682011217',
+        shard: 'https://e.widgetbot.io',
+        // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+      })
+    </script>
+  
+
+</body>
+</html>
