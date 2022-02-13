@@ -10,7 +10,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>fury.io &mdash; FURY 0.7.1 documentation</title>
+  <title>fury.io &mdash; FURY 0.7.1.post500.dev0+gb3aa4d75 documentation</title>
   
 
   
@@ -23,12 +23,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
-        <script type="text/javascript" src="../../_static/copybutton.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/clipboard.min.js"></script>
+        <script src="../../_static/copybutton.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -37,6 +37,8 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/copybutton.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/gallery.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom_github.css" type="text/css" />
@@ -65,7 +67,7 @@
             
             
               <div class="version">
-                0.7.1
+                0.7.1.post500.dev0+gb3aa4d75
               </div>
             
           
@@ -89,13 +91,13 @@
               
             
             
-              <p class="caption"><span class="caption-text">About Fury</span></p>
+              <p class="caption" role="heading"><span class="caption-text">About Fury</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Programming with Fury</span></p>
+<p class="caption" role="heading"><span class="caption-text">Programming with Fury</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
@@ -103,13 +105,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Developers Guide</span></p>
+<p class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Join our community!</span></p>
+<p class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
@@ -183,12 +185,60 @@
             
   <h1>Source code for fury.io</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">vtk</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span> <span class="k">as</span> <span class="n">InTemporaryDirectory</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">vtk.util</span> <span class="kn">import</span> <span class="n">numpy_support</span>
+
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span><span class="n">numpy_support</span><span class="p">,</span> <span class="n">PNGReader</span><span class="p">,</span> <span class="n">BMPReader</span><span class="p">,</span> <span class="n">JPEGReader</span><span class="p">,</span>
+                      <span class="n">ImageData</span><span class="p">,</span> <span class="n">TIFFReader</span><span class="p">,</span> <span class="n">PNGWriter</span><span class="p">,</span> <span class="n">BMPWriter</span><span class="p">,</span>
+                      <span class="n">JPEGWriter</span><span class="p">,</span> <span class="n">TIFFWriter</span><span class="p">,</span> <span class="n">PolyDataReader</span><span class="p">,</span>
+                      <span class="n">XMLPolyDataReader</span><span class="p">,</span> <span class="n">PLYReader</span><span class="p">,</span> <span class="n">STLReader</span><span class="p">,</span>
+                      <span class="n">OBJReader</span><span class="p">,</span> <span class="n">MNIObjectReader</span><span class="p">,</span> <span class="n">PolyDataWriter</span><span class="p">,</span>
+                      <span class="n">XMLPolyDataWriter</span><span class="p">,</span> <span class="n">PLYWriter</span><span class="p">,</span> <span class="n">STLWriter</span><span class="p">,</span>
+                      <span class="n">MNIObjectWriter</span><span class="p">,</span> <span class="n">ImageFlip</span><span class="p">,</span> <span class="n">Texture</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">set_input</span>
-<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlretrieve</span>
+
+
+<div class="viewcode-block" id="load_cubemap_texture"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.load_cubemap_texture">[docs]</a><span class="k">def</span> <span class="nf">load_cubemap_texture</span><span class="p">(</span><span class="n">fnames</span><span class="p">,</span> <span class="n">interpolate_on</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mipmap_on</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load a cube map texture from a list of 6 images.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fnames : list of strings</span>
+<span class="sd">        List of 6 filenames with bmp, jpg, jpeg, png, tif or tiff extensions.</span>
+<span class="sd">    interpolate_on : bool, optional</span>
+<span class="sd">    mipmap_on : bool, optional</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : vtkTexture</span>
+<span class="sd">        Cube map texture.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">6</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Expected 6 filenames, got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fnames</span><span class="p">)))</span>
+    <span class="n">texture</span> <span class="o">=</span> <span class="n">Texture</span><span class="p">()</span>
+    <span class="n">texture</span><span class="o">.</span><span class="n">CubeMapOn</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">fn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">fnames</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fn</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Read the images</span>
+            <span class="n">vtk_img</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Flip the image horizontally</span>
+            <span class="n">img_flip</span> <span class="o">=</span> <span class="n">ImageFlip</span><span class="p">()</span>
+            <span class="n">img_flip</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">vtk_img</span><span class="p">)</span>
+            <span class="n">img_flip</span><span class="o">.</span><span class="n">SetFilteredAxis</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># flip y axis</span>
+            <span class="n">img_flip</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+            <span class="c1"># Add the image to the cube map</span>
+            <span class="n">texture</span><span class="o">.</span><span class="n">SetInputDataObject</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">img_flip</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">interpolate_on</span><span class="p">:</span>
+        <span class="n">texture</span><span class="o">.</span><span class="n">InterpolateOn</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mipmap_on</span><span class="p">:</span>
+        <span class="n">texture</span><span class="o">.</span><span class="n">MipmapOn</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">texture</span></div>
 
 
 <div class="viewcode-block" id="load_image"><a class="viewcode-back" href="../../reference/fury.window.html#fury.actor.load_image">[docs]</a><span class="k">def</span> <span class="nf">load_image</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">use_pillow</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
@@ -237,12 +287,13 @@
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Unknown image mode </span><span class="si">{}</span><span class="s1">&#39;</span>
                                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span><span class="p">))</span>
                 <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">pil_image</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">as_vtktype</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
                 <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;only 2D (L, RGB, RGBA) or 3D image available&quot;</span><span class="p">)</span>
 
-            <span class="n">vtk_image</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">()</span>
+            <span class="n">vtk_image</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">()</span>
             <span class="n">depth</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">image</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
 
             <span class="c1"># width, height</span>
@@ -252,11 +303,11 @@
                                 <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">vtk_image</span><span class="o">.</span><span class="n">SetSpacing</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="n">vtk_image</span><span class="o">.</span><span class="n">SetOrigin</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">arr_tmp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth</span><span class="p">)</span>
-            <span class="n">arr_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">arr_tmp</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
+            <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">depth</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ascontiguousarray</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="n">vtk_array_type</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">get_vtk_array_type</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-            <span class="n">uchar_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">arr_tmp</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">uchar_array</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">numpy_to_vtk</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                                                      <span class="n">array_type</span><span class="o">=</span><span class="n">vtk_array_type</span><span class="p">)</span>
             <span class="n">vtk_image</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">SetScalars</span><span class="p">(</span><span class="n">uchar_array</span><span class="p">)</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">vtk_image</span>
@@ -265,12 +316,12 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">image</span>
 
-    <span class="n">d_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGReader</span><span class="p">,</span>
-                <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkBMPReader</span><span class="p">,</span>
-                <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGReader</span><span class="p">,</span>
-                <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGReader</span><span class="p">,</span>
-                <span class="s2">&quot;.tiff&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFReader</span><span class="p">,</span>
-                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFReader</span><span class="p">}</span>
+    <span class="n">d_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">PNGReader</span><span class="p">,</span>
+                <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">BMPReader</span><span class="p">,</span>
+                <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">JPEGReader</span><span class="p">,</span>
+                <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">JPEGReader</span><span class="p">,</span>
+                <span class="s2">&quot;.tiff&quot;</span><span class="p">:</span> <span class="n">TIFFReader</span><span class="p">,</span>
+                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">TIFFReader</span><span class="p">}</span>
 
     <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
 
@@ -289,7 +340,6 @@
 
         <span class="n">components</span> <span class="o">=</span> <span class="n">vtk_array</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
         <span class="n">image</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">components</span><span class="p">)</span>
-        <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">is_url</span><span class="p">:</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -322,12 +372,12 @@
     <span class="k">if</span> <span class="n">arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Image Dimensions should be &lt;=3&quot;</span><span class="p">)</span>
 
-    <span class="n">d_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPNGWriter</span><span class="p">,</span>
-                <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkBMPWriter</span><span class="p">,</span>
-                <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGWriter</span><span class="p">,</span>
-                <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkJPEGWriter</span><span class="p">,</span>
-                <span class="s2">&quot;.tiff&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFWriter</span><span class="p">,</span>
-                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkTIFFWriter</span><span class="p">,</span>
+    <span class="n">d_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;.png&quot;</span><span class="p">:</span> <span class="n">PNGWriter</span><span class="p">,</span>
+                <span class="s2">&quot;.bmp&quot;</span><span class="p">:</span> <span class="n">BMPWriter</span><span class="p">,</span>
+                <span class="s2">&quot;.jpeg&quot;</span><span class="p">:</span> <span class="n">JPEGWriter</span><span class="p">,</span>
+                <span class="s2">&quot;.jpg&quot;</span><span class="p">:</span> <span class="n">JPEGWriter</span><span class="p">,</span>
+                <span class="s2">&quot;.tiff&quot;</span><span class="p">:</span> <span class="n">TIFFWriter</span><span class="p">,</span>
+                <span class="s2">&quot;.tif&quot;</span><span class="p">:</span> <span class="n">TIFFWriter</span><span class="p">,</span>
                 <span class="p">}</span>
 
     <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">())[</span><span class="mi">1</span><span class="p">]</span>
@@ -337,6 +387,7 @@
                       <span class="nb">format</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">extension</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">use_pillow</span><span class="p">:</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
         <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">quality</span><span class="o">=</span><span class="n">compression_quality</span><span class="p">)</span>
         <span class="k">return</span>
@@ -345,7 +396,6 @@
         <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
 
     <span class="n">shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
-    <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="p">]:</span>
         <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
@@ -357,7 +407,7 @@
 
     <span class="c1"># Todo, look the following link for managing png 16bit</span>
     <span class="c1"># https://stackoverflow.com/questions/15667947/vtkpngwriter-printing-out-black-images</span>
-    <span class="n">vtk_data</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkImageData</span><span class="p">()</span>
+    <span class="n">vtk_data</span> <span class="o">=</span> <span class="n">ImageData</span><span class="p">()</span>
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetDimensions</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
     <span class="n">vtk_data</span><span class="o">.</span><span class="n">SetExtent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
                        <span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
@@ -373,18 +423,20 @@
         <span class="n">writer</span><span class="o">.</span><span class="n">ProgressiveOn</span><span class="p">()</span>
         <span class="n">writer</span><span class="o">.</span><span class="n">SetQuality</span><span class="p">(</span><span class="n">compression_quality</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">extension</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;.tiff&quot;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">compression_type</span><span class="p">:</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">SetCompressionToNoCompression</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">compression_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;lzw&#39;</span><span class="p">:</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">SetCompressionToLZW</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">compression_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;deflation&#39;</span><span class="p">:</span>
-            <span class="n">writer</span><span class="o">.</span><span class="n">SetCompressionToDeflate</span><span class="p">()</span>
+        <span class="n">compression_type</span> <span class="o">=</span> <span class="n">compression_type</span> <span class="ow">or</span> <span class="s1">&#39;nocompression&#39;</span>
+        <span class="n">l_compression</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;nocompression&#39;</span><span class="p">,</span> <span class="s1">&#39;packbits&#39;</span><span class="p">,</span> <span class="s1">&#39;jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;deflate&#39;</span><span class="p">,</span> <span class="s1">&#39;lzw&#39;</span><span class="p">]</span>
 
+        <span class="k">if</span> <span class="n">compression_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">l_compression</span><span class="p">:</span>
+            <span class="n">comp_id</span> <span class="o">=</span> <span class="n">l_compression</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">compression_type</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">SetCompression</span><span class="p">(</span><span class="n">comp_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">SetCompressionToDeflate</span><span class="p">()</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="load_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.load_polydata">[docs]</a><span class="k">def</span> <span class="nf">load_polydata</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Load a vtk polydata to a supported format file.</span>
+
 <span class="sd">    Supported file formats are VTK, VTP, FIB, PLY, STL XML and OBJ</span>
 
 <span class="sd">    Parameters</span>
@@ -398,22 +450,22 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-    <span class="n">poly_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">,</span>
-                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataReader</span><span class="p">,</span>
-                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataReader</span><span class="p">,</span>
-                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYReader</span><span class="p">,</span>
-                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLReader</span><span class="p">,</span>
-                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataReader</span><span class="p">}</span>
+    <span class="n">poly_reader</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">PolyDataReader</span><span class="p">,</span>
+                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">XMLPolyDataReader</span><span class="p">,</span>
+                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">PolyDataReader</span><span class="p">,</span>
+                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">PLYReader</span><span class="p">,</span>
+                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">STLReader</span><span class="p">,</span>
+                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">XMLPolyDataReader</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="n">poly_reader</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">reader</span> <span class="o">=</span> <span class="n">poly_reader</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_extension</span><span class="p">)()</span>
     <span class="k">elif</span> <span class="n">file_extension</span> <span class="o">==</span> <span class="s2">&quot;obj&quot;</span><span class="p">:</span>
         <span class="c1"># Special case, since there is two obj format</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkOBJReader</span><span class="p">()</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">OBJReader</span><span class="p">()</span>
         <span class="n">reader</span><span class="o">.</span><span class="n">SetFileName</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
         <span class="n">reader</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">reader</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span><span class="o">.</span><span class="n">GetNumberOfCells</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">reader</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkMNIObjectReader</span><span class="p">()</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">MNIObjectReader</span><span class="p">()</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">file_extension</span> <span class="o">+</span> <span class="s2">&quot; is not supported by FURY&quot;</span><span class="p">)</span>
 
@@ -424,6 +476,7 @@
 
 <div class="viewcode-block" id="save_polydata"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.save_polydata">[docs]</a><span class="k">def</span> <span class="nf">save_polydata</span><span class="p">(</span><span class="n">polydata</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color_array_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Save a vtk polydata to a supported format file.</span>
+
 <span class="sd">    Save formats can be VTK, FIB, PLY, STL and XML.</span>
 
 <span class="sd">    Parameters</span>
@@ -436,12 +489,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># get file extension (type)</span>
     <span class="n">file_extension</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-    <span class="n">poly_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">,</span>
-                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">,</span>
-                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPolyDataWriter</span><span class="p">,</span>
-                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkPLYWriter</span><span class="p">,</span>
-                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkSTLWriter</span><span class="p">,</span>
-                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkXMLPolyDataWriter</span><span class="p">}</span>
+    <span class="n">poly_writer</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vtk&quot;</span><span class="p">:</span> <span class="n">PolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;vtp&quot;</span><span class="p">:</span> <span class="n">XMLPolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;fib&quot;</span><span class="p">:</span> <span class="n">PolyDataWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;ply&quot;</span><span class="p">:</span> <span class="n">PLYWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;stl&quot;</span><span class="p">:</span> <span class="n">STLWriter</span><span class="p">,</span>
+                   <span class="s2">&quot;xml&quot;</span><span class="p">:</span> <span class="n">XMLPolyDataWriter</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">file_extension</span> <span class="ow">in</span> <span class="n">poly_writer</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
         <span class="n">writer</span> <span class="o">=</span> <span class="n">poly_writer</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">file_extension</span><span class="p">)()</span>
@@ -449,7 +502,7 @@
         <span class="c1"># Special case, since there is two obj format</span>
         <span class="n">find_keyword</span> <span class="o">=</span> <span class="n">file_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="s2">&quot;mni&quot;</span> <span class="ow">in</span> <span class="n">find_keyword</span> <span class="ow">or</span> <span class="s2">&quot;mnc&quot;</span> <span class="ow">in</span> <span class="n">find_keyword</span><span class="p">:</span>
-            <span class="n">writer</span> <span class="o">=</span> <span class="n">vtk</span><span class="o">.</span><span class="n">vtkMNIObjectWriter</span><span class="p">()</span>
+            <span class="n">writer</span> <span class="o">=</span> <span class="n">MNIObjectWriter</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Wavefront obj requires a scene </span><span class="se">\n</span><span class="s2">&quot;</span>
                           <span class="s2">&quot; for MNI obj, use &#39;.mni.obj&#39; extension&quot;</span><span class="p">)</span>
@@ -465,6 +518,54 @@
         <span class="n">writer</span><span class="o">.</span><span class="n">SetFileTypeToBinary</span><span class="p">()</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">Write</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="load_sprite_sheet"><a class="viewcode-back" href="../../reference/fury.io.html#fury.actor.load_sprite_sheet">[docs]</a><span class="k">def</span> <span class="nf">load_sprite_sheet</span><span class="p">(</span><span class="n">sheet_path</span><span class="p">,</span> <span class="n">nb_rows</span><span class="p">,</span> <span class="n">nb_cols</span><span class="p">,</span> <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Process and load sprites from a sprite sheet.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sheet_path: str</span>
+<span class="sd">        Path to the sprite sheet</span>
+<span class="sd">    nb_rows: int</span>
+<span class="sd">        Number of rows in the sprite sheet</span>
+<span class="sd">    nb_cols: int</span>
+<span class="sd">        Number of columns in the sprite sheet</span>
+<span class="sd">    as_vtktype: bool, optional</span>
+<span class="sd">        If True, the output is a vtkImageData</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Dict containing the processed sprites.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sprite_dicts</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sprite_sheet</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">sheet_path</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">sprite_sheet</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+    <span class="n">sprite_size_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="n">nb_rows</span><span class="p">))</span>
+    <span class="n">sprite_size_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">height</span> <span class="o">/</span> <span class="n">nb_cols</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">((</span><span class="n">nb_rows</span><span class="p">,</span> <span class="n">nb_cols</span><span class="p">)):</span>
+        <span class="n">nxt_row</span> <span class="o">=</span> <span class="n">row</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">nxt_col</span> <span class="o">=</span> <span class="n">col</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="n">box</span> <span class="o">=</span> <span class="p">(</span><span class="n">row</span><span class="o">*</span><span class="n">sprite_size_x</span><span class="p">,</span> <span class="n">col</span><span class="o">*</span><span class="n">sprite_size_y</span><span class="p">,</span>
+               <span class="n">nxt_row</span><span class="o">*</span><span class="n">sprite_size_x</span><span class="p">,</span> <span class="n">nxt_col</span><span class="o">*</span><span class="n">sprite_size_y</span><span class="p">)</span>
+
+        <span class="n">sprite_arr</span> <span class="o">=</span> <span class="n">sprite_sheet</span><span class="p">[</span><span class="n">box</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">box</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">box</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">as_vtktype</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">InTemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tdir</span><span class="p">:</span>
+                <span class="n">tmp_img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tdir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">row</span><span class="si">}{</span><span class="n">col</span><span class="si">}</span><span class="s1">.png&#39;</span><span class="p">)</span>
+                <span class="n">save_image</span><span class="p">(</span><span class="n">sprite_arr</span><span class="p">,</span> <span class="n">tmp_img_path</span><span class="p">,</span>
+                           <span class="n">compression_quality</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+                <span class="n">sprite_dicts</span><span class="p">[(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">tmp_img_path</span><span class="p">,</span>
+                                                      <span class="n">as_vtktype</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sprite_dicts</span><span class="p">[(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span> <span class="o">=</span> <span class="n">sprite_arr</span>
+
+    <span class="k">return</span> <span class="n">sprite_dicts</span></div>
 </pre></div>
 
            </div>
@@ -477,7 +578,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2018-2021, FURY
+        &copy; Copyright 2018-2022, FURY
 
     </p>
   </div>
@@ -501,7 +602,7 @@
       <dl>
         
             
-            <li><dd><a href="/dev/_modules/fury/io">fury dev</a></dd></li>
+            <li><dt>fury dev</dt></li>
             
         
             
@@ -509,23 +610,11 @@
             
         
             
-            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
+            <li><dd><a href="/v0.5.x/_modules/fury/io">fury v0.5.x</a></dd></li>
             
         
             
-            <li><dd><a href="/v0.1.x/_modules/fury/io">fury v0.1.x</a></dd></li>
-            
-        
-            
-            <li><dt>fury v0.7.x</dt></li>
-            
-        
-            
-            <li><dd><a href="/v0.2.x/_modules/fury/io">fury v0.2.x</a></dd></li>
-            
-        
-            
-            <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
+            <li><dd><a href="/v0.7.1-zenodo/_modules/fury/io">fury v0.7.1-zenodo</a></dd></li>
             
         
             
@@ -533,7 +622,23 @@
             
         
             
-            <li><dd><a href="/v0.5.x/_modules/fury/io">fury v0.5.x</a></dd></li>
+            <li><dd><a href="/v0.2.x/_modules/fury/io">fury v0.2.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.1.x/_modules/fury/io">fury v0.1.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.7.x/_modules/fury/io">fury v0.7.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.4.x/_modules/fury/io">fury v0.4.x</a></dd></li>
+            
+        
+            
+            <li><dd><a href="/v0.3.x/_modules/fury/io">fury v0.3.x</a></dd></li>
             
         
       </dl>
