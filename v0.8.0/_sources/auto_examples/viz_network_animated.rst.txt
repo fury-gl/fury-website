@@ -41,7 +41,7 @@ First, let's import some useful functions
     from os.path import join as pjoin
     import numpy as np
     from fury import actor, window, colormap as cmap
-    from fury.lib import numpy_support
+    from fury.utils import update_actor, vertices_from_actor, compute_bounds
 
 
 
@@ -83,7 +83,7 @@ Then let's download some available datasets. (mode 1)
 .. code-block:: default
 
 
-    if(mode == 1):
+    if mode == 1:
         from fury.data.fetcher import fetch_viz_wiki_nw
 
         files, folder = fetch_viz_wiki_nw()
@@ -105,7 +105,7 @@ We read our datasets (mode 1)
 .. code-block:: default
 
 
-    if(mode == 1):
+    if mode == 1:
         positions = np.loadtxt(pjoin(folder, positions_file))
         categories = np.loadtxt(pjoin(folder, categories_file), dtype=str)
         edges = np.loadtxt(pjoin(folder, edges_file), dtype=int)
@@ -127,7 +127,7 @@ Generate a geographic random network, requires networkx package (mode 0)
 .. code-block:: default
 
 
-    if(mode == 0):
+    if mode == 0:
         import networkx as nx
         vertices_count = 100
         view_size = 100
@@ -247,7 +247,7 @@ lines_actor for the edges.
 
 Defining timer callback and layout iterator
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-213
+.. GENERATED FROM PYTHON SOURCE LINES 114-210
 
 .. code-block:: default
 
@@ -262,11 +262,10 @@ Defining timer callback and layout iterator
         b = 1.0
         deltaT = 1.0
 
-        sphere_geometry = np.array(numpy_support.vtk_to_numpy(
-            sphere_actor.GetMapper().GetInput().GetPoints().GetData()))
+        sphere_geometry = np.array(vertices_from_actor(sphere_actor))
         geometry_length = sphere_geometry.shape[0] / vertices_count
 
-        if(vertex_initial_positions is not None):
+        if vertex_initial_positions is not None:
             pos = np.array(vertex_initial_positions)
         else:
             pos = view_size * \
@@ -297,7 +296,7 @@ Defining timer callback and layout iterator
                         forces[vertex2] -= np.array([Fx, Fy, Fz])
                 # attractive forces
                 for vFrom, vTo in edges_list:
-                    if(vFrom == vTo):
+                    if vFrom == vTo:
                         continue
                     x1, y1, z1 = pos[vFrom]
                     x2, y2, z2 = pos[vTo]
@@ -324,26 +323,24 @@ Defining timer callback and layout iterator
         def _timer(_obj, _event):
             nonlocal counter, pos
             counter += 1
-            if(mode == 0):
+            if mode == 0:
                 iterate(1)
             else:
                 pos[:] += (np.random.random(pos.shape) - 0.5) * 1.5
-            spheres_positions = numpy_support.vtk_to_numpy(
-                sphere_actor.GetMapper().GetInput().GetPoints().GetData())
+            spheres_positions = vertices_from_actor(sphere_actor)
             spheres_positions[:] = sphere_geometry + \
                 np.repeat(pos, geometry_length, axis=0)
 
-            edges_positions = numpy_support.vtk_to_numpy(
-                lines_actor.GetMapper().GetInput().GetPoints().GetData())
+            edges_positions = vertices_from_actor(lines_actor)
             edges_positions[::2] = pos[edges_list[:, 0]]
             edges_positions[1::2] = pos[edges_list[:, 1]]
 
-            lines_actor.GetMapper().GetInput().GetPoints().GetData().Modified()
-            lines_actor.GetMapper().GetInput().ComputeBounds()
+            update_actor(lines_actor)
+            compute_bounds(lines_actor)
 
-            sphere_actor.GetMapper().GetInput().GetPoints().GetData().Modified()
-            sphere_actor.GetMapper().GetInput().ComputeBounds()
-            showm.scene.ResetCameraClippingRange()
+            update_actor(sphere_actor)
+            compute_bounds(lines_actor)
+            showm.scene.reset_clipping_range()
             showm.render()
 
             if counter >= max_iterations:
@@ -357,12 +354,12 @@ Defining timer callback and layout iterator
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-216
+.. GENERATED FROM PYTHON SOURCE LINES 211-213
 
 All actors need to be added in a scene, so we build one and add our
 lines_actor and sphere_actor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-225
+.. GENERATED FROM PYTHON SOURCE LINES 213-222
 
 .. code-block:: default
 
@@ -382,14 +379,14 @@ lines_actor and sphere_actor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 226-230
+.. GENERATED FROM PYTHON SOURCE LINES 223-227
 
 The final step! Visualize the result of our creation! Also, we need to move
 the camera a little bit farther from the network. you can increase the
 parameter max_iteractions of the timer callback to let the animation run for
 more time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-251
+.. GENERATED FROM PYTHON SOURCE LINES 227-248
 
 .. code-block:: default
 
@@ -429,7 +426,7 @@ more time.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  19.189 seconds)
+   **Total running time of the script:** ( 0 minutes  13.403 seconds)
 
 
 .. _sphx_glr_download_auto_examples_viz_network_animated.py:

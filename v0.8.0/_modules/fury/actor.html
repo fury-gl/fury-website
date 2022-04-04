@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor &#8212; FURY 0.8.0.post39.dev0+g936207de documentation</title>
+    <title>fury.actor &#8212; FURY 0.8.0.post89+g83355557 documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -296,7 +296,7 @@
                       <span class="n">PolyDataNormals</span><span class="p">,</span> <span class="n">Assembly</span><span class="p">,</span> <span class="n">LODActor</span><span class="p">,</span> <span class="n">VTK_UNSIGNED_CHAR</span><span class="p">,</span>
                       <span class="n">PolyDataMapper2D</span><span class="p">,</span> <span class="n">ScalarBarActor</span><span class="p">,</span> <span class="n">PolyVertex</span><span class="p">,</span> <span class="n">CellArray</span><span class="p">,</span>
                       <span class="n">UnstructuredGrid</span><span class="p">,</span> <span class="n">DataSetMapper</span><span class="p">,</span> <span class="n">ConeSource</span><span class="p">,</span> <span class="n">ArrowSource</span><span class="p">,</span>
-                      <span class="n">SphereSource</span><span class="p">,</span> <span class="n">CylinderSource</span><span class="p">,</span> <span class="n">TexturedSphereSource</span><span class="p">,</span>
+                      <span class="n">SphereSource</span><span class="p">,</span> <span class="n">CylinderSource</span><span class="p">,</span> <span class="n">DiskSource</span><span class="p">,</span> <span class="n">TexturedSphereSource</span><span class="p">,</span>
                       <span class="n">Texture</span><span class="p">,</span> <span class="n">FloatArray</span><span class="p">,</span> <span class="n">VTK_TEXT_LEFT</span><span class="p">,</span> <span class="n">VTK_TEXT_RIGHT</span><span class="p">,</span>
                       <span class="n">VTK_TEXT_BOTTOM</span><span class="p">,</span> <span class="n">VTK_TEXT_TOP</span><span class="p">,</span> <span class="n">VTK_TEXT_CENTERED</span><span class="p">,</span>
                       <span class="n">TexturedActor2D</span><span class="p">,</span> <span class="n">TextureMapToPlane</span><span class="p">,</span> <span class="n">TextActor3D</span><span class="p">,</span>
@@ -1883,19 +1883,91 @@
 <span class="sd">    &gt;&gt;&gt; # window.show(scene)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">src</span> <span class="o">=</span> <span class="n">CylinderSource</span><span class="p">()</span> <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-
-    <span class="k">if</span> <span class="n">src</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">CylinderSource</span><span class="p">()</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetCapping</span><span class="p">(</span><span class="n">capped</span><span class="p">)</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetResolution</span><span class="p">(</span><span class="n">resolution</span><span class="p">)</span>
         <span class="n">src</span><span class="o">.</span><span class="n">SetRadius</span><span class="p">(</span><span class="n">radius</span><span class="p">)</span>
+        <span class="n">rotate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">rotate</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="n">cylinder_actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
                                     <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
                                     <span class="n">active_scalars</span><span class="o">=</span><span class="n">heights</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
-                                    <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">)</span>
+                                    <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">,</span>
+                                    <span class="n">orientation</span><span class="o">=</span><span class="n">rotate</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">cylinder_actor</span></div>
+
+
+<div class="viewcode-block" id="disk"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.disk">[docs]</a><span class="k">def</span> <span class="nf">disk</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">rinner</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+         <span class="n">router</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">cresolution</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">rresolution</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Visualize one or many disks with different features.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray, shape (N, 3)</span>
+<span class="sd">        Disk positions</span>
+<span class="sd">    directions : ndarray, shape (N, 3)</span>
+<span class="sd">        The orientation vector of the disk.</span>
+<span class="sd">    colors : ndarray (N,3) or (N, 4) or tuple (3,) or tuple (4,)</span>
+<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1]</span>
+<span class="sd">    rinner : float</span>
+<span class="sd">        disk inner radius, default: 0.3</span>
+<span class="sd">    router : float</span>
+<span class="sd">        disk outer radius, default: 0.5</span>
+<span class="sd">    cresolution: int, optional</span>
+<span class="sd">        Number of facets used to define perimeter of disk, default: 6</span>
+<span class="sd">    rresolution: int, optional</span>
+<span class="sd">        Number of facets used radially, default: 2</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The point cloud defining the disk.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        If faces is None then a disk is created based on theta and phi angles</span>
+<span class="sd">        If not then a disk is created with the provided vertices and faces.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    disk_actor: Actor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury import window, actor</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; scene = window.Scene()</span>
+<span class="sd">    &gt;&gt;&gt; centers = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; dirs = np.random.rand(5, 3)</span>
+<span class="sd">    &gt;&gt;&gt; colors = np.random.rand(5, 4)</span>
+<span class="sd">    &gt;&gt;&gt; actor = actor.disk(centers, dirs, colors,</span>
+<span class="sd">    &gt;&gt;&gt;                    rinner=.1, router=.8, cresolution=30)</span>
+<span class="sd">    &gt;&gt;&gt; scene.add(actor)</span>
+<span class="sd">    &gt;&gt;&gt; window.show(scene)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">DiskSource</span><span class="p">()</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetCircumferentialResolution</span><span class="p">(</span><span class="n">cresolution</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetRadialResolution</span><span class="p">(</span><span class="n">rresolution</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetInnerRadius</span><span class="p">(</span><span class="n">rinner</span><span class="p">)</span>
+        <span class="n">src</span><span class="o">.</span><span class="n">SetOuterRadius</span><span class="p">(</span><span class="n">router</span><span class="p">)</span>
+        <span class="n">rotate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                           <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">rotate</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="n">disk_actor</span> <span class="o">=</span> <span class="n">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+                                <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">src</span><span class="p">,</span>
+                                <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">,</span>
+                                <span class="n">orientation</span><span class="o">=</span><span class="n">rotate</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">disk_actor</span></div>
 
 
 <div class="viewcode-block" id="square"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.square">[docs]</a><span class="k">def</span> <span class="nf">square</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>

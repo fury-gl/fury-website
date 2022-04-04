@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.utils &#8212; FURY 0.8.0.post39.dev0+g936207de documentation</title>
+    <title>fury.utils &#8212; FURY 0.8.0.post89+g83355557 documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -280,7 +280,7 @@
                       <span class="n">CellArray</span><span class="p">,</span> <span class="n">PolyDataNormals</span><span class="p">,</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">PolyDataMapper</span><span class="p">,</span>
                       <span class="n">Matrix4x4</span><span class="p">,</span> <span class="n">Matrix3x3</span><span class="p">,</span> <span class="n">Glyph3D</span><span class="p">,</span> <span class="n">VTK_DOUBLE</span><span class="p">,</span> <span class="n">VTK_FLOAT</span><span class="p">,</span>
                       <span class="n">Transform</span><span class="p">,</span> <span class="n">AlgorithmOutput</span><span class="p">,</span> <span class="n">VTK_INT</span><span class="p">,</span> <span class="n">VTK_UNSIGNED_CHAR</span><span class="p">,</span>
-                      <span class="n">IdTypeArray</span><span class="p">)</span>
+                      <span class="n">TransformPolyDataFilter</span><span class="p">,</span> <span class="n">IdTypeArray</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="remove_observer_from_actor"><a class="viewcode-back" href="../../reference/fury.utils.html#fury.actor.remove_observer_from_actor">[docs]</a><span class="k">def</span> <span class="nf">remove_observer_from_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
@@ -980,7 +980,7 @@
 
 
 <div class="viewcode-block" id="repeat_sources"><a class="viewcode-back" href="../../reference/fury.utils.html#fury.actor.repeat_sources">[docs]</a><span class="k">def</span> <span class="nf">repeat_sources</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">active_scalars</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                   <span class="n">source</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orientation</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Transform a vtksource to glyph.&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;A source or faces should be defined&quot;</span><span class="p">)</span>
@@ -1023,10 +1023,16 @@
 
     <span class="n">glyph</span> <span class="o">=</span> <span class="n">Glyph3D</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">transform</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">()</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">SetMatrix</span><span class="p">(</span><span class="n">numpy_to_vtk_matrix</span><span class="p">(</span><span class="n">orientation</span><span class="p">))</span>
+            <span class="n">rtrans</span> <span class="o">=</span> <span class="n">TransformPolyDataFilter</span><span class="p">()</span>
+            <span class="n">rtrans</span><span class="o">.</span><span class="n">SetInputConnection</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
+            <span class="n">rtrans</span><span class="o">.</span><span class="n">SetTransform</span><span class="p">(</span><span class="n">transform</span><span class="p">)</span>
+            <span class="n">source</span> <span class="o">=</span> <span class="n">rtrans</span>
         <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceConnection</span><span class="p">(</span><span class="n">source</span><span class="o">.</span><span class="n">GetOutputPort</span><span class="p">())</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">glyph</span><span class="o">.</span><span class="n">SetSourceData</span><span class="p">(</span><span class="n">polydata_geom</span><span class="p">)</span>
-
     <span class="n">glyph</span><span class="o">.</span><span class="n">SetInputData</span><span class="p">(</span><span class="n">polydata_centers</span><span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">SetOrient</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">glyph</span><span class="o">.</span><span class="n">SetScaleModeToScaleByScalar</span><span class="p">()</span>
