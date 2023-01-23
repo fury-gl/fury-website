@@ -31,7 +31,8 @@ def update_surface(x, y, equation, cmap_name='viridis'):
 
     # creating the colormap
     v = np.copy(z)
-    v /= np.max(np.abs(v), axis=0)
+    m_v = np.max(np.abs(v), axis=0)
+    v /= m_v if m_v else 1
     colors = colormap.create_colormap(v, name=cmap_name)
 
     return xyz, colors
@@ -133,9 +134,8 @@ showm = window.ShowManager(scene, size=(600, 600))
 # To store the function names
 text = []
 for i in range(4):
-    t_actor = actor.label('Function ' + str(i + 1), pos=(0, 0, 0),
-                          scale=(0.17, 0.2, 0.2))
-    t_actor.SetCamera(scene.camera())
+    t_actor = actor.vector_text('Function ' + str(i + 1), pos=(0, 0, 0),
+                                scale=(0.17, 0.2, 0.2))
     text.append(t_actor)
 
 grid_ui = ui.GridUI(actors=surfaces, captions=text,
@@ -157,7 +157,7 @@ scene.add(tb)
 
 ###############################################################################
 # Initializing showm and counter
-showm.initialize()
+
 counter = itertools.count()
 
 ###############################################################################

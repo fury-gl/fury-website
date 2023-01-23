@@ -54,7 +54,7 @@ and update the colormap being used to color the surface.
 Kindly note that only the z coordinate is being modified with time as only
 the z coordinate is a function of time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-40
+.. GENERATED FROM PYTHON SOURCE LINES 24-41
 
 .. code-block:: default
 
@@ -68,7 +68,8 @@ the z coordinate is a function of time.
 
         # creating the colormap
         v = np.copy(z)
-        v /= np.max(np.abs(v), axis=0)
+        m_v = np.max(np.abs(v), axis=0)
+        v /= m_v if m_v else 1
         colors = colormap.create_colormap(v, name=cmap_name)
 
         return xyz, colors
@@ -81,7 +82,7 @@ the z coordinate is a function of time.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-65
+.. GENERATED FROM PYTHON SOURCE LINES 42-66
 
 Variables and their usage-
 time: float
@@ -108,7 +109,7 @@ npoints: int
          (default = 128)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-74
+.. GENERATED FROM PYTHON SOURCE LINES 66-75
 
 .. code-block:: default
 
@@ -128,12 +129,12 @@ npoints: int
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-77
+.. GENERATED FROM PYTHON SOURCE LINES 76-78
 
 creating the x, y points which will be used to fit the equation to get
 elevation and generate the surface
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-83
+.. GENERATED FROM PYTHON SOURCE LINES 78-84
 
 .. code-block:: default
 
@@ -150,11 +151,11 @@ elevation and generate the surface
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-85
+.. GENERATED FROM PYTHON SOURCE LINES 85-86
 
 Function used to create surface obtained from 2D equation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-100
+.. GENERATED FROM PYTHON SOURCE LINES 86-101
 
 .. code-block:: default
 
@@ -180,11 +181,11 @@ Function used to create surface obtained from 2D equation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-102
+.. GENERATED FROM PYTHON SOURCE LINES 102-103
 
 Equations to be plotted
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-110
+.. GENERATED FROM PYTHON SOURCE LINES 103-111
 
 .. code-block:: default
 
@@ -203,11 +204,11 @@ Equations to be plotted
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-112
+.. GENERATED FROM PYTHON SOURCE LINES 112-113
 
 List of colormaps to be used for the various functions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 113-115
 
 .. code-block:: default
 
@@ -220,11 +221,11 @@ List of colormaps to be used for the various functions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-116
+.. GENERATED FROM PYTHON SOURCE LINES 116-117
 
 Creating a list of surfaces.
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-122
+.. GENERATED FROM PYTHON SOURCE LINES 117-123
 
 .. code-block:: default
 
@@ -238,23 +239,14 @@ Creating a list of surfaces.
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /Users/koudoro/Software/fury/docs/examples/viz_animated_surfaces.py:34: RuntimeWarning: invalid value encountered in true_divide
-      v /= np.max(np.abs(v), axis=0)
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 123-124
+.. GENERATED FROM PYTHON SOURCE LINES 124-125
 
 Creating a scene object and configuring the camera's position
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-130
+.. GENERATED FROM PYTHON SOURCE LINES 125-131
 
 .. code-block:: default
 
@@ -271,11 +263,11 @@ Creating a scene object and configuring the camera's position
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-132
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 Creating a grid to interact with surfaces individually.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-152
+.. GENERATED FROM PYTHON SOURCE LINES 133-152
 
 .. code-block:: default
 
@@ -283,9 +275,8 @@ Creating a grid to interact with surfaces individually.
     # To store the function names
     text = []
     for i in range(4):
-        t_actor = actor.label('Function ' + str(i + 1), pos=(0, 0, 0),
-                              scale=(0.17, 0.2, 0.2))
-        t_actor.SetCamera(scene.camera())
+        t_actor = actor.vector_text('Function ' + str(i + 1), pos=(0, 0, 0),
+                                    scale=(0.17, 0.2, 0.2))
         text.append(t_actor)
 
     grid_ui = ui.GridUI(actors=surfaces, captions=text,
@@ -302,18 +293,6 @@ Creating a grid to interact with surfaces individually.
 
 
 
-
-.. rst-class:: sphx-glr-script-out
-
- Out:
-
- .. code-block:: none
-
-    /Users/koudoro/Software/fury/docs/examples/viz_animated_surfaces.py:137: DeprecationWarning: Label function has been renamed vector_text
-
-    * deprecated from version: 0.7.1
-    * Will raise <class 'fury.deprecator.ExpiredDeprecationError'> as of version: 0.9.0
-      scale=(0.17, 0.2, 0.2))
 
 
 
@@ -345,7 +324,7 @@ Initializing showm and counter
 
 .. code-block:: default
 
-    showm.initialize()
+
     counter = itertools.count()
 
 
@@ -441,28 +420,23 @@ Run every 30 milliseconds
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 0 minutes  3.715 seconds)
+   **Total running time of the script:** ( 0 minutes  1.034 seconds)
 
 
 .. _sphx_glr_download_auto_examples_viz_animated_surfaces.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: viz_animated_surfaces.py <viz_animated_surfaces.py>`
 
-     :download:`Download Python source code: viz_animated_surfaces.py <viz_animated_surfaces.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: viz_animated_surfaces.ipynb <viz_animated_surfaces.ipynb>`
+      :download:`Download Jupyter notebook: viz_animated_surfaces.ipynb <viz_animated_surfaces.ipynb>`
 
 
 .. only:: html

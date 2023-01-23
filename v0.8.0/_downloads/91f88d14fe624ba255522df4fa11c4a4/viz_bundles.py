@@ -12,7 +12,7 @@ from fury import window, actor
 from dipy.data import fetch_bundles_2_subjects, read_bundles_2_subjects
 from dipy.tracking.streamline import transform_streamlines, length
 
-interactive = False  # set to True to show the interactive display window
+interactive = True  # False  # set to True to show the interactive display window
 
 fetch_bundles_2_subjects()
 dix = read_bundles_2_subjects(subj_id='subj_1', metrics=['fa'],
@@ -178,7 +178,7 @@ scene.clear()
 
 colors = [np.random.rand(*streamline.shape) for streamline in bundle_native]
 
-stream_actor6 = actor.line(bundle_native, colors, linewidth=0.2)
+stream_actor6 = actor.line(bundle_native, np.vstack(colors), linewidth=0.2)
 
 scene.add(stream_actor6)
 

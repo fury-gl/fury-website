@@ -33,9 +33,9 @@ to simulate orbital motion.
 
 
     import numpy as np
-    from fury import window, actor, utils, io
+    from fury import window, actor, utils, io, ui
     import itertools
-    from fury.data import read_viz_textures, fetch_viz_textures
+    from fury.data import read_viz_textures, fetch_viz_textures, read_viz_icons
 
 
 
@@ -48,13 +48,29 @@ to simulate orbital motion.
 
 Create a scene to start.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-22
+.. GENERATED FROM PYTHON SOURCE LINES 19-40
 
 .. code-block:: default
 
 
     scene = window.Scene()
 
+    # Create a panel and the start/pause buttons
+
+    panel = ui.Panel2D(size=(300, 100), color=(1, 1, 1), align="right")
+    panel.center = (400, 50)
+
+    pause_button = ui.Button2D(
+        icon_fnames=[("square", read_viz_icons(fname="pause2.png"))]
+    )
+    start_button = ui.Button2D(
+        icon_fnames=[("square", read_viz_icons(fname="play3.png"))]
+    )
+
+    # Add the buttons on the panel
+
+    panel.add_element(pause_button, (0.25, 0.33))
+    panel.add_element(start_button, (0.66, 0.33))
 
 
 
@@ -62,12 +78,14 @@ Create a scene to start.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-25
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 41-43
 
 Define information relevant for each planet actor including its
 texture name, relative position, and scale.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-48
+.. GENERATED FROM PYTHON SOURCE LINES 43-66
 
 .. code-block:: default
 
@@ -100,24 +118,22 @@ texture name, relative position, and scale.
 
 .. rst-class:: sphx-glr-script-out
 
- Out:
-
  .. code-block:: none
 
-    Dataset is already in place. If you want to fetch it again please first remove the folder /Users/koudoro/.fury/textures 
+    Dataset is already in place. If you want to fetch it again please first remove the folder /Users/skoudoro/.fury/textures 
 
-    ({'1_earth_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/1_earth_8k.jpg', '0D66DC62768C43D763D3288CE67128AAED27715B11B0529162DC4117F710E26F'), '2_no_clouds_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2_no_clouds_8k.jpg', '5CF740C72287AF7B3ACCF080C3951944ADCB1617083B918537D08CBD9F2C5465'), '5_night_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/5_night_8k.jpg', 'DF443F3E20C7724803690A350D9F6FDB36AD8EBC011B0345FB519A8B321F680A'), 'earth.ppm': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/earth.ppm', '34CE9AD183D7C7B11E2F682D7EBB84C803E661BE09E01ADB887175AE60C58156'), 'jupiter.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/jupiter.jpg', '5DF6A384E407BD0D5F18176B7DB96AAE1EEA3CFCFE570DDCE0D34B4F0E493668'), 'masonry.bmp': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/masonry.bmp', '045E30B2ABFEAE6318C2CF955040C4A37E6DE595ACE809CE6766D397C0EE205D'), 'moon-8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/moon_8k.jpg', '7397A6C2CE0348E148C66EBEFE078467DDB9D0370FF5E63434D0451477624839'), '8k_mercury.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_mercury.jpg', '5C8BD885AE3571C6BA2CD34B3446B9C6D767E314BF0EE8C1D5C147CADD388FC3'), '8k_venus_surface.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_venus_surface.jpg', '9BC21A50577ED8AC734CDA91058724C7A741C19427AA276224CE349351432C5B'), '8k_mars.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_mars.jpg', '4CC52149924ABC6AE507D63032F994E1D42A55CB82C09E002D1A567FF66C23EE'), '8k_saturn.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_saturn.jpg', '0D39A4A490C87C3EDABE00A3881A29BB3418364178C79C534FE0986E97E09853'), '8k_saturn_ring_alpha.png': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_saturn_ring_alpha.png', 'F1F826933C9FF87D64ECF0518D6256B8ED990B003722794F67E96E3D2B876AE4'), '2k_uranus.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2k_uranus.jpg', 'D15239D46F82D3EA13D2B260B5B29B2A382F42F2916DAE0694D0387B1204A09D'), '2k_neptune.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2k_neptune.jpg', 'CB42EA82709741D28B0AF44D8B283CBC6DBD0C521A7F0E1E1E010ADE00977DF6'), '8k_sun.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_sun.jpg', 'F22B1CFB306DDCE72A7E3B628668A0175B745038CE6268557CB2F7F1BDF98B9D'), '1_earth_16k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/1_earth_16k.jpg', '7DD1DAC926101B5D7B7F2E952E53ACF209421B5CCE57C03168BCE0AAD675998A'), 'clouds.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/clouds.jpg', '85043336E023C4C9394CFD6D48D257A5564B4F895BFCEC01C70E4898CC77F003')}, '/Users/koudoro/.fury/textures')
+    ({'1_earth_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/1_earth_8k.jpg', '0D66DC62768C43D763D3288CE67128AAED27715B11B0529162DC4117F710E26F'), '2_no_clouds_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2_no_clouds_8k.jpg', '5CF740C72287AF7B3ACCF080C3951944ADCB1617083B918537D08CBD9F2C5465'), '5_night_8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/5_night_8k.jpg', 'DF443F3E20C7724803690A350D9F6FDB36AD8EBC011B0345FB519A8B321F680A'), 'earth.ppm': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/earth.ppm', '34CE9AD183D7C7B11E2F682D7EBB84C803E661BE09E01ADB887175AE60C58156'), 'jupiter.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/jupiter.jpg', '5DF6A384E407BD0D5F18176B7DB96AAE1EEA3CFCFE570DDCE0D34B4F0E493668'), 'masonry.bmp': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/masonry.bmp', '045E30B2ABFEAE6318C2CF955040C4A37E6DE595ACE809CE6766D397C0EE205D'), 'moon-8k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/moon_8k.jpg', '7397A6C2CE0348E148C66EBEFE078467DDB9D0370FF5E63434D0451477624839'), '8k_mercury.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_mercury.jpg', '5C8BD885AE3571C6BA2CD34B3446B9C6D767E314BF0EE8C1D5C147CADD388FC3'), '8k_venus_surface.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_venus_surface.jpg', '9BC21A50577ED8AC734CDA91058724C7A741C19427AA276224CE349351432C5B'), '8k_mars.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_mars.jpg', '4CC52149924ABC6AE507D63032F994E1D42A55CB82C09E002D1A567FF66C23EE'), '8k_saturn.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_saturn.jpg', '0D39A4A490C87C3EDABE00A3881A29BB3418364178C79C534FE0986E97E09853'), '8k_saturn_ring_alpha.png': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_saturn_ring_alpha.png', 'F1F826933C9FF87D64ECF0518D6256B8ED990B003722794F67E96E3D2B876AE4'), '2k_uranus.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2k_uranus.jpg', 'D15239D46F82D3EA13D2B260B5B29B2A382F42F2916DAE0694D0387B1204A09D'), '2k_neptune.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/2k_neptune.jpg', 'CB42EA82709741D28B0AF44D8B283CBC6DBD0C521A7F0E1E1E010ADE00977DF6'), '8k_sun.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/8k_sun.jpg', 'F22B1CFB306DDCE72A7E3B628668A0175B745038CE6268557CB2F7F1BDF98B9D'), '1_earth_16k.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/1_earth_16k.jpg', '7DD1DAC926101B5D7B7F2E952E53ACF209421B5CCE57C03168BCE0AAD675998A'), 'clouds.jpg': ('https://raw.githubusercontent.com/fury-gl/fury-data/master/textures/clouds.jpg', '85043336E023C4C9394CFD6D48D257A5564B4F895BFCEC01C70E4898CC77F003')}, '/Users/skoudoro/.fury/textures')
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-53
+.. GENERATED FROM PYTHON SOURCE LINES 67-71
 
 To take advantage of the previously defined data structure we are going to
 create an auxiliary function that will load and apply the respective
 texture, set its respective properties (relative position and scale),
 and add the actor to a previously created scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-80
+.. GENERATED FROM PYTHON SOURCE LINES 71-98
 
 .. code-block:: default
 
@@ -155,13 +171,13 @@ and add the actor to a previously created scene.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-84
+.. GENERATED FROM PYTHON SOURCE LINES 99-102
 
 Use the ``map`` function to create actors for each of the texture files
 in the ``planet_files`` list. Then, assign each actor to its corresponding
 actor in the list.
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-99
+.. GENERATED FROM PYTHON SOURCE LINES 102-117
 
 .. code-block:: default
 
@@ -187,14 +203,14 @@ actor in the list.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-104
+.. GENERATED FROM PYTHON SOURCE LINES 118-122
 
 Define the gravitational constant G, the orbital radii of each of the
 planets, and the central mass of the sun. The gravity and mass will be
 used to calculate the orbital position, so multiply these two together to
 create a new constant, which we will call miu.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-113
+.. GENERATED FROM PYTHON SOURCE LINES 122-131
 
 .. code-block:: default
 
@@ -214,14 +230,14 @@ create a new constant, which we will call miu.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+.. GENERATED FROM PYTHON SOURCE LINES 132-136
 
 Let's define two functions that will help us calculate the position of each
 planet as it orbits around the sun: ``get_orbit_period`` and
 ``get_orbital_position``, using the constant miu and the orbital radii
 of each planet.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-131
+.. GENERATED FROM PYTHON SOURCE LINES 136-149
 
 .. code-block:: default
 
@@ -245,13 +261,13 @@ of each planet.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-135
+.. GENERATED FROM PYTHON SOURCE LINES 150-153
 
 Let's define a function to rotate the planet actor axially, we'll be defining
 axis of each planet and angle by which it should be rotated using
 ``rotate_axial`` funtction
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-144
+.. GENERATED FROM PYTHON SOURCE LINES 153-162
 
 .. code-block:: default
 
@@ -271,11 +287,11 @@ axis of each planet and angle by which it should be rotated using
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-146
+.. GENERATED FROM PYTHON SOURCE LINES 163-164
 
 Let's change the camera position to visualize the planets better.
 
-.. GENERATED FROM PYTHON SOURCE LINES 146-149
+.. GENERATED FROM PYTHON SOURCE LINES 164-167
 
 .. code-block:: default
 
@@ -289,12 +305,12 @@ Let's change the camera position to visualize the planets better.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-152
+.. GENERATED FROM PYTHON SOURCE LINES 168-170
 
 Next, create a ShowManager object. The ShowManager class is the interface
 between the scene, the window and the interactor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-157
+.. GENERATED FROM PYTHON SOURCE LINES 170-176
 
 .. code-block:: default
 
@@ -302,6 +318,7 @@ between the scene, the window and the interactor.
     showm = window.ShowManager(scene,
                                size=(900, 768), reset_camera=False,
                                order_transparent=True)
+    scene.add(panel)
 
 
 
@@ -310,13 +327,13 @@ between the scene, the window and the interactor.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 158-161
+.. GENERATED FROM PYTHON SOURCE LINES 177-180
 
 Next, let's focus on creating the animation.
 We can determine the duration of animation with using the ``counter``.
 Use itertools to avoid global variables.
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-164
+.. GENERATED FROM PYTHON SOURCE LINES 180-183
 
 .. code-block:: default
 
@@ -330,12 +347,12 @@ Use itertools to avoid global variables.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-167
+.. GENERATED FROM PYTHON SOURCE LINES 184-186
 
 Define one new function to use in ``timer_callback`` to update the planet
 positions ``update_planet_position``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-175
+.. GENERATED FROM PYTHON SOURCE LINES 186-194
 
 .. code-block:: default
 
@@ -354,12 +371,12 @@ positions ``update_planet_position``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-178
+.. GENERATED FROM PYTHON SOURCE LINES 195-197
 
 ``calculate_path`` function is for calculating the path/orbit
 of every planet.
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-186
+.. GENERATED FROM PYTHON SOURCE LINES 197-205
 
 .. code-block:: default
 
@@ -378,7 +395,7 @@ of every planet.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-192
+.. GENERATED FROM PYTHON SOURCE LINES 206-211
 
 First we are making a list that will contain radius from `planets_data`.
 Here we are not taking the radius of orbit/path for sun and saturn ring.
@@ -386,7 +403,7 @@ Here we are not taking the radius of orbit/path for sun and saturn ring.
 `r_times` will contain time taken (in days) by the planets to rotate
 around itself.
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-206
+.. GENERATED FROM PYTHON SOURCE LINES 211-225
 
 .. code-block:: default
 
@@ -411,11 +428,11 @@ around itself.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-208
+.. GENERATED FROM PYTHON SOURCE LINES 226-227
 
 Here we are calculating and updating the path/orbit before animation starts.
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-211
+.. GENERATED FROM PYTHON SOURCE LINES 227-230
 
 .. code-block:: default
 
@@ -429,12 +446,12 @@ Here we are calculating and updating the path/orbit before animation starts.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 212-214
+.. GENERATED FROM PYTHON SOURCE LINES 231-233
 
 This is for orbit visualization. We are using line actor for orbits.
 After creating an actor we add it to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-218
+.. GENERATED FROM PYTHON SOURCE LINES 233-237
 
 .. code-block:: default
 
@@ -449,14 +466,14 @@ After creating an actor we add it to the scene.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-223
+.. GENERATED FROM PYTHON SOURCE LINES 238-242
 
 Define the ``timer_callback`` function, which controls what events happen
 at certain times, using the counter. Update the position of each planet
 actor using ``update_planet_position,`` assigning the x and y values of
 each planet's position with the newly calculated ones.
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-246
+.. GENERATED FROM PYTHON SOURCE LINES 242-264
 
 .. code-block:: default
 
@@ -489,17 +506,45 @@ each planet's position with the newly calculated ones.
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 265-266
 
-.. GENERATED FROM PYTHON SOURCE LINES 247-248
+We add a callback to each button to perform some action.
 
-Watch the planets orbit the sun in your new animation!
-
-.. GENERATED FROM PYTHON SOURCE LINES 248-255
+.. GENERATED FROM PYTHON SOURCE LINES 266-280
 
 .. code-block:: default
 
 
-    showm.initialize()
+
+    def start_animation(i_ren, _obj, _button):
+        showm.add_timer_callback(True, 10, timer_callback)
+
+
+    def pause_animation(i_ren, _obj, _button):
+        showm.destroy_timers()
+
+
+    start_button.on_left_mouse_button_clicked = start_animation
+    pause_button.on_left_mouse_button_clicked = pause_animation
+
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 281-282
+
+Watch the planets orbit the sun in your new animation!
+
+.. GENERATED FROM PYTHON SOURCE LINES 282-289
+
+.. code-block:: default
+
+
+
     showm.add_timer_callback(True, 10, timer_callback)
     showm.start()
 
@@ -520,28 +565,23 @@ Watch the planets orbit the sun in your new animation!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** ( 1 minutes  0.975 seconds)
+   **Total running time of the script:** ( 0 minutes  28.882 seconds)
 
 
 .. _sphx_glr_download_auto_tutorials_01_introductory_viz_solar_system.py:
 
+.. only:: html
 
-.. only :: html
-
- .. container:: sphx-glr-footer
-    :class: sphx-glr-footer-example
+  .. container:: sphx-glr-footer sphx-glr-footer-example
 
 
+    .. container:: sphx-glr-download sphx-glr-download-python
 
-  .. container:: sphx-glr-download sphx-glr-download-python
+      :download:`Download Python source code: viz_solar_system.py <viz_solar_system.py>`
 
-     :download:`Download Python source code: viz_solar_system.py <viz_solar_system.py>`
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
-
-  .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-     :download:`Download Jupyter notebook: viz_solar_system.ipynb <viz_solar_system.ipynb>`
+      :download:`Download Jupyter notebook: viz_solar_system.ipynb <viz_solar_system.ipynb>`
 
 
 .. only:: html
