@@ -1,0 +1,868 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Week 4 - Finalizing glTF loader &#8212; FURY 0.8.0.post1451+ga541fd84 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2022/2022-07-12-week4-shivam';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.8.0.post1451+ga541fd84';
+        </script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    <div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text" style="color: #990000;">FURY</div>
+    </a>
+</div>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="week-4-finalizing-gltf-loader">
+<h1>Week 4 - Finalizing glTF loader<a class="headerlink" href="#week-4-finalizing-gltf-loader" title="Permalink to this heading">#</a></h1>
+<section id="what-did-you-do-this-week">
+<h2>What did you do this week?<a class="headerlink" href="#what-did-you-do-this-week" title="Permalink to this heading">#</a></h2>
+<p>This week I had to travel back to my college since the summer vacations have ended.
+I had a coding session with Serge this week, we modified the exporter function and looked at some bugs I faced.</p>
+<p>We managed to use the <code class="docutils literal notranslate"><span class="pre">io.load_io</span></code> function. There was a strange issue with loading png files. I had to convert the PIL <code class="docutils literal notranslate"><span class="pre">Image</span></code> to <code class="docutils literal notranslate"><span class="pre">RGB</span></code> format, and it fixed the issue, turns out png images are stored as <code class="docutils literal notranslate"><span class="pre">P</span></code> (pallet) mode.</p>
+<p>I also added the <code class="docutils literal notranslate"><span class="pre">glb</span></code> format support to the importer. While loading a <code class="docutils literal notranslate"><span class="pre">.glb</span></code> model, I noticed that the image data is also stored in the buffer and there can be a <code class="docutils literal notranslate"><span class="pre">bufferview</span></code> index to get the buffer.</p>
+<p>During this time, I also tested the glTF loader with all models in the <code class="docutils literal notranslate"><span class="pre">KhronoosGroup/glTF-samples</span></code> repository. Here’s the table of models working well: <a class="reference external" href="https://github.com/xtanion/Blog-Items/blob/main/glTF-models-status.csv">see file</a>.</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model Name</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Error Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>BoxInterleaved</p></td>
+<td><p>No</p></td>
+<td><p>“BoxInterleaved.gltf: shapes (4,4) and (7,12) not aligned: 4 (dim 1) != 7 (dim 0)”</p></td>
+</tr>
+<tr class="row-odd"><td><p>Box</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SpecularTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AnimatedCube</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>NormalTangentMirrorTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AnimatedTriangle</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SpecGlossVsMetalRough</p></td>
+<td><p>No</p></td>
+<td><p>SpecGlossVsMetalRough.gltf: ‘NoneType’ object has no attribute ‘baseColorTexture’</p></td>
+</tr>
+<tr class="row-odd"><td><p>CesiumMilkTruck</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>VC</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>WaterBottle</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>AnimatedMorphCube</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Sponza</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SciFiHelmet</p></td>
+<td><p>No</p></td>
+<td><p>SciFiHelmet.gltf: Python int too large to convert to C long</p></td>
+</tr>
+<tr class="row-odd"><td><p>Triangle</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-even"><td><p>IridescenceMetallicSpheres</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-odd"><td><p>Corset</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Cube</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TextureLinearInterpolationTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SimpleMeshes</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Lantern</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>TextureTransformMultiTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TextureSettingsTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>LightsPunctualLamp</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>DamagedHelmet</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>CesiumMan</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Cameras</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>BarramundiFish</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>MetalRoughSpheresNoTextures</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>EnvironmentTest</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-odd"><td><p>MosquitoInAmber</p></td>
+<td><p>No</p></td>
+<td><p>MosquitoInAmber.gltf: buffer is smaller than requested size</p></td>
+</tr>
+<tr class="row-even"><td><p>BoxTexturedNonPowerOfTwo</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>BrainStem</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SimpleMorph</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>OrientationTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>BoxAnimated</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>StainedGlassLamp</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>TextureTransformTest</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-odd"><td><p>ClearCoatTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IridescenceLamp</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-odd"><td><p>DragonAttenuation</p></td>
+<td><p>No</p></td>
+<td><p>DragonAttenuation.gltf: buffer is smaller than requested size</p></td>
+</tr>
+<tr class="row-even"><td><p>RecursiveSkeletons</p></td>
+<td><p>No</p></td>
+<td><p>RecursiveSkeletons.gltf: cannot reshape array of size 120 into shape (9)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Suzanne</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>RiggedSimple</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TextureEncodingTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>2CylinderEngine</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>NormalTangentTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>MorphStressTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>IridescenceDielectricSpheres</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-even"><td><p>TextureCoordinateTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Duck</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>AlphaBlendModeTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TriangleWithoutIndices</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>MultiUVTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>BoomBoxWithAxes</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>Box With Spaces</p></td>
+<td><p>No</p></td>
+<td><p>Box%20With%20Spaces.gltf: ‘NoneType’ object has no attribute ‘shape’</p></td>
+</tr>
+<tr class="row-odd"><td><p>SheenCloth</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ToyCar</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-odd"><td><p>MaterialsVariantsShoe</p></td>
+<td><p>No</p></td>
+<td><p>MaterialsVariantsShoe.gltf: buffer is smaller than requested size</p></td>
+</tr>
+<tr class="row-even"><td><p>IridescentDishWithOlives</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>VertexColorTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SheenChair</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Fox</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>AntiqueCamera</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>TransmissionTest</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-even"><td><p>TransmissionRoughnessTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>BoxVertexColors</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>ReciprocatingSaw</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>MorphPrimitivesTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>MetalRoughSpheres</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>GearboxAssy</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>TwoSidedPlane</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Buggy</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>SimpleSparseAccessor</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>BoxTextured</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>UnlitTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>SimpleSkin</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>FlightHelmet</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>Unicode❤♻Test</p></td>
+<td><p>No</p></td>
+<td><p>Unicode%E2%9D%A4%E2%99%BBTest.gltf: ‘NoneType’ object has no attribute ‘shape’</p></td>
+</tr>
+<tr class="row-even"><td><p>Avocado</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>InterpolationTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>GlamVelvetSofa</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>RiggedFigure</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>BoomBox</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>EmissiveStrengthTest</p></td>
+<td><p>No</p></td>
+<td><p>None: file not downloaded</p></td>
+</tr>
+<tr class="row-even"><td><p>AttenuationTest</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>AnimatedMorphSphere</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>IridescenceSuzanne</p></td>
+<td><p>Yes</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="what-is-coming-up-next-week">
+<h2>What is coming up next week?<a class="headerlink" href="#what-is-coming-up-next-week" title="Permalink to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Adding tests and merging export function PR.</p></li>
+<li><p>Start working on Simple Animations.</p></li>
+</ul>
+</section>
+<section id="did-you-get-stuck-anywhere">
+<h2>Did you get stuck anywhere?<a class="headerlink" href="#did-you-get-stuck-anywhere" title="Permalink to this heading">#</a></h2>
+<ul>
+<li><p>To create a texture, we needed the RGB values, However <code class="docutils literal notranslate"><span class="pre">.png</span></code> images were returning a 2D array when read using PIL. It is fixed by</p>
+<blockquote>
+<div><div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]:</span>
+   <span class="n">pil_image</span> <span class="o">=</span> <span class="n">pil_image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</li>
+<li><p>pygltflib’s <code class="docutils literal notranslate"><span class="pre">load</span></code> method doesnot handle glb files very well. It does not contain the buffer <code class="docutils literal notranslate"><span class="pre">uri</span></code>. I used <code class="docutils literal notranslate"><span class="pre">glb2gltf</span></code> method as of now.</p></li>
+</ul>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-did-you-do-this-week">
+   What did you do this week?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-is-coming-up-next-week">
+   What is coming up next week?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#did-you-get-stuck-anywhere">
+   Did you get stuck anywhere?
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/posts/2022/2022-07-12-week4-shivam.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+ 
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2023, FURY. All rights reserved.</div>
+    </div>
+</div>
+  </div>
+  
+</div>
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <id>https://fury.gl/</id>
+  <title>Blog - Posts by Praneeth Shetty</title>
+  <updated>2023-01-23T18:07:01.021870+00:00</updated>
+  <link href="https://fury.gl/"/>
+  <link href="https://fury.gl/blog/author/praneeth-shetty/atom.xml" rel="self"/>
+  <generator uri="https://ablog.readthedocs.org/" version="0.10.33">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-07-20-week-7-praneeth.html</id>
+    <title>Week 7 - Working on Rotation PR and Trying Freehand Drawing</title>
+    <updated>2022-07-20T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-7-working-on-rotation-pr-and-trying-freehand-drawing"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;I continued PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; and fixed the displacement of the shape from its original position when applying rotation. This was happening because most of the calculations resulted in &lt;cite&gt;float&lt;/cite&gt; values, but as the pixel position were integers we had to explicitly convert these values into &lt;cite&gt;int&lt;/cite&gt;. This conversion rounded off the values and as we call this function continuously, each time the round-off would happen, the shape would get displaced.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" style="width: 400px;" /&gt;
+&lt;p&gt;To fix this, I converted all the calculations into integer calculations using floor division &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;//&lt;/span&gt;&lt;/code&gt; instead of normal division &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;/&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" style="width: 400px;" /&gt;
+&lt;p&gt;The tests were failing in &lt;cite&gt;Ubuntu&lt;/cite&gt; and the &lt;cite&gt;macOS&lt;/cite&gt; because the mouse click event wasn’t propagated to the line due to some unknown reasons. When investigating more about the issue, Mohamed suggested and helped me implement another approach to select the shapes. In this approach, we calculate the distance between the mouse click event position and each of the shapes, and if any of the distances is less than a specific value (which I call as limit value), then we send this current event to that element.&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/ganimtron-10/fury/tree/new-selection"&gt;New shape selection technique:&lt;/a&gt;&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" style="width: 400px;" /&gt;
+&lt;p&gt;I also tried to implement a freehand drawing mode by adding &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Disk2D&lt;/span&gt;&lt;/code&gt; as points. But as you can see below, there are many flaws in this.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;First of all, we add many &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Disk2D&lt;/span&gt;&lt;/code&gt; objects which make it memory consuming process.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If the mouse moves very fast, then we can see the gaps between points.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Storing, managing, and transforming are difficult.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" style="width: 400px;" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;It was hard to debug why the tests were failing in &lt;cite&gt;Ubuntu&lt;/cite&gt; and &lt;cite&gt;macOS&lt;/cite&gt;. I tried investigating it by installing Ubuntu and got nothing, but then while implementing the new selection approach, it automatically got fixed.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Getting PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; merged and working on the polyline feature.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-07-20-week-7-praneeth.html" rel="alternate"/>
+    <summary>I continued PR #623 and fixed the displacement of the shape from its original position when applying rotation. This was happening because most of the calculations resulted in float values, but as the pixel position were integers we had to explicitly convert these values into int. This conversion rounded off the values and as we call this function continuously, each time the round-off would happen, the shape would get displaced.</summary>
+    <category term="google" label="google"/>
+    <published>2022-07-20T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-07-27-week-8-praneeth.html</id>
+    <title>Week 8 - Working on the polyline feature</title>
+    <updated>2022-07-27T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-8-working-on-the-polyline-feature"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I started working on the &lt;cite&gt;polyline&lt;/cite&gt; feature. After a lot of investigating and trying out different things, I found a way to call the dragging event manually without any prior click event. VTK actually captures the mouse movement using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;MouseMoveEvent&lt;/span&gt;&lt;/code&gt;. This event is then modified by FURY to only be called after the click event. So I added a new callback to track the mouse movement and set the current canvas as an active prop because it is required to capture the drag event happening on it.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/182432684-abd015e5-b63d-4aab-b6a5-c8ba5dab3252.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/182432684-abd015e5-b63d-4aab-b6a5-c8ba5dab3252.gif" style="width: 400px;" /&gt;
+&lt;p&gt;I had to look for some ways by which we could make the icons look smoother. For this, I created an icon test file, which consisted of a set of icons of varying scales. Then on these icons, I used some vtkTexture methods discussed in the meeting, such as &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;MipmapOn&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;InterpolateOn&lt;/span&gt;&lt;/code&gt;. You can see some differences in the icons below:&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/182910990-fe4934ee-4201-4c3c-8ab4-1a4f7bfa9276.png" class="align-center" src="https://user-images.githubusercontent.com/64432063/182910990-fe4934ee-4201-4c3c-8ab4-1a4f7bfa9276.png" style="width: 600px;" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;It took some time to get settled with all the things as my college reopened.
+I was trying to use shaders with the UI elements to implement the freehand drawing, but then my mentors suggested that I should look  into the tracer widget in the VTK.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Updating PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; to keep &lt;cite&gt;rotation_slider&lt;/cite&gt; on the top of the screen.
+Looking into various vtk tracer widgets to see if we can use that to create freehand drawings.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-07-27-week-8-praneeth.html" rel="alternate"/>
+    <summary>This week I started working on the polyline feature. After a lot of investigating and trying out different things, I found a way to call the dragging event manually without any prior click event. VTK actually captures the mouse movement using the MouseMoveEvent. This event is then modified by FURY to only be called after the click event. So I added a new callback to track the mouse movement and set the current canvas as an active prop because it is required to capture the drag event happening on it.</summary>
+    <category term="google" label="google"/>
+    <published>2022-07-27T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-03-week-9-praneeth.html</id>
+    <title>Week 9 - Grouping and Transforming Shapes</title>
+    <updated>2022-08-03T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-9-grouping-and-transforming-shapes"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;I started this week by creating a quick PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/645"&gt;#645&lt;/a&gt; for the UI sliders. The sliders raised &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ZeroDivsionError&lt;/span&gt;&lt;/code&gt; when the min and max values were the same. To solve this, I handled the case where the value_range becomes zero and then manually set the handle position to zero.&lt;/p&gt;
+&lt;p&gt;Then I updated the implementation of the Grouping Shapes feature to support the translation and rotation of the shapes grouped together, as you can see below.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/183248609-4281087c-c930-4141-907a-5a906732524a.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/183248609-4281087c-c930-4141-907a-5a906732524a.gif" style="width: 400px;" /&gt;
+&lt;p&gt;After this, I worked on the &lt;cite&gt;PolyLine&lt;/cite&gt; and removed the extra point being added to the start of the &lt;cite&gt;PolyLine&lt;/cite&gt; whenever a new instance was created.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/183280803-5d7ae350-f080-478d-8a2f-a71460037ea4.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/183280803-5d7ae350-f080-478d-8a2f-a71460037ea4.gif" style="width: 400px;" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, everything went well.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Completing the PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt;.
+Searching different approaches for implementing the freehand drawing.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-03-week-9-praneeth.html" rel="alternate"/>
+    <summary>I started this week by creating a quick PR #645 for the UI sliders. The sliders raised ZeroDivsionError when the min and max values were the same. To solve this, I handled the case where the value_range becomes zero and then manually set the handle position to zero.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-03T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-10-week-10-praneeth.html</id>
+    <title>Week 10 - Understanding Codes and Playing with Animation</title>
+    <updated>2022-08-10T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-10-understanding-codes-and-playing-with-animation"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;I started working on the PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/645"&gt;#645&lt;/a&gt; created last week and tested a few more corner cases such as What happens if the maximum value is exceeded?? What if we give a value less than the minimum value range??
+Most of these worked as intended.&lt;/p&gt;
+&lt;p&gt;Then I moved on to &lt;cite&gt;vtkImageTracer&lt;/cite&gt;, I tried implementing this locally. It required an ImageSource on which the tracing was done. As you can see below, I managed to implement the pure VTK version of the widget. After this, I tried integrating this with FURY and besides the ImageSource all things were successfully handled by FURY.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/185802405-b289dbc9-08a3-496a-8cc4-ef8c4d40bf60.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/185802405-b289dbc9-08a3-496a-8cc4-ef8c4d40bf60.gif" style="width: 400px;" /&gt;
+&lt;p&gt;As per the suggestions from the mentors, I started looking at the implementation of the &lt;a class="reference external" href="https://github.com/Kitware/VTK/blob/master/Interaction/Widgets/vtkImageTracerWidget.cxx"&gt;vtkImageTracer&lt;/a&gt; to see how they manage the widget. My prior experience with C++ helped me a lot with this because the original implementation of vtk is in C++.&lt;/p&gt;
+&lt;p&gt;Here, I found an approach similar to the polyline. They first grab the current point, check whether it’s inside the area, and then use the last point to draw a line by calculating some kind of motion vector.&lt;/p&gt;
+&lt;p&gt;Using the Animation Architecture created by Mohamed, I created a Bouncing Text Animation using UI elements to check the compatibility of the UI System with the Animation.&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/ganimtron-10/fury/blob/354e56338d197fe2a29b628e86a16ad7c7a845b5/docs/tutorials/02_ui/viz_ui_text_animation.py"&gt;Bouncing text animation:&lt;/a&gt;&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/185803066-70e320de-0777-478d-87bf-30767b02efe2.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/185803066-70e320de-0777-478d-87bf-30767b02efe2.gif" style="width: 400px;" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Proper tutorials weren’t there to implement &lt;cite&gt;vtkImageTracer&lt;/cite&gt;, which took time to make it work locally.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Working on the Freehand Drawing.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-10-week-10-praneeth.html" rel="alternate"/>
+    <summary>I started working on the PR #645 created last week and tested a few more corner cases such as What happens if the maximum value is exceeded?? What if we give a value less than the minimum value range??
+Most of these worked as intended.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-10T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-17-week-11-praneeth.html</id>
+    <title>Week 11 - Creating a base for Freehand Drawing</title>
+    <updated>2022-08-17T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-11-creating-a-base-for-freehand-drawing"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I tried to imitate the working of &lt;cite&gt;vtkImageTracer&lt;/cite&gt;. Previously, I had created a small prototype for freehand drawing by adding points at the mouse position (which you can check out &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/ganimtron_10s-blog/week-7-working-on-rotation-pr-and-trying-freehand-drawing/"&gt;here&lt;/a&gt;). As mentioned, there were some drawback of this method.
+So to overcome these issues, I tried combining both methods. Considering points using the previous method and instead of adding points I tried creating lines between them which looks promising. Below you can see a demo.&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/ganimtron-10/fury/tree/freehand-drawing"&gt;Freehand Drawing:&lt;/a&gt;&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/186952329-636a0d81-6631-4e8d-9486-9a8c5e88a9a7.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/186952329-636a0d81-6631-4e8d-9486-9a8c5e88a9a7.gif" style="width: 400px;" /&gt;
+&lt;p&gt;While doing this, I started working on how I could efficiently draw the lines and smoothen them out. My mentors referred me &lt;a class="reference external" href="https://github.com/rougier/python-opengl/blob/master/09-lines.rst"&gt;this&lt;/a&gt;  to learn more about constructing and rendering lines.&lt;/p&gt;
+&lt;p&gt;Along with this, I updated a few tests and some small bugs in PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, I didn’t get stuck anywhere.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Enhancing the freehand drawing feature.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-17-week-11-praneeth.html" rel="alternate"/>
+    <summary>This week I tried to imitate the working of vtkImageTracer. Previously, I had created a small prototype for freehand drawing by adding points at the mouse position (which you can check out here). As mentioned, there were some drawback of this method.
+So to overcome these issues, I tried combining both methods. Considering points using the previous method and instead of adding points I tried creating lines between them which looks promising. Below you can see a demo.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-17T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-24-week-12-praneeth.html</id>
+    <title>Week 12 - Fixing translating issues and updating tests</title>
+    <updated>2022-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-12-fixing-translating-issues-and-updating-tests"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;I started with updating the tests for PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; as some of the tests weren’t covering all the aspects in the code.
+Previously I was just creating the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;DrawShape&lt;/span&gt;&lt;/code&gt; and adding it to the scene but now I had to analyze the scene to see whether they were properly added or not.&lt;/p&gt;
+&lt;p&gt;Then I moved on to PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt; to resolve the clamping issue. As you can see below, the shapes overlappes when they move nearer to the panel border.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/187023615-d7c69904-4925-41b1-945d-b5993c20c862.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/187023615-d7c69904-4925-41b1-945d-b5993c20c862.gif" style="width: 400px;" /&gt;
+&lt;p&gt;To solve this, I am thinking of calculating the center of the group and clipping it according to the panel, which may give us the required result. I tried doing the same, and it worked partially.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/187023880-84e13dab-313b-49e4-9b06-df5465c9d762.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/187023880-84e13dab-313b-49e4-9b06-df5465c9d762.gif" style="width: 400px;" /&gt;
+&lt;p&gt;As we can see above, the shapes are kind of clamping but there’s some issue with positioning. It would be good to go once this is fixed.&lt;/p&gt;
+&lt;p&gt;Along this, I tried to integrate shaders with the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Rectangle2D&lt;/span&gt;&lt;/code&gt; but there’s something which I am missing. When I tried executing that program, it executed successfully but I am not getting the desired output. I tried debugging the code as well using the &lt;cite&gt;debug&lt;/cite&gt; flag on the &lt;cite&gt;shader_to_actor&lt;/cite&gt; function but still, it doesn’t throw any error.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2022/2022-08-24-week-12-praneeth.rst&lt;/span&gt;, line 3); &lt;em&gt;&lt;a href="#id3"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “#623”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;While updating the tests for PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; the quad shape wasn’t getting analyzed by the &lt;cite&gt;analyse_snapshot&lt;/cite&gt; method. I tried various approaches to fix it, but it didn’t work.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2022/2022-08-24-week-12-praneeth.rst&lt;/span&gt;, line 3); &lt;em&gt;&lt;a href="#id4"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “#623”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2022/2022-08-24-week-12-praneeth.rst&lt;/span&gt;, line 3); &lt;em&gt;&lt;a href="#id5"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “#653”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;Merging the PRs &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt; and working on the freehand drawing.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-24-week-12-praneeth.html" rel="alternate"/>
+    <summary>I started with updating the tests for PR #623 as some of the tests weren’t covering all the aspects in the code.
+Previously I was just creating the DrawShape and adding it to the scene but now I had to analyze the scene to see whether they were properly added or not.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-24T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-31-week-13-praneeth.html</id>
+    <title>Week 13 - Separating tests and fixing bugs</title>
+    <updated>2022-08-31T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-13-separating-tests-and-fixing-bugs"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I managed to fix the translation issue in PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt;. This was happening because of the calculation error while repositioning the shapes. Now it works as intended.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/187058183-840df649-163e-44dd-8104-27d6c2db87a9.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/187058183-840df649-163e-44dd-8104-27d6c2db87a9.gif" style="width: 400px;" /&gt;
+&lt;p&gt;Also, the PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/623"&gt;#623&lt;/a&gt; got merged as now the tests were passing after the update.&lt;/p&gt;
+&lt;p&gt;As we are now adding new features to the DrawPanel, the current tests are becoming bigger and bigger.
+Due to this creating, debugging, and managing tests are becoming harder.
+So to keep things simple, separating the tests to validate individual parts and features of the DrawPanel. This was done in PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/674"&gt;#674&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Along this, there was a redundant parameter called &lt;cite&gt;in_progress&lt;/cite&gt;, which was used to keep a check whether the shapes are added to the panel or not, but it was confusing, and discarding it didn’t affect the codebase. So PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/673"&gt;#673&lt;/a&gt; removed that parameter and separated the two functions.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2022/2022-08-31-week-13-praneeth.rst&lt;/span&gt;, line 3); &lt;em&gt;&lt;a href="#id5"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “#653”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;Debugging the issue in PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;#653&lt;/a&gt; took most of the time this week. I had to manually calculate and check whether the calculations were correct or not.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Currently, the borders around the shapes are not actually the borders, they are the bounding box of that shape. So I have to find out some ways to highlight the shapes when selected by the user.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-31-week-13-praneeth.html" rel="alternate"/>
+    <summary>This week I managed to fix the translation issue in PR #653. This was happening because of the calculation error while repositioning the shapes. Now it works as intended.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-31T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-07-week-14-praneeth.html</id>
+    <title>Week 14 - Updating DrawPanel architecture</title>
+    <updated>2022-09-07T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-14-updating-drawpanel-architecture"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I continued updating the DrawShape and DrawPanel.&lt;/p&gt;
+&lt;p&gt;So as we can see below, whenever we create, translate, or rotate the shapes on the panel, it sometimes overlaps the &lt;cite&gt;mode_panel&lt;/cite&gt; or &lt;cite&gt;mode_text&lt;/cite&gt; which are used to select and show the current mode respectively.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/188268649-65ea24f0-3f46-4545-8e52-e07513a94b9f.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/188268649-65ea24f0-3f46-4545-8e52-e07513a94b9f.gif" style="width: 400px;" /&gt;
+&lt;p&gt;To resolve this, I created a PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/678"&gt;#678&lt;/a&gt; which moves the &lt;cite&gt;mode_panel&lt;/cite&gt; and the &lt;cite&gt;mode_text&lt;/cite&gt; to be on the borders of the panel.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/188268804-949ec656-7da3-4310-ba8b-7e4f0281faa1.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/188268804-949ec656-7da3-4310-ba8b-7e4f0281faa1.gif" style="width: 400px;" /&gt;
+&lt;p&gt;Along this, there were some similar functionalities in the &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/653"&gt;Grouping Shapes PR&lt;/a&gt; and the &lt;cite&gt;DrawShape&lt;/cite&gt; due to which some lines of code were repeating. To remove this duplicacy I created a PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/679"&gt;#679&lt;/a&gt; to move these functions to the &lt;cite&gt;helper.py&lt;/cite&gt; file.&lt;/p&gt;
+&lt;p&gt;Then I tried different ways of highlighting the shapes,&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;To create a copy of the shape and scale it in the background so that it looks like a border or highlighted edges.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add yellow color to the shape so that it looks brighter.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Working on these new PRs to get them merged. Implement a highlighting feature.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-07-week-14-praneeth.html" rel="alternate"/>
+    <summary>This week I continued updating the DrawShape and DrawPanel.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-07T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-14-week-15-praneeth.html</id>
+    <title>Week 15 - Highlighting DrawShapes</title>
+    <updated>2022-09-14T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-15-highlighting-drawshapes"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;This week I started with highlighting the shapes. As discussed earlier, I had two ways, but while implementing them, I found out both ways aren’t that good to continue with.
+The first way in which we thought of creating the scaled shapes in the background had an issue with the stacking. The border(blue rectangle) and the shape(grey rectangle) both seem to look like different shapes just grouped together as shown below.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/192321622-964cef6e-f965-4a24-8dcf-0b899fe5e387.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/192321622-964cef6e-f965-4a24-8dcf-0b899fe5e387.gif" style="width: 400px;" /&gt;
+&lt;p&gt;While playing around with the second way, which was to add yellow color to the shape to make it brighter, it was difficult to identify which shape was selected. Also sometimes instead of making it brighter the addition of color created a new color which again confused the user.
+After discussing these issues my mentors suggested having a user-defined highlight color that will be shown whenever the shape is selected.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/192326416-4454718d-1dda-4a13-9f97-07387a50a580.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/192326416-4454718d-1dda-4a13-9f97-07387a50a580.gif" style="width: 400px;" /&gt;
+&lt;p&gt;Along this, we were also trying to integrate shaders to the Actor2D (i.e. the UI elements) but there were some issues with it. I used &lt;a class="reference external" href="https://fury.gl/latest/auto_tutorials/03_shaders/viz_shader.html#sphx-glr-auto-tutorials-03-shaders-viz-shader-py"&gt;this&lt;/a&gt; shaders example as a starting point and just replaced the &lt;cite&gt;utah&lt;/cite&gt; actor by Rectangle2D actor. This program executed successfully without any errors, but it didn’t give the required output.&lt;/p&gt;
+&lt;p&gt;So instead of wasting time searching for how it is done, we thought it would be great if we directly ask in the VTK discourse forum. For this, I had to create a minimalistic pure VTK code. You can check out my code as well as the post &lt;a class="reference external" href="https://discourse.vtk.org/t/how-to-connect-shaders-to-actor2d/9384"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Working on the rotation slider and the polyline.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-14-week-15-praneeth.html" rel="alternate"/>
+    <summary>This week I started with highlighting the shapes. As discussed earlier, I had two ways, but while implementing them, I found out both ways aren’t that good to continue with.
+The first way in which we thought of creating the scaled shapes in the background had an issue with the stacking. The border(blue rectangle) and the shape(grey rectangle) both seem to look like different shapes just grouped together as shown below.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-14T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-21-week-16-praneeth.html</id>
+    <title>Week 16 - Working with Rotations!</title>
+    <updated>2022-09-21T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-16-working-with-rotations"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;Last week my mentors noticed that each &lt;cite&gt;DrawShape&lt;/cite&gt; has its individual &lt;cite&gt;rotation_slider&lt;/cite&gt; which increases redundancy and complexity in setting its visibility on and off. Instead, they suggested moving the &lt;cite&gt;rotation_slider&lt;/cite&gt; to &lt;cite&gt;DrawPanel&lt;/cite&gt; and keeping a common slider for all the shapes.&lt;/p&gt;
+&lt;p&gt;PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/688"&gt;#688&lt;/a&gt; does the above mentioned thing.
+There isn’t any visual difference as everything is as it was earlier, just the code was modified a bit to make it work properly.&lt;/p&gt;
+&lt;p&gt;After this, I started working with the rotation for the &lt;cite&gt;Polyline&lt;/cite&gt; feature. For rotating the &lt;cite&gt;Polyline&lt;/cite&gt;, I implemented something similar to what I had did while rotating the individual shapes. Firstly I calculate the bounding box and the center of the shape, then apply the rotation to the points through which the polyline was generated.&lt;/p&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/ganimtron-10/fury/tree/polyline-with-grouping"&gt;Polyline:&lt;/a&gt;&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/64432063/193308748-6bc14acb-b687-4d88-9c41-12991186a104.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/193308748-6bc14acb-b687-4d88-9c41-12991186a104.gif" style="width: 400px;" /&gt;
+&lt;p&gt;As we can see above the rotation seems correct but as earlier the shape is translating from its original center. This should be easy to fix.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Instead of implementing the approaches for creating and managing the &lt;cite&gt;Polyline&lt;/cite&gt;, I kept on thinking of various ideas on how I could do so, which wasted my time. I should have thought about some approaches and tried to implement them so that I would get an idea of whether things would work or not.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;Working on &lt;cite&gt;Polyline&lt;/cite&gt; to make sure everything works fine.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-21-week-16-praneeth.html" rel="alternate"/>
+    <summary>Last week my mentors noticed that each DrawShape has its individual rotation_slider which increases redundancy and complexity in setting its visibility on and off. Instead, they suggested moving the rotation_slider to DrawPanel and keeping a common slider for all the shapes.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-21T00:00:00+00:00</published>
+  </entry>
+</feed>
