@@ -12,7 +12,7 @@ from fury import window, actor
 from dipy.data import fetch_bundles_2_subjects, read_bundles_2_subjects
 from dipy.tracking.streamline import transform_streamlines, length
 
-interactive = True  # False  # set to True to show the interactive display window
+interactive = False  # set to True to show the interactive display window
 
 fetch_bundles_2_subjects()
 dix = read_bundles_2_subjects(subj_id='subj_1', metrics=['fa'],
