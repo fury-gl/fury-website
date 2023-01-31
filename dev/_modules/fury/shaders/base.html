@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.shaders.base &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.shaders.base &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -278,59 +278,66 @@
               
   <h1>Source code for fury.shaders.base</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">enable_warnings</span>
 <span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecate_with_version</span>
 <span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_text</span>
-<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span><span class="n">VTK_OBJECT</span><span class="p">,</span> <span class="n">Command</span><span class="p">,</span> <span class="n">DataObject</span><span class="p">,</span> <span class="n">Shader</span><span class="p">,</span> <span class="n">calldata_type</span><span class="p">,</span>
-                      <span class="n">numpy_support</span><span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">VTK_OBJECT</span><span class="p">,</span>
+    <span class="n">Command</span><span class="p">,</span>
+    <span class="n">DataObject</span><span class="p">,</span>
+    <span class="n">Shader</span><span class="p">,</span>
+    <span class="n">calldata_type</span><span class="p">,</span>
+    <span class="n">numpy_support</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">SHADERS_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
 <span class="n">SHADERS_EXTS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.glsl&#39;</span><span class="p">,</span> <span class="s1">&#39;.vert&#39;</span><span class="p">,</span> <span class="s1">&#39;.tesc&#39;</span><span class="p">,</span> <span class="s1">&#39;.tese&#39;</span><span class="p">,</span> <span class="s1">&#39;.geom&#39;</span><span class="p">,</span> <span class="s1">&#39;.frag&#39;</span><span class="p">,</span> <span class="s1">&#39;.comp&#39;</span><span class="p">]</span>
 
-<span class="n">SHADERS_TYPE</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vertex&quot;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Geometry</span><span class="p">,</span>
-                <span class="s2">&quot;fragment&quot;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">}</span>
+<span class="n">SHADERS_TYPE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;vertex&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span>
+    <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Geometry</span><span class="p">,</span>
+    <span class="s1">&#39;fragment&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">,</span>
+<span class="p">}</span>
 
-<span class="n">REPLACEMENT_SHADERS_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertex&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span>
-                             <span class="s1">&#39;fragment&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">}</span>
+<span class="n">REPLACEMENT_SHADERS_TYPES</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;vertex&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Vertex</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">:</span> <span class="n">Shader</span><span class="o">.</span><span class="n">Fragment</span><span class="p">}</span>
 
 <span class="n">SHADERS_BLOCK</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::PositionVC&quot;</span><span class="p">,</span>  <span class="c1"># frag position in VC</span>
-    <span class="s2">&quot;normal&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Normal&quot;</span><span class="p">,</span>  <span class="c1"># optional normal declaration</span>
-    <span class="s2">&quot;light&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Light&quot;</span><span class="p">,</span>  <span class="c1"># extra lighting parameters</span>
-    <span class="s2">&quot;tcoord&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::TCoord&quot;</span><span class="p">,</span>  <span class="c1"># Texture coordinates</span>
-    <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Color&quot;</span><span class="p">,</span>  <span class="c1"># material property values</span>
-    <span class="s2">&quot;clip&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Clip&quot;</span><span class="p">,</span>  <span class="c1"># clipping plane vars</span>
-    <span class="s2">&quot;camera&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Camera&quot;</span><span class="p">,</span>  <span class="c1"># camera and actor matrix values</span>
-    <span class="s2">&quot;prim_id&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::PrimID&quot;</span><span class="p">,</span>   <span class="c1"># Apple Bug</span>
-    <span class="s2">&quot;valuepass&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::ValuePass&quot;</span><span class="p">,</span>  <span class="c1"># Value raster</span>
-    <span class="s2">&quot;output&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Output&quot;</span><span class="p">,</span>  <span class="c1"># only for geometry shader</span>
-    <span class="s2">&quot;coincident&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Coincident&quot;</span><span class="p">,</span>  <span class="c1"># handle coincident offsets</span>
-    <span class="s2">&quot;zbufer&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::ZBuffer&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;depth_peeling&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::DepthPeeling&quot;</span><span class="p">,</span>  <span class="c1"># Depth Peeling Support</span>
-    <span class="s2">&quot;picking&quot;</span><span class="p">:</span> <span class="s2">&quot;//VTK::Picking&quot;</span>  <span class="c1"># picking support</span>
+    <span class="s1">&#39;position&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::PositionVC&#39;</span><span class="p">,</span>  <span class="c1"># frag position in VC</span>
+    <span class="s1">&#39;normal&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Normal&#39;</span><span class="p">,</span>  <span class="c1"># optional normal declaration</span>
+    <span class="s1">&#39;light&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Light&#39;</span><span class="p">,</span>  <span class="c1"># extra lighting parameters</span>
+    <span class="s1">&#39;tcoord&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::TCoord&#39;</span><span class="p">,</span>  <span class="c1"># Texture coordinates</span>
+    <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Color&#39;</span><span class="p">,</span>  <span class="c1"># material property values</span>
+    <span class="s1">&#39;clip&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Clip&#39;</span><span class="p">,</span>  <span class="c1"># clipping plane vars</span>
+    <span class="s1">&#39;camera&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Camera&#39;</span><span class="p">,</span>  <span class="c1"># camera and actor matrix values</span>
+    <span class="s1">&#39;prim_id&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::PrimID&#39;</span><span class="p">,</span>  <span class="c1"># Apple Bug</span>
+    <span class="s1">&#39;valuepass&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::ValuePass&#39;</span><span class="p">,</span>  <span class="c1"># Value raster</span>
+    <span class="s1">&#39;output&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Output&#39;</span><span class="p">,</span>  <span class="c1"># only for geometry shader</span>
+    <span class="s1">&#39;coincident&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Coincident&#39;</span><span class="p">,</span>  <span class="c1"># handle coincident offsets</span>
+    <span class="s1">&#39;zbufer&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::ZBuffer&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;depth_peeling&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::DepthPeeling&#39;</span><span class="p">,</span>  <span class="c1"># Depth Peeling Support</span>
+    <span class="s1">&#39;picking&#39;</span><span class="p">:</span> <span class="s1">&#39;//VTK::Picking&#39;</span><span class="p">,</span>  <span class="c1"># picking support</span>
 <span class="p">}</span>
 
 <span class="c1"># See [1] for a more extensive list of OpenGL constants</span>
 <span class="c1"># [1] https://docs.factorcode.org/content/vocab-opengl.gl.html</span>
 <span class="n">GL_NUMBERS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;GL_ONE&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;GL_ZERO&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s2">&quot;GL_BLEND&quot;</span><span class="p">:</span> <span class="mi">3042</span><span class="p">,</span>
-    <span class="s2">&quot;GL_ONE_MINUS_SRC_ALPHA&quot;</span><span class="p">:</span> <span class="mi">771</span><span class="p">,</span>
-    <span class="s2">&quot;GL_SRC_ALPHA&quot;</span><span class="p">:</span> <span class="mi">770</span><span class="p">,</span>
-    <span class="s2">&quot;GL_DEPTH_TEST&quot;</span><span class="p">:</span> <span class="mi">2929</span><span class="p">,</span>
-    <span class="s2">&quot;GL_DST_COLOR&quot;</span><span class="p">:</span> <span class="mi">774</span><span class="p">,</span>
-    <span class="s2">&quot;GL_FUNC_SUBTRACT&quot;</span><span class="p">:</span> <span class="mi">3277</span><span class="p">,</span>
-    <span class="s2">&quot;GL_CULL_FACE&quot;</span><span class="p">:</span> <span class="mi">2884</span><span class="p">,</span>
-    <span class="s2">&quot;GL_ALPHA_TEST&quot;</span><span class="p">:</span> <span class="mi">3008</span><span class="p">,</span>
-    <span class="s2">&quot;GL_CW&quot;</span><span class="p">:</span> <span class="mi">2304</span><span class="p">,</span>
-    <span class="s2">&quot;GL_CCW&quot;</span><span class="p">:</span> <span class="mi">2305</span><span class="p">,</span>
-    <span class="s2">&quot;GL_ONE_MINUS_SRC_COLOR&quot;</span><span class="p">:</span> <span class="mi">769</span><span class="p">,</span>
-    <span class="s2">&quot;GL_SRC_COLOR&quot;</span><span class="p">:</span> <span class="mi">768</span>
+    <span class="s1">&#39;GL_ONE&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;GL_ZERO&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;GL_BLEND&#39;</span><span class="p">:</span> <span class="mi">3042</span><span class="p">,</span>
+    <span class="s1">&#39;GL_ONE_MINUS_SRC_ALPHA&#39;</span><span class="p">:</span> <span class="mi">771</span><span class="p">,</span>
+    <span class="s1">&#39;GL_SRC_ALPHA&#39;</span><span class="p">:</span> <span class="mi">770</span><span class="p">,</span>
+    <span class="s1">&#39;GL_DEPTH_TEST&#39;</span><span class="p">:</span> <span class="mi">2929</span><span class="p">,</span>
+    <span class="s1">&#39;GL_DST_COLOR&#39;</span><span class="p">:</span> <span class="mi">774</span><span class="p">,</span>
+    <span class="s1">&#39;GL_FUNC_SUBTRACT&#39;</span><span class="p">:</span> <span class="mi">3277</span><span class="p">,</span>
+    <span class="s1">&#39;GL_CULL_FACE&#39;</span><span class="p">:</span> <span class="mi">2884</span><span class="p">,</span>
+    <span class="s1">&#39;GL_ALPHA_TEST&#39;</span><span class="p">:</span> <span class="mi">3008</span><span class="p">,</span>
+    <span class="s1">&#39;GL_CW&#39;</span><span class="p">:</span> <span class="mi">2304</span><span class="p">,</span>
+    <span class="s1">&#39;GL_CCW&#39;</span><span class="p">:</span> <span class="mi">2305</span><span class="p">,</span>
+    <span class="s1">&#39;GL_ONE_MINUS_SRC_COLOR&#39;</span><span class="p">:</span> <span class="mi">769</span><span class="p">,</span>
+    <span class="s1">&#39;GL_SRC_COLOR&#39;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -348,7 +355,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">glsl_code</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">glsl_code</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The only supported format are string.&#39;</span><span class="p">)</span>
@@ -356,7 +363,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">glsl_code</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">glsl_code</span>
 
-    <span class="n">code</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">code</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">glsl_code</span><span class="p">:</span>
         <span class="n">code</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="n">code</span> <span class="o">+=</span> <span class="n">content</span>
@@ -401,14 +408,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">file_ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">shader_file</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">file_ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">SHADERS_EXTS</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;Shader file &quot;</span><span class="si">{}</span><span class="s1">&quot; does not have one of the supported &#39;</span>
-                      <span class="s1">&#39;extensions: </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shader_file</span><span class="p">,</span> <span class="n">SHADERS_EXTS</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+            <span class="s1">&#39;Shader file &quot;</span><span class="si">{}</span><span class="s1">&quot; does not have one of the supported &#39;</span>
+            <span class="s1">&#39;extensions: </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">shader_file</span><span class="p">,</span> <span class="n">SHADERS_EXTS</span><span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">return</span> <span class="n">load_text</span><span class="p">(</span><span class="n">shader_file</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.load">[docs]</a><span class="nd">@deprecate_with_version</span><span class="p">(</span>
     <span class="n">message</span><span class="o">=</span><span class="s1">&#39;Load function has been reimplemented as import_fury_shader.&#39;</span><span class="p">,</span>
-    <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.8.1&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.9.0&#39;</span><span class="p">)</span>
+    <span class="n">since</span><span class="o">=</span><span class="s1">&#39;0.8.1&#39;</span><span class="p">,</span>
+    <span class="n">until</span><span class="o">=</span><span class="s1">&#39;0.9.0&#39;</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a Fury shader file.</span>
 
@@ -427,9 +438,17 @@
         <span class="k">return</span> <span class="n">shader_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="shader_to_actor"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.shader_to_actor">[docs]</a><span class="k">def</span> <span class="nf">shader_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">shader_type</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-                    <span class="n">block</span><span class="o">=</span><span class="s2">&quot;valuepass&quot;</span><span class="p">,</span> <span class="n">keep_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">replace_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">replace_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="shader_to_actor"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.shader_to_actor">[docs]</a><span class="k">def</span> <span class="nf">shader_to_actor</span><span class="p">(</span>
+    <span class="n">actor</span><span class="p">,</span>
+    <span class="n">shader_type</span><span class="p">,</span>
+    <span class="n">impl_code</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">decl_code</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">block</span><span class="o">=</span><span class="s1">&#39;valuepass&#39;</span><span class="p">,</span>
+    <span class="n">keep_default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">replace_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">replace_all</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply your own substitutions to the shader creation process.</span>
 
 <span class="sd">    A set of string replacements is applied to a shader template. This</span>
@@ -468,35 +487,37 @@
     <span class="n">shader_type</span> <span class="o">=</span> <span class="n">shader_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">shader_type</span> <span class="o">=</span> <span class="n">REPLACEMENT_SHADERS_TYPES</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">shader_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">shader_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid Shader Type. Please choose between &quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid Shader Type. Please choose between &#39;</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">REPLACEMENT_SHADERS_TYPES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="n">block</span> <span class="o">=</span> <span class="n">block</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">block</span> <span class="o">=</span> <span class="n">SHADERS_BLOCK</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid Shader Type. Please choose between &quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid Shader Type. Please choose between &#39;</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SHADERS_BLOCK</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="n">block_dec</span> <span class="o">=</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">&quot;::Dec&quot;</span>
-    <span class="n">block_impl</span> <span class="o">=</span> <span class="n">block</span> <span class="o">+</span> <span class="s2">&quot;::Impl&quot;</span>
+    <span class="n">block_dec</span> <span class="o">=</span> <span class="n">block</span> <span class="o">+</span> <span class="s1">&#39;::Dec&#39;</span>
+    <span class="n">block_impl</span> <span class="o">=</span> <span class="n">block</span> <span class="o">+</span> <span class="s1">&#39;::Impl&#39;</span>
 
     <span class="k">if</span> <span class="n">keep_default</span><span class="p">:</span>
-        <span class="n">decl_code</span> <span class="o">=</span> <span class="n">block_dec</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">decl_code</span>
-        <span class="n">impl_code</span> <span class="o">=</span> <span class="n">block_impl</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">impl_code</span>
+        <span class="n">decl_code</span> <span class="o">=</span> <span class="n">block_dec</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">decl_code</span>
+        <span class="n">impl_code</span> <span class="o">=</span> <span class="n">block_impl</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">impl_code</span>
 
     <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
         <span class="n">enable_warnings</span><span class="p">()</span>
-        <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">--- DEBUG: THIS LINE GENERATES AN ERROR ---</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+        <span class="n">error_msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">--- DEBUG: THIS LINE GENERATES AN ERROR ---</span><span class="se">\n\n</span><span class="s1">&#39;</span>
         <span class="n">impl_code</span> <span class="o">+=</span> <span class="n">error_msg</span>
 
     <span class="n">sp</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetShaderProperty</span><span class="p">()</span>
 
-    <span class="n">sp</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span><span class="n">shader_type</span><span class="p">,</span> <span class="n">block_dec</span><span class="p">,</span> <span class="n">replace_first</span><span class="p">,</span>
-                            <span class="n">decl_code</span><span class="p">,</span> <span class="n">replace_all</span><span class="p">)</span>
-    <span class="n">sp</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span><span class="n">shader_type</span><span class="p">,</span> <span class="n">block_impl</span><span class="p">,</span> <span class="n">replace_first</span><span class="p">,</span>
-                            <span class="n">impl_code</span><span class="p">,</span> <span class="n">replace_all</span><span class="p">)</span></div>
+    <span class="n">sp</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">shader_type</span><span class="p">,</span> <span class="n">block_dec</span><span class="p">,</span> <span class="n">replace_first</span><span class="p">,</span> <span class="n">decl_code</span><span class="p">,</span> <span class="n">replace_all</span>
+    <span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">AddShaderReplacement</span><span class="p">(</span>
+        <span class="n">shader_type</span><span class="p">,</span> <span class="n">block_impl</span><span class="p">,</span> <span class="n">replace_first</span><span class="p">,</span> <span class="n">impl_code</span><span class="p">,</span> <span class="n">replace_all</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="replace_shader_in_actor"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.replace_shader_in_actor">[docs]</a><span class="k">def</span> <span class="nf">replace_shader_in_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">shader_type</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
@@ -513,14 +534,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">function_name</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;vertex&quot;</span><span class="p">:</span> <span class="s2">&quot;SetVertexShaderCode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;fragment&quot;</span><span class="p">:</span> <span class="s2">&quot;SetFragmentShaderCode&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="s2">&quot;SetGeometryShaderCode&quot;</span>
+        <span class="s1">&#39;vertex&#39;</span><span class="p">:</span> <span class="s1">&#39;SetVertexShaderCode&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fragment&#39;</span><span class="p">:</span> <span class="s1">&#39;SetFragmentShaderCode&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="s1">&#39;SetGeometryShaderCode&#39;</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">shader_type</span> <span class="o">=</span> <span class="n">shader_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
     <span class="n">function</span> <span class="o">=</span> <span class="n">function_name</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">shader_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Invalid Shader Type. Please choose between &quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid Shader Type. Please choose between &#39;</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">function_name</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -528,7 +549,7 @@
     <span class="nb">getattr</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">function</span><span class="p">)(</span><span class="n">code</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="add_shader_callback"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.add_shader_callback">[docs]</a><span class="k">def</span> <span class="nf">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+<div class="viewcode-block" id="add_shader_callback"><a class="viewcode-back" href="../../../reference/fury.shaders.html#fury.actor.add_shader_callback">[docs]</a><span class="k">def</span> <span class="nf">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a shader callback to the actor.</span>
 
 <span class="sd">    Parameters</span>
@@ -587,13 +608,16 @@
 <span class="sd">        # test_values = [999, 500, 0, 999, 500, 0, ...]</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@calldata_type</span><span class="p">(</span><span class="n">VTK_OBJECT</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">cbk</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">callback</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">calldata</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">priority</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">            add_shader_callback priority argument shoud be a float/int&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            add_shader_callback priority argument shoud be a float/int&quot;&quot;&quot;</span>
+        <span class="p">)</span>
 
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span>
     <span class="n">id_observer</span> <span class="o">=</span> <span class="n">mapper</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="n">Command</span><span class="o">.</span><span class="n">UpdateShaderEvent</span><span class="p">,</span> <span class="n">cbk</span><span class="p">,</span> <span class="n">priority</span><span class="p">)</span>
@@ -627,9 +651,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">effects</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">effects</span> <span class="o">=</span> <span class="p">[</span><span class="n">effects</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span>
-            <span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">effects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">program</span> <span class="o">=</span> <span class="n">calldata</span>
         <span class="n">glState</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">GetState</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">program</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -637,9 +659,8 @@
                 <span class="n">func</span><span class="p">(</span><span class="n">glState</span><span class="p">)</span>
 
     <span class="n">id_observer</span> <span class="o">=</span> <span class="n">add_shader_callback</span><span class="p">(</span>
-        <span class="n">actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span>
-            <span class="n">callback</span><span class="p">,</span>
-            <span class="n">effects</span><span class="o">=</span><span class="n">effects</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">),</span> <span class="n">priority</span><span class="p">)</span>
+        <span class="n">actor</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><span class="n">effects</span><span class="p">,</span> <span class="n">window</span><span class="o">=</span><span class="n">window</span><span class="p">),</span> <span class="n">priority</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">id_observer</span></div>
 
@@ -668,7 +689,8 @@
     <span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span><span class="o">.</span><span class="n">GetInput</span><span class="p">()</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">AddArray</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span>
     <span class="n">mapper</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetMapper</span><span class="p">()</span>
     <span class="n">mapper</span><span class="o">.</span><span class="n">MapDataArrayToVertexAttribute</span><span class="p">(</span>
-        <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">DataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="n">attr_name</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="n">DataObject</span><span class="o">.</span><span class="n">FIELD_ASSOCIATION_POINTS</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="p">)</span></div>
 </pre></div>
 
             </article>

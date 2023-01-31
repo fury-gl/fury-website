@@ -27,21 +27,23 @@ in fury. In this example we specifically render a Chain oscillating to and fro.
 
 First some imports.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-16
+.. GENERATED FROM PYTHON SOURCE LINES 11-18
 
 .. code-block:: default
 
-    import numpy as np
-    from fury import window, actor, ui, utils
     import itertools
+
+    import numpy as np
     import pybullet as p
 
+    from fury import actor, ui, utils, window
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-18
+
+.. GENERATED FROM PYTHON SOURCE LINES 19-20
 
 Setup pybullet and add gravity.
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-24
+.. GENERATED FROM PYTHON SOURCE LINES 20-26
 
 .. code-block:: default
 
@@ -52,11 +54,11 @@ Setup pybullet and add gravity.
     p.setGravity(0, 0, -10)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-26
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 Now we render the Chain using the following parameters and definitions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-98
+.. GENERATED FROM PYTHON SOURCE LINES 28-106
 
 .. code-block:: default
 
@@ -70,13 +72,14 @@ Now we render the Chain using the following parameters and definitions.
 
     joint_friction = 0.0005  # rotational joint friction [N/(rad/s)]
 
-    link_shape = p.createCollisionShape(p.GEOM_CYLINDER,
-                                        radius=radii,
-                                        height=dx_link,
-                                        collisionFramePosition=[0, 0, -dx_link / 2])
+    link_shape = p.createCollisionShape(
+        p.GEOM_CYLINDER,
+        radius=radii,
+        height=dx_link,
+        collisionFramePosition=[0, 0, -dx_link / 2],
+    )
 
-    base_shape = p.createCollisionShape(p.GEOM_BOX,
-                                        halfExtents=[0.01, 0.01, 0.01])
+    base_shape = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.01, 0.01, 0.01])
 
     visualShapeId = -1
 
@@ -108,36 +111,41 @@ Now we render the Chain using the following parameters and definitions.
     link_heights = np.zeros(n_links)
     link_heights[:] = dx_link
 
-    rope_actor = actor.cylinder(centers=linkPositions,
-                                directions=linkDirections,
-                                colors=np.random.rand(n_links, 3),
-                                radius=radii,
-                                heights=link_heights, capped=True)
+    rope_actor = actor.cylinder(
+        centers=linkPositions,
+        directions=linkDirections,
+        colors=np.random.rand(n_links, 3),
+        radius=radii,
+        heights=link_heights,
+        capped=True,
+    )
 
     basePosition = [0, 0, 2]
     baseOrientation = [0, 0, 0, 1]
-    rope = p.createMultiBody(base_mass,
-                             base_shape,
-                             visualShapeId,
-                             basePosition,
-                             baseOrientation,
-                             linkMasses=link_Masses,
-                             linkCollisionShapeIndices=linkCollisionShapeIndices,
-                             linkVisualShapeIndices=linkVisualShapeIndices,
-                             linkPositions=linkPositions,
-                             linkOrientations=linkOrientations,
-                             linkInertialFramePositions=linkInertialFramePositions,
-                             linkInertialFrameOrientations=linkInertialFrameOrns,
-                             linkParentIndices=indices,
-                             linkJointTypes=jointTypes,
-                             linkJointAxis=axis)
+    rope = p.createMultiBody(
+        base_mass,
+        base_shape,
+        visualShapeId,
+        basePosition,
+        baseOrientation,
+        linkMasses=link_Masses,
+        linkCollisionShapeIndices=linkCollisionShapeIndices,
+        linkVisualShapeIndices=linkVisualShapeIndices,
+        linkPositions=linkPositions,
+        linkOrientations=linkOrientations,
+        linkInertialFramePositions=linkInertialFramePositions,
+        linkInertialFrameOrientations=linkInertialFrameOrns,
+        linkParentIndices=indices,
+        linkJointTypes=jointTypes,
+        linkJointAxis=axis,
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-100
+.. GENERATED FROM PYTHON SOURCE LINES 107-108
 
 We remove stiffness among the joints by adding friction to them.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-111
+.. GENERATED FROM PYTHON SOURCE LINES 108-123
 
 .. code-block:: default
 
@@ -145,44 +153,50 @@ We remove stiffness among the joints by adding friction to them.
     friction_vec = [joint_friction] * 3  # same all axis
     control_mode = p.POSITION_CONTROL  # set pos control mode
     for j in range(p.getNumJoints(rope)):
-        p.setJointMotorControlMultiDof(rope, j, control_mode,
-                                       targetPosition=[0, 0, 0, 1],
-                                       targetVelocity=[0, 0, 0],
-                                       positionGain=0,
-                                       velocityGain=1,
-                                       force=friction_vec)
+        p.setJointMotorControlMultiDof(
+            rope,
+            j,
+            control_mode,
+            targetPosition=[0, 0, 0, 1],
+            targetVelocity=[0, 0, 0],
+            positionGain=0,
+            velocityGain=1,
+            force=friction_vec,
+        )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 124-126
 
 Next, we define a constraint base that will help us in the oscillation of the
 chain.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-129
+.. GENERATED FROM PYTHON SOURCE LINES 126-143
 
 .. code-block:: default
 
 
-    root_robe_c = p.createConstraint(rope, -1, -1, -1,
-                                     p.JOINT_FIXED, [0, 0, 0],
-                                     [0, 0, 0], [0, 0, 2])
+    root_robe_c = p.createConstraint(
+        rope, -1, -1, -1, p.JOINT_FIXED, [0, 0, 0], [0, 0, 0], [0, 0, 2]
+    )
 
     # some traj to inject motion
     amplitude_x = 0.3
     amplitude_y = 0.0
     freq = 0.6
 
-    base_actor = actor.box(centers=np.array([[0, 0, 0]]),
-                           directions=np.array([[0, 0, 0]]),
-                           scales=(0.02, 0.02, 0.02),
-                           colors=np.array([[1, 0, 0]]))
+    base_actor = actor.box(
+        centers=np.array([[0, 0, 0]]),
+        directions=np.array([[0, 0, 0]]),
+        scales=(0.02, 0.02, 0.02),
+        colors=np.array([[1, 0, 0]]),
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-131
+.. GENERATED FROM PYTHON SOURCE LINES 144-145
 
 We add the necessary actors to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-150
+.. GENERATED FROM PYTHON SOURCE LINES 145-163
 
 .. code-block:: default
 
@@ -195,10 +209,9 @@ We add the necessary actors to the scene.
     scene.add(base_actor)
 
     # Create show manager.
-    showm = window.ShowManager(scene,
-                               size=(900, 768), reset_camera=False,
-                               order_transparent=True)
-
+    showm = window.ShowManager(
+        scene, size=(900, 768), reset_camera=False, order_transparent=True
+    )
 
 
     # Counter interator for tracking simulation steps.
@@ -206,11 +219,11 @@ We add the necessary actors to the scene.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 164-165
 
 We define a couple of syncing methods for the base and chain.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-187
+.. GENERATED FROM PYTHON SOURCE LINES 165-202
 
 .. code-block:: default
 
@@ -238,30 +251,33 @@ We define a couple of syncing methods for the base and chain.
 
             rot_mat = np.reshape(
                 p.getMatrixFromQuaternion(
-                    p.getDifferenceQuaternion(orn, linkOrientations[joint])),
-                (3, 3))
+                    p.getDifferenceQuaternion(orn, linkOrientations[joint])
+                ),
+                (3, 3),
+            )
 
-            vertices[joint * sec: joint * sec + sec] = \
-                (vertices[joint * sec: joint * sec + sec] -
-                 linkPositions[joint]) @ rot_mat + pos
+            vertices[joint * sec : joint * sec + sec] = (
+                vertices[joint * sec : joint * sec + sec] - linkPositions[joint]
+            ) @ rot_mat + pos
 
             linkPositions[joint] = pos
             linkOrientations[joint] = orn
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 188-189
+.. GENERATED FROM PYTHON SOURCE LINES 203-204
 
 We define a TextBlock to display the Avg. FPS and Simulation steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-199
+.. GENERATED FROM PYTHON SOURCE LINES 204-215
 
 .. code-block:: default
 
 
     fpss = np.array([])
-    tb = ui.TextBlock2D(position=(0, 680), font_size=30, color=(1, 0.5, 0),
-                        text="Avg. FPS: \nSim Steps: ")
+    tb = ui.TextBlock2D(
+        position=(0, 680), font_size=30, color=(1, 0.5, 0), text='Avg. FPS: \nSim Steps: '
+    )
     scene.add(tb)
 
     t = 0.0
@@ -269,11 +285,11 @@ We define a TextBlock to display the Avg. FPS and Simulation steps.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-201
+.. GENERATED FROM PYTHON SOURCE LINES 216-217
 
 Timer callback to sync objects, simulate steps and oscillate the base.
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-250
+.. GENERATED FROM PYTHON SOURCE LINES 217-266
 
 .. code-block:: default
 
@@ -284,13 +300,14 @@ Timer callback to sync objects, simulate steps and oscillate the base.
         global t, fpss
         showm.render()
 
-        t += 1. / freq_sim
+        t += 1.0 / freq_sim
 
         if cnt % 1 == 0:
             fps = showm.frame_rate
             fpss = np.append(fpss, fps)
-            tb.message = "Avg. FPS: " + str(np.round(np.mean(fpss), 0)) + \
-                         "\nSim Steps: " + str(cnt)
+            tb.message = (
+                'Avg. FPS: ' + str(np.round(np.mean(fpss), 0)) + '\nSim Steps: ' + str(cnt)
+            )
 
         # some trajectory
         ux = amplitude_x * np.sin(2 * np.pi * freq * t)
@@ -299,8 +316,7 @@ Timer callback to sync objects, simulate steps and oscillate the base.
         # move base around
         pivot = [3 * ux, uy, 2]
         orn = p.getQuaternionFromEuler([0, 0, 0])
-        p.changeConstraint(root_robe_c, pivot, jointChildFrameOrientation=orn,
-                           maxForce=500)
+        p.changeConstraint(root_robe_c, pivot, jointChildFrameOrientation=orn, maxForce=500)
 
         # Sync base and chain.
         sync_actor(base_actor, rope)
@@ -325,7 +341,7 @@ Timer callback to sync objects, simulate steps and oscillate the base.
     if interactive:
         showm.start()
 
-    window.record(scene, size=(900, 768), out_path="viz_chain.png")
+    window.record(scene, size=(900, 768), out_path='viz_chain.png')
 
 
 .. rst-class:: sphx-glr-timing

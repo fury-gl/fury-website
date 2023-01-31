@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.colormap &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.colormap &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -277,22 +277,28 @@
             <article class="bd-article" role="main">
               
   <h1>Source code for fury.colormap</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<span></span><span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <span class="n">pjoin</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">linalg</span>
 
 <span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
 <span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">LookupTable</span>
+
 <span class="c1"># Allow import, but disable doctests if we don&#39;t have matplotlib</span>
 <span class="kn">from</span> <span class="nn">fury.optpkg</span> <span class="kn">import</span> <span class="n">optional_package</span>
+
 <span class="n">cm</span><span class="p">,</span> <span class="n">have_matplotlib</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">optional_package</span><span class="p">(</span><span class="s1">&#39;matplotlib.cm&#39;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="colormap_lookup_table"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.colormap_lookup_table">[docs]</a><span class="k">def</span> <span class="nf">colormap_lookup_table</span><span class="p">(</span><span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">hue_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                          <span class="n">saturation_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">)):</span>
+<div class="viewcode-block" id="colormap_lookup_table"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.colormap_lookup_table">[docs]</a><span class="k">def</span> <span class="nf">colormap_lookup_table</span><span class="p">(</span>
+    <span class="n">scale_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">hue_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">saturation_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">value_range</span><span class="o">=</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lookup table for the colormap.</span>
 
 <span class="sd">    Parameters</span>
@@ -333,7 +339,7 @@
 
 
 <div class="viewcode-block" id="boys2rgb"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.boys2rgb">[docs]</a><span class="k">def</span> <span class="nf">boys2rgb</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot; boys 2 rgb cool colormap</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;boys 2 rgb cool colormap</span>
 
 <span class="sd">    Maps a given field of undirected lines (line field) to rgb</span>
 <span class="sd">    colors using Boy&#39;s Surface immersion of the real projective</span>
@@ -380,9 +386,9 @@
         <span class="n">y</span> <span class="o">=</span> <span class="n">v</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">z</span> <span class="o">=</span> <span class="n">v</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span>
 
-    <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="n">z2</span> <span class="o">=</span> <span class="n">z</span> <span class="o">**</span> <span class="mi">2</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">z</span><span class="o">**</span><span class="mi">2</span>
 
     <span class="n">x3</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">x2</span>
     <span class="n">y3</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y2</span>
@@ -394,12 +400,12 @@
     <span class="n">xz</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="n">z</span>
     <span class="n">yz</span> <span class="o">=</span> <span class="n">y</span> <span class="o">*</span> <span class="n">z</span>
 
-    <span class="n">hh1</span> <span class="o">=</span> <span class="mf">.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.58</span>
+    <span class="n">hh1</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.58</span>
     <span class="n">hh2</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">xz</span> <span class="o">/</span> <span class="mf">2.745</span>
     <span class="n">hh3</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">yz</span> <span class="o">/</span> <span class="mf">2.745</span>
     <span class="n">hh4</span> <span class="o">=</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.745</span>
     <span class="n">hh5</span> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="n">xy</span> <span class="o">/</span> <span class="mf">5.5</span>
-    <span class="n">hh6</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">1.176</span><span class="p">)</span> <span class="o">*</span> <span class="mf">.125</span> <span class="o">*</span> <span class="p">(</span><span class="mi">35</span> <span class="o">*</span> <span class="n">z4</span> <span class="o">-</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">hh6</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">1.176</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.125</span> <span class="o">*</span> <span class="p">(</span><span class="mi">35</span> <span class="o">*</span> <span class="n">z4</span> <span class="o">-</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">hh7</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">z3</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.737</span>
     <span class="n">hh8</span> <span class="o">=</span> <span class="mf">2.5</span> <span class="o">*</span> <span class="n">y</span> <span class="o">*</span> <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">z3</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.737</span>
     <span class="n">hh9</span> <span class="o">=</span> <span class="p">((</span><span class="n">x2</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="mf">7.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">z2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">/</span> <span class="mf">15.85</span>
@@ -416,10 +422,10 @@
     <span class="n">cc23</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">2.71</span><span class="p">,</span> <span class="n">s0</span><span class="p">)</span>
     <span class="n">ss45</span> <span class="o">=</span> <span class="n">ss</span><span class="p">(</span><span class="mf">2.12</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
     <span class="n">cc45</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">2.12</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
-    <span class="n">ss67</span> <span class="o">=</span> <span class="n">ss</span><span class="p">(</span><span class="mf">.972</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
-    <span class="n">cc67</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">.972</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
-    <span class="n">ss89</span> <span class="o">=</span> <span class="n">ss</span><span class="p">(</span><span class="mf">.868</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span>
-    <span class="n">cc89</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">.868</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span>
+    <span class="n">ss67</span> <span class="o">=</span> <span class="n">ss</span><span class="p">(</span><span class="mf">0.972</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">cc67</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">0.972</span><span class="p">,</span> <span class="n">s2</span><span class="p">)</span>
+    <span class="n">ss89</span> <span class="o">=</span> <span class="n">ss</span><span class="p">(</span><span class="mf">0.868</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span>
+    <span class="n">cc89</span> <span class="o">=</span> <span class="n">cc</span><span class="p">(</span><span class="mf">0.868</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span>
 
     <span class="n">X</span> <span class="o">=</span> <span class="mf">0.0</span>
 
@@ -511,8 +517,9 @@
         <span class="n">orientn</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">orientn</span><span class="o">.</span><span class="n">shape</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="p">,)</span>
         <span class="n">orient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">orientn</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">orientn</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">))</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Wrong vector dimension, It should be an array&quot;</span>
-                      <span class="s2">&quot; with a shape (N, 3)&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
+            <span class="s1">&#39;Wrong vector dimension, It should be an array&#39;</span> <span class="s1">&#39; with a shape (N, 3)&#39;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">orient</span></div>
 
@@ -531,12 +538,14 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">cmap</span> <span class="o">==</span> <span class="s1">&#39;rgb_standard&#39;</span><span class="p">:</span>
-        <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">orient2rgb</span><span class="p">(</span><span class="n">streamline</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">streamline</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="n">streamlines</span><span class="p">]</span>
+        <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">orient2rgb</span><span class="p">(</span><span class="n">streamline</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">streamline</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="n">streamlines</span>
+        <span class="p">]</span>
 
     <span class="k">if</span> <span class="n">cmap</span> <span class="o">==</span> <span class="s1">&#39;boys_standard&#39;</span><span class="p">:</span>
-        <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">boys2rgb</span><span class="p">(</span><span class="n">streamline</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">streamline</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="n">streamlines</span><span class="p">]</span>
+        <span class="n">col_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">boys2rgb</span><span class="p">(</span><span class="n">streamline</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">streamline</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">streamline</span> <span class="ow">in</span> <span class="n">streamlines</span>
+        <span class="p">]</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">col_list</span><span class="p">)</span></div>
 
@@ -547,15 +556,17 @@
 
 <div class="viewcode-block" id="get_cmap"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.get_cmap">[docs]</a><span class="k">def</span> <span class="nf">get_cmap</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Make a callable, similar to maptlotlib.pyplot.get_cmap.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;accent&quot;</span><span class="p">:</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The `Accent` colormap is deprecated as of version&quot;</span> <span class="o">+</span>
-             <span class="s2">&quot; 0.2 of Fury and will be removed in a future &quot;</span> <span class="o">+</span>
-             <span class="s2">&quot;version. Please use another colormap&quot;</span><span class="p">,</span>
-             <span class="ne">PendingDeprecationWarning</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;accent&#39;</span><span class="p">:</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;The `Accent` colormap is deprecated as of version&#39;</span>
+            <span class="o">+</span> <span class="s1">&#39; 0.2 of Fury and will be removed in a future &#39;</span>
+            <span class="o">+</span> <span class="s1">&#39;version. Please use another colormap&#39;</span><span class="p">,</span>
+            <span class="ne">PendingDeprecationWarning</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">global</span> <span class="n">dipy_cmaps</span>
     <span class="k">if</span> <span class="n">dipy_cmaps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s2">&quot;dipy_colormaps.json&quot;</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">pjoin</span><span class="p">(</span><span class="n">DATA_DIR</span><span class="p">,</span> <span class="s1">&#39;dipy_colormaps.json&#39;</span><span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">dipy_cmaps</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
@@ -604,8 +615,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">have_matplotlib</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;You do not have Matplotlib installed. Some colormaps&quot;</span>
-        <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot; might not work for you. Consider downloading Matplotlib.&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;You do not have Matplotlib installed. Some colormaps&#39;</span>
+        <span class="n">msg</span> <span class="o">+=</span> <span class="s1">&#39; might not work for you. Consider downloading Matplotlib.&#39;</span>
         <span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;jet&#39;</span><span class="p">:</span>
@@ -627,7 +638,7 @@
 
     <span class="n">colormap</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="n">newname</span><span class="p">)</span> <span class="k">if</span> <span class="n">have_matplotlib</span> <span class="k">else</span> <span class="n">get_cmap</span><span class="p">(</span><span class="n">newname</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">e_s</span> <span class="o">=</span> <span class="s2">&quot;Colormap </span><span class="si">{}</span><span class="s2"> is not yet implemented &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">e_s</span> <span class="o">=</span> <span class="s1">&#39;Colormap </span><span class="si">{}</span><span class="s1"> is not yet implemented &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e_s</span><span class="p">)</span>
 
     <span class="n">rgba</span> <span class="o">=</span> <span class="n">colormap</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
@@ -689,19 +700,19 @@
     <span class="n">var_Z</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">ref_Z</span>
 
     <span class="n">idx</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
-    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span>
+    <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_X</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span>
 
     <span class="n">idx</span> <span class="o">=</span> <span class="n">var_Y</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
-    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span>
+    <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Y</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span>
 
     <span class="n">idx</span> <span class="o">=</span> <span class="n">var_Z</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
-    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span>
+    <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">7.787</span> <span class="o">*</span> <span class="n">var_Z</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span> <span class="o">+</span> <span class="p">(</span><span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span>
 
     <span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mi">116</span> <span class="o">*</span> <span class="n">var_Y</span><span class="p">)</span> <span class="o">-</span> <span class="mi">16</span>
     <span class="n">A</span> <span class="o">=</span> <span class="mi">500</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_X</span> <span class="o">-</span> <span class="n">var_Y</span><span class="p">)</span>
@@ -718,17 +729,17 @@
     <span class="k">if</span> <span class="n">var_Y</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
         <span class="n">var_Y</span> <span class="o">=</span> <span class="n">var_Y</span><span class="o">**</span><span class="mi">3</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">var_Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Y</span> <span class="o">-</span> <span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+        <span class="n">var_Y</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Y</span> <span class="o">-</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
 
     <span class="k">if</span> <span class="n">var_X</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
         <span class="n">var_X</span> <span class="o">=</span> <span class="n">var_X</span><span class="o">**</span><span class="mi">3</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">var_X</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_X</span> <span class="o">-</span> <span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+        <span class="n">var_X</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_X</span> <span class="o">-</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
 
     <span class="k">if</span> <span class="n">var_Z</span><span class="o">**</span><span class="mi">3</span> <span class="o">&gt;</span> <span class="mf">0.008856</span><span class="p">:</span>
         <span class="n">var_Z</span> <span class="o">=</span> <span class="n">var_Z</span><span class="o">**</span><span class="mi">3</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">var_Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Z</span> <span class="o">-</span> <span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+        <span class="n">var_Z</span> <span class="o">=</span> <span class="p">(</span><span class="n">var_Z</span> <span class="o">-</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
 
     <span class="n">ref_X</span> <span class="o">=</span> <span class="mf">095.047</span>
     <span class="n">ref_Y</span> <span class="o">=</span> <span class="mf">100.000</span>
@@ -750,17 +761,17 @@
     <span class="n">var_B</span> <span class="o">=</span> <span class="n">var_X</span> <span class="o">*</span> <span class="mf">00.0557</span> <span class="o">+</span> <span class="n">var_Y</span> <span class="o">*</span> <span class="o">-</span><span class="mf">0.2040</span> <span class="o">+</span> <span class="n">var_Z</span> <span class="o">*</span> <span class="mf">01.0570</span>
 
     <span class="k">if</span> <span class="n">var_R</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
-        <span class="n">var_R</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_R</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+        <span class="n">var_R</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_R</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">var_R</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_R</span>
 
     <span class="k">if</span> <span class="n">var_G</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
-        <span class="n">var_G</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_G</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+        <span class="n">var_G</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_G</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">var_G</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_G</span>
 
     <span class="k">if</span> <span class="n">var_B</span> <span class="o">&gt;</span> <span class="mf">0.0031308</span><span class="p">:</span>
-        <span class="n">var_B</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_B</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
+        <span class="n">var_B</span> <span class="o">=</span> <span class="mf">1.055</span> <span class="o">*</span> <span class="p">(</span><span class="n">var_B</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mf">2.4</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.055</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">var_B</span> <span class="o">=</span> <span class="mf">12.92</span> <span class="o">*</span> <span class="n">var_B</span>
 
@@ -851,7 +862,7 @@
         <span class="n">lastlab</span> <span class="o">=</span> <span class="n">bglab</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">mindist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rgb</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
         <span class="k">for</span> <span class="n">bglab_i</span> <span class="ow">in</span> <span class="n">bglab</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-            <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">lab</span><span class="o">-</span><span class="n">bglab_i</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">dist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">lab</span> <span class="o">-</span> <span class="n">bglab_i</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># Dist2 to closest previously-chosen color.</span>
             <span class="n">mindist2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">dist2</span><span class="p">,</span> <span class="n">mindist2</span><span class="p">)</span>
 
@@ -894,14 +905,14 @@
 <span class="sd">    &gt;&gt;&gt; c = colormap.hex_to_rgb(color)</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;#&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;#&#39;</span><span class="p">:</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-    <span class="n">r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;0x&quot;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
-    <span class="n">g</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;0x&quot;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span> <span class="mi">4</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
-    <span class="n">b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s2">&quot;0x&quot;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span> <span class="mi">6</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="s1">&#39;0x&#39;</span> <span class="o">+</span> <span class="n">color</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mi">255</span>
 
-    <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">]))</span></div>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">b</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="rgb2hsv"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.rgb2hsv">[docs]</a><span class="k">def</span> <span class="nf">rgb2hsv</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
@@ -938,22 +949,22 @@
     <span class="c1"># Ignore warning for zero divided by zero</span>
     <span class="n">old_settings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
     <span class="n">out_s</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">/</span> <span class="n">out_v</span>
-    <span class="n">out_s</span><span class="p">[</span><span class="n">delta</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">out_s</span><span class="p">[</span><span class="n">delta</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="c1"># -- H channel</span>
     <span class="c1"># red is max</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span>
     <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">/</span> <span class="n">delta</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
     <span class="c1"># green is max</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span><span class="p">)</span>
-    <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.</span> <span class="o">+</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">delta</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">/</span> <span class="n">delta</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
     <span class="c1"># blue is max</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span><span class="p">)</span>
-    <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.</span> <span class="o">+</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">delta</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-    <span class="n">out_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">6.</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1.</span>
-    <span class="n">out_h</span><span class="p">[</span><span class="n">delta</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">rgb</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">out_v</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">rgb</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">delta</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+    <span class="n">out_h</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1.0</span>
+    <span class="n">out_h</span><span class="p">[</span><span class="n">delta</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="o">**</span><span class="n">old_settings</span><span class="p">)</span>
 
@@ -1003,19 +1014,29 @@
 
     <span class="n">hi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">hi</span><span class="p">,</span> <span class="n">hi</span><span class="p">,</span> <span class="n">hi</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span> <span class="o">%</span> <span class="mi">6</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">choose</span><span class="p">(</span>
-        <span class="n">hi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-                      <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-                      <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-                      <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-                      <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-                      <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)]))</span>
+        <span class="n">hi</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">v</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">v</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">q</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
 
 <span class="c1"># From sRGB specification</span>
-<span class="n">xyz_from_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.412453</span><span class="p">,</span> <span class="mf">0.357580</span><span class="p">,</span> <span class="mf">0.180423</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.212671</span><span class="p">,</span> <span class="mf">0.715160</span><span class="p">,</span> <span class="mf">0.072169</span><span class="p">],</span>
-                         <span class="p">[</span><span class="mf">0.019334</span><span class="p">,</span> <span class="mf">0.119193</span><span class="p">,</span> <span class="mf">0.950227</span><span class="p">]])</span>
+<span class="n">xyz_from_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">0.412453</span><span class="p">,</span> <span class="mf">0.357580</span><span class="p">,</span> <span class="mf">0.180423</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.212671</span><span class="p">,</span> <span class="mf">0.715160</span><span class="p">,</span> <span class="mf">0.072169</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.019334</span><span class="p">,</span> <span class="mf">0.119193</span><span class="p">,</span> <span class="mf">0.950227</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
 <span class="n">rgb_from_xyz</span> <span class="o">=</span> <span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">xyz_from_rgb</span><span class="p">)</span>
 
@@ -1083,31 +1104,44 @@
 <span class="c1"># Original Implementation of this object is from scikit-image package.</span>
 <span class="c1"># it can be found at:</span>
 <span class="c1"># https://github.com/scikit-image/scikit-image/blob/main/skimage/color/colorconv.py</span>
-<span class="n">illuminants</span> <span class="o">=</span> \
-    <span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.098466069456375</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3558228003436005</span><span class="p">),</span>
-           <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.111420406956693</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3519978321919493</span><span class="p">),</span>
-           <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.098466069456375</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3558228003436005</span><span class="p">)},</span>
-     <span class="s2">&quot;B&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9909274480248003</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8531327322886154</span><span class="p">),</span>
-           <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9917777147717607</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8434930535866175</span><span class="p">),</span>
-           <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9909274480248003</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8531327322886154</span><span class="p">)},</span>
-     <span class="s2">&quot;C&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.980705971659919</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1822494939271255</span><span class="p">),</span>
-           <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9728569189782166</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1614480488951577</span><span class="p">),</span>
-           <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.980705971659919</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1822494939271255</span><span class="p">)},</span>
-     <span class="s2">&quot;D50&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9642119944211994</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8251882845188288</span><span class="p">),</span>
-             <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9672062750333777</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8142801513128616</span><span class="p">),</span>
-             <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9639501491621826</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8241280285499208</span><span class="p">)},</span>
-     <span class="s2">&quot;D55&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.956797052643698</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9214805860173273</span><span class="p">),</span>
-             <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9579665682254781</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9092525159847462</span><span class="p">),</span>
-             <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9565317453467969</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9202554587037198</span><span class="p">)},</span>
-     <span class="s2">&quot;D65&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.95047</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">1.08883</span><span class="p">),</span>
-             <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.94809667673716</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0730513595166162</span><span class="p">),</span>
-             <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9532057125493769</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0853843816469158</span><span class="p">)},</span>
-     <span class="s2">&quot;D75&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9497220898840717</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.226393520724154</span><span class="p">),</span>
-             <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9441713925645873</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.2064272211720228</span><span class="p">),</span>
-             <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9497220898840717</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.226393520724154</span><span class="p">)},</span>
-     <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
-           <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
-           <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)}}</span>
+<span class="n">illuminants</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.098466069456375</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3558228003436005</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.111420406956693</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3519978321919493</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.098466069456375</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.3558228003436005</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9909274480248003</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8531327322886154</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9917777147717607</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8434930535866175</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9909274480248003</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8531327322886154</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.980705971659919</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1822494939271255</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9728569189782166</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1614480488951577</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.980705971659919</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.1822494939271255</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;D50&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9642119944211994</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8251882845188288</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9672062750333777</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8142801513128616</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9639501491621826</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.8241280285499208</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;D55&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.956797052643698</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9214805860173273</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9579665682254781</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9092525159847462</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9565317453467969</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.9202554587037198</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;D65&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.95047</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.08883</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.94809667673716</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0730513595166162</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9532057125493769</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.0853843816469158</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;D75&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9497220898840717</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.226393520724154</span><span class="p">),</span>
+        <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9441713925645873</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.2064272211720228</span><span class="p">),</span>
+        <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9497220898840717</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">1.226393520724154</span><span class="p">),</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="s1">&#39;10&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span> <span class="s1">&#39;R&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)},</span>
+<span class="p">}</span>
 
 
 <div class="viewcode-block" id="get_xyz_coords"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.get_xyz_coords">[docs]</a><span class="k">def</span> <span class="nf">get_xyz_coords</span><span class="p">(</span><span class="n">illuminant</span><span class="p">,</span> <span class="n">observer</span><span class="p">):</span>
@@ -1139,11 +1173,13 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">illuminants</span><span class="p">[</span><span class="n">illuminant</span><span class="p">][</span><span class="n">observer</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown illuminant/observer combination &#39;</span>
-                         <span class="sa">f</span><span class="s1">&#39;(`</span><span class="si">{</span><span class="n">illuminant</span><span class="si">}</span><span class="s1">`, `</span><span class="si">{</span><span class="n">observer</span><span class="si">}</span><span class="s1">`)&#39;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;Unknown illuminant/observer combination &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;(`</span><span class="si">{</span><span class="n">illuminant</span><span class="si">}</span><span class="s1">`, `</span><span class="si">{</span><span class="n">observer</span><span class="si">}</span><span class="s1">`)&#39;</span>
+        <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="xyz2lab"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.xyz2lab">[docs]</a><span class="k">def</span> <span class="nf">xyz2lab</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s2">&quot;D65&quot;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="xyz2lab"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.xyz2lab">[docs]</a><span class="k">def</span> <span class="nf">xyz2lab</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s1">&#39;D65&#39;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s1">&#39;2&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;XYZ to CIE-LAB color space conversion.</span>
 
 <span class="sd">    Parameters</span>
@@ -1179,19 +1215,19 @@
     <span class="c1"># Nonlinear distortion and linear transformation</span>
     <span class="n">mask</span> <span class="o">=</span> <span class="n">arr</span> <span class="o">&gt;</span> <span class="mf">0.008856</span>
     <span class="n">arr</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cbrt</span><span class="p">(</span><span class="n">arr</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
-    <span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.787</span> <span class="o">*</span> <span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">16.</span> <span class="o">/</span> <span class="mf">116.</span>
+    <span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="mf">7.787</span> <span class="o">*</span> <span class="n">arr</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">+</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span>
 
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">arr</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 
     <span class="c1"># Vector scaling</span>
-    <span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">116.</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="mf">16.</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">116.0</span> <span class="o">*</span> <span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="mf">16.0</span>
     <span class="n">a</span> <span class="o">=</span> <span class="mf">500.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">b</span> <span class="o">=</span> <span class="mf">200.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="n">L</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="lab2xyz"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.lab2xyz">[docs]</a><span class="k">def</span> <span class="nf">lab2xyz</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s2">&quot;D65&quot;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="lab2xyz"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.lab2xyz">[docs]</a><span class="k">def</span> <span class="nf">lab2xyz</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s1">&#39;D65&#39;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s1">&#39;2&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CIE-LAB to XYZcolor space conversion.</span>
 
 <span class="sd">    Parameters</span>
@@ -1217,21 +1253,23 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">L</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">lab</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">lab</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="mf">16.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">116.</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="mf">500.</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="mf">200.</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">L</span> <span class="o">+</span> <span class="mf">16.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">116.0</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">/</span> <span class="mf">500.0</span><span class="p">)</span> <span class="o">+</span> <span class="n">y</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="p">(</span><span class="n">b</span> <span class="o">/</span> <span class="mf">200.0</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">z</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="n">invalid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">z</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Color data out of range: Z &lt; 0 in </span><span class="si">%s</span><span class="s1"> pixels&#39;</span> <span class="o">%</span> <span class="n">invalid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
-             <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;Color data out of range: Z &lt; 0 in </span><span class="si">%s</span><span class="s1"> pixels&#39;</span> <span class="o">%</span> <span class="n">invalid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">z</span><span class="p">[</span><span class="n">invalid</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="n">mask</span> <span class="o">=</span> <span class="n">out</span> <span class="o">&gt;</span> <span class="mf">0.2068966</span>
-    <span class="n">out</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="mf">3.</span><span class="p">)</span>
-    <span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
+    <span class="n">out</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">mask</span><span class="p">],</span> <span class="mf">3.0</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="o">~</span><span class="n">mask</span><span class="p">]</span> <span class="o">-</span> <span class="mf">16.0</span> <span class="o">/</span> <span class="mf">116.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.787</span>
 
     <span class="c1"># rescale to the reference white (illuminant)</span>
     <span class="n">xyz_ref_white</span> <span class="o">=</span> <span class="n">get_xyz_coords</span><span class="p">(</span><span class="n">illuminant</span><span class="p">,</span> <span class="n">observer</span><span class="p">)</span>
@@ -1239,7 +1277,7 @@
     <span class="k">return</span> <span class="n">out</span></div>
 
 
-<div class="viewcode-block" id="rgb2lab"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.rgb2lab">[docs]</a><span class="k">def</span> <span class="nf">rgb2lab</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s2">&quot;D65&quot;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="rgb2lab"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.rgb2lab">[docs]</a><span class="k">def</span> <span class="nf">rgb2lab</span><span class="p">(</span><span class="n">rgb</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s1">&#39;D65&#39;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s1">&#39;2&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Conversion from the sRGB color space (IEC 61966-2-1:1999)</span>
 <span class="sd">    to the CIE Lab colorspace under the given illuminant and observer.</span>
 
@@ -1269,7 +1307,7 @@
     <span class="k">return</span> <span class="n">xyz2lab</span><span class="p">(</span><span class="n">rgb2xyz</span><span class="p">(</span><span class="n">rgb</span><span class="p">),</span> <span class="n">illuminant</span><span class="p">,</span> <span class="n">observer</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="lab2rgb"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.lab2rgb">[docs]</a><span class="k">def</span> <span class="nf">lab2rgb</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s2">&quot;D65&quot;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s2">&quot;2&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="lab2rgb"><a class="viewcode-back" href="../../reference/fury.colormap.html#fury.actor.lab2rgb">[docs]</a><span class="k">def</span> <span class="nf">lab2rgb</span><span class="p">(</span><span class="n">lab</span><span class="p">,</span> <span class="n">illuminant</span><span class="o">=</span><span class="s1">&#39;D65&#39;</span><span class="p">,</span> <span class="n">observer</span><span class="o">=</span><span class="s1">&#39;2&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Lab to RGB color space conversion.</span>
 
 <span class="sd">    Parameters</span>

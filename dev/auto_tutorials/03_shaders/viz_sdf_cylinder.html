@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Make a Cylinder using polygons vs SDF &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Make a Cylinder using polygons vs SDF &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -302,12 +302,17 @@ implementation on FURY, and for the visualization using SDFs, we will
 implement shader code to create the cylinder and use a box actor to put our
 implementation inside.</p>
 <p>We start by importing the necessary modules:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
-<span class="kn">from</span> <span class="nn">fury.shaders</span> <span class="kn">import</span> <a href="../../reference/fury.shaders.html#fury.shaders.compose_shader" title="fury.shaders.compose_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">compose_shader</span></a><span class="p">,</span> <a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">,</span> <a href="../../reference/fury.shaders.html#fury.shaders.attribute_to_actor" title="fury.shaders.attribute_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">attribute_to_actor</span></a><span class="p">,</span>\
-    <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
+<span class="kn">from</span> <span class="nn">fury.shaders</span> <span class="kn">import</span> <span class="p">(</span>
+    <a href="../../reference/fury.shaders.html#fury.shaders.attribute_to_actor" title="fury.shaders.attribute_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">attribute_to_actor</span></a><span class="p">,</span>
+    <a href="../../reference/fury.shaders.html#fury.shaders.compose_shader" title="fury.shaders.compose_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">compose_shader</span></a><span class="p">,</span>
+    <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">,</span>
+    <a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <section id="cylinder-using-polygons">
@@ -320,29 +325,79 @@ model, which is translated into the use of more space to store data and more
 rendering time to display the object.</p>
 <p>Now we define some properties of our actors, use them to create a set of
 cylinders, and add them to the scene.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="o">-</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span>
-                    <span class="p">[</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span>
-                    <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">]])</span>
-<span class="n">dirs</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span>
-                 <span class="p">[</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mf">.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">.2</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="mf">.4</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-                 <span class="p">[</span><span class="mf">.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">.4</span><span class="p">]])</span>
-<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                   <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-<span class="n">radius</span> <span class="o">=</span> <span class="mf">.5</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">3.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">2.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">2.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">3.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.4</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">dirs</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.9</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">radius</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">height</span> <span class="o">=</span> <span class="mi">1</span>
 </pre></div>
 </div>
 <p>In order to see how cylinders are made, we set different resolutions (number
 of sides used to define the bases of the cylinder) to see how it changes the
 surface of the primitive.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylinders_8</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span><span class="n">centers</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dirs</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">colors</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
-                             <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-<span class="n">cylinders_16</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">],</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">],</span> <span class="n">colors</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span> <span class="mi">6</span><span class="p">],</span>
-                              <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                              <span class="n">resolution</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
-<span class="n">cylinders_32</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span><span class="n">centers</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span> <span class="mi">9</span><span class="p">],</span> <span class="n">dirs</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span> <span class="mi">9</span><span class="p">],</span> <span class="n">colors</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span> <span class="mi">9</span><span class="p">],</span>
-                              <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span> <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                              <span class="n">resolution</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cylinders_8</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+    <span class="n">dirs</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+    <span class="n">colors</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cylinders_16</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span>
+    <span class="n">dirs</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span>
+    <span class="n">colors</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="mi">6</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">cylinders_32</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">],</span>
+    <span class="n">dirs</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">],</span>
+    <span class="n">colors</span><span class="p">[</span><span class="mi">6</span><span class="p">:</span><span class="mi">9</span><span class="p">],</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radius</span><span class="p">,</span>
+    <span class="n">heights</span><span class="o">=</span><span class="n">height</span><span class="p">,</span>
+    <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, we set up a new scene to add and visualize the actors created.</p>
@@ -390,8 +445,12 @@ perfectly smooth surfaces and allows a faster rendering in comparison to
 polygon-based modeling (more details in <a class="reference internal" href="#hart1996" id="id1"><span>[Hart1996]</span></a>).</p>
 <p>Now we create cylinders using box actor and SDF implementation on shaders.
 For this, we first create a box actor.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">box_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="n">dirs</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-                      <span class="n">scales</span><span class="o">=</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">box_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span>
+    <span class="n">directions</span><span class="o">=</span><span class="n">dirs</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">radius</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Now we use attribute_to_actor to link a NumPy array, with the centers and
@@ -414,28 +473,26 @@ since we handle the processing of individual vertices in the vertex shader.</p>
 fragment shader. Here we are passing data to the fragment shader through
 the vertex shader.</p>
 <p>Vertex shaders perform basic processing of each individual vertex.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs_dec</span> <span class="o">=</span> \
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    in vec3 center;</span>
-<span class="sd">    in vec3 direction;</span>
-<span class="sd">    in float height;</span>
-<span class="sd">    in float radius;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs_dec</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    in vec3 center;</span>
+<span class="s2">    in vec3 direction;</span>
+<span class="s2">    in float height;</span>
+<span class="s2">    in float radius;</span>
 
-<span class="sd">    out vec4 vertexMCVSOutput;</span>
-<span class="sd">    out vec3 centerMCVSOutput;</span>
-<span class="sd">    out vec3 directionVSOutput;</span>
-<span class="sd">    out float heightVSOutput;</span>
-<span class="sd">    out float radiusVSOutput;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="s2">    out vec4 vertexMCVSOutput;</span>
+<span class="s2">    out vec3 centerMCVSOutput;</span>
+<span class="s2">    out vec3 directionVSOutput;</span>
+<span class="s2">    out float heightVSOutput;</span>
+<span class="s2">    out float radiusVSOutput;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
-<span class="n">vs_impl</span> <span class="o">=</span> \
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    vertexMCVSOutput = vertexMC;</span>
-<span class="sd">    centerMCVSOutput = center;</span>
-<span class="sd">    directionVSOutput = direction;</span>
-<span class="sd">    heightVSOutput = height;</span>
-<span class="sd">    radiusVSOutput = radius;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="n">vs_impl</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    vertexMCVSOutput = vertexMC;</span>
+<span class="s2">    centerMCVSOutput = center;</span>
+<span class="s2">    directionVSOutput = direction;</span>
+<span class="s2">    heightVSOutput = height;</span>
+<span class="s2">    radiusVSOutput = radius;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
 <p>Then we add the vertex shader code to the box_actor. We use shader_to_actor
@@ -451,23 +508,23 @@ screen.</p>
 lighting, and color in a scene. In this case, we are using vertex shader not
 just to define the colors of the cylinders but to manipulate its position in
 world space, rotation with respect to the box, and lighting of the scene.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs_vars_dec</span> <span class="o">=</span> \
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    in vec4 vertexMCVSOutput;</span>
-<span class="sd">    in vec3 centerMCVSOutput;</span>
-<span class="sd">    in vec3 directionVSOutput;</span>
-<span class="sd">    in float heightVSOutput;</span>
-<span class="sd">    in float radiusVSOutput;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs_vars_dec</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    in vec4 vertexMCVSOutput;</span>
+<span class="s2">    in vec3 centerMCVSOutput;</span>
+<span class="s2">    in vec3 directionVSOutput;</span>
+<span class="s2">    in float heightVSOutput;</span>
+<span class="s2">    in float radiusVSOutput;</span>
 
-<span class="sd">    uniform mat4 MCVCMatrix;</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="s2">    uniform mat4 MCVCMatrix;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
 <p>We use this function to generate an appropriate rotation matrix which help us
 to transform our position vectors in order to align the direction of
 cylinder with respect to the box.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vec_to_vec_rot_mat</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">(</span>
-    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;vec_to_vec_rot_mat.glsl&#39;</span><span class="p">))</span>
+    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;utils&#39;</span><span class="p">,</span> <span class="s1">&#39;vec_to_vec_rot_mat.glsl&#39;</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We calculate the distance using the SDF function for the cylinder.</p>
@@ -475,27 +532,25 @@ cylinder with respect to the box.</p>
 </pre></div>
 </div>
 <p>This is used on calculations for surface normals of the cylinder.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sdf_map</span> <span class="o">=</span> \
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    float map(in vec3 position)</span>
-<span class="sd">    {</span>
-<span class="sd">        // the sdCylinder function creates vertical cylinders by default, that</span>
-<span class="sd">        // is the cylinder is created pointing in the up direction (0, 1, 0).</span>
-<span class="sd">        // We want to rotate that vector to be aligned with the box&#39;s direction</span>
-<span class="sd">        mat4 rot = vec2VecRotMat(normalize(directionVSOutput),</span>
-<span class="sd">                                 normalize(vec3(0, 1, 0)));</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sdf_map</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    float map(in vec3 position)</span>
+<span class="s2">    {</span>
+<span class="s2">        // the sdCylinder function creates vertical cylinders by default, that</span>
+<span class="s2">        // is the cylinder is created pointing in the up direction (0, 1, 0).</span>
+<span class="s2">        // We want to rotate that vector to be aligned with the box&#39;s direction</span>
+<span class="s2">        mat4 rot = vec2VecRotMat(normalize(directionVSOutput),</span>
+<span class="s2">                                 normalize(vec3(0, 1, 0)));</span>
 
-<span class="sd">        vec3 pos = (rot * vec4(position - centerMCVSOutput, 0.0)).xyz;</span>
+<span class="s2">        vec3 pos = (rot * vec4(position - centerMCVSOutput, 0.0)).xyz;</span>
 
-<span class="sd">        // distance to the cylinder&#39;s boundary</span>
-<span class="sd">        return sdCylinder(pos, radiusVSOutput, heightVSOutput / 2);</span>
-<span class="sd">    }</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="s2">        // distance to the cylinder&#39;s boundary</span>
+<span class="s2">        return sdCylinder(pos, radiusVSOutput, heightVSOutput / 2);</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 </pre></div>
 </div>
 <p>We use central differences technique for computing surface normals.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">central_diffs_normal</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;sdf&#39;</span><span class="p">,</span>
-                                                       <span class="s1">&#39;central_diffs.frag&#39;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">central_diffs_normal</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;sdf&#39;</span><span class="p">,</span> <span class="s1">&#39;central_diffs.frag&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>We use cast_ray for the implementation of Ray Marching.</p>
@@ -503,54 +558,62 @@ cylinder with respect to the box.</p>
 </pre></div>
 </div>
 <p>For the illumination of the scene we use the Blinn-Phong model.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">blinn_phong_model</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;lighting&#39;</span><span class="p">,</span>
-                                                    <span class="s1">&#39;blinn_phong_model.frag&#39;</span><span class="p">))</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">blinn_phong_model</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.import_fury_shader" title="fury.shaders.import_fury_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">import_fury_shader</span></a><span class="p">(</span>
+    <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span></a><span class="p">(</span><span class="s1">&#39;lighting&#39;</span><span class="p">,</span> <span class="s1">&#39;blinn_phong_model.frag&#39;</span><span class="p">)</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Now we use compose_shader to join our pieces of GLSL shader code.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs_dec</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.compose_shader" title="fury.shaders.compose_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">compose_shader</span></a><span class="p">([</span><span class="n">fs_vars_dec</span><span class="p">,</span> <span class="n">vec_to_vec_rot_mat</span><span class="p">,</span> <span class="n">sd_cylinder</span><span class="p">,</span> <span class="n">sdf_map</span><span class="p">,</span>
-                         <span class="n">central_diffs_normal</span><span class="p">,</span> <span class="n">cast_ray</span><span class="p">,</span> <span class="n">blinn_phong_model</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fs_dec</span> <span class="o">=</span> <a href="../../reference/fury.shaders.html#fury.shaders.compose_shader" title="fury.shaders.compose_shader" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">compose_shader</span></a><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">fs_vars_dec</span><span class="p">,</span>
+        <span class="n">vec_to_vec_rot_mat</span><span class="p">,</span>
+        <span class="n">sd_cylinder</span><span class="p">,</span>
+        <span class="n">sdf_map</span><span class="p">,</span>
+        <span class="n">central_diffs_normal</span><span class="p">,</span>
+        <span class="n">cast_ray</span><span class="p">,</span>
+        <span class="n">blinn_phong_model</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="p">)</span>
 
-<a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">(</span><span class="n">box_actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec</span><span class="p">)</span>
+<a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">(</span><span class="n">box_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Here we have the implementation of all the previous code with all the
 necessary variables and functions to build the cylinders.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sdf_cylinder_frag_impl</span> <span class="o">=</span> \
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    vec3 point = vertexMCVSOutput.xyz;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sdf_cylinder_frag_impl</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    vec3 point = vertexMCVSOutput.xyz;</span>
 
-<span class="sd">    // ray origin</span>
-<span class="sd">    vec4 ro = -MCVCMatrix[3] * MCVCMatrix;  // camera position in world space</span>
+<span class="s2">    // ray origin</span>
+<span class="s2">    vec4 ro = -MCVCMatrix[3] * MCVCMatrix;  // camera position in world space</span>
 
-<span class="sd">    // ray direction</span>
-<span class="sd">    vec3 rd = normalize(point - ro.xyz);</span>
+<span class="s2">    // ray direction</span>
+<span class="s2">    vec3 rd = normalize(point - ro.xyz);</span>
 
-<span class="sd">    // light direction</span>
-<span class="sd">    vec3 ld = normalize(ro.xyz - point);</span>
+<span class="s2">    // light direction</span>
+<span class="s2">    vec3 ld = normalize(ro.xyz - point);</span>
 
-<span class="sd">    ro += vec4((point - ro.xyz), 0);</span>
+<span class="s2">    ro += vec4((point - ro.xyz), 0);</span>
 
-<span class="sd">    float t = castRay(ro.xyz, rd);</span>
+<span class="s2">    float t = castRay(ro.xyz, rd);</span>
 
-<span class="sd">    if(t &lt; 20.0)</span>
-<span class="sd">    {</span>
-<span class="sd">        vec3 position = ro.xyz + t * rd;</span>
-<span class="sd">        vec3 normal = centralDiffsNormals(position, .0001);</span>
-<span class="sd">        float lightAttenuation = dot(ld, normal);</span>
-<span class="sd">        vec3 color = blinnPhongIllumModel(</span>
-<span class="sd">                        lightAttenuation, lightColor0, diffuseColor,</span>
-<span class="sd">                        specularPower, specularColor, ambientColor);</span>
-<span class="sd">        fragOutput0 = vec4(color, opacity);</span>
-<span class="sd">    }</span>
-<span class="sd">    else</span>
-<span class="sd">    {</span>
-<span class="sd">        discard;</span>
-<span class="sd">    }</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="s2">    if(t &lt; 20.0)</span>
+<span class="s2">    {</span>
+<span class="s2">        vec3 position = ro.xyz + t * rd;</span>
+<span class="s2">        vec3 normal = centralDiffsNormals(position, .0001);</span>
+<span class="s2">        float lightAttenuation = dot(ld, normal);</span>
+<span class="s2">        vec3 color = blinnPhongIllumModel(</span>
+<span class="s2">                        lightAttenuation, lightColor0, diffuseColor,</span>
+<span class="s2">                        specularPower, specularColor, ambientColor);</span>
+<span class="s2">        fragOutput0 = vec4(color, opacity);</span>
+<span class="s2">    }</span>
+<span class="s2">    else</span>
+<span class="s2">    {</span>
+<span class="s2">        discard;</span>
+<span class="s2">    }</span>
+<span class="s2">    &quot;&quot;&quot;</span>
 
-<a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">(</span><span class="n">box_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">sdf_cylinder_frag_impl</span><span class="p">,</span>
-                <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
+<a href="../../reference/fury.shaders.html#fury.shaders.shader_to_actor" title="fury.shaders.shader_to_actor" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_to_actor</span></a><span class="p">(</span><span class="n">box_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">sdf_cylinder_frag_impl</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, we visualize the cylinders made using ray marching and SDFs.</p>

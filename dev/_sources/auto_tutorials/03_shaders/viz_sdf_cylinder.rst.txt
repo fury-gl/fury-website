@@ -33,20 +33,25 @@ implementation inside.
 
 We start by importing the necessary modules:
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-25
+.. GENERATED FROM PYTHON SOURCE LINES 17-30
 
 .. code-block:: default
 
 
-    from fury import actor, window
-    from fury.shaders import compose_shader, shader_to_actor, attribute_to_actor,\
-        import_fury_shader
-
     import os
+
     import numpy as np
 
+    from fury import actor, window
+    from fury.shaders import (
+        attribute_to_actor,
+        compose_shader,
+        import_fury_shader,
+        shader_to_actor,
+    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-37
+
+.. GENERATED FROM PYTHON SOURCE LINES 31-42
 
 Cylinder using polygons
 =======================
@@ -60,49 +65,99 @@ rendering time to display the object.
 Now we define some properties of our actors, use them to create a set of
 cylinders, and add them to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-49
+.. GENERATED FROM PYTHON SOURCE LINES 42-85
 
 .. code-block:: default
 
 
-    centers = np.array([[-3.2, .9, .4], [-3.5, -.5, 1], [-2.1, 0, .4],
-                        [-.2, .9, .4], [-.5, -.5, 1], [.9, 0, .4],
-                        [2.8, .9, 1.4], [2.5, -.5, 2], [3.9, 0, 1.4]])
-    dirs = np.array([[-.2, .9, .4], [-.5, -.5, 1], [.9, 0, .4], [-.2, .9, .4],
-                     [-.5, -.5, 1], [.9, 0, .4], [-.2, .9, .4], [-.5, -.5, 1],
-                     [.9, 0, .4]])
-    colors = np.array([[1, 0, 0], [1, 0, 0], [1, 0, 0], [0, 1, 0], [0, 1, 0],
-                       [0, 1, 0], [0, 0, 1], [0, 0, 1], [0, 0, 1]])
-    radius = .5
+    centers = np.array(
+        [
+            [-3.2, 0.9, 0.4],
+            [-3.5, -0.5, 1],
+            [-2.1, 0, 0.4],
+            [-0.2, 0.9, 0.4],
+            [-0.5, -0.5, 1],
+            [0.9, 0, 0.4],
+            [2.8, 0.9, 1.4],
+            [2.5, -0.5, 2],
+            [3.9, 0, 1.4],
+        ]
+    )
+    dirs = np.array(
+        [
+            [-0.2, 0.9, 0.4],
+            [-0.5, -0.5, 1],
+            [0.9, 0, 0.4],
+            [-0.2, 0.9, 0.4],
+            [-0.5, -0.5, 1],
+            [0.9, 0, 0.4],
+            [-0.2, 0.9, 0.4],
+            [-0.5, -0.5, 1],
+            [0.9, 0, 0.4],
+        ]
+    )
+    colors = np.array(
+        [
+            [1, 0, 0],
+            [1, 0, 0],
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 1, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+            [0, 0, 1],
+            [0, 0, 1],
+        ]
+    )
+    radius = 0.5
     height = 1
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-53
+.. GENERATED FROM PYTHON SOURCE LINES 86-89
 
 In order to see how cylinders are made, we set different resolutions (number
 of sides used to define the bases of the cylinder) to see how it changes the
 surface of the primitive.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-63
+.. GENERATED FROM PYTHON SOURCE LINES 89-118
 
 .. code-block:: default
 
 
-    cylinders_8 = actor.cylinder(centers[:3], dirs[:3], colors[:3], radius=radius,
-                                 heights=height, capped=True, resolution=8)
-    cylinders_16 = actor.cylinder(centers[3: 6], dirs[3: 6], colors[3: 6],
-                                  radius=radius, heights=height, capped=True,
-                                  resolution=16)
-    cylinders_32 = actor.cylinder(centers[6: 9], dirs[6: 9], colors[6: 9],
-                                  radius=radius, heights=height, capped=True,
-                                  resolution=32)
+    cylinders_8 = actor.cylinder(
+        centers[:3],
+        dirs[:3],
+        colors[:3],
+        radius=radius,
+        heights=height,
+        capped=True,
+        resolution=8,
+    )
+    cylinders_16 = actor.cylinder(
+        centers[3:6],
+        dirs[3:6],
+        colors[3:6],
+        radius=radius,
+        heights=height,
+        capped=True,
+        resolution=16,
+    )
+    cylinders_32 = actor.cylinder(
+        centers[6:9],
+        dirs[6:9],
+        colors[6:9],
+        radius=radius,
+        heights=height,
+        capped=True,
+        resolution=32,
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-65
+.. GENERATED FROM PYTHON SOURCE LINES 119-120
 
 Next, we set up a new scene to add and visualize the actors created.
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-79
+.. GENERATED FROM PYTHON SOURCE LINES 120-134
 
 .. code-block:: default
 
@@ -121,11 +176,11 @@ Next, we set up a new scene to add and visualize the actors created.
     window.record(scene, size=(600, 600), out_path='viz_poly_cylinder.png')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 135-136
 
 Visualize the surface geometry representation for the object.
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-91
+.. GENERATED FROM PYTHON SOURCE LINES 136-146
 
 .. code-block:: default
 
@@ -140,12 +195,12 @@ Visualize the surface geometry representation for the object.
     window.record(scene, size=(600, 600), out_path='viz_poly_cylinder_geom.png')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-94
+.. GENERATED FROM PYTHON SOURCE LINES 147-149
 
 Then we clean the scene to render the boxes we will use to render our
 SDF-based actors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-97
+.. GENERATED FROM PYTHON SOURCE LINES 149-152
 
 .. code-block:: default
 
@@ -153,7 +208,7 @@ SDF-based actors.
     scene.clear()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-110
+.. GENERATED FROM PYTHON SOURCE LINES 153-165
 
 Cylinder using SDF
 ==================
@@ -168,21 +223,25 @@ SDF, and because we don’t use polygonal meshes it is possible to define
 perfectly smooth surfaces and allows a faster rendering in comparison to
 polygon-based modeling (more details in [Hart1996]_).
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-114
+.. GENERATED FROM PYTHON SOURCE LINES 167-169
 
 Now we create cylinders using box actor and SDF implementation on shaders.
 For this, we first create a box actor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+.. GENERATED FROM PYTHON SOURCE LINES 169-177
 
 .. code-block:: default
 
 
-    box_actor = actor.box(centers=centers, directions=dirs, colors=colors,
-                          scales=(height, radius * 2, radius * 2))
+    box_actor = actor.box(
+        centers=centers,
+        directions=dirs,
+        colors=colors,
+        scales=(height, radius * 2, radius * 2),
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-125
+.. GENERATED FROM PYTHON SOURCE LINES 178-184
 
 Now we use attribute_to_actor to link a NumPy array, with the centers and
 directions data, with a vertex attribute. We do this to pass the data to
@@ -191,7 +250,7 @@ the vertex shader, with the corresponding attribute name.
 We need to associate the data to each of the 8 vertices that make up the box
 since we handle the processing of individual vertices in the vertex shader.
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-136
+.. GENERATED FROM PYTHON SOURCE LINES 184-195
 
 .. code-block:: default
 
@@ -207,7 +266,7 @@ since we handle the processing of individual vertices in the vertex shader.
     attribute_to_actor(box_actor, rep_heights, 'height')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 137-142
+.. GENERATED FROM PYTHON SOURCE LINES 196-201
 
 Then we have the shader code implementation corresponding to vertex and
 fragment shader. Here we are passing data to the fragment shader through
@@ -215,13 +274,12 @@ the vertex shader.
 
 Vertex shaders perform basic processing of each individual vertex.
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-166
+.. GENERATED FROM PYTHON SOURCE LINES 201-223
 
 .. code-block:: default
 
 
-    vs_dec = \
-        '''
+    vs_dec = """
         in vec3 center;
         in vec3 direction;
         in float height;
@@ -232,25 +290,24 @@ Vertex shaders perform basic processing of each individual vertex.
         out vec3 directionVSOutput;
         out float heightVSOutput;
         out float radiusVSOutput;
-        '''
+        """
 
-    vs_impl = \
-        '''
+    vs_impl = """
         vertexMCVSOutput = vertexMC;
         centerMCVSOutput = center;
         directionVSOutput = direction;
         heightVSOutput = height;
         radiusVSOutput = radius;
-        '''
+        """
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-170
+.. GENERATED FROM PYTHON SOURCE LINES 224-227
 
 Then we add the vertex shader code to the box_actor. We use shader_to_actor
 to apply our implementation to the shader creation process, this function
 joins our code to the shader template that FURY has by default.
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-173
+.. GENERATED FROM PYTHON SOURCE LINES 227-230
 
 .. code-block:: default
 
@@ -258,7 +315,7 @@ joins our code to the shader template that FURY has by default.
     shader_to_actor(box_actor, 'vertex', decl_code=vs_dec, impl_code=vs_impl)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-182
+.. GENERATED FROM PYTHON SOURCE LINES 231-239
 
 Fragment shaders are used to define the colors of each pixel being processed,
 the program runs on each of the pixels that the object occupies on the
@@ -269,13 +326,12 @@ lighting, and color in a scene. In this case, we are using vertex shader not
 just to define the colors of the cylinders but to manipulate its position in
 world space, rotation with respect to the box, and lighting of the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-194
+.. GENERATED FROM PYTHON SOURCE LINES 239-250
 
 .. code-block:: default
 
 
-    fs_vars_dec = \
-        '''
+    fs_vars_dec = """
         in vec4 vertexMCVSOutput;
         in vec3 centerMCVSOutput;
         in vec3 directionVSOutput;
@@ -283,29 +339,30 @@ world space, rotation with respect to the box, and lighting of the scene.
         in float radiusVSOutput;
 
         uniform mat4 MCVCMatrix;
-        '''
+        """
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-198
+.. GENERATED FROM PYTHON SOURCE LINES 251-254
 
 We use this function to generate an appropriate rotation matrix which help us
 to transform our position vectors in order to align the direction of
 cylinder with respect to the box.
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-202
+.. GENERATED FROM PYTHON SOURCE LINES 254-259
 
 .. code-block:: default
 
 
     vec_to_vec_rot_mat = import_fury_shader(
-        os.path.join('utils', 'vec_to_vec_rot_mat.glsl'))
+        os.path.join('utils', 'vec_to_vec_rot_mat.glsl')
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-204
+.. GENERATED FROM PYTHON SOURCE LINES 260-261
 
 We calculate the distance using the SDF function for the cylinder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-207
+.. GENERATED FROM PYTHON SOURCE LINES 261-264
 
 .. code-block:: default
 
@@ -313,17 +370,16 @@ We calculate the distance using the SDF function for the cylinder.
     sd_cylinder = import_fury_shader(os.path.join('sdf', 'sd_cylinder.frag'))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-209
+.. GENERATED FROM PYTHON SOURCE LINES 265-266
 
 This is used on calculations for surface normals of the cylinder.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-227
+.. GENERATED FROM PYTHON SOURCE LINES 266-283
 
 .. code-block:: default
 
 
-    sdf_map = \
-        '''
+    sdf_map = """
         float map(in vec3 position)
         {
             // the sdCylinder function creates vertical cylinders by default, that
@@ -337,27 +393,26 @@ This is used on calculations for surface normals of the cylinder.
             // distance to the cylinder's boundary
             return sdCylinder(pos, radiusVSOutput, heightVSOutput / 2);
         }
-        '''
+        """
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 228-229
+.. GENERATED FROM PYTHON SOURCE LINES 284-285
 
 We use central differences technique for computing surface normals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-233
+.. GENERATED FROM PYTHON SOURCE LINES 285-288
 
 .. code-block:: default
 
 
-    central_diffs_normal = import_fury_shader(os.path.join('sdf',
-                                                           'central_diffs.frag'))
+    central_diffs_normal = import_fury_shader(os.path.join('sdf', 'central_diffs.frag'))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-235
+.. GENERATED FROM PYTHON SOURCE LINES 289-290
 
 We use cast_ray for the implementation of Ray Marching.
 
-.. GENERATED FROM PYTHON SOURCE LINES 235-238
+.. GENERATED FROM PYTHON SOURCE LINES 290-293
 
 .. code-block:: default
 
@@ -365,46 +420,55 @@ We use cast_ray for the implementation of Ray Marching.
     cast_ray = import_fury_shader(os.path.join('ray_marching', 'cast_ray.frag'))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-240
+.. GENERATED FROM PYTHON SOURCE LINES 294-295
 
 For the illumination of the scene we use the Blinn-Phong model.
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-244
+.. GENERATED FROM PYTHON SOURCE LINES 295-300
 
 .. code-block:: default
 
 
-    blinn_phong_model = import_fury_shader(os.path.join('lighting',
-                                                        'blinn_phong_model.frag'))
+    blinn_phong_model = import_fury_shader(
+        os.path.join('lighting', 'blinn_phong_model.frag')
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-246
+.. GENERATED FROM PYTHON SOURCE LINES 301-302
 
 Now we use compose_shader to join our pieces of GLSL shader code.
 
-.. GENERATED FROM PYTHON SOURCE LINES 246-252
+.. GENERATED FROM PYTHON SOURCE LINES 302-317
 
 .. code-block:: default
 
 
-    fs_dec = compose_shader([fs_vars_dec, vec_to_vec_rot_mat, sd_cylinder, sdf_map,
-                             central_diffs_normal, cast_ray, blinn_phong_model])
+    fs_dec = compose_shader(
+        [
+            fs_vars_dec,
+            vec_to_vec_rot_mat,
+            sd_cylinder,
+            sdf_map,
+            central_diffs_normal,
+            cast_ray,
+            blinn_phong_model,
+        ]
+    )
 
-    shader_to_actor(box_actor, "fragment", decl_code=fs_dec)
+    shader_to_actor(box_actor, 'fragment', decl_code=fs_dec)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-255
+.. GENERATED FROM PYTHON SOURCE LINES 318-320
 
 Here we have the implementation of all the previous code with all the
 necessary variables and functions to build the cylinders.
 
-.. GENERATED FROM PYTHON SOURCE LINES 255-292
+.. GENERATED FROM PYTHON SOURCE LINES 320-355
 
 .. code-block:: default
 
 
-    sdf_cylinder_frag_impl = \
-        '''
+    sdf_cylinder_frag_impl = """
         vec3 point = vertexMCVSOutput.xyz;
 
         // ray origin
@@ -434,17 +498,16 @@ necessary variables and functions to build the cylinders.
         {
             discard;
         }
-        '''
+        """
 
-    shader_to_actor(box_actor, 'fragment', impl_code=sdf_cylinder_frag_impl,
-                    block='light')
+    shader_to_actor(box_actor, 'fragment', impl_code=sdf_cylinder_frag_impl, block='light')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 293-294
+.. GENERATED FROM PYTHON SOURCE LINES 356-357
 
 Finally, we visualize the cylinders made using ray marching and SDFs.
 
-.. GENERATED FROM PYTHON SOURCE LINES 294-302
+.. GENERATED FROM PYTHON SOURCE LINES 357-365
 
 .. code-block:: default
 
@@ -457,7 +520,7 @@ Finally, we visualize the cylinders made using ray marching and SDFs.
     window.record(scene, size=(600, 600), out_path='viz_sdf_cylinder.png')
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-310
+.. GENERATED FROM PYTHON SOURCE LINES 366-373
 
 References
 ----------

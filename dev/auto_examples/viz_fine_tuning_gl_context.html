@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Fine-tuning the OpenGL state using shader callbacks &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Fine-tuning the OpenGL state using shader callbacks &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -53,8 +53,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Play a video in the 3D world" href="viz_play_video.html" />
-    <link rel="prev" title="Brownian motion" href="viz_brownian_motion.html" />
+    <link rel="next" title="Electromagnetic Wave Propagation Animation" href="viz_emwave_animation.html" />
+    <link rel="prev" title="Play a video in the 3D world" href="viz_play_video.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -311,72 +311,65 @@ OpenGL will render the actors. This example shows how to change the OpenGL
 state of one or more actors. This can be useful when we need to create
 specialized visualization effects.</p>
 <p>First, let’s import some functions</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
 <span class="kn">from</span> <span class="nn">fury.shaders</span> <span class="kn">import</span> <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <a href="../reference/fury.utils.html#fury.utils.remove_observer_from_actor" title="fury.utils.remove_observer_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">remove_observer_from_actor</span></a>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
 </pre></div>
 </div>
 <p>We just proceed as usual: creating the actors and initializing a scene in
 FURY</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="p">[</span><span class="o">-</span><span class="mf">.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="p">[</span><span class="mf">.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-<span class="p">])</span>
-<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span>
-    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-    <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-<span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
 
 <span class="n">actor_no_depth_test</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.markers" title="fury.actor.markers" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">markers</span></a><span class="p">(</span>
     <span class="n">centers</span><span class="p">,</span>
     <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-    <span class="n">scales</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span>
+    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">actor_normal_blending</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.markers" title="fury.actor.markers" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">markers</span></a><span class="p">(</span>
-    <span class="n">centers</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
+    <span class="n">centers</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
     <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-    <span class="n">scales</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span>
+    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">actor_add_blending</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.markers" title="fury.actor.markers" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">markers</span></a><span class="p">(</span>
     <span class="n">centers</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
     <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-    <span class="n">scales</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span>
+    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="n">actor_sub_blending</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.markers" title="fury.actor.markers" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">markers</span></a><span class="p">(</span>
     <span class="n">centers</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
     <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-    <span class="n">scales</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span>
+    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">actor_mul_blending</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.markers" title="fury.actor.markers" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">markers</span></a><span class="p">(</span>
     <span class="n">centers</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
     <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
-    <span class="n">scales</span><span class="o">=</span><span class="mf">.2</span><span class="p">,</span>
+    <span class="n">marker_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
 <span class="p">)</span>
 
 
 <span class="n">scene</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 
 
-<span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">((</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">))</span>
-<span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
-                           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                           <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">((</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>All actors must be added  in the scene</p>
@@ -393,32 +386,36 @@ change the OpenGL state of a given fury window instance (showm.window).</p>
 <p>Here we’re using the pre-build FURY window functions which has already a
 set of  specific behaviors to  be applied in the OpenGL context</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_normal_blending</span><span class="p">,</span>
-    <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_normal_blending" title="fury.window.gl_set_normal_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_normal_blending</span></a><span class="p">)</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_normal_blending</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_normal_blending" title="fury.window.gl_set_normal_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_normal_blending</span></a>
+<span class="p">)</span>
 
 <span class="c1"># ###############################################################################</span>
 <span class="c1">#  It&#39;s also possible use a list of effects. The final opengl state it&#39;ll</span>
 <span class="c1">#  be the composition of each effect that each function has in the opengl state</span>
 
 <span class="n">id_observer</span> <span class="o">=</span> <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_no_depth_test</span><span class="p">,</span>
-    <span class="n">effects</span><span class="o">=</span><span class="p">[</span>
-        <a href="../reference/fury.window.html#fury.window.gl_reset_blend" title="fury.window.gl_reset_blend" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_reset_blend</span></a><span class="p">,</span> <a href="../reference/fury.window.html#fury.window.gl_disable_blend" title="fury.window.gl_disable_blend" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_disable_blend</span></a><span class="p">,</span>
-        <a href="../reference/fury.window.html#fury.window.gl_disable_depth" title="fury.window.gl_disable_depth" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_disable_depth</span></a><span class="p">])</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span>
+    <span class="n">actor_no_depth_test</span><span class="p">,</span>
+    <span class="n">effects</span><span class="o">=</span><span class="p">[</span><a href="../reference/fury.window.html#fury.window.gl_reset_blend" title="fury.window.gl_reset_blend" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_reset_blend</span></a><span class="p">,</span> <a href="../reference/fury.window.html#fury.window.gl_disable_blend" title="fury.window.gl_disable_blend" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_disable_blend</span></a><span class="p">,</span> <a href="../reference/fury.window.html#fury.window.gl_disable_depth" title="fury.window.gl_disable_depth" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_disable_depth</span></a><span class="p">],</span>
+<span class="p">)</span>
 
 <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_add_blending</span><span class="p">,</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span>
+    <span class="n">actor_add_blending</span><span class="p">,</span>
     <span class="n">effects</span><span class="o">=</span><span class="p">[</span>
         <a href="../reference/fury.window.html#fury.window.gl_reset_blend" title="fury.window.gl_reset_blend" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_reset_blend</span></a><span class="p">,</span>
-        <a href="../reference/fury.window.html#fury.window.gl_enable_depth" title="fury.window.gl_enable_depth" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_enable_depth</span></a><span class="p">,</span> <a href="../reference/fury.window.html#fury.window.gl_set_additive_blending" title="fury.window.gl_set_additive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_additive_blending</span></a><span class="p">])</span>
+        <a href="../reference/fury.window.html#fury.window.gl_enable_depth" title="fury.window.gl_enable_depth" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_enable_depth</span></a><span class="p">,</span>
+        <a href="../reference/fury.window.html#fury.window.gl_set_additive_blending" title="fury.window.gl_set_additive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_additive_blending</span></a><span class="p">,</span>
+    <span class="p">],</span>
+<span class="p">)</span>
 
 <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_sub_blending</span><span class="p">,</span>
-    <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_subtractive_blending" title="fury.window.gl_set_subtractive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_subtractive_blending</span></a><span class="p">)</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_sub_blending</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_subtractive_blending" title="fury.window.gl_set_subtractive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_subtractive_blending</span></a>
+<span class="p">)</span>
 
 <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_mul_blending</span><span class="p">,</span>
-    <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_multiplicative_blending" title="fury.window.gl_set_multiplicative_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_multiplicative_blending</span></a><span class="p">)</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_mul_blending</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_multiplicative_blending" title="fury.window.gl_set_multiplicative_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_multiplicative_blending</span></a>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Finaly, just render and see the results</p>
@@ -436,8 +433,8 @@ set of  specific behaviors to  be applied in the OpenGL context</p>
     <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">400</span><span class="p">:</span>
         <a href="../reference/fury.utils.html#fury.utils.remove_observer_from_actor" title="fury.utils.remove_observer_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">remove_observer_from_actor</span></a><span class="p">(</span><span class="n">actor_no_depth_test</span><span class="p">,</span> <span class="n">id_observer</span><span class="p">)</span>
         <a href="../reference/fury.shaders.html#fury.shaders.shader_apply_effects" title="fury.shaders.shader_apply_effects" class="sphx-glr-backref-module-fury-shaders sphx-glr-backref-type-py-function"><span class="n">shader_apply_effects</span></a><span class="p">(</span>
-             <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_no_depth_test</span><span class="p">,</span>
-             <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_additive_blending" title="fury.window.gl_set_additive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_additive_blending</span></a><span class="p">)</span>
+            <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="p">,</span> <span class="n">actor_no_depth_test</span><span class="p">,</span> <span class="n">effects</span><span class="o">=</span><a href="../reference/fury.window.html#fury.window.gl_set_additive_blending" title="fury.window.gl_set_additive_blending" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">gl_set_additive_blending</span></a>
+        <span class="p">)</span>
     <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">1000</span><span class="p">:</span>
         <span class="n">showm</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 
@@ -447,8 +444,7 @@ set of  specific behaviors to  be applied in the OpenGL context</p>
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span>
-    <span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_fine_tuning_gl_context.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_fine_tuning_gl_context.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -471,17 +467,17 @@ set of  specific behaviors to  be applied in the OpenGL context</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="viz_brownian_motion.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="viz_play_video.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Brownian motion</p>
+          <p class="prev-next-title">Play a video in the 3D world</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="viz_play_video.html" title="next page">
+  <a class='right-next' id="next-link" href="viz_emwave_animation.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Play a video in the 3D world</p>
+      <p class="prev-next-title">Electromagnetic Wave Propagation Animation</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>

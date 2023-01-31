@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Visualize Networks (Animated version) &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Visualize Networks (Animated version) &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -54,7 +54,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Interactive PBR demo" href="viz_pbr_interactive.html" />
-    <link rel="prev" title="Brain Fiber ODF Visualisation" href="viz_fiber_odf.html" />
+    <link rel="prev" title="Fractals" href="viz_fractals.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -314,9 +314,13 @@ positions is also demoed.</p>
 <p>First, let’s import some useful functions</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span> <span class="k">as</span> <a href="https://docs.python.org/3/library/os.path.html#os.path.join" title="os.path.join" class="sphx-glr-backref-module-os-path sphx-glr-backref-type-py-function"><span class="n">pjoin</span></a>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span><span class="p">,</span> <span class="n">colormap</span> <span class="k">as</span> <span class="n">cmap</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <a href="../reference/fury.utils.html#fury.utils.update_actor" title="fury.utils.update_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">update_actor</span></a><span class="p">,</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">vertices_from_actor</span></a><span class="p">,</span> <a href="../reference/fury.utils.html#fury.utils.compute_bounds" title="fury.utils.compute_bounds" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">compute_bounds</span></a>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">colormap</span> <span class="k">as</span> <span class="n">cmap</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <a href="../reference/fury.utils.html#fury.utils.compute_bounds" title="fury.utils.compute_bounds" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">compute_bounds</span></a><span class="p">,</span> <a href="../reference/fury.utils.html#fury.utils.update_actor" title="fury.utils.update_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">update_actor</span></a><span class="p">,</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">vertices_from_actor</span></a>
 </pre></div>
 </div>
 <p>This demo has two modes.
@@ -346,28 +350,27 @@ displacements</p>
 <p>Generate a geographic random network, requires networkx package (mode 0)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+
     <span class="n">vertices_count</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">view_size</span> <span class="o">=</span> <span class="mi">100</span>
     <span class="n">network</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">random_geometric_graph</span><span class="p">(</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
-    <span class="n">positions</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> \
-        <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
     <span class="n">categories</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vertices_count</span><span class="p">)</span>
     <span class="n">edges</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">edges</span><span class="p">())</span>
-    <span class="n">positions</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> \
-        <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
 </pre></div>
 </div>
 <p>We attribute a color to each category of our dataset which correspond to our
 nodes colors.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">category2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">category</span><span class="p">:</span> <span class="n">i</span>
-                  <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">category</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><span class="n">categories</span><span class="p">))}</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">category2index</span> <span class="o">=</span> <span class="p">{</span><span class="n">category</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">category</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><span class="n">categories</span><span class="p">))}</span>
 
 <span class="n">index2category</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><span class="n">categories</span><span class="p">)</span>
 
 <span class="n">category_colors</span> <span class="o">=</span> <a href="../reference/fury.colormap.html#fury.colormap.distinguishable_colormap" title="fury.colormap.distinguishable_colormap" class="sphx-glr-backref-module-fury-colormap sphx-glr-backref-type-py-function"><span class="n">cmap</span><span class="o">.</span><span class="n">distinguishable_colormap</span></a><span class="p">(</span><span class="n">nb_colors</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">index2category</span><span class="p">))</span>
 
-<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">category_colors</span><span class="p">[</span><span class="n">category2index</span><span class="p">[</span><span class="n">category</span><span class="p">]]</span>
-                   <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">])</span>
+<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+    <span class="p">[</span><span class="n">category_colors</span><span class="p">[</span><span class="n">category2index</span><span class="p">[</span><span class="n">category</span><span class="p">]]</span> <span class="k">for</span> <span class="n">category</span> <span class="ow">in</span> <span class="n">categories</span><span class="p">]</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We define our node size</p>
@@ -386,21 +389,28 @@ The colors of each edge are interpolated between the two endpoints.</p>
 <p>Our data preparation is ready, it is time to visualize them all. We start to
 build 2 actors that we represent our data : sphere_actor for the nodes and
 lines_actor for the edges.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sphere_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.sphere" title="fury.actor.sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span>
-                            <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
-                            <span class="n">radii</span><span class="o">=</span><span class="n">radii</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span>
-                            <span class="n">theta</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-                            <span class="n">phi</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sphere_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.sphere" title="fury.actor.sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="n">radii</span> <span class="o">*</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">8</span>
+<span class="p">)</span>
 
 
-<span class="n">lines_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
-                         <span class="n">colors</span><span class="o">=</span><span class="n">edges_colors</span><span class="p">,</span> <span class="n">lod</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="n">fake_tube</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">lines_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">edges</span><span class="p">),</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">edges_colors</span><span class="p">,</span>
+    <span class="n">lod</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">fake_tube</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Defining timer callback and layout iterator</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">new_layout_timer</span><span class="p">(</span><span class="n">showm</span><span class="p">,</span> <span class="n">edges_list</span><span class="p">,</span> <span class="n">vertices_count</span><span class="p">,</span>
-                     <span class="n">max_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">vertex_initial_positions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">new_layout_timer</span><span class="p">(</span>
+    <span class="n">showm</span><span class="p">,</span>
+    <span class="n">edges_list</span><span class="p">,</span>
+    <span class="n">vertices_count</span><span class="p">,</span>
+    <span class="n">max_iterations</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">vertex_initial_positions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">view_size</span> <span class="o">=</span> <span class="mi">500</span>
     <span class="n">viscosity</span> <span class="o">=</span> <span class="mf">0.10</span>
     <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.5</span>
@@ -414,8 +424,7 @@ lines_actor for the edges.</p>
     <span class="k">if</span> <span class="n">vertex_initial_positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pos</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">vertex_initial_positions</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> \
-            <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">view_size</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">-</span> <span class="n">view_size</span> <span class="o">/</span> <span class="mf">2.0</span>
 
     <span class="n">velocities</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="n">vertices_count</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
@@ -428,10 +437,14 @@ lines_actor for the edges.</p>
                 <span class="k">for</span> <span class="n">vertex2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertex1</span><span class="p">):</span>
                     <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">vertex1</span><span class="p">]</span>
                     <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">vertex2</span><span class="p">]</span>
-                    <span class="n">distance</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/math.html#math.sqrt" title="math.sqrt" class="sphx-glr-backref-module-math sphx-glr-backref-type-py-function"><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span>
-                        <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">+</span>
-                        <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">+</span>
-                        <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">))</span> <span class="o">+</span> <span class="n">alpha</span>
+                    <span class="n">distance</span> <span class="o">=</span> <span class="p">(</span>
+                        <a href="https://docs.python.org/3/library/math.html#math.sqrt" title="math.sqrt" class="sphx-glr-backref-module-math sphx-glr-backref-type-py-function"><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span>
+                            <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span>
+                            <span class="o">+</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="o">+</span> <span class="n">alpha</span>
+                    <span class="p">)</span>
                     <span class="n">rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">/</span> <span class="n">distance</span>
                     <span class="n">ry</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">/</span> <span class="n">distance</span>
                     <span class="n">rz</span> <span class="o">=</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span> <span class="o">/</span> <span class="n">distance</span>
@@ -447,23 +460,25 @@ lines_actor for the edges.</p>
                 <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">vFrom</span><span class="p">]</span>
                 <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">vTo</span><span class="p">]</span>
                 <span class="n">distance</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/math.html#math.sqrt" title="math.sqrt" class="sphx-glr-backref-module-math sphx-glr-backref-type-py-function"><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span>
-                    <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">+</span>
-                    <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">+</span>
-                    <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">))</span>
-                <span class="n">Rx</span> <span class="o">=</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span>
-                <span class="n">Ry</span> <span class="o">=</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span>
-                <span class="n">Rz</span> <span class="o">=</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span>
+                    <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span><span class="p">)</span>
+                    <span class="o">+</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">Rx</span> <span class="o">=</span> <span class="n">x2</span> <span class="o">-</span> <span class="n">x1</span>
+                <span class="n">Ry</span> <span class="o">=</span> <span class="n">y2</span> <span class="o">-</span> <span class="n">y1</span>
+                <span class="n">Rz</span> <span class="o">=</span> <span class="n">z2</span> <span class="o">-</span> <span class="n">z1</span>
                 <span class="n">Fx</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">Rx</span> <span class="o">*</span> <span class="n">distance</span>
                 <span class="n">Fy</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">Ry</span> <span class="o">*</span> <span class="n">distance</span>
                 <span class="n">Fz</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">Rz</span> <span class="o">*</span> <span class="n">distance</span>
                 <span class="n">forces</span><span class="p">[</span><span class="n">vFrom</span><span class="p">]</span> <span class="o">+=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">Fx</span><span class="p">,</span> <span class="n">Fy</span><span class="p">,</span> <span class="n">Fz</span><span class="p">])</span>
                 <span class="n">forces</span><span class="p">[</span><span class="n">vTo</span><span class="p">]</span> <span class="o">-=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">Fx</span><span class="p">,</span> <span class="n">Fy</span><span class="p">,</span> <span class="n">Fz</span><span class="p">])</span>
             <span class="n">velocities</span> <span class="o">+=</span> <span class="n">forces</span> <span class="o">*</span> <span class="n">deltaT</span>
-            <span class="n">velocities</span> <span class="o">*=</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">viscosity</span><span class="p">)</span>
+            <span class="n">velocities</span> <span class="o">*=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">viscosity</span>
             <span class="n">pos</span> <span class="o">+=</span> <span class="n">velocities</span> <span class="o">*</span> <span class="n">deltaT</span>
         <span class="n">pos</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span>
         <span class="n">pos</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])</span>
         <span class="n">pos</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">pos</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">])</span>
+
     <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">_timer</span><span class="p">(</span><span class="n">_obj</span><span class="p">,</span> <span class="n">_event</span><span class="p">):</span>
@@ -474,8 +489,7 @@ lines_actor for the edges.</p>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pos</span><span class="p">[:]</span> <span class="o">+=</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.random.html#numpy.random.random" title="numpy.random.random" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span></a><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.5</span>
         <span class="n">spheres_positions</span> <span class="o">=</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">sphere_actor</span><span class="p">)</span>
-        <span class="n">spheres_positions</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">sphere_geometry</span> <span class="o">+</span> \
-            <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">geometry_length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">spheres_positions</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">sphere_geometry</span> <span class="o">+</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">geometry_length</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
         <span class="n">edges_positions</span> <span class="o">=</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">lines_actor</span><span class="p">)</span>
         <span class="n">edges_positions</span><span class="p">[::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span><span class="p">[</span><span class="n">edges_list</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span>
@@ -491,6 +505,7 @@ lines_actor for the edges.</p>
 
         <span class="k">if</span> <span class="n">counter</span> <span class="o">&gt;=</span> <span class="n">max_iterations</span><span class="p">:</span>
             <span class="n">showm</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
+
     <span class="k">return</span> <span class="n">_timer</span>
 </pre></div>
 </div>
@@ -508,17 +523,16 @@ lines_actor and sphere_actor.</p>
 the camera a little bit farther from the network. you can increase the
 parameter max_iteractions of the timer callback to let the animation run for
 more time.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span>
-    <span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
-
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span>
+<span class="p">)</span>
 
 
 <span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">300</span><span class="p">))</span>
 
 <span class="n">timer_callback</span> <span class="o">=</span> <span class="n">new_layout_timer</span><span class="p">(</span>
-    <span class="n">showm</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">vertices_count</span><span class="p">,</span>
-    <span class="n">max_iterations</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-    <span class="n">vertex_initial_positions</span><span class="o">=</span><span class="n">positions</span><span class="p">)</span>
+    <span class="n">showm</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">vertices_count</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">vertex_initial_positions</span><span class="o">=</span><span class="n">positions</span>
+<span class="p">)</span>
 
 
 <span class="c1"># Run every 16 milliseconds</span>
@@ -526,8 +540,7 @@ more time.</p>
 
 <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span>
-              <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_animated_networks.png&quot;</span><span class="p">)</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_animated_networks.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -550,11 +563,11 @@ more time.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="viz_fiber_odf.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="viz_fractals.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Brain Fiber ODF Visualisation</p>
+          <p class="prev-next-title">Fractals</p>
       </div>
   </a>
   <a class='right-next' id="next-link" href="viz_pbr_interactive.html" title="next page">

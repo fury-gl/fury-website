@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.stream.client &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.stream.client &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -278,18 +278,22 @@
               
   <h1>Source code for fury.stream.client</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
-<span class="kn">import</span> <span class="nn">vtk</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury.stream.tools</span> <span class="kn">import</span> <span class="n">ArrayCircularQueue</span><span class="p">,</span> <span class="n">SharedMemCircularQueue</span>
-<span class="kn">from</span> <span class="nn">fury.stream.tools</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">RawArrayImageBufferManager</span><span class="p">,</span> <span class="n">SharedMemImageBufferManager</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">fury.stream.tools</span> <span class="kn">import</span> <span class="n">IntervalTimer</span>
-<span class="kn">from</span> <span class="nn">fury.stream.tools</span> <span class="kn">import</span> <span class="n">IntervalTimerThreading</span>
+<span class="kn">import</span> <span class="nn">vtk</span>
+
 <span class="kn">from</span> <span class="nn">fury.stream.constants</span> <span class="kn">import</span> <span class="n">_CQUEUE</span><span class="p">,</span> <span class="n">PY_VERSION_8</span>
+<span class="kn">from</span> <span class="nn">fury.stream.tools</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ArrayCircularQueue</span><span class="p">,</span>
+    <span class="n">IntervalTimer</span><span class="p">,</span>
+    <span class="n">IntervalTimerThreading</span><span class="p">,</span>
+    <span class="n">RawArrayImageBufferManager</span><span class="p">,</span>
+    <span class="n">SharedMemCircularQueue</span><span class="p">,</span>
+    <span class="n">SharedMemImageBufferManager</span><span class="p">,</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="callback_stream_client"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.callback_stream_client">[docs]</a><span class="k">def</span> <span class="nf">callback_stream_client</span><span class="p">(</span><span class="n">stream_client</span><span class="p">):</span>
@@ -321,12 +325,14 @@
 
 <div class="viewcode-block" id="FuryStreamClient"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamClient">[docs]</a><span class="k">class</span> <span class="nc">FuryStreamClient</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This obj is responsible to create a StreamClient.&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="FuryStreamClient.__init__"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamClient.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">showm</span><span class="p">,</span>
-            <span class="n">max_window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">use_raw_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">whithout_iren_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">num_buffers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">showm</span><span class="p">,</span>
+        <span class="n">max_window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_raw_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">whithout_iren_start</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">num_buffers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A StreamClient extracts a framebuffer from the OpenGL context</span>
@@ -362,26 +368,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">num_buffers</span> <span class="o">=</span> <span class="n">num_buffers</span>
         <span class="k">if</span> <span class="n">max_window_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">max_window_size</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mf">0.1</span><span class="p">)),</span>
-                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mf">0.1</span><span class="p">))</span>
+                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">)),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">)),</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">=</span> <span class="n">max_window_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">max_window_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">=</span> <span class="n">max_window_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">max_window_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_window_size</span> <span class="o">=</span> <span class="n">max_window_size</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s1">&#39;max_window_size must be greater than window_size&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_size</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;max_window_size must be greater than window_size&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">PY_VERSION_8</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">use_raw_array</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">               SharedMemory works only in python 3.8 or higher&quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">               SharedMemory works only in python 3.8 or higher&quot;&quot;&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">use_raw_array</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span> <span class="o">=</span> <span class="n">RawArrayImageBufferManager</span><span class="p">(</span>
-                <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="n">num_buffers</span><span class="p">)</span>
+                <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="n">num_buffers</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span> <span class="o">=</span> <span class="n">SharedMemImageBufferManager</span><span class="p">(</span>
-                <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="n">num_buffers</span><span class="p">)</span>
+                <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="n">num_buffers</span>
+            <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_id_timer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_id_observer</span> <span class="o">=</span> <span class="kc">None</span>
@@ -405,47 +414,36 @@
 <span class="sd">            using a threading technique.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">callback_for_vtk</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="n">callback_stream_client</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s2">&quot;stream_client&quot;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;stream_client&quot;</span><span class="p">]})</span>
+            <span class="n">callback_stream_client</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;stream_client&#39;</span><span class="p">]})</span>
+
         <span class="n">use_asyncio</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;Windows&#39;</span> <span class="ow">or</span> <span class="n">use_asyncio</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">ms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whithout_iren_start</span><span class="p">:</span>
 
-                <span class="n">Interval</span> <span class="o">=</span> <span class="n">IntervalTimer</span> \
-                    <span class="k">if</span> <span class="n">use_asyncio</span> <span class="k">else</span> <span class="n">IntervalTimerThreading</span>
+                <span class="n">Interval</span> <span class="o">=</span> <span class="n">IntervalTimer</span> <span class="k">if</span> <span class="n">use_asyncio</span> <span class="k">else</span> <span class="n">IntervalTimerThreading</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_interval_timer</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span>
-                    <span class="n">ms</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span>
-                    <span class="n">callback_stream_client</span><span class="p">,</span>
-                    <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
+                    <span class="n">ms</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">callback_stream_client</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_id_observer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
-                    <span class="s2">&quot;TimerEvent&quot;</span><span class="p">,</span>
-                    <span class="n">partial</span><span class="p">(</span>
-                        <span class="n">callback_for_vtk</span><span class="p">,</span>
-                        <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
-                    <span class="p">)</span>
+                    <span class="s1">&#39;TimerEvent&#39;</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">callback_for_vtk</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_id_timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">CreateRepeatingTimer</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id_observer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
-                <span class="s1">&#39;RenderEvent&#39;</span><span class="p">,</span>
-                <span class="n">partial</span><span class="p">(</span>
-                    <span class="n">callback_for_vtk</span><span class="p">,</span>
-                    <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">}</span>
-                <span class="p">)</span>
+                <span class="s1">&#39;RenderEvent&#39;</span><span class="p">,</span> <span class="n">partial</span><span class="p">(</span><span class="n">callback_for_vtk</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">callback_stream_client</span><span class="p">(</span>
-            <span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span></div>
+        <span class="n">callback_stream_client</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="s1">&#39;stream_client&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="p">})</span></div>
 
 <div class="viewcode-block" id="FuryStreamClient.stop"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamClient.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the stream client.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the stream client.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
@@ -463,8 +461,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="FuryStreamClient.cleanup"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamClient.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the shared memory resources if necessary.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the shared memory resources if necessary.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_raw_array</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -476,11 +473,13 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">info_buffer</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Shared Memory </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">info_buffer_name</span><span class="si">}</span><span class="se">\</span>
-<span class="s1">                    (info_buffer) File not found&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Shared Memory </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">info_buffer_name</span><span class="si">}</span><span class="se">\</span>
+<span class="s1">                    (info_buffer) File not found&#39;</span>
+            <span class="p">)</span>
         <span class="k">for</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">image_buffers</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">image_buffer_names</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">image_buffers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img_manager</span><span class="o">.</span><span class="n">image_buffer_names</span>
+        <span class="p">):</span>
             <span class="n">buffer</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">buffer</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
@@ -502,7 +501,7 @@
 <span class="sd">        dequeue</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">circular_queue</span><span class="o">.</span><span class="n">dequeue</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
@@ -510,9 +509,9 @@
     <span class="n">user_event_id</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">user_timestamp</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">user_timestamp</span><span class="p">]</span>
 
-    <span class="n">ts</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span>
-    <span class="n">newX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">x</span><span class="p">])</span>
-    <span class="n">newY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+    <span class="n">ts</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span>
+    <span class="n">newX</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">x</span><span class="p">])</span>
+    <span class="n">newY</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
     <span class="n">ctrl_key</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">ctrl</span><span class="p">])</span>
     <span class="n">shift_key</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">_CQUEUE</span><span class="o">.</span><span class="n">index_info</span><span class="o">.</span><span class="n">shift</span><span class="p">])</span>
     <span class="n">newY</span> <span class="o">=</span> <span class="n">showm</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">newY</span>
@@ -525,19 +524,15 @@
         <span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="n">fp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">pos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
 
         <span class="n">pos2</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">GetPosition</span><span class="p">()</span>
-        <span class="n">camera</span><span class="o">.</span><span class="n">SetFocalPoint</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">pos2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
+        <span class="n">camera</span><span class="o">.</span><span class="n">SetFocalPoint</span><span class="p">([</span><span class="n">pos2</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)])</span>
         <span class="n">camera</span><span class="o">.</span><span class="n">Zoom</span><span class="p">(</span><span class="n">zoomFactor</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">user_event_id</span> <span class="o">==</span> <span class="n">event_ids</span><span class="o">.</span><span class="n">mouse_move</span><span class="p">:</span>
-        <span class="n">iren</span><span class="o">.</span><span class="n">SetEventInformation</span><span class="p">(</span>
-            <span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">,</span> <span class="n">ctrl_key</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">,</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">iren</span><span class="o">.</span><span class="n">SetEventInformation</span><span class="p">(</span><span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">,</span> <span class="n">ctrl_key</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">,</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="n">iren</span><span class="o">.</span><span class="n">MouseMoveEvent</span><span class="p">()</span>
 
     <span class="k">elif</span> <span class="n">event_ids</span><span class="o">.</span><span class="n">mouse_ids</span><span class="p">:</span>
-        <span class="n">iren</span><span class="o">.</span><span class="n">SetEventInformation</span><span class="p">(</span>
-            <span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">,</span> <span class="n">ctrl_key</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">,</span>
-            <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">iren</span><span class="o">.</span><span class="n">SetEventInformation</span><span class="p">(</span><span class="n">newX</span><span class="p">,</span> <span class="n">newY</span><span class="p">,</span> <span class="n">ctrl_key</span><span class="p">,</span> <span class="n">shift_key</span><span class="p">,</span> <span class="nb">chr</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">mouse_actions</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">event_ids</span><span class="o">.</span><span class="n">left_btn_press</span><span class="p">:</span> <span class="n">iren</span><span class="o">.</span><span class="n">LeftButtonPressEvent</span><span class="p">,</span>
             <span class="n">event_ids</span><span class="o">.</span><span class="n">left_btn_release</span><span class="p">:</span> <span class="n">iren</span><span class="o">.</span><span class="n">LeftButtonReleaseEvent</span><span class="p">,</span>
@@ -547,9 +542,7 @@
             <span class="n">event_ids</span><span class="o">.</span><span class="n">right_btn_release</span><span class="p">:</span> <span class="n">iren</span><span class="o">.</span><span class="n">RightButtonReleaseEvent</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">mouse_actions</span><span class="p">[</span><span class="n">user_event_id</span><span class="p">]()</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-        <span class="s1">&#39;Interaction: time to peform event &#39;</span> <span class="o">+</span>
-        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ts</span><span class="o">-</span><span class="n">user_timestamp</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> ms&#39;</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Interaction: time to peform event &#39;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">ts</span><span class="o">-</span><span class="n">user_timestamp</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> ms&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">render_after</span><span class="p">:</span>
         <span class="n">showm</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
         <span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span></div>
@@ -557,9 +550,10 @@
 
 <div class="viewcode-block" id="FuryStreamInteraction"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction">[docs]</a><span class="k">class</span> <span class="nc">FuryStreamInteraction</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This obj. is responsible to manage the user interaction&quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="FuryStreamInteraction.__init__"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">showm</span><span class="p">,</span>  <span class="n">max_queue_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-            <span class="n">use_raw_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">whithout_iren_start</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">showm</span><span class="p">,</span> <span class="n">max_queue_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">use_raw_array</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">whithout_iren_start</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Parameters</span>
@@ -614,32 +608,24 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_whithout_iren_start</span><span class="p">:</span>
-            <span class="n">Interval</span> <span class="o">=</span> <span class="n">IntervalTimer</span> \
-                    <span class="k">if</span> <span class="n">use_asyncio</span> <span class="k">else</span> <span class="n">IntervalTimerThreading</span>
+            <span class="n">Interval</span> <span class="o">=</span> <span class="n">IntervalTimer</span> <span class="k">if</span> <span class="n">use_asyncio</span> <span class="k">else</span> <span class="n">IntervalTimerThreading</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_interval_timer</span> <span class="o">=</span> <span class="n">Interval</span><span class="p">(</span>
-                <span class="n">ms</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span>
+                <span class="n">ms</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span>
                 <span class="n">interaction_callback</span><span class="p">,</span>
-                <span class="o">*</span><span class="p">[</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">circular_queue</span><span class="p">,</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="p">,</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="p">,</span>
-                     <span class="kc">True</span>
-                 <span class="p">]</span>
+                <span class="o">*</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">circular_queue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-                <span class="n">interaction_callback</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">circular_queue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">_id_observer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
-                <span class="s2">&quot;TimerEvent&quot;</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
+            <span class="k">def</span> <span class="nf">callback</span><span class="p">(</span><span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+                <span class="n">interaction_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">circular_queue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id_observer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span><span class="s1">&#39;TimerEvent&#39;</span><span class="p">,</span> <span class="n">callback</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_id_timer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showm</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">CreateRepeatingTimer</span><span class="p">(</span><span class="n">ms</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 <div class="viewcode-block" id="FuryStreamInteraction.stop"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the stream interaction client.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the stream interaction client.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_started</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>
 
@@ -659,8 +645,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_started</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 <div class="viewcode-block" id="FuryStreamInteraction.cleanup"><a class="viewcode-back" href="../../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction.cleanup">[docs]</a>    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the shared memory resources if necessary.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the shared memory resources if necessary.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">circular_queue</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span></div></div>
 </pre></div>
 

@@ -33,22 +33,24 @@ Where, k:wavenumber, x:abscissa, w:angular frequency, t:time, d:phase angle
 
 Importing necessary modules
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-22
+.. GENERATED FROM PYTHON SOURCE LINES 17-24
 
 .. code-block:: default
 
 
-    from fury import window, actor, utils, ui
-    import numpy as np
     import itertools
 
+    import numpy as np
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-25
+    from fury import actor, ui, utils, window
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 25-27
 
 function that updates and returns the coordinates of the waves which are
 changing with time
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-33
+.. GENERATED FROM PYTHON SOURCE LINES 27-36
 
 .. code-block:: default
 
@@ -56,12 +58,13 @@ changing with time
 
     def update_coordinates(wavenumber, ang_frq, time, phase_angle):
         x = np.linspace(-3, 3, npoints)
-        y = np.sin(wavenumber*x - ang_frq*time + phase_angle)
+        y = np.sin(wavenumber * x - ang_frq * time + phase_angle)
         z = np.array([0 for i in range(npoints)])
         return x, y, z
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-45
+
+.. GENERATED FROM PYTHON SOURCE LINES 37-48
 
 Variable(s) and their description-
 npoints: For high quality rendering, keep the number of npoints high
@@ -75,7 +78,7 @@ incre_time: value by which time is incremented for each call of
 angular_frq: angular frequency (default = 0.1)
 phase_angle: phase angle (default = 0.002)
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-55
+.. GENERATED FROM PYTHON SOURCE LINES 48-58
 
 .. code-block:: default
 
@@ -83,37 +86,38 @@ phase_angle: phase angle (default = 0.002)
 
     npoints = 800
     wavelength = 2
-    wavenumber = 2*np.pi/wavelength
+    wavenumber = 2 * np.pi / wavelength
     time = 0
     incre_time = 0.1
     angular_frq = 0.1
     phase_angle = 0.002
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-57
+.. GENERATED FROM PYTHON SOURCE LINES 59-60
 
 Creating a scene object and configuring the camera's position
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-66
+.. GENERATED FROM PYTHON SOURCE LINES 60-70
 
 .. code-block:: default
 
 
     scene = window.Scene()
-    scene.set_camera(position=(-6, 5, -10), focal_point=(0.0, 0.0, 0.0),
-                     view_up=(0.0, 0.0, 0.0))
-    showm = window.ShowManager(scene,
-                               size=(800, 600), reset_camera=True,
-                               order_transparent=True)
+    scene.set_camera(
+        position=(-6, 5, -10), focal_point=(0.0, 0.0, 0.0), view_up=(0.0, 0.0, 0.0)
+    )
+    showm = window.ShowManager(
+        scene, size=(800, 600), reset_camera=True, order_transparent=True
+    )
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-69
+.. GENERATED FROM PYTHON SOURCE LINES 71-73
 
 Creating a yellow colored arrow to show the direction of propagation of
 electromagnetic wave
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-79
+.. GENERATED FROM PYTHON SOURCE LINES 73-90
 
 .. code-block:: default
 
@@ -121,24 +125,31 @@ electromagnetic wave
     centers = np.array([[3, 0, 0]])
     directions = np.array([[-1, 0, 0]])
     heights = np.array([6.4])
-    arrow_actor = actor.arrow(centers, directions, window.colors.yellow, heights,
-                              resolution=20, tip_length=0.06, tip_radius=0.012,
-                              shaft_radius=0.005)
+    arrow_actor = actor.arrow(
+        centers,
+        directions,
+        window.colors.yellow,
+        heights,
+        resolution=20,
+        tip_length=0.06,
+        tip_radius=0.012,
+        shaft_radius=0.005,
+    )
     scene.add(arrow_actor)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 91-92
 
 Creating point actor that renders the magnetic field
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-99
+.. GENERATED FROM PYTHON SOURCE LINES 92-109
 
 .. code-block:: default
 
 
     x = np.linspace(-3, 3, npoints)
-    y = np.sin(wavenumber*x - angular_frq*time + phase_angle)
+    y = np.sin(wavenumber * x - angular_frq * time + phase_angle)
     z = np.array([0 for i in range(npoints)])
 
     pts = np.array([(a, b, c) for (a, b, c) in zip(x, y, z)])
@@ -149,24 +160,23 @@ Creating point actor that renders the magnetic field
 
     vertices = utils.vertices_from_actor(wave_actor1)
     vcolors = utils.colors_from_actor(wave_actor1, 'colors')
-    no_vertices_per_point = len(vertices)/npoints
-    initial_vertices = vertices.copy() - \
-        np.repeat(pts, no_vertices_per_point, axis=0)
+    no_vertices_per_point = len(vertices) / npoints
+    initial_vertices = vertices.copy() - np.repeat(pts, no_vertices_per_point, axis=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-101
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 Creating point actor that renders the electric field
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-119
+.. GENERATED FROM PYTHON SOURCE LINES 111-128
 
 .. code-block:: default
 
 
     xx = np.linspace(-3, 3, npoints)
     yy = np.array([0 for i in range(npoints)])
-    zz = np.sin(wavenumber*xx - angular_frq*time + phase_angle)
+    zz = np.sin(wavenumber * xx - angular_frq * time + phase_angle)
 
     pts2 = np.array([(a, b, c) for (a, b, c) in zip(xx, yy, zz)])
     pts2 = [pts2]
@@ -176,31 +186,30 @@ Creating point actor that renders the electric field
 
     vertices2 = utils.vertices_from_actor(wave_actor2)
     vcolors2 = utils.colors_from_actor(wave_actor2, 'colors')
-    no_vertices_per_point2 = len(vertices2)/npoints
-    initial_vertices2 = vertices2.copy() - \
-        np.repeat(pts2, no_vertices_per_point2, axis=0)
+    no_vertices_per_point2 = len(vertices2) / npoints
+    initial_vertices2 = vertices2.copy() - np.repeat(pts2, no_vertices_per_point2, axis=0)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-121
+.. GENERATED FROM PYTHON SOURCE LINES 129-130
 
 Initializing text box to display the title of the animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-126
+.. GENERATED FROM PYTHON SOURCE LINES 130-135
 
 .. code-block:: default
 
 
     tb = ui.TextBlock2D(bold=True, position=(160, 90))
-    tb.message = "Electromagnetic Wave"
+    tb.message = 'Electromagnetic Wave'
     scene.add(tb)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-128
+.. GENERATED FROM PYTHON SOURCE LINES 136-137
 
 end is used to decide when to end the animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-131
+.. GENERATED FROM PYTHON SOURCE LINES 137-140
 
 .. code-block:: default
 
@@ -208,11 +217,11 @@ end is used to decide when to end the animation
     end = 300
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-133
+.. GENERATED FROM PYTHON SOURCE LINES 141-142
 
 Initializing counter
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-137
+.. GENERATED FROM PYTHON SOURCE LINES 142-146
 
 .. code-block:: default
 
@@ -221,12 +230,12 @@ Initializing counter
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-140
+.. GENERATED FROM PYTHON SOURCE LINES 147-149
 
 Coordinates to be plotted are changed everytime timer_callback is called by
 using the update_coordinates function. The wave is rendered here.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-166
+.. GENERATED FROM PYTHON SOURCE LINES 149-173
 
 .. code-block:: default
 
@@ -239,14 +248,12 @@ using the update_coordinates function. The wave is rendered here.
 
         x, y, z = update_coordinates(wavenumber, angular_frq, phase_angle, time)
         pts = np.array([(a, b, c) for (a, b, c) in zip(x, y, z)])
-        vertices[:] = initial_vertices + \
-            np.repeat(pts, no_vertices_per_point, axis=0)
+        vertices[:] = initial_vertices + np.repeat(pts, no_vertices_per_point, axis=0)
         utils.update_actor(wave_actor1)
 
         xx, zz, yy = update_coordinates(wavenumber, angular_frq, phase_angle, time)
         pts2 = np.array([(a, b, c) for (a, b, c) in zip(xx, yy, zz)])
-        vertices2[:] = initial_vertices2 + \
-            np.repeat(pts2, no_vertices_per_point2, axis=0)
+        vertices2[:] = initial_vertices2 + np.repeat(pts2, no_vertices_per_point2, axis=0)
         utils.update_actor(wave_actor2)
 
         showm.render()
@@ -257,11 +264,11 @@ using the update_coordinates function. The wave is rendered here.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-168
+.. GENERATED FROM PYTHON SOURCE LINES 174-175
 
 Run every 25 milliseconds
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-175
+.. GENERATED FROM PYTHON SOURCE LINES 175-182
 
 .. code-block:: default
 
@@ -271,7 +278,7 @@ Run every 25 milliseconds
     interactive = False
     if interactive:
         showm.start()
-    window.record(showm.scene, size=(800, 600), out_path="viz_emwave.png")
+    window.record(showm.scene, size=(800, 600), out_path='viz_emwave.png')
 
 
 .. rst-class:: sphx-glr-timing

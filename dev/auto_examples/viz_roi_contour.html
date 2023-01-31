@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Visualization of ROI Surface Rendered with Streamlines &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Visualization of ROI Surface Rendered with Streamlines &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -239,16 +239,16 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -309,20 +309,22 @@ to download the full example code</p>
 <p>Here is a simple tutorial following the probabilistic CSA Tracking Example in
 which we generate a dataset of streamlines from a corpus callosum ROI, and
 then display them with the seed ROI rendered in 3D with 50% transparency.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.data/#dipy.data.read_stanford_labels" title="dipy.data.read_stanford_labels" class="sphx-glr-backref-module-dipy-data sphx-glr-backref-type-py-function"><span class="n">read_stanford_labels</span></a>
-<span class="kn">from</span> <span class="nn">dipy.reconst.shm</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.reconst/#dipy.reconst.shm.CsaOdfModel" title="dipy.reconst.shm.CsaOdfModel" class="sphx-glr-backref-module-dipy-reconst-shm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CsaOdfModel</span></a>
-<span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">default_sphere</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dipy.data</span> <span class="kn">import</span> <span class="n">default_sphere</span><span class="p">,</span> <a href="https://dipy.org/documentation/latest/reference/dipy.data/#dipy.data.read_stanford_labels" title="dipy.data.read_stanford_labels" class="sphx-glr-backref-module-dipy-data sphx-glr-backref-type-py-function"><span class="n">read_stanford_labels</span></a>
 <span class="kn">from</span> <span class="nn">dipy.direction</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.direction/#dipy.direction.peaks_from_model" title="dipy.direction.peaks_from_model" class="sphx-glr-backref-module-dipy-direction sphx-glr-backref-type-py-function"><span class="n">peaks_from_model</span></a>
+<span class="kn">from</span> <span class="nn">dipy.reconst.shm</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.reconst/#dipy.reconst.shm.CsaOdfModel" title="dipy.reconst.shm.CsaOdfModel" class="sphx-glr-backref-module-dipy-reconst-shm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CsaOdfModel</span></a>
+
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">dipy.tracking.local</span> <span class="kn">import</span> <span class="n">ThresholdTissueClassifier</span> <span class="k">as</span> \
-        <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" title="dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" class="sphx-glr-backref-module-dipy-tracking-stopping_criterion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ThresholdStoppingCriterion</span></a>
     <span class="kn">from</span> <span class="nn">dipy.tracking.local</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.local_tracking.LocalTracking" title="dipy.tracking.local_tracking.LocalTracking" class="sphx-glr-backref-module-dipy-tracking-local_tracking sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LocalTracking</span></a>
+    <span class="kn">from</span> <span class="nn">dipy.tracking.local</span> <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">ThresholdTissueClassifier</span> <span class="k">as</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" title="dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" class="sphx-glr-backref-module-dipy-tracking-stopping_criterion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ThresholdStoppingCriterion</span></a><span class="p">,</span>
+    <span class="p">)</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">dipy.tracking.stopping_criterion</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" title="dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" class="sphx-glr-backref-module-dipy-tracking-stopping_criterion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ThresholdStoppingCriterion</span></a>
     <span class="kn">from</span> <span class="nn">dipy.tracking.local_tracking</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.local_tracking.LocalTracking" title="dipy.tracking.local_tracking.LocalTracking" class="sphx-glr-backref-module-dipy-tracking-local_tracking sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LocalTracking</span></a>
 
 <span class="kn">from</span> <span class="nn">dipy.tracking</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.Streamlines" title="dipy.tracking.Streamlines" class="sphx-glr-backref-module-dipy-tracking sphx-glr-backref-type-py-attribute"><span class="n">Streamlines</span></a>
+
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <a href="../reference/fury.colormap.html#fury.colormap.line_colors" title="fury.colormap.line_colors" class="sphx-glr-backref-module-fury-colormap sphx-glr-backref-type-py-function"><span class="n">line_colors</span></a>
 </pre></div>
@@ -338,19 +340,22 @@ Tutorial.</p>
 <span class="n">white_matter</span> <span class="o">=</span> <span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="n">csa_model</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.reconst/#dipy.reconst.shm.CsaOdfModel" title="dipy.reconst.shm.CsaOdfModel" class="sphx-glr-backref-module-dipy-reconst-shm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CsaOdfModel</span></a><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
-<span class="n">csa_peaks</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.direction/#dipy.direction.peaks_from_model" title="dipy.direction.peaks_from_model" class="sphx-glr-backref-module-dipy-direction sphx-glr-backref-type-py-function"><span class="n">peaks_from_model</span></a><span class="p">(</span><span class="n">csa_model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">default_sphere</span><span class="p">,</span>
-                             <span class="n">relative_peak_threshold</span><span class="o">=</span><span class="mf">.8</span><span class="p">,</span>
-                             <span class="n">min_separation_angle</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-                             <span class="n">mask</span><span class="o">=</span><span class="n">white_matter</span><span class="p">)</span>
+<span class="n">csa_peaks</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.direction/#dipy.direction.peaks_from_model" title="dipy.direction.peaks_from_model" class="sphx-glr-backref-module-dipy-direction sphx-glr-backref-type-py-function"><span class="n">peaks_from_model</span></a><span class="p">(</span>
+    <span class="n">csa_model</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">,</span>
+    <span class="n">default_sphere</span><span class="p">,</span>
+    <span class="n">relative_peak_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">min_separation_angle</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+    <span class="n">mask</span><span class="o">=</span><span class="n">white_matter</span><span class="p">,</span>
+<span class="p">)</span>
 
-<span class="n">classifier</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" title="dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" class="sphx-glr-backref-module-dipy-tracking-stopping_criterion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ThresholdStoppingCriterion</span></a><span class="p">(</span><span class="n">csa_peaks</span><span class="o">.</span><span class="n">gfa</span><span class="p">,</span> <span class="mf">.25</span><span class="p">)</span>
+<span class="n">classifier</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" title="dipy.tracking.stopping_criterion.ThresholdStoppingCriterion" class="sphx-glr-backref-module-dipy-tracking-stopping_criterion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ThresholdStoppingCriterion</span></a><span class="p">(</span><span class="n">csa_peaks</span><span class="o">.</span><span class="n">gfa</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>
 
 <span class="n">seed_mask</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">==</span> <span class="mi">2</span>
 <span class="n">seeds</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.utils.seeds_from_mask" title="dipy.tracking.utils.seeds_from_mask" class="sphx-glr-backref-module-dipy-tracking-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">seeds_from_mask</span></a><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">)</span>
 
 <span class="c1"># Initialization of LocalTracking. The computation happens in the next step.</span>
-<span class="n">streamlines</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.local_tracking.LocalTracking" title="dipy.tracking.local_tracking.LocalTracking" class="sphx-glr-backref-module-dipy-tracking-local_tracking sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LocalTracking</span></a><span class="p">(</span><span class="n">csa_peaks</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span>
-                            <span class="n">step_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">streamlines</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.local_tracking.LocalTracking" title="dipy.tracking.local_tracking.LocalTracking" class="sphx-glr-backref-module-dipy-tracking-local_tracking sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LocalTracking</span></a><span class="p">(</span><span class="n">csa_peaks</span><span class="p">,</span> <span class="n">classifier</span><span class="p">,</span> <span class="n">seeds</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># Compute streamlines and store as a list.</span>
 <span class="n">streamlines</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.tracking/#dipy.tracking.Streamlines" title="dipy.tracking.Streamlines" class="sphx-glr-backref-module-dipy-tracking sphx-glr-backref-type-py-attribute"><span class="n">Streamlines</span></a><span class="p">(</span><span class="n">streamlines</span><span class="p">)</span>
@@ -367,8 +372,9 @@ a decimal between zero and one. Here, we set the color as blue/green with
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">surface_opacity</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">surface_color</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
-<span class="n">seedroi_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.contour_from_roi" title="fury.actor.contour_from_roi" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">contour_from_roi</span></a><span class="p">(</span><span class="n">seed_mask</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span>
-                                       <span class="n">surface_color</span><span class="p">,</span> <span class="n">surface_opacity</span><span class="p">)</span>
+<span class="n">seedroi_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.contour_from_roi" title="fury.actor.contour_from_roi" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">contour_from_roi</span></a><span class="p">(</span>
+    <span class="n">seed_mask</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">surface_color</span><span class="p">,</span> <span class="n">surface_opacity</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, we initialize a ‘’Scene’’ object and add both actors
@@ -387,8 +393,7 @@ interactive window.</p>
 <span class="c1"># scene.zoom(1.5)</span>
 <span class="c1"># scene.reset_clipping_range()</span>
 
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;contour_from_roi_tutorial.png&#39;</span><span class="p">,</span>
-              <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;contour_from_roi_tutorial.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>

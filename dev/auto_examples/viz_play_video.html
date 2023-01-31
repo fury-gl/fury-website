@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Play a video in the 3D world &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Play a video in the 3D world &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -53,8 +53,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Electromagnetic Wave Propagation Animation" href="viz_emwave_animation.html" />
-    <link rel="prev" title="Fine-tuning the OpenGL state using shader callbacks" href="viz_fine_tuning_gl_context.html" />
+    <link rel="next" title="Fine-tuning the OpenGL state using shader callbacks" href="viz_fine_tuning_gl_context.html" />
+    <link rel="prev" title="Brownian motion" href="viz_brownian_motion.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -308,17 +308,17 @@ to download the full example code</p>
 <span id="sphx-glr-auto-examples-viz-play-video-py"></span><h1>Play a video in the 3D world<a class="headerlink" href="#play-a-video-in-the-3d-world" title="Permalink to this heading">#</a></h1>
 <p>The goal of this demo is to show how to visualize a video
 on a rectangle by updating a texture.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">cv2</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
 
-<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
 
 
 <span class="c1"># The VideoCapturer Class</span>
 <span class="c1"># This Class wraps OpenCV Videocapture</span>
 <span class="k">class</span> <span class="nc">VideoCapturer</span><span class="p">:</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <a href="https://docs.python.org/3/library/time.html#module-time" title="builtins.time" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-module"><span class="n">time</span></a><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">video</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">video</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoCapture</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
@@ -341,7 +341,6 @@ on a rectangle by updating a texture.</p>
 
 
 <span class="k">class</span> <span class="nc">VideoPlayer</span><span class="p">:</span>
-
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video</span><span class="p">,</span> <a href="https://docs.python.org/3/library/time.html#module-time" title="builtins.time" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-module"><span class="n">time</span></a><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
         <span class="c1"># Initializes the Video object with the given Video</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">video</span> <span class="o">=</span> <span class="n">VideoCapturer</span><span class="p">(</span><span class="n">video</span><span class="p">,</span> <a href="https://docs.python.org/3/library/time.html#module-time" title="builtins.time" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-module"><span class="n">time</span></a><span class="p">)</span>
@@ -350,10 +349,9 @@ on a rectangle by updating a texture.</p>
         <span class="c1"># Initialize Scene</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialize_scene</span><span class="p">()</span>
         <span class="c1"># Create a Show Manager and Initialize it</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">show_manager</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
-                                               <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span>
-                                               <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                               <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_manager</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
     <span class="c1"># Initialize the Scene with actors</span>
     <span class="k">def</span> <span class="nf">initialize_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -379,20 +377,21 @@ on a rectangle by updating a texture.</p>
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Add a timer callback to show manager after with</span>
         <span class="c1"># video frame duration as the interval</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">frame_duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">show_manager</span><span class="o">.</span><span class="n">add_timer_callback</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span>
-                                             <span class="bp">self</span><span class="o">.</span><span class="n">frame_duration</span><span class="p">,</span>
-                                             <span class="bp">self</span><span class="o">.</span><span class="n">timer_callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_duration</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">fps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_manager</span><span class="o">.</span><span class="n">add_timer_callback</span><span class="p">(</span>
+            <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_duration</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer_callback</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">show_manager</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
 
 <span class="c1"># Create VideoPlayer Object and run it</span>
-<span class="n">video_url</span> <span class="o">=</span> <span class="s2">&quot;http://commondatastorage.googleapis.com/&quot;</span> <span class="o">+</span>\
-            <span class="s2">&quot;gtv-videos-bucket/sample/BigBuckBunny.mp4&quot;</span>
+<span class="n">video_url</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s1">&#39;http://commondatastorage.googleapis.com/&#39;</span>
+    <span class="o">+</span> <span class="s1">&#39;gtv-videos-bucket/sample/BigBuckBunny.mp4&#39;</span>
+<span class="p">)</span>
 <span class="n">vp</span> <span class="o">=</span> <span class="n">VideoPlayer</span><span class="p">(</span><span class="n">video_url</span><span class="p">)</span>
 <span class="n">vp</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">vp</span><span class="o">.</span><span class="n">show_manager</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_play_video.png&#39;</span><span class="p">,</span>
-              <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">vp</span><span class="o">.</span><span class="n">show_manager</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_play_video.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -415,17 +414,17 @@ on a rectangle by updating a texture.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="viz_fine_tuning_gl_context.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="viz_brownian_motion.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Fine-tuning the OpenGL state using shader callbacks</p>
+          <p class="prev-next-title">Brownian motion</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="viz_emwave_animation.html" title="next page">
+  <a class='right-next' id="next-link" href="viz_fine_tuning_gl_context.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Electromagnetic Wave Propagation Animation</p>
+      <p class="prev-next-title">Fine-tuning the OpenGL state using shader callbacks</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>

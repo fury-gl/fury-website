@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Brownian motion &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Brownian motion &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -53,7 +53,7 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Fine-tuning the OpenGL state using shader callbacks" href="viz_fine_tuning_gl_context.html" />
+    <link rel="next" title="Play a video in the 3D world" href="viz_play_video.html" />
     <link rel="prev" title="Motion of a charged particle in a combined magnetic and electric field" href="viz_helical_motion.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -310,9 +310,10 @@ to download the full example code</p>
 suspended in a medium. In this animation, path followed by 20 particles
 exhibiting brownian motion in 3D is plotted.</p>
 <p>Importing necessary modules</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
 </pre></div>
 </div>
 <p>Let’s define some variable and their description:</p>
@@ -346,34 +347,40 @@ path(s) of the particle(s) (default: 3)</p></li>
 </div>
 <p>We define a particle function that will return an actor, store and update
 coordinates of the particles (the path of the particles).</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">particle</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">num_total_steps</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-             <span class="n">total_time</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span> <span class="n">path_thickness</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">particle</span><span class="p">(</span>
+    <span class="n">colors</span><span class="p">,</span>
+    <span class="n">origin</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+    <span class="n">num_total_steps</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+    <span class="n">total_time</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">delta</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
+    <span class="n">path_thickness</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="n">origin</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="numpy.asarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">asarray</span></a><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">position</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.tile.html#numpy.tile" title="numpy.tile" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">tile</span></a><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="p">(</span><span class="n">num_total_steps</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-    <span class="n">path_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">([</span><span class="n">position</span><span class="p">],</span> <span class="n">colors</span><span class="p">,</span>
-                            <span class="n">linewidth</span><span class="o">=</span><span class="n">path_thickness</span><span class="p">)</span>
+    <span class="n">path_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">([</span><span class="n">position</span><span class="p">],</span> <span class="n">colors</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="n">path_thickness</span><span class="p">)</span>
     <span class="n">path_actor</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
     <span class="n">path_actor</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="n">delta</span>
     <span class="n">path_actor</span><span class="o">.</span><span class="n">num_total_steps</span> <span class="o">=</span> <span class="n">num_total_steps</span>
     <span class="n">path_actor</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">total_time</span> <span class="o">/</span> <span class="n">num_total_steps</span>
     <span class="n">path_actor</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">path_actor</span><span class="p">)</span>
-    <span class="n">path_actor</span><span class="o">.</span><span class="n">no_vertices_per_point</span> <span class="o">=</span> \
-        <span class="nb">len</span><span class="p">(</span><span class="n">path_actor</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_total_steps</span>
-    <span class="n">path_actor</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">=</span> <span class="n">path_actor</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">-</span> \
-        <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">path_actor</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">path_actor</span><span class="o">.</span><span class="n">no_vertices_per_point</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_actor</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_total_steps</span>
+    <span class="n">path_actor</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">=</span> <span class="n">path_actor</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span>
+        <span class="n">position</span><span class="p">,</span> <span class="n">path_actor</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">path_actor</span>
 </pre></div>
 </div>
 <p>The function <cite>update_path</cite> will simulate the the brownian motion.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update_path</span><span class="p">(</span><span class="n">act</span><span class="p">,</span> <span class="n">counter_step</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">counter_step</span> <span class="o">&lt;</span> <span class="n">act</span><span class="o">.</span><span class="n">num_total_steps</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="n">counter_step</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="n">counter_step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">x</span> <span class="o">+=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">act</span><span class="o">.</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">act</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
         <span class="n">y</span> <span class="o">+=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">act</span><span class="o">.</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">act</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
         <span class="n">z</span> <span class="o">+=</span> <span class="n">norm</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">act</span><span class="o">.</span><span class="n">delta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">act</span><span class="o">.</span><span class="n">time_step</span><span class="p">)</span>
         <span class="n">act</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="n">counter_step</span><span class="p">:]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">]</span>
-        <span class="n">act</span><span class="o">.</span><span class="n">vertices</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">+</span> \
-            <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">act</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">act</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">act</span><span class="o">.</span><span class="n">vertices</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">act</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">+</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span>
+            <span class="n">act</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">act</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
         <a href="../reference/fury.utils.html#fury.utils.update_actor" title="fury.utils.update_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">update_actor</span></a><span class="p">(</span><span class="n">act</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -381,31 +388,39 @@ coordinates of the particles (the path of the particles).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">1.7</span><span class="p">)</span>
-<span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-                 <span class="n">view_up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-<span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
-                           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                           <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">view_up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>Creating a list of particle objects</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l_particle</span> <span class="o">=</span> <span class="p">[</span><span class="n">particle</span><span class="p">(</span><span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html#numpy.random.rand" title="numpy.random.rand" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
-                       <span class="n">num_total_steps</span><span class="o">=</span><span class="n">num_total_steps</span><span class="p">,</span>
-                       <span class="n">total_time</span><span class="o">=</span><span class="n">total_time</span><span class="p">,</span> <span class="n">path_thickness</span><span class="o">=</span><span class="n">path_thickness</span><span class="p">)</span>
-              <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_particles</span><span class="p">)]</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">l_particle</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">particle</span><span class="p">(</span>
+        <span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html#numpy.random.rand" title="numpy.random.rand" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="n">origin</span><span class="o">=</span><span class="n">origin</span><span class="p">,</span>
+        <span class="n">num_total_steps</span><span class="o">=</span><span class="n">num_total_steps</span><span class="p">,</span>
+        <span class="n">total_time</span><span class="o">=</span><span class="n">total_time</span><span class="p">,</span>
+        <span class="n">path_thickness</span><span class="o">=</span><span class="n">path_thickness</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_particles</span><span class="p">)</span>
+<span class="p">]</span>
 
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="n">l_particle</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Creating a container (cube actor) inside which the particle(s) move around</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">container_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
-                            <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="n">scales</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">container_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span> <span class="n">scales</span><span class="o">=</span><span class="mi">6</span>
+<span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">container_actor</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Initializing text box to display the name of the animation</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tb</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">235</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-<span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Brownian Motion&quot;</span>
+<span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Brownian Motion&#39;</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -424,7 +439,7 @@ coordinates of the particles (the path of the particles).</p>
 <p>Run every 30 milliseconds</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span><span class="o">.</span><span class="n">add_timer_callback</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">timer_callback</span><span class="p">)</span>
 <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_brownian_motion.png&quot;</span><span class="p">)</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_brownian_motion.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -454,10 +469,10 @@ coordinates of the particles (the path of the particles).</p>
           <p class="prev-next-title">Motion of a charged particle in a combined magnetic and electric field</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="viz_fine_tuning_gl_context.html" title="next page">
+  <a class='right-next' id="next-link" href="viz_play_video.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Fine-tuning the OpenGL state using shader callbacks</p>
+      <p class="prev-next-title">Play a video in the 3D world</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
