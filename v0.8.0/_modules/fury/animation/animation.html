@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.animation &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.animation.animation &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -277,16 +277,22 @@
             <article class="bd-article" role="main">
               
   <h1>Source code for fury.animation.animation</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">transform</span>
-<span class="kn">from</span> <span class="nn">fury.actor</span> <span class="kn">import</span> <span class="n">line</span>
+
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">Transform</span><span class="p">,</span> <span class="n">Camera</span>
-<span class="kn">from</span> <span class="nn">fury.animation.interpolator</span> <span class="kn">import</span> <span class="n">spline_interpolator</span><span class="p">,</span> \
-    <span class="n">step_interpolator</span><span class="p">,</span> <span class="n">linear_interpolator</span><span class="p">,</span> <span class="n">slerp</span>    <span class="c1"># noqa F401</span>
+<span class="kn">from</span> <span class="nn">fury.actor</span> <span class="kn">import</span> <span class="n">line</span>
+<span class="kn">from</span> <span class="nn">fury.animation.interpolator</span> <span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa F401</span>
+    <span class="n">linear_interpolator</span><span class="p">,</span>
+    <span class="n">slerp</span><span class="p">,</span>
+    <span class="n">spline_interpolator</span><span class="p">,</span>
+    <span class="n">step_interpolator</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">Transform</span>
 
 
 <div class="viewcode-block" id="Animation"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation">[docs]</a><span class="k">class</span> <span class="nc">Animation</span><span class="p">:</span>
@@ -314,8 +320,7 @@
 <span class="sd">        path (visualizing position).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Animation.__init__"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Animation.__init__"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
@@ -352,8 +357,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_max_timestamp</span><span class="p">,</span> <span class="nb">max</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">anim</span><span class="o">.</span><span class="n">update_duration</span><span class="p">()</span> <span class="k">for</span> <span class="n">anim</span>
-                                                <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_animations</span><span class="p">]))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_max_timestamp</span><span class="p">,</span>
+                <span class="nb">max</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">anim</span><span class="o">.</span><span class="n">update_duration</span><span class="p">()</span> <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_animations</span><span class="p">]),</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span></div>
 
@@ -403,8 +409,9 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s1">&#39;color&#39;</span><span class="p">):</span>
                 <span class="p">[</span><span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_color</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ts</span><span class="p">]</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">colors</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">vcolors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">])</span> <span class="o">/</span> \
-                         <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">vcolors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
@@ -450,10 +457,9 @@
             <span class="n">data</span><span class="p">[</span><span class="n">attrib</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s1">&#39;keyframes&#39;</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">),</span>
                 <span class="s1">&#39;interpolator&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">linear_interpolator</span> <span class="k">if</span> <span class="n">attrib</span> <span class="o">!=</span> <span class="s1">&#39;rotation&#39;</span> <span class="k">else</span>
-                    <span class="n">slerp</span><span class="p">,</span>
+                    <span class="s1">&#39;base&#39;</span><span class="p">:</span> <span class="n">linear_interpolator</span> <span class="k">if</span> <span class="n">attrib</span> <span class="o">!=</span> <span class="s1">&#39;rotation&#39;</span> <span class="k">else</span> <span class="n">slerp</span><span class="p">,</span>
                     <span class="s1">&#39;func&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">()</span>
+                    <span class="s1">&#39;args&#39;</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(),</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;callbacks&#39;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="p">}</span>
@@ -472,12 +478,14 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">attrib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">attribs</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-            <span class="k">return</span> <span class="p">{</span><span class="n">attrib</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keyframes&#39;</span><span class="p">,</span> <span class="p">{})</span> <span class="k">for</span>
-                    <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attribs</span><span class="p">}</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">attrib</span><span class="p">:</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keyframes&#39;</span><span class="p">,</span> <span class="p">{})</span> <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="n">attribs</span>
+            <span class="p">}</span>
         <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;keyframes&#39;</span><span class="p">,</span> <span class="p">{})</span></div>
 
-<div class="viewcode-block" id="Animation.set_keyframe"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_keyframe">[docs]</a>    <span class="k">def</span> <span class="nf">set_keyframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">update_interpolator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                     <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Animation.set_keyframe"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_keyframe">[docs]</a>    <span class="k">def</span> <span class="nf">set_keyframe</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">update_interpolator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a keyframe for a certain attribute.</span>
 
 <span class="sd">        Parameters</span>
@@ -508,14 +516,18 @@
 
         <span class="n">keyframes</span><span class="p">[</span><span class="n">timestamp</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">),</span>
-            <span class="o">**</span><span class="p">{</span><span class="n">par</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">par</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-               <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="n">par</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">par</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">},</span>
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">update_interpolator</span><span class="p">:</span>
             <span class="n">interp</span> <span class="o">=</span> <span class="n">attrib_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">)</span>
             <span class="n">interp_base</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">linear_interpolator</span> <span class="k">if</span> <span class="n">attrib</span> <span class="o">!=</span> <span class="s1">&#39;rotation&#39;</span> <span class="k">else</span> <span class="n">slerp</span><span class="p">)</span>
+                <span class="s1">&#39;base&#39;</span><span class="p">,</span> <span class="n">linear_interpolator</span> <span class="k">if</span> <span class="n">attrib</span> <span class="o">!=</span> <span class="s1">&#39;rotation&#39;</span> <span class="k">else</span> <span class="n">slerp</span>
+            <span class="p">)</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">interp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;args&#39;</span><span class="p">,</span> <span class="p">{})</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="n">interp_base</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
 
@@ -574,8 +586,7 @@
             <span class="n">parent_in_scene</span> <span class="o">=</span> <span class="n">parent</span><span class="o">.</span><span class="n">_added_to_scene</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s1">&#39;in_scene&#39;</span><span class="p">):</span>
-            <span class="n">in_scene</span> <span class="o">=</span> <span class="n">parent_in_scene</span> <span class="ow">and</span> \
-                       <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;in_scene&#39;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span>
+            <span class="n">in_scene</span> <span class="o">=</span> <span class="n">parent_in_scene</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s1">&#39;in_scene&#39;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">in_scene</span> <span class="o">=</span> <span class="n">parent_in_scene</span>
         <span class="k">return</span> <span class="n">in_scene</span></div>
@@ -618,8 +629,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">False</span>
 
-<div class="viewcode-block" id="Animation.set_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                         <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Animation.set_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set keyframes interpolator for a certain property</span>
 
 <span class="sd">        Parameters</span>
@@ -697,8 +707,7 @@
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Animation.set_position_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_position_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_position_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                                  <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Animation.set_position_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_position_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_position_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the position interpolator.</span>
 
 <span class="sd">        Parameters</span>
@@ -720,8 +729,9 @@
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_position_interpolator(spline_interpolator, degree=5)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span>
-                              <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span>
+            <span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Animation.set_scale_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_scale_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_scale_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the scale interpolator.</span>
@@ -757,8 +767,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_rotation_interpolator(slerp)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span>
-                              <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Animation.set_color_interpolator"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_color_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_color_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the color interpolator.</span>
@@ -793,8 +802,7 @@
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_opacity_interpolator(step_interpolator)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;opacity&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span>
-                              <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;opacity&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Animation.get_value"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the value of an attribute at any given timestamp.</span>
@@ -806,8 +814,9 @@
 <span class="sd">        timestamp: float</span>
 <span class="sd">            The timestamp to interpolate at.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span> \
-            <span class="n">get</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)(</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)(</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
 <div class="viewcode-block" id="Animation.get_current_value"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.get_current_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_current_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">):</span>
@@ -818,8 +827,11 @@
 <span class="sd">        attrib: str</span>
 <span class="sd">            The attribute name.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">)</span><span class="o">.</span> \
-            <span class="n">get</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;interpolator&#39;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;func&#39;</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span><span class="o">.</span><span class="n">current_timestamp</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Animation.set_position"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_position">[docs]</a>    <span class="k">def</span> <span class="nf">set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a position keyframe at a specific timestamp.</span>
@@ -891,13 +903,15 @@
             <span class="c1"># user is expected to set rotation order by default as setting</span>
             <span class="c1"># orientation of a `vtkActor` ordered as z-&gt;x-&gt;y.</span>
             <span class="n">rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">rotation</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-            <span class="n">rotation</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_euler</span><span class="p">(</span><span class="s1">&#39;zxy&#39;</span><span class="p">,</span>
-                                                     <span class="n">rotation</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
-                                                     <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span>
+            <span class="n">rotation</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_euler</span><span class="p">(</span>
+                <span class="s1">&#39;zxy&#39;</span><span class="p">,</span> <span class="n">rotation</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">rotation</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Keyframe with </span><span class="si">{</span><span class="n">no_components</span><span class="si">}</span><span class="s1"> components is not a &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;valid rotation data. Skipped!&#39;</span><span class="p">)</span></div>
+            <span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Keyframe with </span><span class="si">{</span><span class="n">no_components</span><span class="si">}</span><span class="s1"> components is not a &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;valid rotation data. Skipped!&#39;</span>
+            <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Animation.set_rotation_as_vector"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.set_rotation_as_vector">[docs]</a>    <span class="k">def</span> <span class="nf">set_rotation_as_vector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">vector</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a rotation keyframe at a specific timestamp.</span>
@@ -1042,9 +1056,9 @@
             <span class="k">return</span> <span class="n">degrees</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">as_quat</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">rot</span>
-        <span class="k">return</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_euler</span><span class="p">(</span><span class="s1">&#39;zxy&#39;</span><span class="p">,</span>
-                                             <span class="n">rot</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
-                                             <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_euler</span><span class="p">(</span>
+            <span class="s1">&#39;zxy&#39;</span><span class="p">,</span> <span class="n">rot</span><span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">degrees</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Animation.get_scale"><a class="viewcode-back" href="../../../reference/fury.window.html#fury.animation.Animation.get_scale">[docs]</a>    <span class="k">def</span> <span class="nf">get_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the interpolated scale.</span>
@@ -1356,8 +1370,7 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s1">&#39;opacity&#39;</span><span class="p">):</span>
                 <span class="n">opacity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opacity</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="p">[</span><span class="n">act</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span> <span class="k">for</span>
-                 <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
+                <span class="p">[</span><span class="n">act</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s1">&#39;rotation&#39;</span><span class="p">):</span>
                 <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
@@ -1437,10 +1450,10 @@
 <span class="sd">        path (visualizing position).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CameraAnimation.__init__"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.CameraAnimation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                 <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CameraAnimation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span>
-                                              <span class="n">motion_path_res</span><span class="o">=</span><span class="n">motion_path_res</span><span class="p">)</span>
+<div class="viewcode-block" id="CameraAnimation.__init__"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.CameraAnimation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CameraAnimation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="n">motion_path_res</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span></div>
 
     <span class="nd">@property</span>
@@ -1580,7 +1593,7 @@
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;focal&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CameraAnimation.set_view_up_interpolator"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.CameraAnimation.set_view_up_interpolator">[docs]</a>    <span class="k">def</span> <span class="nf">set_view_up_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the camera up-view vector animation interpolator.</span>
@@ -1594,8 +1607,7 @@
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span>
-                              <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s1">&#39;view_up&#39;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CameraAnimation.update_animation"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.CameraAnimation.update_animation">[docs]</a>    <span class="k">def</span> <span class="nf">update_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the camera animation.</span>
@@ -1619,10 +1631,7 @@
                 <span class="c1"># camera axis is reverted</span>
                 <span class="n">rot</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">as_quat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">rot</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-                <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span>
-                                <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span>
-                                <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span>
-                                <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+                <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
                 <span class="n">rot</span> <span class="o">=</span> <span class="n">translation</span> <span class="o">@</span> <span class="n">rot</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">translation</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetModelTransformMatrix</span><span class="p">(</span><span class="n">rot</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
 
