@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.deprecator &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.deprecator &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -284,15 +284,16 @@
 <span class="sd">this file is copied (with minor modifications) from the Nibabel.</span>
 <span class="sd">https://github.com/nipy/nibabel. See COPYING file distributed along with</span>
 <span class="sd">the Nibabel package for the copyright and license terms.</span>
-
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">signature</span>
+
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">fury.optpkg</span> <span class="kn">import</span> <span class="n">optional_package</span>
+
 <span class="c1"># packaging.version.parse is a third-party utility but is used by setuptools</span>
 <span class="c1"># (so probably already installed) and is conformant to the current PEP 440.</span>
 <span class="c1"># But just if it is not the case, we use distutils</span>
@@ -393,8 +394,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">version_cmp</span> <span class="o">=</span> <span class="n">packaging</span><span class="o">.</span><span class="n">version</span><span class="o">.</span><span class="n">parse</span> <span class="k">if</span> <span class="n">have_pkg</span> <span class="k">else</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[a-z, A-Z]&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="n">version_str</span><span class="p">,</span>
-                                                 <span class="n">pkg_version_str</span><span class="p">]]):</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[a-z, A-Z]&#39;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="n">version_str</span><span class="p">,</span> <span class="n">pkg_version_str</span><span class="p">]]):</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Invalid version </span><span class="si">{0}</span><span class="s1"> or </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">version_str</span><span class="p">,</span> <span class="n">pkg_version_str</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">version_cmp</span><span class="p">(</span><span class="n">version_str</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">version_cmp</span><span class="p">(</span><span class="n">pkg_version_str</span><span class="p">):</span>
@@ -410,10 +410,14 @@
     <span class="k">return</span> <span class="n">version_comparator</span><span class="p">(</span><span class="n">version_str</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span></div>
 
 
-<div class="viewcode-block" id="deprecate_with_version"><a class="viewcode-back" href="../../reference/fury.shaders.html#fury.actor.deprecate_with_version">[docs]</a><span class="k">def</span> <span class="nf">deprecate_with_version</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-                           <span class="n">version_comparator</span><span class="o">=</span><span class="n">cmp_pkg_version</span><span class="p">,</span>
-                           <span class="n">warn_class</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
-                           <span class="n">error_class</span><span class="o">=</span><span class="n">ExpiredDeprecationError</span><span class="p">):</span>
+<div class="viewcode-block" id="deprecate_with_version"><a class="viewcode-back" href="../../reference/fury.shaders.html#fury.actor.deprecate_with_version">[docs]</a><span class="k">def</span> <span class="nf">deprecate_with_version</span><span class="p">(</span>
+    <span class="n">message</span><span class="p">,</span>
+    <span class="n">since</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">until</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">version_comparator</span><span class="o">=</span><span class="n">cmp_pkg_version</span><span class="p">,</span>
+    <span class="n">warn_class</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+    <span class="n">error_class</span><span class="o">=</span><span class="n">ExpiredDeprecationError</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return decorator function for deprecation warning / error.</span>
 
 <span class="sd">    The decorated function / method will:</span>
@@ -458,14 +462,14 @@
     <span class="k">if</span> <span class="n">since</span><span class="p">:</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* deprecated from version: &#39;</span> <span class="o">+</span> <span class="n">since</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">until</span><span class="p">:</span>
-        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* </span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1"> as of version: </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="s2">&quot;Raises&quot;</span> <span class="k">if</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;Will raise&quot;</span><span class="p">,</span>
-            <span class="n">error_class</span><span class="p">,</span>
-            <span class="n">until</span><span class="p">))</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="s1">&#39;* </span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1"> as of version: </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="s1">&#39;Raises&#39;</span> <span class="k">if</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;Will raise&#39;</span><span class="p">,</span> <span class="n">error_class</span><span class="p">,</span> <span class="n">until</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">deprecator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">deprecated_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">until</span> <span class="ow">and</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">,</span> <span class="n">version_comparator</span><span class="p">):</span>
@@ -473,19 +477,23 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">warn_class</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">deprecated_func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_add_dep_doc</span><span class="p">(</span><span class="n">deprecated_func</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                               <span class="n">message</span><span class="p">)</span>
+        <span class="n">deprecated_func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="n">_add_dep_doc</span><span class="p">(</span><span class="n">deprecated_func</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">deprecated_func</span>
 
     <span class="k">return</span> <span class="n">deprecator</span></div>
 
 
-<div class="viewcode-block" id="deprecated_params"><a class="viewcode-back" href="../../reference/fury.deprecator.html#fury.actor.deprecated_params">[docs]</a><span class="k">def</span> <span class="nf">deprecated_params</span><span class="p">(</span><span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">since</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">until</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-                      <span class="n">version_comparator</span><span class="o">=</span><span class="n">cmp_pkg_version</span><span class="p">,</span>
-                      <span class="n">arg_in_kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                      <span class="n">warn_class</span><span class="o">=</span><span class="n">ArgsDeprecationWarning</span><span class="p">,</span>
-                      <span class="n">error_class</span><span class="o">=</span><span class="n">ExpiredDeprecationError</span><span class="p">,</span>
-                      <span class="n">alternative</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="deprecated_params"><a class="viewcode-back" href="../../reference/fury.deprecator.html#fury.actor.deprecated_params">[docs]</a><span class="k">def</span> <span class="nf">deprecated_params</span><span class="p">(</span>
+    <span class="n">old_name</span><span class="p">,</span>
+    <span class="n">new_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">since</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">until</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="n">version_comparator</span><span class="o">=</span><span class="n">cmp_pkg_version</span><span class="p">,</span>
+    <span class="n">arg_in_kwargs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">warn_class</span><span class="o">=</span><span class="n">ArgsDeprecationWarning</span><span class="p">,</span>
+    <span class="n">error_class</span><span class="o">=</span><span class="n">ExpiredDeprecationError</span><span class="p">,</span>
+    <span class="n">alternative</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Deprecate a *renamed* or *removed* function argument.</span>
 
 <span class="sd">    The decorator assumes that the argument with the ``old_name`` was removed</span>
@@ -582,9 +590,21 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_name</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
             <span class="n">new_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">new_name</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">old_name</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_name</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">since</span><span class="p">),</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">until</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg_in_kwargs</span><span class="p">)]))</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All parameters should have the same length&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">old_name</span><span class="p">),</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">new_name</span><span class="p">),</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">since</span><span class="p">),</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">until</span><span class="p">),</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">arg_in_kwargs</span><span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="o">!=</span> <span class="mi">1</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All parameters should have the same length&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># To allow a uniform approach later on, wrap all arguments in lists.</span>
         <span class="n">old_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">old_name</span><span class="p">]</span>
@@ -598,9 +618,9 @@
         <span class="n">arguments</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">function</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
         <span class="n">positions</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_name</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">o_name</span><span class="p">,</span> <span class="n">n_name</span><span class="p">,</span> <span class="n">in_keywords</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">old_name</span><span class="p">,</span>
-                                                              <span class="n">new_name</span><span class="p">,</span>
-                                                              <span class="n">arg_in_kwargs</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">o_name</span><span class="p">,</span> <span class="n">n_name</span><span class="p">,</span> <span class="n">in_keywords</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">,</span> <span class="n">arg_in_kwargs</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="c1"># Determine the position of the argument.</span>
             <span class="k">if</span> <span class="n">in_keywords</span><span class="p">:</span>
                 <span class="k">continue</span>
@@ -633,17 +653,21 @@
         <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">function</span><span class="p">)</span>
         <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">o_name</span><span class="p">,</span> <span class="n">n_name</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">old_name</span><span class="p">,</span> <span class="n">new_name</span><span class="p">)):</span>
-                <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; was deprecated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o_name</span><span class="p">),</span> <span class="p">]</span>
+                <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="s1">&quot; was deprecated&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">o_name</span><span class="p">),</span>
+                <span class="p">]</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">since</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">!=</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
                     <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">since</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* deprecated from version: &#39;</span> <span class="o">+</span>
-                                    <span class="nb">str</span><span class="p">(</span><span class="n">since</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* deprecated from version: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">since</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
                 <span class="k">if</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* </span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1"> as of version: </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="s2">&quot;Raises&quot;</span> <span class="k">if</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">else</span> <span class="s2">&quot;Will raise&quot;</span><span class="p">,</span>
-                        <span class="n">error_class</span><span class="p">,</span>
-                        <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+                    <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="s1">&#39;* </span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1"> as of version: </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="s1">&#39;Raises&#39;</span> <span class="k">if</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">else</span> <span class="s1">&#39;Will raise&#39;</span><span class="p">,</span>
+                            <span class="n">error_class</span><span class="p">,</span>
+                            <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
                 <span class="n">messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
 
@@ -653,8 +677,9 @@
                 <span class="k">if</span> <span class="n">o_name</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">o_name</span><span class="p">)</span>
                     <span class="c1"># Check if the newkeyword was given as well.</span>
-                    <span class="n">newarg_in_args</span> <span class="o">=</span> <span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                                      <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                    <span class="n">newarg_in_args</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="p">)</span>
                     <span class="n">newarg_in_kwargs</span> <span class="o">=</span> <span class="n">n_name</span> <span class="ow">in</span> <span class="n">kwargs</span>
 
                     <span class="k">if</span> <span class="n">newarg_in_args</span> <span class="ow">or</span> <span class="n">newarg_in_kwargs</span><span class="p">:</span>
@@ -669,24 +694,20 @@
                     <span class="n">kwargs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
                     <span class="k">if</span> <span class="n">n_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                        <span class="n">message</span> <span class="o">+=</span> <span class="s1">&#39;* Use argument &quot;</span><span class="si">{}</span><span class="s1">&quot; instead.&#39;</span> \
-                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_name</span><span class="p">)</span>
+                        <span class="n">message</span> <span class="o">+=</span> <span class="s1">&#39;* Use argument &quot;</span><span class="si">{}</span><span class="s1">&quot; instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n_name</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="n">alternative</span><span class="p">:</span>
                         <span class="n">message</span> <span class="o">+=</span> <span class="s1">&#39;* Use </span><span class="si">{}</span><span class="s1"> instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alternative</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                                                   <span class="n">version_comparator</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">version_comparator</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="n">error_class</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">warn_class</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
                 <span class="c1"># Deprecated keyword without replacement is given as</span>
                 <span class="c1"># positional argument.</span>
-                <span class="k">elif</span> <span class="p">(</span><span class="ow">not</span> <span class="n">n_name</span> <span class="ow">and</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span>
-                      <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="n">n_name</span> <span class="ow">and</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">positions</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
                     <span class="k">if</span> <span class="n">alternative</span><span class="p">:</span>
                         <span class="n">message</span> <span class="o">+=</span> <span class="s1">&#39;* Use </span><span class="si">{}</span><span class="s1"> instead.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">alternative</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                                                   <span class="n">version_comparator</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">and</span> <span class="n">is_bad_version</span><span class="p">(</span><span class="n">until</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">version_comparator</span><span class="p">):</span>
                         <span class="k">raise</span> <span class="n">error_class</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">warn_class</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
@@ -694,6 +715,7 @@
             <span class="k">return</span> <span class="n">function</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">wrapper</span>
+
     <span class="k">return</span> <span class="n">deprecator</span></div>
 </pre></div>
 

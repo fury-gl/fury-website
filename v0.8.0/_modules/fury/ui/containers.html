@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.containers &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>fury.ui.containers &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -279,17 +279,24 @@
   <h1>Source code for fury.ui.containers</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;UI container module.&quot;&quot;&quot;</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Panel2D&quot;</span><span class="p">,</span> <span class="s2">&quot;TabPanel2D&quot;</span><span class="p">,</span> <span class="s2">&quot;TabUI&quot;</span><span class="p">,</span> <span class="s2">&quot;ImageContainer2D&quot;</span><span class="p">,</span>
-           <span class="s2">&quot;GridUI&quot;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Panel2D&#39;</span><span class="p">,</span> <span class="s1">&#39;TabPanel2D&#39;</span><span class="p">,</span> <span class="s1">&#39;TabUI&#39;</span><span class="p">,</span> <span class="s1">&#39;ImageContainer2D&#39;</span><span class="p">,</span> <span class="s1">&#39;GridUI&#39;</span><span class="p">]</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
-<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span><span class="n">PolyData</span><span class="p">,</span> <span class="n">PolyDataMapper2D</span><span class="p">,</span> <span class="n">Points</span><span class="p">,</span> <span class="n">CellArray</span><span class="p">,</span>
-                      <span class="n">FloatArray</span><span class="p">,</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">TexturedActor2D</span><span class="p">,</span> <span class="n">Property2D</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">fury.ui.core</span> <span class="kn">import</span> <span class="n">UI</span><span class="p">,</span> <span class="n">Rectangle2D</span><span class="p">,</span> <span class="n">TextBlock2D</span>
-<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">set_input</span><span class="p">,</span> <span class="n">rotate</span>
 <span class="kn">from</span> <span class="nn">fury.actor</span> <span class="kn">import</span> <span class="n">grid</span>
+<span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CellArray</span><span class="p">,</span>
+    <span class="n">FloatArray</span><span class="p">,</span>
+    <span class="n">Points</span><span class="p">,</span>
+    <span class="n">PolyData</span><span class="p">,</span>
+    <span class="n">PolyDataMapper2D</span><span class="p">,</span>
+    <span class="n">Property2D</span><span class="p">,</span>
+    <span class="n">Texture</span><span class="p">,</span>
+    <span class="n">TexturedActor2D</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">fury.ui.core</span> <span class="kn">import</span> <span class="n">UI</span><span class="p">,</span> <span class="n">Rectangle2D</span><span class="p">,</span> <span class="n">TextBlock2D</span>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">rotate</span><span class="p">,</span> <span class="n">set_input</span>
 
 
 <div class="viewcode-block" id="Panel2D"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D">[docs]</a><span class="k">class</span> <span class="nc">Panel2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
@@ -303,9 +310,17 @@
 <span class="sd">        Alignment of the panel with respect to the overall screen.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Panel2D.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
-                 <span class="n">opacity</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="n">border_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-                 <span class="n">border_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">has_border</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="Panel2D.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">size</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">),</span>
+        <span class="n">opacity</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">align</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+        <span class="n">border_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">border_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">has_border</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
 <span class="sd">        Parameters</span>
@@ -349,26 +364,32 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">Rectangle2D</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_border</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
-                            <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
-                            <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
-                            <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
+                <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
+                <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
+                <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="n">Rectangle2D</span><span class="p">(),</span>
+            <span class="p">}</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
-                                  <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
-                                  <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
-                                  <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+                <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="p">}</span>
 
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_color</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
 
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span>
+                    <span class="n">key</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
 
-                <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span>
+                    <span class="n">key</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
@@ -408,17 +429,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_border</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span>
-                                        <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">)</span>
+            <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span>
-                                          <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;right&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">)</span>
+            <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span>
-                                        <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">)</span>
+            <span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span>
-                                           <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="s1">&#39;bottom&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_border_width</span><span class="p">)</span>
+            <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">update_border_coords</span><span class="p">()</span></div>
 
@@ -451,7 +476,7 @@
     <span class="k">def</span> <span class="nf">opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opacity</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="n">opacity</span>
 
-<div class="viewcode-block" id="Panel2D.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Panel2D.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a UI component to the panel.</span>
 
 <span class="sd">        The coordinates represent an offset from the lower left corner of the</span>
@@ -472,17 +497,16 @@
 
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">coords</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">coords</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">coords</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Normalized coordinates must be in [0,1].&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Normalized coordinates must be in [0,1].&#39;</span><span class="p">)</span>
 
             <span class="n">coords</span> <span class="o">=</span> <span class="n">coords</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
 
-        <span class="k">if</span> <span class="n">anchor</span> <span class="o">==</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">anchor</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
             <span class="n">element</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">coords</span>
-        <span class="k">elif</span> <span class="n">anchor</span> <span class="o">==</span> <span class="s2">&quot;position&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">anchor</span> <span class="o">==</span> <span class="s1">&#39;position&#39;</span><span class="p">:</span>
             <span class="n">element</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+</span> <span class="n">coords</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Unknown anchor </span><span class="si">{}</span><span class="s2">. Supported anchors are &#39;position&#39;&quot;</span>
-                   <span class="s2">&quot; and &#39;center&#39;.&quot;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Unknown anchor </span><span class="si">{}</span><span class="s2">. Supported anchors are &#39;position&#39;&quot;</span> <span class="s2">&quot; and &#39;center&#39;.&quot;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
@@ -501,7 +525,7 @@
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_elements</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">element_offsets</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Panel2D.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="Panel2D.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the position of a UI component in the panel.</span>
 
 <span class="sd">        Parameters</span>
@@ -538,21 +562,22 @@
 <span class="sd">        window_size_change : (int, int)</span>
 <span class="sd">            New window size (width, height) in pixels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">==</span> <span class="s2">&quot;left&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">==</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">alignment</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">position</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">window_size_change</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;You can only left-align or right-align objects in a panel.&quot;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;You can only left-align or right-align objects in a panel.&#39;</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Panel2D.update_border_coords"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Panel2D.update_border_coords">[docs]</a>    <span class="k">def</span> <span class="nf">update_border_coords</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the coordinates of the borders</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
-                              <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">),</span>
-                              <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">),</span>
-                              <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)}</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the coordinates of the borders&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;left&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="s1">&#39;right&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+            <span class="s1">&#39;top&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s1">&#39;bottom&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="p">}</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">border_coords</span><span class="p">[</span><span class="n">key</span><span class="p">])</span></div>
@@ -574,8 +599,7 @@
         <span class="n">side</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">side_color</span>
 
         <span class="k">if</span> <span class="n">side</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">,</span> <span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">]:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">side</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
 
@@ -590,8 +614,7 @@
             <span class="k">elif</span> <span class="n">side</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">]:</span>
                 <span class="n">widths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">side</span><span class="p">]</span><span class="o">.</span><span class="n">height</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">widths</span>
 
     <span class="nd">@border_width</span><span class="o">.</span><span class="n">setter</span>
@@ -610,8 +633,7 @@
         <span class="k">elif</span> <span class="n">side</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">borders</span><span class="p">[</span><span class="n">side</span><span class="p">]</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">border_width</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">side</span><span class="si">}</span><span class="s1"> not a valid border side&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="TabPanel2D"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D">[docs]</a><span class="k">class</span> <span class="nc">TabPanel2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
@@ -625,8 +647,14 @@
 <span class="sd">        Renders the title of the tab.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TabPanel2D.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
-                 <span class="n">title</span><span class="o">=</span><span class="s2">&quot;New Tab&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">content_panel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="TabPanel2D.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s1">&#39;New Tab&#39;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">content_panel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
 <span class="sd">        Parameters</span>
@@ -661,8 +689,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_text_size</span><span class="p">,</span>
-                                      <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_text_size</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -739,7 +766,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
 
-<div class="viewcode-block" id="TabPanel2D.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="TabPanel2D.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a UI component to the content panel.</span>
 
 <span class="sd">        The coordinates represent an offset from the lower left corner of the</span>
@@ -768,7 +795,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">remove_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TabPanel2D.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="TabPanel2D.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the position of a UI component in the content panel.</span>
 
 <span class="sd">        Parameters</span>
@@ -782,7 +809,7 @@
 <span class="sd">            If int, pixels coordinates are assumed and it must fit within the</span>
 <span class="sd">            panel&#39;s size.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">)</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="TabUI"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI">[docs]</a><span class="k">class</span> <span class="nc">TabUI</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
@@ -794,9 +821,15 @@
 <span class="sd">        Stores all the instances of &#39;TabPanel2D&#39; that renderes the contents.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="TabUI.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">nb_tabs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                 <span class="n">active_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
-                 <span class="n">draggable</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="TabUI.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">nb_tabs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">active_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">draggable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
 <span class="sd">        Parameters</span>
@@ -884,8 +917,7 @@
 
 <div class="viewcode-block" id="TabUI.update_tabs"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.update_tabs">[docs]</a>    <span class="k">def</span> <span class="nf">update_tabs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update position, size and callbacks for tab panels.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span> <span class="o">=</span>\
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="n">tab_panel_pos</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">tab_panel</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">:</span>
@@ -894,45 +926,55 @@
 
             <span class="n">content_panel</span> <span class="o">=</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span><span class="p">:</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span>\
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span>\
+                <span class="p">)</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span>\
+                <span class="p">)</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
+                <span class="p">)</span>
 
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span>\
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span>\
+                <span class="p">)</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span>\
+                <span class="p">)</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span>\
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_comp</span><span class="p">:</span> <span class="n">i_ren</span><span class="o">.</span><span class="n">force_render</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span>\
+                <span class="p">)</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_comp</span><span class="p">:</span> <span class="n">i_ren</span><span class="o">.</span><span class="n">force_render</span>
+                <span class="p">)</span>
 
-            <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span>\
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_tab_callback</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">select_tab_callback</span>
-            <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">select_tab_callback</span>
+            <span class="p">)</span>
 
-            <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span>\
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">collapse_tab_ui</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">collapse_tab_ui</span>
-            <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span>\
-                <span class="bp">self</span><span class="o">.</span><span class="n">collapse_tab_ui</span>
+            <span class="p">)</span>
 
             <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">,</span> <span class="n">tab_panel_pos</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-            <span class="n">tab_panel_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span></div>
+            <span class="n">tab_panel_pos</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span></div>
 
 <div class="viewcode-block" id="TabUI.select_tab_callback"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.select_tab_callback">[docs]</a>    <span class="k">def</span> <span class="nf">select_tab_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_tab_comp</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle events when a tab is selected.&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_tab_comp</span> <span class="ow">and</span>\
-               <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_tab_comp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_tab_comp</span>
+                <span class="ow">and</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">_tab_comp</span>
+            <span class="p">):</span>
                 <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
                 <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -957,29 +999,26 @@
         <span class="n">iren</span><span class="o">.</span><span class="n">force_render</span><span class="p">()</span>
         <span class="n">iren</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">abort</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TabUI.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="TabUI.add_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.add_element">[docs]</a>    <span class="k">def</span> <span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add element to content panel after checking its existence.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span> <span class="ow">and</span> <span class="n">tab_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Tab with index &quot;</span>
-                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Tab with index &#39;</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TabUI.remove_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.remove_element">[docs]</a>    <span class="k">def</span> <span class="nf">remove_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove element from content panel after checking its existence.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span> <span class="ow">and</span> <span class="n">tab_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">remove_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Tab with index &quot;</span>
-                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Tab with index &#39;</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="TabUI.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="TabUI.update_element"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.update_element">[docs]</a>    <span class="k">def</span> <span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s1">&#39;position&#39;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update element on content panel after checking its existence.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span> <span class="ow">and</span> <span class="n">tab_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s2">&quot;Tab with index &quot;</span>
-                             <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> does not exist&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Tab with index &#39;</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="TabUI.left_button_pressed"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.left_button_pressed">[docs]</a>    <span class="k">def</span> <span class="nf">left_button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_sub_component</span><span class="p">):</span>
         <span class="n">click_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i_ren</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
@@ -1145,19 +1184,30 @@
 <div class="viewcode-block" id="GridUI"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.GridUI">[docs]</a><span class="k">class</span> <span class="nc">GridUI</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Add actors in a grid and interact with them individually.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GridUI.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.GridUI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">actors</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                 <span class="n">cell_padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                 <span class="n">cell_shape</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">,</span> <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">16</span><span class="o">/</span><span class="mf">9.</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">rotation_speed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">rotation_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+<div class="viewcode-block" id="GridUI.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.GridUI.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actors</span><span class="p">,</span>
+        <span class="n">captions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">cell_padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">cell_shape</span><span class="o">=</span><span class="s1">&#39;rect&#39;</span><span class="p">,</span>
+        <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">16</span> <span class="o">/</span> <span class="mf">9.0</span><span class="p">,</span>
+        <span class="n">dim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">rotation_speed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">rotation_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="p">):</span>
 
         <span class="c1"># TODO: add rotation axis None by default</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">grid</span><span class="p">(</span><span class="n">actors</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="n">captions</span><span class="p">,</span>
-                              <span class="n">caption_offset</span><span class="o">=</span><span class="n">caption_offset</span><span class="p">,</span>
-                              <span class="n">cell_padding</span><span class="o">=</span><span class="n">cell_padding</span><span class="p">,</span>
-                              <span class="n">cell_shape</span><span class="o">=</span><span class="n">cell_shape</span><span class="p">,</span>
-                              <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">grid</span><span class="p">(</span>
+            <span class="n">actors</span><span class="p">,</span>
+            <span class="n">captions</span><span class="o">=</span><span class="n">captions</span><span class="p">,</span>
+            <span class="n">caption_offset</span><span class="o">=</span><span class="n">caption_offset</span><span class="p">,</span>
+            <span class="n">cell_padding</span><span class="o">=</span><span class="n">cell_padding</span><span class="p">,</span>
+            <span class="n">cell_shape</span><span class="o">=</span><span class="n">cell_shape</span><span class="p">,</span>
+            <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span>
+            <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actors_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span> <span class="o">=</span> <span class="n">rotation_speed</span>
@@ -1195,8 +1245,7 @@
     <span class="k">def</span> <span class="nf">left_click_callback2</span><span class="p">(</span><span class="n">istyle</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
 
         <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span>
-        <span class="n">clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span>
-                                       <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
+        <span class="n">clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
         <span class="n">rotate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">clockwise_rotation</span><span class="p">)</span>
 
         <span class="n">istyle</span><span class="o">.</span><span class="n">force_render</span><span class="p">()</span>
@@ -1211,7 +1260,7 @@
 <div class="viewcode-block" id="GridUI.mouse_move_callback2"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.GridUI.mouse_move_callback2">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">mouse_move_callback2</span><span class="p">(</span><span class="n">istyle</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="bp">self</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors_dict</span><span class="p">[</span><span class="n">obj</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors_dict</span><span class="p">[</span><span class="n">obj</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">:</span>
 
             <span class="n">iren</span> <span class="o">=</span> <span class="n">istyle</span><span class="o">.</span><span class="n">GetInteractor</span><span class="p">()</span>
             <span class="n">event_pos</span> <span class="o">=</span> <span class="n">iren</span><span class="o">.</span><span class="n">GetEventPosition</span><span class="p">()</span>
@@ -1224,12 +1273,10 @@
             <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span>
 
             <span class="k">if</span> <span class="n">event_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors_dict</span><span class="p">[</span><span class="n">obj</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]:</span>
-                <span class="n">clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span>
-                                               <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
+                <span class="n">clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">clockwise_rotation</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">anti_clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
+                <span class="n">anti_clockwise_rotation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">rotation_speed</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">ry</span><span class="p">,</span> <span class="n">rz</span><span class="p">])</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">anti_clockwise_rotation</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_actors_dict</span><span class="p">[</span><span class="n">obj</span><span class="p">][</span><span class="s1">&#39;y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -1244,19 +1291,19 @@
 
 <div class="viewcode-block" id="GridUI.key_press_callback"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.GridUI.key_press_callback">[docs]</a>    <span class="k">def</span> <span class="nf">key_press_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">istyle</span><span class="p">,</span> <span class="n">obj</span><span class="p">,</span> <span class="n">_what</span><span class="p">):</span>
         <span class="n">has_changed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Left&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;Left&#39;</span><span class="p">:</span>
             <span class="n">has_changed</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">:</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ANTICLOCKWISE_ROTATION_Y</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Right&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;Right&#39;</span><span class="p">:</span>
             <span class="n">has_changed</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">:</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLOCKWISE_ROTATION_Y</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Up&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;Up&#39;</span><span class="p">:</span>
             <span class="n">has_changed</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">:</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ANTICLOCKWISE_ROTATION_X</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Down&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">istyle</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;Down&#39;</span><span class="p">:</span>
             <span class="n">has_changed</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">:</span>
                 <span class="n">rotate</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">CLOCKWISE_ROTATION_X</span><span class="p">)</span>
@@ -1271,24 +1318,25 @@
             <span class="c1"># self.handle_events(actor)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">left_click_callback</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">left_release_callback</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move_callback</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span>
+                    <span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;LeftButtonPressEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_click_callback</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span>
+                    <span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;LeftButtonReleaseEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_release_callback</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;MouseMoveEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move_callback</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;LeftButtonPressEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">left_click_callback2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span>
+                    <span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;LeftButtonPressEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_click_callback2</span>
+                <span class="p">)</span>
                 <span class="c1"># TODO: possibly add this too</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;LeftButtonReleaseEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">left_release_callback2</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;MouseMoveEvent&quot;</span><span class="p">,</span>
-                                  <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move_callback2</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span>
+                    <span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;LeftButtonReleaseEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_release_callback2</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;MouseMoveEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mouse_move_callback2</span><span class="p">)</span>
 
             <span class="c1"># TODO: this is currently not running</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;KeyPressEvent&quot;</span><span class="p">,</span>
-                              <span class="bp">self</span><span class="o">.</span><span class="n">key_press_callback</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s1">&#39;KeyPressEvent&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_press_callback</span><span class="p">)</span>
         <span class="c1"># self.on_key_press = self.key_press_callback2</span>
 
     <span class="k">def</span> <span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
