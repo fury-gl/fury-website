@@ -24,17 +24,17 @@ Making a custom interpolator
 
 Keyframe animation using custom interpolator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-14
+.. GENERATED FROM PYTHON SOURCE LINES 8-13
 
 .. code-block:: default
 
     import numpy as np
+
     from fury import actor, window
-    from fury.animation import helpers, Animation
+    from fury.animation import Animation, helpers
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 15-22
+.. GENERATED FROM PYTHON SOURCE LINES 14-21
 
 Implementing a custom interpolator
 ===============================================
@@ -44,7 +44,7 @@ as an argument and returns a value.
 It's recommended to import `fury.animation.helpers`, which has some useful
 functions that would help to implement the interpolator.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-53
+.. GENERATED FROM PYTHON SOURCE LINES 23-52
 
 In glTF, animations using cubic spline interpolator needs at least two
 points, and each point has two tangent vectors.
@@ -76,7 +76,7 @@ Note: Also any other additional arguments are ok, see `spline_interpolator`
 Second step is to implement the `interpolate` closure that only takes the
 current time as input.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-118
+.. GENERATED FROM PYTHON SOURCE LINES 52-122
 
 .. code-block:: default
 
@@ -134,41 +134,48 @@ current time as input.
             # cubic spline equation using tangents
             t2 = dt * dt
             t3 = t2 * dt
-            return (2 * t3 - 3 * t2 + 1) * p0 + (t3 - 2 * t2 + dt) * tan_0 + (
-                    -2 * t3 + 3 * t2) * p1 + (t3 - t2) * tan_1
+            return (
+                (2 * t3 - 3 * t2 + 1) * p0
+                + (t3 - 2 * t2 + dt) * tan_0
+                + (-2 * t3 + 3 * t2) * p1
+                + (t3 - t2) * tan_1
+            )
+
         return interpolate
 
 
     scene = window.Scene()
-    showm = window.ShowManager(scene,
-                               size=(900, 768), reset_camera=False,
-                               order_transparent=True)
+    showm = window.ShowManager(
+        scene, size=(900, 768), reset_camera=False, order_transparent=True
+    )
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-121
+.. GENERATED FROM PYTHON SOURCE LINES 123-125
 
 Cubic spline keyframes data same as the one you get from glTF file.
 ===================================================================
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-129
+.. GENERATED FROM PYTHON SOURCE LINES 125-135
 
 .. code-block:: default
 
 
     #               t    in tangent     position                   out tangent
-    translation = [[0.0, [0., 0., 0.],  [3.3051798, 6.640117, 0.], [1., 0., 0.]],
-                   [1.0, [0., 0., 0.],  [3.3051798, 8., 0.],       [-1., 0., 0.]],
-                   [2.0, [-1., 0., 0.], [3.3051798, 6., 0.],       [1., 0., 0.]],
-                   [3.0, [0., 0., 0.],  [3.3051798, 8., 0.],       [-1., 0., 0.]],
-                   [4.0, [0, -1., 0.],  [3.3051798, 6., 0.],       [0., 0., 0.]]]
+    translation = [
+        [0.0, [0.0, 0.0, 0.0], [3.3051798, 6.640117, 0.0], [1.0, 0.0, 0.0]],
+        [1.0, [0.0, 0.0, 0.0], [3.3051798, 8.0, 0.0], [-1.0, 0.0, 0.0]],
+        [2.0, [-1.0, 0.0, 0.0], [3.3051798, 6.0, 0.0], [1.0, 0.0, 0.0]],
+        [3.0, [0.0, 0.0, 0.0], [3.3051798, 8.0, 0.0], [-1.0, 0.0, 0.0]],
+        [4.0, [0, -1.0, 0.0], [3.3051798, 6.0, 0.0], [0.0, 0.0, 0.0]],
+    ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-131
+.. GENERATED FROM PYTHON SOURCE LINES 136-137
 
 Initializing an ``Animation`` and adding sphere actor to it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-137
+.. GENERATED FROM PYTHON SOURCE LINES 137-143
 
 .. code-block:: default
 
@@ -179,12 +186,12 @@ Initializing an ``Animation`` and adding sphere actor to it.
     animation.add_actor(sphere)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-140
+.. GENERATED FROM PYTHON SOURCE LINES 144-146
 
 Setting position keyframes
 ==========================
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-146
+.. GENERATED FROM PYTHON SOURCE LINES 146-152
 
 .. code-block:: default
 
@@ -195,22 +202,22 @@ Setting position keyframes
         animation.set_position(t, pos, in_tangent=in_tan, out_tangent=out_tan)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-148
+.. GENERATED FROM PYTHON SOURCE LINES 153-154
 
 Set the new interpolator to interpolate position keyframes
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-150
+.. GENERATED FROM PYTHON SOURCE LINES 154-156
 
 .. code-block:: default
 
     animation.set_position_interpolator(tan_cubic_spline_interpolator)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-152
+.. GENERATED FROM PYTHON SOURCE LINES 157-158
 
 adding the animation to the show manager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-162
+.. GENERATED FROM PYTHON SOURCE LINES 158-167
 
 .. code-block:: default
 
@@ -222,8 +229,7 @@ adding the animation to the show manager.
     if interactive:
         showm.start()
 
-    window.record(scene, out_path='viz_keyframe_custom_interpolator.png',
-                  size=(900, 768))
+    window.record(scene, out_path='viz_keyframe_custom_interpolator.png', size=(900, 768))
 
 
 .. rst-class:: sphx-glr-timing

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Fractals &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Fractals &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -54,8 +54,8 @@
         </script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Advanced interactive visualization" href="viz_advanced.html" />
-    <link rel="prev" title="Collisions of particles in a box" href="collision-particles.html" />
+    <link rel="next" title="Visualize Networks (Animated version)" href="viz_network_animated.html" />
+    <link rel="prev" title="Brain Fiber ODF Visualisation" href="viz_fiber_odf.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -240,16 +240,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -320,8 +320,10 @@ avoid having to hardcode the geometry of a tetrahedron and a cube.
 <code class="docutils literal notranslate"><span class="pre">fury.utils</span></code> also contains a <code class="docutils literal notranslate"><span class="pre">repeat_primitive</span></code> function which we will use
 for this demo.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">ui</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
 </pre></div>
 </div>
 <p>Before we create our first fractal, let’s set some ground rules for us to
@@ -348,10 +350,10 @@ for the next level. We can use the vertices of a tetrahedron as the offsets
 for the new centers, provided that the tetrahedron is centered at the origin
 (which is the case here).</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">tetrix</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">4</span> <span class="o">**</span> <span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">4</span><span class="o">**</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
 
     <span class="c1"># skipping non-leaf nodes (see above)</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">**</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span><span class="o">**</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">3</span> <span class="o">+</span> <span class="mi">1</span>
 
     <span class="c1"># just need the vertices</span>
     <span class="n">U</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="../reference/fury.primitive.html#fury.primitive.prim_tetrahedron" title="fury.primitive.prim_tetrahedron" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_tetrahedron</span></a><span class="p">()</span>
@@ -366,7 +368,7 @@ for the new centers, provided that the tetrahedron is centered at the origin
                 <span class="n">gen_centers</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">center</span> <span class="o">+</span> <span class="n">dist</span> <span class="o">*</span> <span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dist</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="c1"># the division by sqrt(6) is to ensure correct scale</span>
-    <span class="n">gen_centers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">6</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+    <span class="n">gen_centers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">6</span><span class="o">**</span><span class="mf">0.5</span><span class="p">))</span>
 
     <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../reference/fury.primitive.html#fury.primitive.prim_tetrahedron" title="fury.primitive.prim_tetrahedron" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_tetrahedron</span></a><span class="p">()</span>
 
@@ -390,22 +392,42 @@ every level we get 20 new cubes.</p>
 center and add the offsets to each smaller cube, scaled according to the
 level.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sponge</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">20</span> <span class="o">**</span> <span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span> <span class="o">**</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">19</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">20</span><span class="o">**</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="o">**</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">19</span> <span class="o">+</span> <span class="mi">1</span>
 
     <span class="c1"># these are the offsets of the new centers at the next level of recursion</span>
     <span class="c1"># each cube is divided into 20 smaller cubes for a snowflake</span>
-    <span class="n">V</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]])</span>
+    <span class="n">V</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">gen_centers</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">dist</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">N</span><span class="p">:</span>
             <span class="n">centers</span><span class="p">[</span><span class="n">pos</span> <span class="o">-</span> <span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># we consider a corner cube as our starting point</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">dist</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">dist</span><span class="o">**</span><span class="mf">0.5</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="mi">20</span> <span class="o">*</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
 
             <span class="c1"># this moves from the corner cube to each new cube&#39;s center</span>
@@ -416,7 +438,7 @@ level.</p>
     <span class="n">gen_centers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
 
     <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../reference/fury.primitive.html#fury.primitive.prim_box" title="fury.primitive.prim_box" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_box</span></a><span class="p">()</span>
-    <span class="n">vertices</span> <span class="o">/=</span> <span class="mi">3</span> <span class="o">**</span> <span class="n">N</span>
+    <span class="n">vertices</span> <span class="o">/=</span> <span class="mi">3</span><span class="o">**</span><span class="n">N</span>
 
     <span class="n">bounds_min</span><span class="p">,</span> <span class="n">bounds_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="n">centers</span> <span class="o">-</span> <span class="n">bounds_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">bounds_max</span> <span class="o">-</span> <span class="n">bounds_min</span><span class="p">)</span>
@@ -431,18 +453,36 @@ level.</p>
 (corners and center). I think this looks quite interesting, and it is
 possible to see the Koch snowflake if you position the camera just right.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">snowflake</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">18</span> <span class="o">**</span> <span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">18</span> <span class="o">**</span> <span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">17</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="n">V</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                  <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">18</span><span class="o">**</span><span class="n">N</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="p">(</span><span class="mi">18</span><span class="o">**</span><span class="n">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="mi">17</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">V</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+            <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">gen_centers</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">side</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="n">N</span><span class="p">:</span>
             <span class="n">centers</span><span class="p">[</span><span class="n">pos</span> <span class="o">-</span> <span class="n">offset</span><span class="p">]</span> <span class="o">=</span> <span class="n">center</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">side</span> <span class="o">**</span> <span class="mf">0.5</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">center</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="n">side</span><span class="o">**</span><span class="mf">0.5</span>
             <span class="n">idx</span> <span class="o">=</span> <span class="mi">18</span> <span class="o">*</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">18</span><span class="p">):</span>
                 <span class="n">gen_centers</span><span class="p">(</span><span class="n">depth</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span> <span class="n">start</span> <span class="o">+</span> <span class="n">V</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">side</span><span class="p">,</span> <span class="n">side</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
@@ -450,7 +490,7 @@ possible to see the Koch snowflake if you position the camera just right.</p>
     <span class="n">gen_centers</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="mi">3</span><span class="p">),</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
 
     <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../reference/fury.primitive.html#fury.primitive.prim_box" title="fury.primitive.prim_box" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_box</span></a><span class="p">()</span>
-    <span class="n">vertices</span> <span class="o">/=</span> <span class="mi">3</span> <span class="o">**</span> <span class="n">N</span>
+    <span class="n">vertices</span> <span class="o">/=</span> <span class="mi">3</span><span class="o">**</span><span class="n">N</span>
 
     <span class="n">bounds_min</span><span class="p">,</span> <span class="n">bounds_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="p">(</span><span class="n">centers</span> <span class="o">-</span> <span class="n">bounds_min</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">bounds_max</span> <span class="o">-</span> <span class="n">bounds_min</span><span class="p">)</span>
@@ -464,7 +504,7 @@ possible to see the Koch snowflake if you position the camera just right.</p>
 <p>Now that we have the functions to generate fractals, we can start setting up
 the Scene and ShowManager.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
-<span class="n">showmgr</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;Fractals&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">showmgr</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s1">&#39;Fractals&#39;</span><span class="p">,</span> <span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>These values are what work nicely on my machine without lagging. If you have
@@ -476,13 +516,18 @@ a powerful machine, you could bump these up by around 2-3.</p>
 we’ll create a RadioButton and register a callback which will remove existing
 fractals and add the selected one. This also resets the camera.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">options</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;Tetrix&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="s2">&quot;Sponge&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="s2">&quot;Snowflake&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s1">&#39;Tetrix&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="s1">&#39;Sponge&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s1">&#39;Snowflake&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">shape_chooser</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.RadioButton" title="fury.ui.RadioButton" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">RadioButton</span></a><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-                               <span class="n">checked_labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Tetrix&quot;</span><span class="p">],</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">shape_chooser</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.RadioButton" title="fury.ui.RadioButton" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">RadioButton</span></a><span class="p">(</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+    <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+    <span class="n">checked_labels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Tetrix&#39;</span><span class="p">],</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+<span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">choose_shape</span><span class="p">(</span><span class="n">radio</span><span class="p">):</span>
@@ -523,7 +568,7 @@ reading.</p>
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
     <span class="n">showmgr</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 <span class="k">else</span><span class="p">:</span>
-    <a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showmgr</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;fractals.png&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">))</span>
+    <a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showmgr</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;fractals.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">))</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -546,17 +591,17 @@ reading.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="collision-particles.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="viz_fiber_odf.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Collisions of particles in a box</p>
+          <p class="prev-next-title">Brain Fiber ODF Visualisation</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="viz_advanced.html" title="next page">
+  <a class='right-next' id="next-link" href="viz_network_animated.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Advanced interactive visualization</p>
+      <p class="prev-next-title">Visualize Networks (Animated version)</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>

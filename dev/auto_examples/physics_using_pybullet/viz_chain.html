@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Chain Simulation &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Chain Simulation &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -53,8 +53,8 @@
         </script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Wrecking Ball Simulation" href="viz_wrecking_ball.html" />
-    <link rel="prev" title="Brick Wall Simulation" href="viz_brick_wall.html" />
+    <link rel="next" title="Brick Wall Simulation" href="viz_brick_wall.html" />
+    <link rel="prev" title="Domino Physics Simulation" href="viz_domino.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="../viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_animated_surfaces.html">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -309,10 +309,12 @@ to download the full example code</p>
 <p>This example simulation shows how to use pybullet to render physics simulations
 in fury. In this example we specifically render a Chain oscillating to and fro.</p>
 <p>First some imports.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pybullet</span> <span class="k">as</span> <span class="nn">p</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
 </pre></div>
 </div>
 <p>Setup pybullet and add gravity.</p>
@@ -332,13 +334,14 @@ in fury. In this example we specifically render a Chain oscillating to and fro.<
 
 <span class="n">joint_friction</span> <span class="o">=</span> <span class="mf">0.0005</span>  <span class="c1"># rotational joint friction [N/(rad/s)]</span>
 
-<span class="n">link_shape</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createCollisionShape</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">GEOM_CYLINDER</span><span class="p">,</span>
-                                    <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
-                                    <span class="n">height</span><span class="o">=</span><span class="n">dx_link</span><span class="p">,</span>
-                                    <span class="n">collisionFramePosition</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">dx_link</span> <span class="o">/</span> <span class="mi">2</span><span class="p">])</span>
+<span class="n">link_shape</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createCollisionShape</span><span class="p">(</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">GEOM_CYLINDER</span><span class="p">,</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="n">dx_link</span><span class="p">,</span>
+    <span class="n">collisionFramePosition</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">dx_link</span> <span class="o">/</span> <span class="mi">2</span><span class="p">],</span>
+<span class="p">)</span>
 
-<span class="n">base_shape</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createCollisionShape</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">GEOM_BOX</span><span class="p">,</span>
-                                    <span class="n">halfExtents</span><span class="o">=</span><span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">])</span>
+<span class="n">base_shape</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createCollisionShape</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">GEOM_BOX</span><span class="p">,</span> <span class="n">halfExtents</span><span class="o">=</span><span class="p">[</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">])</span>
 
 <span class="n">visualShapeId</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
@@ -370,58 +373,69 @@ in fury. In this example we specifically render a Chain oscillating to and fro.<
 <span class="n">link_heights</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">n_links</span><span class="p">)</span>
 <span class="n">link_heights</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">dx_link</span>
 
-<span class="n">rope_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">linkPositions</span><span class="p">,</span>
-                            <span class="n">directions</span><span class="o">=</span><span class="n">linkDirections</span><span class="p">,</span>
-                            <span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html#numpy.random.rand" title="numpy.random.rand" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="n">n_links</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-                            <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
-                            <span class="n">heights</span><span class="o">=</span><span class="n">link_heights</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">rope_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.cylinder" title="fury.actor.cylinder" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">cylinder</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><span class="n">linkPositions</span><span class="p">,</span>
+    <span class="n">directions</span><span class="o">=</span><span class="n">linkDirections</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/random/generated/numpy.random.rand.html#numpy.random.rand" title="numpy.random.rand" class="sphx-glr-backref-module-numpy-random sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span></a><span class="p">(</span><span class="n">n_links</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="n">radius</span><span class="o">=</span><span class="n">radii</span><span class="p">,</span>
+    <span class="n">heights</span><span class="o">=</span><span class="n">link_heights</span><span class="p">,</span>
+    <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">basePosition</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
 <span class="n">baseOrientation</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-<span class="n">rope</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createMultiBody</span><span class="p">(</span><span class="n">base_mass</span><span class="p">,</span>
-                         <span class="n">base_shape</span><span class="p">,</span>
-                         <span class="n">visualShapeId</span><span class="p">,</span>
-                         <span class="n">basePosition</span><span class="p">,</span>
-                         <span class="n">baseOrientation</span><span class="p">,</span>
-                         <span class="n">linkMasses</span><span class="o">=</span><span class="n">link_Masses</span><span class="p">,</span>
-                         <span class="n">linkCollisionShapeIndices</span><span class="o">=</span><span class="n">linkCollisionShapeIndices</span><span class="p">,</span>
-                         <span class="n">linkVisualShapeIndices</span><span class="o">=</span><span class="n">linkVisualShapeIndices</span><span class="p">,</span>
-                         <span class="n">linkPositions</span><span class="o">=</span><span class="n">linkPositions</span><span class="p">,</span>
-                         <span class="n">linkOrientations</span><span class="o">=</span><span class="n">linkOrientations</span><span class="p">,</span>
-                         <span class="n">linkInertialFramePositions</span><span class="o">=</span><span class="n">linkInertialFramePositions</span><span class="p">,</span>
-                         <span class="n">linkInertialFrameOrientations</span><span class="o">=</span><span class="n">linkInertialFrameOrns</span><span class="p">,</span>
-                         <span class="n">linkParentIndices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
-                         <span class="n">linkJointTypes</span><span class="o">=</span><span class="n">jointTypes</span><span class="p">,</span>
-                         <span class="n">linkJointAxis</span><span class="o">=</span><span class="n">axis</span><span class="p">)</span>
+<span class="n">rope</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createMultiBody</span><span class="p">(</span>
+    <span class="n">base_mass</span><span class="p">,</span>
+    <span class="n">base_shape</span><span class="p">,</span>
+    <span class="n">visualShapeId</span><span class="p">,</span>
+    <span class="n">basePosition</span><span class="p">,</span>
+    <span class="n">baseOrientation</span><span class="p">,</span>
+    <span class="n">linkMasses</span><span class="o">=</span><span class="n">link_Masses</span><span class="p">,</span>
+    <span class="n">linkCollisionShapeIndices</span><span class="o">=</span><span class="n">linkCollisionShapeIndices</span><span class="p">,</span>
+    <span class="n">linkVisualShapeIndices</span><span class="o">=</span><span class="n">linkVisualShapeIndices</span><span class="p">,</span>
+    <span class="n">linkPositions</span><span class="o">=</span><span class="n">linkPositions</span><span class="p">,</span>
+    <span class="n">linkOrientations</span><span class="o">=</span><span class="n">linkOrientations</span><span class="p">,</span>
+    <span class="n">linkInertialFramePositions</span><span class="o">=</span><span class="n">linkInertialFramePositions</span><span class="p">,</span>
+    <span class="n">linkInertialFrameOrientations</span><span class="o">=</span><span class="n">linkInertialFrameOrns</span><span class="p">,</span>
+    <span class="n">linkParentIndices</span><span class="o">=</span><span class="n">indices</span><span class="p">,</span>
+    <span class="n">linkJointTypes</span><span class="o">=</span><span class="n">jointTypes</span><span class="p">,</span>
+    <span class="n">linkJointAxis</span><span class="o">=</span><span class="n">axis</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We remove stiffness among the joints by adding friction to them.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">friction_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">joint_friction</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># same all axis</span>
 <span class="n">control_mode</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">POSITION_CONTROL</span>  <span class="c1"># set pos control mode</span>
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">getNumJoints</span><span class="p">(</span><span class="n">rope</span><span class="p">)):</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">setJointMotorControlMultiDof</span><span class="p">(</span><span class="n">rope</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">control_mode</span><span class="p">,</span>
-                                   <span class="n">targetPosition</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
-                                   <span class="n">targetVelocity</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                   <span class="n">positionGain</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                                   <span class="n">velocityGain</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                                   <span class="n">force</span><span class="o">=</span><span class="n">friction_vec</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">setJointMotorControlMultiDof</span><span class="p">(</span>
+        <span class="n">rope</span><span class="p">,</span>
+        <span class="n">j</span><span class="p">,</span>
+        <span class="n">control_mode</span><span class="p">,</span>
+        <span class="n">targetPosition</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">targetVelocity</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="n">positionGain</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">velocityGain</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">force</span><span class="o">=</span><span class="n">friction_vec</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, we define a constraint base that will help us in the oscillation of the
 chain.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root_robe_c</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createConstraint</span><span class="p">(</span><span class="n">rope</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
-                                 <span class="n">p</span><span class="o">.</span><span class="n">JOINT_FIXED</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-                                 <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">root_robe_c</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">createConstraint</span><span class="p">(</span>
+    <span class="n">rope</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">JOINT_FIXED</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="p">)</span>
 
 <span class="c1"># some traj to inject motion</span>
 <span class="n">amplitude_x</span> <span class="o">=</span> <span class="mf">0.3</span>
 <span class="n">amplitude_y</span> <span class="o">=</span> <span class="mf">0.0</span>
 <span class="n">freq</span> <span class="o">=</span> <span class="mf">0.6</span>
 
-<span class="n">base_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
-                       <span class="n">directions</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
-                       <span class="n">scales</span><span class="o">=</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">),</span>
-                       <span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]))</span>
+<span class="n">base_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.box" title="fury.actor.box" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">box</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
+    <span class="n">directions</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
+    <span class="n">scales</span><span class="o">=</span><span class="p">(</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">),</span>
+    <span class="n">colors</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We add the necessary actors to the scene.</p>
@@ -433,10 +447,9 @@ chain.</p>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">base_actor</span><span class="p">)</span>
 
 <span class="c1"># Create show manager.</span>
-<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
-                           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                           <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 
 
 <span class="c1"># Counter interator for tracking simulation steps.</span>
@@ -467,12 +480,14 @@ chain.</p>
 
         <span class="n">rot_mat</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.reshape.html#numpy.reshape" title="numpy.reshape" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">reshape</span></a><span class="p">(</span>
             <span class="n">p</span><span class="o">.</span><span class="n">getMatrixFromQuaternion</span><span class="p">(</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">getDifferenceQuaternion</span><span class="p">(</span><span class="n">orn</span><span class="p">,</span> <span class="n">linkOrientations</span><span class="p">[</span><span class="n">joint</span><span class="p">])),</span>
-            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">getDifferenceQuaternion</span><span class="p">(</span><span class="n">orn</span><span class="p">,</span> <span class="n">linkOrientations</span><span class="p">[</span><span class="n">joint</span><span class="p">])</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+        <span class="p">)</span>
 
-        <span class="n">vertices</span><span class="p">[</span><span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span><span class="p">:</span> <span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="o">+</span> <span class="n">sec</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="p">(</span><span class="n">vertices</span><span class="p">[</span><span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span><span class="p">:</span> <span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="o">+</span> <span class="n">sec</span><span class="p">]</span> <span class="o">-</span>
-             <span class="n">linkPositions</span><span class="p">[</span><span class="n">joint</span><span class="p">])</span> <span class="o">@</span> <span class="n">rot_mat</span> <span class="o">+</span> <span class="n">pos</span>
+        <span class="n">vertices</span><span class="p">[</span><span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="p">:</span> <span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="o">+</span> <span class="n">sec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">vertices</span><span class="p">[</span><span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="p">:</span> <span class="n">joint</span> <span class="o">*</span> <span class="n">sec</span> <span class="o">+</span> <span class="n">sec</span><span class="p">]</span> <span class="o">-</span> <span class="n">linkPositions</span><span class="p">[</span><span class="n">joint</span><span class="p">]</span>
+        <span class="p">)</span> <span class="o">@</span> <span class="n">rot_mat</span> <span class="o">+</span> <span class="n">pos</span>
 
         <span class="n">linkPositions</span><span class="p">[</span><span class="n">joint</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
         <span class="n">linkOrientations</span><span class="p">[</span><span class="n">joint</span><span class="p">]</span> <span class="o">=</span> <span class="n">orn</span>
@@ -480,8 +495,9 @@ chain.</p>
 </div>
 <p>We define a TextBlock to display the Avg. FPS and Simulation steps.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fpss</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([])</span>
-<span class="n">tb</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">680</span><span class="p">),</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Avg. FPS: </span><span class="se">\n</span><span class="s2">Sim Steps: &quot;</span><span class="p">)</span>
+<span class="n">tb</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">680</span><span class="p">),</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Avg. FPS: </span><span class="se">\n</span><span class="s1">Sim Steps: &#39;</span>
+<span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
 
 <span class="n">t</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -494,13 +510,14 @@ chain.</p>
     <span class="k">global</span> <span class="n">t</span><span class="p">,</span> <span class="n">fpss</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 
-    <span class="n">t</span> <span class="o">+=</span> <span class="mf">1.</span> <span class="o">/</span> <span class="n">freq_sim</span>
+    <span class="n">t</span> <span class="o">+=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">freq_sim</span>
 
     <span class="k">if</span> <span class="n">cnt</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">fps</span> <span class="o">=</span> <span class="n">showm</span><span class="o">.</span><span class="n">frame_rate</span>
         <span class="n">fpss</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.append.html#numpy.append" title="numpy.append" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">append</span></a><span class="p">(</span><span class="n">fpss</span><span class="p">,</span> <span class="n">fps</span><span class="p">)</span>
-        <span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Avg. FPS: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">fpss</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span> <span class="o">+</span> \
-                     <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Sim Steps: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span>
+        <span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s1">&#39;Avg. FPS: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.mean.html#numpy.mean" title="numpy.mean" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">mean</span></a><span class="p">(</span><span class="n">fpss</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Sim Steps: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cnt</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="c1"># some trajectory</span>
     <span class="n">ux</span> <span class="o">=</span> <span class="n">amplitude_x</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.sin.html#numpy.sin" title="numpy.sin" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-data"><span class="n">np</span><span class="o">.</span><span class="n">sin</span></a><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/constants.html#numpy.pi" title="numpy.pi" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-data"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a> <span class="o">*</span> <span class="n">freq</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span>
@@ -509,8 +526,7 @@ chain.</p>
     <span class="c1"># move base around</span>
     <span class="n">pivot</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span> <span class="o">*</span> <span class="n">ux</span><span class="p">,</span> <span class="n">uy</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
     <span class="n">orn</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">getQuaternionFromEuler</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
-    <span class="n">p</span><span class="o">.</span><span class="n">changeConstraint</span><span class="p">(</span><span class="n">root_robe_c</span><span class="p">,</span> <span class="n">pivot</span><span class="p">,</span> <span class="n">jointChildFrameOrientation</span><span class="o">=</span><span class="n">orn</span><span class="p">,</span>
-                       <span class="n">maxForce</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">changeConstraint</span><span class="p">(</span><span class="n">root_robe_c</span><span class="p">,</span> <span class="n">pivot</span><span class="p">,</span> <span class="n">jointChildFrameOrientation</span><span class="o">=</span><span class="n">orn</span><span class="p">,</span> <span class="n">maxForce</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 
     <span class="c1"># Sync base and chain.</span>
     <span class="n">sync_actor</span><span class="p">(</span><span class="n">base_actor</span><span class="p">,</span> <span class="n">rope</span><span class="p">)</span>
@@ -535,7 +551,7 @@ chain.</p>
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_chain.png&quot;</span><span class="p">)</span>
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_chain.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
@@ -558,17 +574,17 @@ chain.</p>
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="viz_brick_wall.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="viz_domino.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Brick Wall Simulation</p>
+          <p class="prev-next-title">Domino Physics Simulation</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="viz_wrecking_ball.html" title="next page">
+  <a class='right-next' id="next-link" href="viz_brick_wall.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Wrecking Ball Simulation</p>
+      <p class="prev-next-title">Brick Wall Simulation</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>

@@ -28,23 +28,27 @@ layout the network. A simpler animation of the network
 made by adding some random displacements to nodes
 positions is also demoed.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-16
+.. GENERATED FROM PYTHON SOURCE LINES 14-15
 
 First, let's import some useful functions
 
-.. GENERATED FROM PYTHON SOURCE LINES 16-23
+.. GENERATED FROM PYTHON SOURCE LINES 15-26
 
 .. code-block:: default
 
 
     import math
     from os.path import join as pjoin
+
     import numpy as np
-    from fury import actor, window, colormap as cmap
-    from fury.utils import update_actor, vertices_from_actor, compute_bounds
+
+    from fury import actor
+    from fury import colormap as cmap
+    from fury import window
+    from fury.utils import compute_bounds, update_actor, vertices_from_actor
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-31
+.. GENERATED FROM PYTHON SOURCE LINES 27-34
 
 This demo has two modes.
 Use `mode = 0` to visualize a randomly generated geographic network by
@@ -54,7 +58,7 @@ Use `mode = 1` to visualize a large network being animated with random
 displacements
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-34
+.. GENERATED FROM PYTHON SOURCE LINES 34-37
 
 .. code-block:: default
 
@@ -62,11 +66,11 @@ displacements
     mode = 0
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-36
+.. GENERATED FROM PYTHON SOURCE LINES 38-39
 
 Then let's download some available datasets. (mode 1)
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-43
+.. GENERATED FROM PYTHON SOURCE LINES 39-46
 
 .. code-block:: default
 
@@ -78,11 +82,11 @@ Then let's download some available datasets. (mode 1)
         categories_file, edges_file, positions_file = sorted(files.keys())
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 44-45
+.. GENERATED FROM PYTHON SOURCE LINES 47-48
 
 We read our datasets (mode 1)
 
-.. GENERATED FROM PYTHON SOURCE LINES 45-52
+.. GENERATED FROM PYTHON SOURCE LINES 48-55
 
 .. code-block:: default
 
@@ -94,54 +98,53 @@ We read our datasets (mode 1)
         vertices_count = len(positions)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 56-57
 
 Generate a geographic random network, requires networkx package (mode 0)
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-67
+.. GENERATED FROM PYTHON SOURCE LINES 57-69
 
 .. code-block:: default
 
 
     if mode == 0:
         import networkx as nx
+
         vertices_count = 100
         view_size = 100
         network = nx.random_geometric_graph(vertices_count, 0.2)
-        positions = view_size * \
-            np.random.random((vertices_count, 3)) - view_size / 2.0
+        positions = view_size * np.random.random((vertices_count, 3)) - view_size / 2.0
         categories = np.arange(0, vertices_count)
         edges = np.array(network.edges())
-        positions = view_size * \
-            np.random.random((vertices_count, 3)) - view_size / 2.0
+        positions = view_size * np.random.random((vertices_count, 3)) - view_size / 2.0
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-70
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 We attribute a color to each category of our dataset which correspond to our
 nodes colors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-81
+.. GENERATED FROM PYTHON SOURCE LINES 72-83
 
 .. code-block:: default
 
 
-    category2index = {category: i
-                      for i, category in enumerate(np.unique(categories))}
+    category2index = {category: i for i, category in enumerate(np.unique(categories))}
 
     index2category = np.unique(categories)
 
     category_colors = cmap.distinguishable_colormap(nb_colors=len(index2category))
 
-    colors = np.array([category_colors[category2index[category]]
-                       for category in categories])
+    colors = np.array(
+        [category_colors[category2index[category]] for category in categories]
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 84-85
 
 We define our node size
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-86
+.. GENERATED FROM PYTHON SOURCE LINES 85-88
 
 .. code-block:: default
 
@@ -149,12 +152,12 @@ We define our node size
     radii = 1 + np.random.rand(len(positions))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-89
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 Let's create our edges now. They will indicate a citation between two nodes.
 The colors of each edge are interpolated between the two endpoints.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-96
+.. GENERATED FROM PYTHON SOURCE LINES 91-98
 
 .. code-block:: default
 
@@ -166,41 +169,48 @@ The colors of each edge are interpolated between the two endpoints.
     edges_colors = np.average(np.array(edges_colors), axis=1)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-100
+.. GENERATED FROM PYTHON SOURCE LINES 99-102
 
 Our data preparation is ready, it is time to visualize them all. We start to
 build 2 actors that we represent our data : sphere_actor for the nodes and
 lines_actor for the edges.
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-112
+.. GENERATED FROM PYTHON SOURCE LINES 102-116
 
 .. code-block:: default
 
 
-    sphere_actor = actor.sphere(centers=np.zeros(positions.shape),
-                                colors=colors,
-                                radii=radii * 0.5,
-                                theta=8,
-                                phi=8)
+    sphere_actor = actor.sphere(
+        centers=np.zeros(positions.shape), colors=colors, radii=radii * 0.5, theta=8, phi=8
+    )
 
 
-    lines_actor = actor.line(np.zeros((len(edges), 2, 3)),
-                             colors=edges_colors, lod=False,
-                             fake_tube=True, linewidth=3)
+    lines_actor = actor.line(
+        np.zeros((len(edges), 2, 3)),
+        colors=edges_colors,
+        lod=False,
+        fake_tube=True,
+        linewidth=3,
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-114
+.. GENERATED FROM PYTHON SOURCE LINES 117-118
 
 Defining timer callback and layout iterator
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-210
+.. GENERATED FROM PYTHON SOURCE LINES 118-225
 
 .. code-block:: default
 
 
 
-    def new_layout_timer(showm, edges_list, vertices_count,
-                         max_iterations=1000, vertex_initial_positions=None):
+    def new_layout_timer(
+        showm,
+        edges_list,
+        vertices_count,
+        max_iterations=1000,
+        vertex_initial_positions=None,
+    ):
         view_size = 500
         viscosity = 0.10
         alpha = 0.5
@@ -214,8 +224,7 @@ Defining timer callback and layout iterator
         if vertex_initial_positions is not None:
             pos = np.array(vertex_initial_positions)
         else:
-            pos = view_size * \
-                np.random.random((vertices_count, 3)) - view_size / 2.0
+            pos = view_size * np.random.random((vertices_count, 3)) - view_size / 2.0
 
         velocities = np.zeros((vertices_count, 3))
 
@@ -228,10 +237,14 @@ Defining timer callback and layout iterator
                     for vertex2 in range(vertex1):
                         x1, y1, z1 = pos[vertex1]
                         x2, y2, z2 = pos[vertex2]
-                        distance = math.sqrt(
-                            (x2 - x1) * (x2 - x1) +
-                            (y2 - y1) * (y2 - y1) +
-                            (z2 - z1) * (z2 - z1)) + alpha
+                        distance = (
+                            math.sqrt(
+                                (x2 - x1) * (x2 - x1)
+                                + (y2 - y1) * (y2 - y1)
+                                + (z2 - z1) * (z2 - z1)
+                            )
+                            + alpha
+                        )
                         rx = (x2 - x1) / distance
                         ry = (y2 - y1) / distance
                         rz = (z2 - z1) / distance
@@ -247,23 +260,25 @@ Defining timer callback and layout iterator
                     x1, y1, z1 = pos[vFrom]
                     x2, y2, z2 = pos[vTo]
                     distance = math.sqrt(
-                        (x2 - x1) * (x2 - x1) +
-                        (y2 - y1) * (y2 - y1) +
-                        (z2 - z1) * (z2 - z1))
-                    Rx = (x2 - x1)
-                    Ry = (y2 - y1)
-                    Rz = (z2 - z1)
+                        (x2 - x1) * (x2 - x1)
+                        + (y2 - y1) * (y2 - y1)
+                        + (z2 - z1) * (z2 - z1)
+                    )
+                    Rx = x2 - x1
+                    Ry = y2 - y1
+                    Rz = z2 - z1
                     Fx = a * Rx * distance
                     Fy = a * Ry * distance
                     Fz = a * Rz * distance
                     forces[vFrom] += np.array([Fx, Fy, Fz])
                     forces[vTo] -= np.array([Fx, Fy, Fz])
                 velocities += forces * deltaT
-                velocities *= (1.0 - viscosity)
+                velocities *= 1.0 - viscosity
                 pos += velocities * deltaT
             pos[:, 0] -= np.mean(pos[:, 0])
             pos[:, 1] -= np.mean(pos[:, 1])
             pos[:, 2] -= np.mean(pos[:, 2])
+
         counter = 0
 
         def _timer(_obj, _event):
@@ -274,8 +289,7 @@ Defining timer callback and layout iterator
             else:
                 pos[:] += (np.random.random(pos.shape) - 0.5) * 1.5
             spheres_positions = vertices_from_actor(sphere_actor)
-            spheres_positions[:] = sphere_geometry + \
-                np.repeat(pos, geometry_length, axis=0)
+            spheres_positions[:] = sphere_geometry + np.repeat(pos, geometry_length, axis=0)
 
             edges_positions = vertices_from_actor(lines_actor)
             edges_positions[::2] = pos[edges_list[:, 0]]
@@ -291,15 +305,17 @@ Defining timer callback and layout iterator
 
             if counter >= max_iterations:
                 showm.exit()
+
         return _timer
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-213
+
+.. GENERATED FROM PYTHON SOURCE LINES 226-228
 
 All actors need to be added in a scene, so we build one and add our
 lines_actor and sphere_actor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-222
+.. GENERATED FROM PYTHON SOURCE LINES 228-237
 
 .. code-block:: default
 
@@ -313,29 +329,28 @@ lines_actor and sphere_actor.
     scene.add(sphere_actor)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-227
+.. GENERATED FROM PYTHON SOURCE LINES 238-242
 
 The final step! Visualize the result of our creation! Also, we need to move
 the camera a little bit farther from the network. you can increase the
 parameter max_iteractions of the timer callback to let the animation run for
 more time.
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-248
+.. GENERATED FROM PYTHON SOURCE LINES 242-261
 
 .. code-block:: default
 
 
-    showm = window.ShowManager(scene, reset_camera=False, size=(
-        900, 768), order_transparent=True, multi_samples=8)
-
+    showm = window.ShowManager(
+        scene, reset_camera=False, size=(900, 768), order_transparent=True, multi_samples=8
+    )
 
 
     scene.set_camera(position=(0, 0, -300))
 
     timer_callback = new_layout_timer(
-        showm, edges, vertices_count,
-        max_iterations=200,
-        vertex_initial_positions=positions)
+        showm, edges, vertices_count, max_iterations=200, vertex_initial_positions=positions
+    )
 
 
     # Run every 16 milliseconds
@@ -343,8 +358,7 @@ more time.
 
     showm.start()
 
-    window.record(showm.scene, size=(900, 768),
-                  out_path="viz_animated_networks.png")
+    window.record(showm.scene, size=(900, 768), out_path='viz_animated_networks.png')
 
 
 .. rst-class:: sphx-glr-timing

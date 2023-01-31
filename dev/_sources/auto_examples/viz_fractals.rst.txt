@@ -35,17 +35,19 @@ avoid having to hardcode the geometry of a tetrahedron and a cube.
 ``fury.utils`` also contains a ``repeat_primitive`` function which we will use
 for this demo.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-24
+.. GENERATED FROM PYTHON SOURCE LINES 19-26
 
 .. code-block:: default
 
 
     import math
+
     import numpy as np
-    from fury import window, primitive, utils, ui
+
+    from fury import primitive, ui, utils, window
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-49
+.. GENERATED FROM PYTHON SOURCE LINES 27-51
 
 Before we create our first fractal, let's set some ground rules for us to
 work with.
@@ -72,7 +74,7 @@ size at the start, without any additional overhead.
 
 -----------------------------------------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-56
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 The tetrix is a classic 3d fractal, a natural three-dimensional extension of
 the Sierpinski Triangle. At each level, we need to calculate the new centers
@@ -80,17 +82,17 @@ for the next level. We can use the vertices of a tetrahedron as the offsets
 for the new centers, provided that the tetrahedron is centered at the origin
 (which is the case here).
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-93
+.. GENERATED FROM PYTHON SOURCE LINES 58-96
 
 .. code-block:: default
 
 
 
     def tetrix(N):
-        centers = np.zeros((4 ** N, 3))
+        centers = np.zeros((4**N, 3))
 
         # skipping non-leaf nodes (see above)
-        offset = (4 ** N - 1) // 3 + 1
+        offset = (4**N - 1) // 3 + 1
 
         # just need the vertices
         U, _ = primitive.prim_tetrahedron()
@@ -105,7 +107,7 @@ for the new centers, provided that the tetrahedron is centered at the origin
                     gen_centers(depth + 1, idx + i, center + dist * U[i], dist / 2)
 
         # the division by sqrt(6) is to ensure correct scale
-        gen_centers(0, 1, np.zeros(3), 2 / (6 ** 0.5))
+        gen_centers(0, 1, np.zeros(3), 2 / (6**0.5))
 
         vertices, faces = primitive.prim_tetrahedron()
 
@@ -122,7 +124,8 @@ for the new centers, provided that the tetrahedron is centered at the origin
         return utils.get_actor_from_primitive(vertices, triangles, colors)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-101
+
+.. GENERATED FROM PYTHON SOURCE LINES 97-104
 
 For a Menger Sponge, each cube is divided into 27 smaller cubes, and we skip
 some of them (face centers, and the center of the cube). This means that on
@@ -132,29 +135,49 @@ Here, to compute the points of each new center, we start at a corner cube's
 center and add the offsets to each smaller cube, scaled according to the
 level.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-141
+.. GENERATED FROM PYTHON SOURCE LINES 104-164
 
 .. code-block:: default
 
 
 
     def sponge(N):
-        centers = np.zeros((20 ** N, 3))
-        offset = (20 ** N - 1) // 19 + 1
+        centers = np.zeros((20**N, 3))
+        offset = (20**N - 1) // 19 + 1
 
         # these are the offsets of the new centers at the next level of recursion
         # each cube is divided into 20 smaller cubes for a snowflake
-        V = np.array([[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 1, 0], [0, 1, 2],
-                      [0, 2, 0], [0, 2, 1], [0, 2, 2], [1, 0, 0], [1, 0, 2],
-                      [1, 2, 0], [1, 2, 2], [2, 0, 0], [2, 0, 1], [2, 0, 2],
-                      [2, 1, 0], [2, 1, 2], [2, 2, 0], [2, 2, 1], [2, 2, 2]])
+        V = np.array(
+            [
+                [0, 0, 0],
+                [0, 0, 1],
+                [0, 0, 2],
+                [0, 1, 0],
+                [0, 1, 2],
+                [0, 2, 0],
+                [0, 2, 1],
+                [0, 2, 2],
+                [1, 0, 0],
+                [1, 0, 2],
+                [1, 2, 0],
+                [1, 2, 2],
+                [2, 0, 0],
+                [2, 0, 1],
+                [2, 0, 2],
+                [2, 1, 0],
+                [2, 1, 2],
+                [2, 2, 0],
+                [2, 2, 1],
+                [2, 2, 2],
+            ]
+        )
 
         def gen_centers(depth, pos, center, dist):
             if depth == N:
                 centers[pos - offset] = center
             else:
                 # we consider a corner cube as our starting point
-                start = center - np.array([1, 1, 1]) * dist ** 0.5
+                start = center - np.array([1, 1, 1]) * dist**0.5
                 idx = 20 * (pos - 1) + 2
 
                 # this moves from the corner cube to each new cube's center
@@ -165,7 +188,7 @@ level.
         gen_centers(0, 1, np.zeros(3), 1 / 3)
 
         vertices, faces = primitive.prim_box()
-        vertices /= 3 ** N
+        vertices /= 3**N
 
         bounds_min, bounds_max = np.min(centers, axis=0), np.max(centers, axis=0)
         colors = (centers - bounds_min) / (bounds_max - bounds_min)
@@ -177,30 +200,49 @@ level.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 142-145
+.. GENERATED FROM PYTHON SOURCE LINES 165-168
 
 A snowflake is exactly the same as above, but we skip different cubes
 (corners and center). I think this looks quite interesting, and it is
 possible to see the Koch snowflake if you position the camera just right.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-177
+.. GENERATED FROM PYTHON SOURCE LINES 168-219
 
 .. code-block:: default
 
 
+
     def snowflake(N):
-        centers = np.zeros((18 ** N, 3))
-        offset = (18 ** N - 1) // 17 + 1
-        V = np.array([[0, 0, 1], [0, 1, 0], [0, 1, 1], [0, 1, 2], [0, 2, 1],
-                      [1, 0, 0], [1, 0, 1], [1, 0, 2], [1, 1, 0], [1, 1, 2],
-                      [1, 2, 0], [1, 2, 1], [1, 2, 2], [2, 0, 1], [2, 1, 0],
-                      [2, 1, 1], [2, 1, 2], [2, 2, 1]])
+        centers = np.zeros((18**N, 3))
+        offset = (18**N - 1) // 17 + 1
+        V = np.array(
+            [
+                [0, 0, 1],
+                [0, 1, 0],
+                [0, 1, 1],
+                [0, 1, 2],
+                [0, 2, 1],
+                [1, 0, 0],
+                [1, 0, 1],
+                [1, 0, 2],
+                [1, 1, 0],
+                [1, 1, 2],
+                [1, 2, 0],
+                [1, 2, 1],
+                [1, 2, 2],
+                [2, 0, 1],
+                [2, 1, 0],
+                [2, 1, 1],
+                [2, 1, 2],
+                [2, 2, 1],
+            ]
+        )
 
         def gen_centers(depth, pos, center, side):
             if depth == N:
                 centers[pos - offset] = center
             else:
-                start = center - np.array([1, 1, 1]) * side ** 0.5
+                start = center - np.array([1, 1, 1]) * side**0.5
                 idx = 18 * (pos - 1) + 2
                 for i in range(18):
                     gen_centers(depth + 1, idx + i, start + V[i] * side, side / 3)
@@ -208,7 +250,7 @@ possible to see the Koch snowflake if you position the camera just right.
         gen_centers(0, 1, np.zeros(3), 1 / 3)
 
         vertices, faces = primitive.prim_box()
-        vertices /= 3 ** N
+        vertices /= 3**N
 
         bounds_min, bounds_max = np.min(centers, axis=0), np.max(centers, axis=0)
         colors = (centers - bounds_min) / (bounds_max - bounds_min)
@@ -220,26 +262,26 @@ possible to see the Koch snowflake if you position the camera just right.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-180
+.. GENERATED FROM PYTHON SOURCE LINES 220-222
 
 Now that we have the functions to generate fractals, we can start setting up
 the Scene and ShowManager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-184
+.. GENERATED FROM PYTHON SOURCE LINES 222-226
 
 .. code-block:: default
 
 
     scene = window.Scene()
-    showmgr = window.ShowManager(scene, "Fractals", (800, 800), reset_camera=True)
+    showmgr = window.ShowManager(scene, 'Fractals', (800, 800), reset_camera=True)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-187
+.. GENERATED FROM PYTHON SOURCE LINES 227-229
 
 These values are what work nicely on my machine without lagging. If you have
 a powerful machine, you could bump these up by around 2-3.
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-190
+.. GENERATED FROM PYTHON SOURCE LINES 229-232
 
 .. code-block:: default
 
@@ -247,25 +289,30 @@ a powerful machine, you could bump these up by around 2-3.
     fractals = [tetrix(6), sponge(3), snowflake(3)]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 191-194
+.. GENERATED FROM PYTHON SOURCE LINES 233-236
 
 We want to be able to switch between the three fractals. To achieve this
 we'll create a RadioButton and register a callback which will remove existing
 fractals and add the selected one. This also resets the camera.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-217
+.. GENERATED FROM PYTHON SOURCE LINES 236-264
 
 .. code-block:: default
 
 
     options = {
-        "Tetrix": 0,
-        "Sponge": 1,
-        "Snowflake": 2,
+        'Tetrix': 0,
+        'Sponge': 1,
+        'Snowflake': 2,
     }
 
-    shape_chooser = ui.RadioButton(options.keys(), padding=10, font_size=16,
-                                   checked_labels=["Tetrix"], position=(10, 10))
+    shape_chooser = ui.RadioButton(
+        options.keys(),
+        padding=10,
+        font_size=16,
+        checked_labels=['Tetrix'],
+        position=(10, 10),
+    )
 
 
     def choose_shape(radio):
@@ -281,14 +328,14 @@ fractals and add the selected one. This also resets the camera.
     showmgr.scene.add(shape_chooser)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-222
+.. GENERATED FROM PYTHON SOURCE LINES 265-269
 
 Let's add some basic camera movement to make it look a little interesting.
 We can use a callback here to update a counter and calculate the camera
 positions using the counter. ``sin`` and ``cos`` are used here to make smooth
 looping movements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-236
+.. GENERATED FROM PYTHON SOURCE LINES 269-283
 
 .. code-block:: default
 
@@ -307,13 +354,13 @@ looping movements.
     showmgr.add_timer_callback(True, 20, timer_callback)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-240
+.. GENERATED FROM PYTHON SOURCE LINES 284-287
 
 Finally, show the window if running in interactive mode or render to an image
 otherwise. This is needed for generating the documentation that you are
 reading.
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-246
+.. GENERATED FROM PYTHON SOURCE LINES 287-293
 
 .. code-block:: default
 
@@ -322,7 +369,7 @@ reading.
     if interactive:
         showmgr.start()
     else:
-        window.record(showmgr.scene, out_path="fractals.png", size=(800, 800))
+        window.record(showmgr.scene, out_path='fractals.png', size=(800, 800))
 
 
 .. rst-class:: sphx-glr-timing

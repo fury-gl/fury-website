@@ -27,24 +27,25 @@ several FURY UI elements, then use a list box to toggle which element is shown.
 
 First, a bunch of imports.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-17
+.. GENERATED FROM PYTHON SOURCE LINES 12-18
 
 .. code-block:: default
 
 
-    from fury.data import read_viz_icons, fetch_viz_icons
-    from fury import ui, window, actor
     import numpy as np
 
+    from fury import actor, ui, window
+    from fury.data import fetch_viz_icons, read_viz_icons
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-22
+
+.. GENERATED FROM PYTHON SOURCE LINES 19-23
 
 Shapes
 ======
 
 Let's start by drawing some simple shapes. First, a rectangle.
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-25
+.. GENERATED FROM PYTHON SOURCE LINES 23-26
 
 .. code-block:: default
 
@@ -52,11 +53,11 @@ Let's start by drawing some simple shapes. First, a rectangle.
     rect = ui.Rectangle2D(size=(200, 200), position=(400, 300), color=(1, 0, 1))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-27
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 Then we can draw a solid circle, or disk.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-30
+.. GENERATED FROM PYTHON SOURCE LINES 28-31
 
 .. code-block:: default
 
@@ -64,17 +65,16 @@ Then we can draw a solid circle, or disk.
     disk = ui.Disk2D(outer_radius=50, center=(500, 500), color=(1, 1, 0))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-32
+.. GENERATED FROM PYTHON SOURCE LINES 32-33
 
 Add an inner radius to make a ring.
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-36
+.. GENERATED FROM PYTHON SOURCE LINES 33-36
 
 .. code-block:: default
 
 
-    ring = ui.Disk2D(outer_radius=50, inner_radius=45, center=(500, 300),
-                     color=(0, 1, 1))
+    ring = ui.Disk2D(outer_radius=50, inner_radius=45, center=(500, 300), color=(0, 1, 1))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 37-42
@@ -97,16 +97,17 @@ included in FURY.
 
 Now we can create an image container.
 
-.. GENERATED FROM PYTHON SOURCE LINES 47-51
+.. GENERATED FROM PYTHON SOURCE LINES 47-52
 
 .. code-block:: default
 
 
-    img = ui.ImageContainer2D(img_path=read_viz_icons(fname='home3.png'),
-                              position=(450, 350))
+    img = ui.ImageContainer2D(
+        img_path=read_viz_icons(fname='home3.png'), position=(450, 350)
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-57
+.. GENERATED FROM PYTHON SOURCE LINES 53-58
 
 Panel with buttons and text
 ===========================
@@ -114,21 +115,21 @@ Panel with buttons and text
 Let's create some buttons and text and put them in a panel. First we'll
 make the panel.
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-61
+.. GENERATED FROM PYTHON SOURCE LINES 58-62
 
 .. code-block:: default
 
 
-    panel = ui.Panel2D(size=(300, 150), color=(1, 1, 1), align="right")
+    panel = ui.Panel2D(size=(300, 150), color=(1, 1, 1), align='right')
     panel.center = (500, 400)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 63-65
 
 Then we'll make two text labels and place them on the panel.
 Note that we specifiy the position with integer numbers of pixels.
 
-.. GENERATED FROM PYTHON SOURCE LINES 64-70
+.. GENERATED FROM PYTHON SOURCE LINES 65-71
 
 .. code-block:: default
 
@@ -139,21 +140,22 @@ Note that we specifiy the position with integer numbers of pixels.
     panel.add_element(text2, (180, 100))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-75
+.. GENERATED FROM PYTHON SOURCE LINES 72-76
 
 Then we'll create two buttons and add them to the panel.
 
 Note that here we specify the positions with floats. In this case, these are
 percentages of the panel size.
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-91
+.. GENERATED FROM PYTHON SOURCE LINES 76-93
 
 .. code-block:: default
 
 
 
     button_example = ui.Button2D(
-        icon_fnames=[('square', read_viz_icons(fname='stop2.png'))])
+        icon_fnames=[('square', read_viz_icons(fname='stop2.png'))]
+    )
 
     icon_files = []
     icon_files.append(('down', read_viz_icons(fname='circle-down.png')))
@@ -167,11 +169,11 @@ percentages of the panel size.
     panel.add_element(second_button_example, (0.66, 0.33))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-93
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 We can add a callback to each button to perform some action.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-108
+.. GENERATED FROM PYTHON SOURCE LINES 95-110
 
 .. code-block:: default
 
@@ -191,51 +193,62 @@ We can add a callback to each button to perform some action.
     second_button_example.on_left_mouse_button_pressed = change_icon_callback
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-113
+.. GENERATED FROM PYTHON SOURCE LINES 111-115
 
 Cube and sliders
 ================
 
 Let's add a cube to the scene and control it with sliders.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-120
+.. GENERATED FROM PYTHON SOURCE LINES 115-124
 
 .. code-block:: default
 
 
 
-    cube = actor.cube(centers=np.array([[15, 0, 0]]),
-                      colors=np.array([[0, 0, 1]]),
-                      scales=np.array([[20, 20, 20]]),
-                      directions=np.array([[0, 0, 1]]))
+    cube = actor.cube(
+        centers=np.array([[15, 0, 0]]),
+        colors=np.array([[0, 0, 1]]),
+        scales=np.array([[20, 20, 20]]),
+        directions=np.array([[0, 0, 1]]),
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-122
+.. GENERATED FROM PYTHON SOURCE LINES 125-126
 
 Now we'll add three sliders: one circular and two linear.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-134
+.. GENERATED FROM PYTHON SOURCE LINES 126-147
 
 .. code-block:: default
 
 
-    ring_slider = ui.RingSlider2D(center=(740, 400), initial_value=0,
-                                  text_template="{angle:5.1f}°")
+    ring_slider = ui.RingSlider2D(
+        center=(740, 400), initial_value=0, text_template='{angle:5.1f}°'
+    )
 
-    line_slider_x = ui.LineSlider2D(center=(500, 250), initial_value=0,
-                                    min_value=-10, max_value=10,
-                                    orientation="horizontal")
+    line_slider_x = ui.LineSlider2D(
+        center=(500, 250),
+        initial_value=0,
+        min_value=-10,
+        max_value=10,
+        orientation='horizontal',
+    )
 
-    line_slider_y = ui.LineSlider2D(center=(650, 350), initial_value=0,
-                                    min_value=-10, max_value=10,
-                                    orientation="vertical")
+    line_slider_y = ui.LineSlider2D(
+        center=(650, 350),
+        initial_value=0,
+        min_value=-10,
+        max_value=10,
+        orientation='vertical',
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 135-136
+.. GENERATED FROM PYTHON SOURCE LINES 148-149
 
 We can use a callback to rotate the cube with the ring slider.
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-147
+.. GENERATED FROM PYTHON SOURCE LINES 149-160
 
 .. code-block:: default
 
@@ -251,12 +264,12 @@ We can use a callback to rotate the cube with the ring slider.
     ring_slider.on_change = rotate_cube
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-150
+.. GENERATED FROM PYTHON SOURCE LINES 161-163
 
 Similarly, we can translate the cube with line sliders.
 We use global variables to keep track of the position of the cube.
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-170
+.. GENERATED FROM PYTHON SOURCE LINES 163-183
 
 .. code-block:: default
 
@@ -281,7 +294,7 @@ We use global variables to keep track of the position of the cube.
     line_slider_y.on_change = translate_cube_y
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-176
+.. GENERATED FROM PYTHON SOURCE LINES 184-189
 
 Range Slider
 ============
@@ -289,24 +302,41 @@ Range Slider
 Finally, we can add a range slider. This element is composed of two sliders.
 The first slider has two handles which let you set the range of the second.
 
-.. GENERATED FROM PYTHON SOURCE LINES 176-188
+.. GENERATED FROM PYTHON SOURCE LINES 189-218
 
 .. code-block:: default
 
 
     range_slider_x = ui.RangeSlider(
-        line_width=8, handle_side=25, range_slider_center=(450, 450),
-        value_slider_center=(450, 350), length=150, min_value=0,
-        max_value=10, font_size=18, range_precision=2, value_precision=4,
-        shape="square")
+        line_width=8,
+        handle_side=25,
+        range_slider_center=(450, 450),
+        value_slider_center=(450, 350),
+        length=150,
+        min_value=0,
+        max_value=10,
+        font_size=18,
+        range_precision=2,
+        value_precision=4,
+        shape='square',
+    )
 
     range_slider_y = ui.RangeSlider(
-        line_width=8, handle_side=25, range_slider_center=(750, 400),
-        value_slider_center=(650, 400), length=150, min_value=0,
-        max_value=10, font_size=18, range_precision=2, value_precision=4,
-        orientation="vertical", shape="square")
+        line_width=8,
+        handle_side=25,
+        range_slider_center=(750, 400),
+        value_slider_center=(650, 400),
+        length=150,
+        min_value=0,
+        max_value=10,
+        font_size=18,
+        range_precision=2,
+        value_precision=4,
+        orientation='vertical',
+        shape='square',
+    )
 
-.. GENERATED FROM PYTHON SOURCE LINES 189-196
+.. GENERATED FROM PYTHON SOURCE LINES 219-226
 
 Select menu
 ============
@@ -316,22 +346,27 @@ the screen. Let's make a simple menu to choose which example is shown.
 
 We'll first make a list of the examples.
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-201
+.. GENERATED FROM PYTHON SOURCE LINES 226-236
 
 .. code-block:: default
 
 
-    examples = [[rect], [disk, ring], [img], [panel],
-                [ring_slider, line_slider_x, line_slider_y],
-                [range_slider_x, range_slider_y]]
+    examples = [
+        [rect],
+        [disk, ring],
+        [img],
+        [panel],
+        [ring_slider, line_slider_x, line_slider_y],
+        [range_slider_x, range_slider_y],
+    ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-204
+.. GENERATED FROM PYTHON SOURCE LINES 237-239
 
 Now we'll make a function to hide all the examples. Then we'll call it so
 that none are shown initially.
 
-.. GENERATED FROM PYTHON SOURCE LINES 204-215
+.. GENERATED FROM PYTHON SOURCE LINES 239-250
 
 .. code-block:: default
 
@@ -347,39 +382,46 @@ that none are shown initially.
     hide_all_examples()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-218
+.. GENERATED FROM PYTHON SOURCE LINES 251-253
 
 To make the menu, we'll first need to create a list of labels which
 correspond with the examples.
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-222
+.. GENERATED FROM PYTHON SOURCE LINES 253-263
 
 .. code-block:: default
 
 
-    values = ['Rectangle', 'Disks', 'Image', "Button Panel",
-              "Line & Ring Slider", "Range Slider"]
+    values = [
+        'Rectangle',
+        'Disks',
+        'Image',
+        'Button Panel',
+        'Line & Ring Slider',
+        'Range Slider',
+    ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 223-224
+.. GENERATED FROM PYTHON SOURCE LINES 264-265
 
 Now we can create the menu.
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-228
+.. GENERATED FROM PYTHON SOURCE LINES 265-270
 
 .. code-block:: default
 
 
-    listbox = ui.ListBox2D(values=values, position=(10, 300), size=(300, 200),
-                           multiselection=False)
+    listbox = ui.ListBox2D(
+        values=values, position=(10, 300), size=(300, 200), multiselection=False
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-231
+.. GENERATED FROM PYTHON SOURCE LINES 271-273
 
 Then we will use a callback to show the correct example when a label is
 clicked.
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-244
+.. GENERATED FROM PYTHON SOURCE LINES 273-286
 
 .. code-block:: default
 
@@ -397,7 +439,7 @@ clicked.
     listbox.on_change = display_element
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-250
+.. GENERATED FROM PYTHON SOURCE LINES 287-292
 
 Show Manager
 ==================================
@@ -405,13 +447,13 @@ Show Manager
 Now that all the elements have been initialised, we add them to the show
 manager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 250-271
+.. GENERATED FROM PYTHON SOURCE LINES 292-313
 
 .. code-block:: default
 
 
     current_size = (800, 800)
-    show_manager = window.ShowManager(size=current_size, title="FURY UI Example")
+    show_manager = window.ShowManager(size=current_size, title='FURY UI Example')
 
     show_manager.scene.add(listbox)
     for example in examples:
@@ -429,7 +471,7 @@ manager.
     if interactive:
         show_manager.start()
 
-    window.record(show_manager.scene, size=current_size, out_path="viz_ui.png")
+    window.record(show_manager.scene, size=current_size, out_path='viz_ui.png')
 
 
 .. rst-class:: sphx-glr-timing

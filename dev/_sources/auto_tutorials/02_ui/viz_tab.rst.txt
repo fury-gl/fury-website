@@ -31,20 +31,21 @@ create Tabs for:
 
 First, some imports.
 
-.. GENERATED FROM PYTHON SOURCE LINES 15-19
+.. GENERATED FROM PYTHON SOURCE LINES 15-20
 
 .. code-block:: default
 
-    from fury import ui, window, actor
     import numpy as np
+
+    from fury import actor, ui, window
     from fury.data import fetch_viz_icons
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-21
+.. GENERATED FROM PYTHON SOURCE LINES 21-22
 
 First we need to fetch some icons that are included in FURY.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-24
+.. GENERATED FROM PYTHON SOURCE LINES 22-25
 
 .. code-block:: default
 
@@ -52,17 +53,16 @@ First we need to fetch some icons that are included in FURY.
     fetch_viz_icons()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-26
+.. GENERATED FROM PYTHON SOURCE LINES 26-27
 
 First, we create the Tab UI.
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-30
+.. GENERATED FROM PYTHON SOURCE LINES 27-30
 
 .. code-block:: default
 
 
-    tab_ui = ui.TabUI(position=(49, 94), size=(300, 300), nb_tabs=3,
-                      draggable=True)
+    tab_ui = ui.TabUI(position=(49, 94), size=(300, 300), nb_tabs=3, draggable=True)
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-35
@@ -72,28 +72,35 @@ Slider Controls for a Cube for Tab Index 0
 
 Now we prepare content for the first tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-80
+.. GENERATED FROM PYTHON SOURCE LINES 35-87
 
 .. code-block:: default
 
 
-    ring_slider = ui.RingSlider2D(initial_value=0,
-                                  text_template="{angle:5.1f}°")
+    ring_slider = ui.RingSlider2D(initial_value=0, text_template='{angle:5.1f}°')
 
-    line_slider_x = ui.LineSlider2D(initial_value=0,
-                                    min_value=-10, max_value=10,
-                                    orientation="horizontal",
-                                    text_alignment="Top")
+    line_slider_x = ui.LineSlider2D(
+        initial_value=0,
+        min_value=-10,
+        max_value=10,
+        orientation='horizontal',
+        text_alignment='Top',
+    )
 
-    line_slider_y = ui.LineSlider2D(initial_value=0,
-                                    min_value=-10, max_value=10,
-                                    orientation="vertical",
-                                    text_alignment="Right")
+    line_slider_y = ui.LineSlider2D(
+        initial_value=0,
+        min_value=-10,
+        max_value=10,
+        orientation='vertical',
+        text_alignment='Right',
+    )
 
-    cube = actor.box(centers=np.array([[10, 0, 0]]),
-                     directions=np.array([[0, 1, 0]]),
-                     colors=np.array([[0, 0, 1]]),
-                     scales=np.array([[1, 1, 1]]))
+    cube = actor.box(
+        centers=np.array([[10, 0, 0]]),
+        directions=np.array([[0, 1, 0]]),
+        colors=np.array([[0, 0, 1]]),
+        scales=np.array([[1, 1, 1]]),
+    )
     cube_x = 0
     cube_y = 0
 
@@ -122,43 +129,44 @@ Now we prepare content for the first tab.
     line_slider_y.on_change = translate_cube_y
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-82
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 After defining content, we define properties for the tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-88
+.. GENERATED FROM PYTHON SOURCE LINES 89-95
 
 .. code-block:: default
 
 
-    tab_ui.tabs[0].title = "Sliders"
+    tab_ui.tabs[0].title = 'Sliders'
     tab_ui.add_element(0, ring_slider, (0.3, 0.3))
     tab_ui.add_element(0, line_slider_x, (0.0, 0.0))
     tab_ui.add_element(0, line_slider_y, (0.0, 0.1))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-93
+.. GENERATED FROM PYTHON SOURCE LINES 96-100
 
 CheckBoxes For Cylinder and Sphere for Tab Index 1
 ==================================================
 
 Now we prepare content for second tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-125
+.. GENERATED FROM PYTHON SOURCE LINES 100-133
 
 .. code-block:: default
 
 
-    cylinder = actor.cylinder(centers=np.array([[0, 0, 0]]),
-                              directions=np.array([[1, 1, 0]]),
-                              colors=np.array([[0, 1, 1]]),
-                              radius=1.0)
+    cylinder = actor.cylinder(
+        centers=np.array([[0, 0, 0]]),
+        directions=np.array([[1, 1, 0]]),
+        colors=np.array([[0, 1, 1]]),
+        radius=1.0,
+    )
 
-    sphere = actor.sphere(centers=np.array([[5, 0, 0]]),
-                          colors=(1, 1, 0))
+    sphere = actor.sphere(centers=np.array([[5, 0, 0]]), colors=(1, 1, 0))
 
     figure_dict = {'cylinder': cylinder, 'sphere': sphere}
-    checkbox = ui.Checkbox(labels=["cylinder", "sphere"])
+    checkbox = ui.Checkbox(labels=['cylinder', 'sphere'])
 
 
     # Get difference between two lists.
@@ -181,50 +189,56 @@ Now we prepare content for second tab.
     checkbox.on_change = set_figure_visiblity
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-127
+.. GENERATED FROM PYTHON SOURCE LINES 134-135
 
 After defining content, we define properties for the tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 127-131
+.. GENERATED FROM PYTHON SOURCE LINES 135-139
 
 .. code-block:: default
 
 
-    tab_ui.tabs[1].title = "Checkbox"
+    tab_ui.tabs[1].title = 'Checkbox'
     tab_ui.add_element(1, checkbox, (0.2, 0.2))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-136
+.. GENERATED FROM PYTHON SOURCE LINES 140-144
 
 Color Combobox for Fury for Tab Index 2
 =======================================
 
 Now we prepare content for third tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 136-164
+.. GENERATED FROM PYTHON SOURCE LINES 144-178
 
 .. code-block:: default
 
 
     label = ui.TextBlock2D(
-        position=(600, 300), font_size=40, color=(1, 0.5, 0),
-        justification="center", vertical_justification="top",
-        text="FURY rocks!!!"
+        position=(600, 300),
+        font_size=40,
+        color=(1, 0.5, 0),
+        justification='center',
+        vertical_justification='top',
+        text='FURY rocks!!!',
     )
 
     colors = {
-        "Violet": (0.6, 0, 0.8),
-        "Indigo": (0.3, 0, 0.5),
-        "Blue": (0, 0, 1),
-        "Green": (0, 1, 0),
-        "Yellow": (1, 1, 0),
-        "Orange": (1, 0.5, 0),
-        "Red": (1, 0, 0)
+        'Violet': (0.6, 0, 0.8),
+        'Indigo': (0.3, 0, 0.5),
+        'Blue': (0, 0, 1),
+        'Green': (0, 1, 0),
+        'Yellow': (1, 1, 0),
+        'Orange': (1, 0.5, 0),
+        'Red': (1, 0, 0),
     }
 
-    color_combobox = ui.ComboBox2D(items=list(colors.keys()),
-                                   placeholder="Choose Text Color",
-                                   size=(250, 150), draggable=True)
+    color_combobox = ui.ComboBox2D(
+        items=list(colors.keys()),
+        placeholder='Choose Text Color',
+        size=(250, 150),
+        draggable=True,
+    )
 
 
     def change_color(combobox):
@@ -234,39 +248,39 @@ Now we prepare content for third tab.
     color_combobox.on_change = change_color
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-166
+.. GENERATED FROM PYTHON SOURCE LINES 179-180
 
 After defining content, we define properties for the tab.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-170
+.. GENERATED FROM PYTHON SOURCE LINES 180-184
 
 .. code-block:: default
 
 
-    tab_ui.tabs[2].title = "Colors"
+    tab_ui.tabs[2].title = 'Colors'
     tab_ui.add_element(2, color_combobox, (0.1, 0.3))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 171-174
+.. GENERATED FROM PYTHON SOURCE LINES 185-188
 
 Define on_change & on_collapsed methods for tab ui to perform certain tasks
 while active tab is changed or when the tab is collapsed.
 Note: Tab UI can be collapsed by right clicking on it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-207
+.. GENERATED FROM PYTHON SOURCE LINES 188-221
 
 .. code-block:: default
 
 
 
     def hide_actors(tab_ui):
-        if tab_ui.tabs[tab_ui.active_tab_idx].title == "Sliders":
+        if tab_ui.tabs[tab_ui.active_tab_idx].title == 'Sliders':
             cube.SetVisibility(True)
             cylinder.SetVisibility(False)
             sphere.SetVisibility(False)
             label.set_visibility(False)
 
-        elif tab_ui.tabs[tab_ui.active_tab_idx].title == "Checkbox":
+        elif tab_ui.tabs[tab_ui.active_tab_idx].title == 'Checkbox':
             cube.SetVisibility(False)
             set_figure_visiblity(checkbox)
             label.set_visibility(False)
@@ -291,16 +305,16 @@ Note: Tab UI can be collapsed by right clicking on it.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-209
+.. GENERATED FROM PYTHON SOURCE LINES 222-223
 
 Next we prepare the scene and render it with the help of show manager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-220
+.. GENERATED FROM PYTHON SOURCE LINES 223-234
 
 .. code-block:: default
 
 
-    sm = window.ShowManager(size=(800, 500), title="Viz Tab")
+    sm = window.ShowManager(size=(800, 500), title='Viz Tab')
     sm.scene.add(tab_ui, cube, cylinder, sphere, label)
 
     # To interact with the ui set interactive = True
@@ -309,7 +323,7 @@ Next we prepare the scene and render it with the help of show manager.
     if interactive:
         sm.start()
 
-    window.record(sm.scene, size=(500, 500), out_path="viz_tab.png")
+    window.record(sm.scene, size=(500, 500), out_path='viz_tab.png')
 
 
 .. rst-class:: sphx-glr-timing

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Animated 2D functions &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Animated 2D functions &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -239,16 +239,16 @@
 <li class="toctree-l2"><a class="reference internal" href="viz_roi_contour.html">Visualization of ROI Surface Rendered with Streamlines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_helical_motion.html">Motion of a charged particle in a combined magnetic and electric field</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_brownian_motion.html">Brownian motion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_play_video.html">Play a video in the 3D world</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fine_tuning_gl_context.html">Fine-tuning the OpenGL state using shader callbacks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_emwave_animation.html">Electromagnetic Wave Propagation Animation</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Animated 2D functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_bundles.html">Visualize bundles and metrics on bundles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_tesseract.html">Tesseract (Hypercube)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="collision-particles.html">Collisions of particles in a box</a></li>
-<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_advanced.html">Advanced interactive visualization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_fiber_odf.html">Brain Fiber ODF Visualisation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="viz_fractals.html">Fractals</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_network_animated.html">Visualize Networks (Animated version)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="viz_pbr_interactive.html">Interactive PBR demo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
@@ -309,9 +309,11 @@ to download the full example code</p>
 <p>This is a simple demonstration of how one can
 animate 2D functions using FURY.</p>
 <p>Importing necessary modules</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">colormap</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">colormap</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
 </pre></div>
 </div>
 <p>The following function is used to create and update the coordinates of the
@@ -334,11 +336,10 @@ the z coordinate is a function of time.</p>
     <span class="k">return</span> <span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span>
 </pre></div>
 </div>
-<p>Variables and their usage-
-time: float</p>
+<p>Variables and their usage:
+:time - float: initial value of the time variable i.e. value of the time variable at</p>
 <blockquote>
-<div><p>initial value of the time variable i.e. value of the time variable at
-the beginning of the program; (default = 0)</p>
+<div><p>the beginning of the program; (default = 0)</p>
 </div></blockquote>
 <dl class="simple">
 <dt>dt: float</dt><dd><p>amount by which <code class="docutils literal notranslate"><span class="pre">time</span></code> variable is incremented for every iteration
@@ -381,25 +382,25 @@ elevation and generate the surface</p>
 </div>
 <p>Function used to create surface obtained from 2D equation.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">create_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="p">,</span> <span class="n">colormap_name</span><span class="p">):</span>
-    <span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">update_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">equation</span><span class="p">,</span>
-                                 <span class="n">cmap_name</span><span class="o">=</span><span class="n">colormap_name</span><span class="p">)</span>
+    <span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">update_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">equation</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="n">colormap_name</span><span class="p">)</span>
     <span class="n">surf</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.surface" title="fury.actor.surface" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">surface</span></a><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
     <span class="n">surf</span><span class="o">.</span><span class="n">equation</span> <span class="o">=</span> <span class="n">equation</span>
     <span class="n">surf</span><span class="o">.</span><span class="n">cmap_name</span> <span class="o">=</span> <span class="n">colormap_name</span>
     <span class="n">surf</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <a href="../reference/fury.utils.html#fury.utils.vertices_from_actor" title="fury.utils.vertices_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">vertices_from_actor</span></a><span class="p">(</span><span class="n">surf</span><span class="p">)</span>
-    <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span><span class="o">/</span><span class="n">npoints</span><span class="o">**</span><span class="mi">2</span>
-    <span class="n">surf</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">-</span> \
-        <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">/</span> <span class="n">npoints</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">surf</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span>
+        <span class="n">xyz</span><span class="p">,</span> <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">surf</span>
 </pre></div>
 </div>
 <p>Equations to be plotted</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eq1</span> <span class="o">=</span> <span class="s2">&quot;np.abs(np.sin(x*2*np.pi*np.cos(time/2)))**1*np.cos(time/2)*</span><span class="se">\</span>
-<span class="s2">      np.abs(np.cos(y*2*np.pi*np.sin(time/2)))**1*np.sin(time/2)*1.2&quot;</span>
-<span class="n">eq2</span> <span class="o">=</span> <span class="s2">&quot;((x**2 - y**2)/(x**2 + y**2))**(2)*np.cos(6*np.pi*x*y-1.8*time)*0.24&quot;</span>
-<span class="n">eq3</span> <span class="o">=</span> <span class="s2">&quot;(np.sin(np.pi*2*x-np.sin(1.8*time))*np.cos(np.pi*2*y+np.cos(1.8*time)))</span><span class="se">\</span>
-<span class="s2">      *0.48&quot;</span>
-<span class="n">eq4</span> <span class="o">=</span> <span class="s2">&quot;np.cos(24*np.sqrt(x**2 + y**2) - 2*time)*0.18&quot;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">eq1</span> <span class="o">=</span> <span class="s1">&#39;np.abs(np.sin(x*2*np.pi*np.cos(time/2)))**1*np.cos(time/2)*</span><span class="se">\</span>
+<span class="s1">      np.abs(np.cos(y*2*np.pi*np.sin(time/2)))**1*np.sin(time/2)*1.2&#39;</span>
+<span class="n">eq2</span> <span class="o">=</span> <span class="s1">&#39;((x**2 - y**2)/(x**2 + y**2))**(2)*np.cos(6*np.pi*x*y-1.8*time)*0.24&#39;</span>
+<span class="n">eq3</span> <span class="o">=</span> <span class="s1">&#39;(np.sin(np.pi*2*x-np.sin(1.8*time))*np.cos(np.pi*2*y+np.cos(1.8*time)))</span><span class="se">\</span>
+<span class="s1">      *0.48&#39;</span>
+<span class="n">eq4</span> <span class="o">=</span> <span class="s1">&#39;np.cos(24*np.sqrt(x**2 + y**2) - 2*time)*0.18&#39;</span>
 <span class="n">equations</span> <span class="o">=</span> <span class="p">[</span><span class="n">eq1</span><span class="p">,</span> <span class="n">eq2</span><span class="p">,</span> <span class="n">eq3</span><span class="p">,</span> <span class="n">eq4</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -410,14 +411,16 @@ elevation and generate the surface</p>
 <p>Creating a list of surfaces.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">surfaces</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-    <span class="n">surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">create_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">equations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
-                    <span class="n">colormap_name</span><span class="o">=</span><span class="n">cmap_names</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">surfaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">create_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">equations</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">colormap_name</span><span class="o">=</span><span class="n">cmap_names</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="p">)</span>
 </pre></div>
 </div>
 <p>Creating a scene object and configuring the camera’s position</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
-<span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">4.45</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">4.45</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
-                 <span class="n">view_up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">4.45</span><span class="p">,</span> <span class="o">-</span><span class="mi">21</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">4.45</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">view_up</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<span class="p">)</span>
 <span class="n">showm</span> <span class="o">=</span> <a href="../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
 </pre></div>
 </div>
@@ -425,15 +428,20 @@ elevation and generate the surface</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># To store the function names</span>
 <span class="n">text</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
-    <span class="n">t_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span><span class="s1">&#39;Function &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                                <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">))</span>
+    <span class="n">t_actor</span> <span class="o">=</span> <a href="../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span>
+        <span class="s1">&#39;Function &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">pos</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scale</span><span class="o">=</span><span class="p">(</span><span class="mf">0.17</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+    <span class="p">)</span>
     <span class="n">text</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t_actor</span><span class="p">)</span>
 
-<span class="n">grid_ui</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.GridUI" title="fury.ui.GridUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">GridUI</span></a><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">surfaces</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
-                    <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                    <span class="n">cell_padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-                    <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                    <span class="n">rotation_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="n">grid_ui</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.GridUI" title="fury.ui.GridUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">GridUI</span></a><span class="p">(</span>
+    <span class="n">actors</span><span class="o">=</span><span class="n">surfaces</span><span class="p">,</span>
+    <span class="n">captions</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+    <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="n">cell_padding</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">aspect_ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">rotation_axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">)</span>
 <span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grid_ui</span><span class="p">)</span>
 
 <span class="c1"># Adding an axes actor to the first surface.</span>
@@ -442,7 +450,7 @@ elevation and generate the surface</p>
 </div>
 <p>Initializing text box to print the title of the animation</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tb</span> <span class="o">=</span> <a href="../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
-<span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Animated 2D functions&quot;</span>
+<span class="n">tb</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="s1">&#39;Animated 2D functions&#39;</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -463,11 +471,13 @@ elevation and generate the surface</p>
     <span class="c1"># updating the colors and vertices of the triangles used to form the</span>
     <span class="c1"># surfaces</span>
     <span class="k">for</span> <span class="n">surf</span> <span class="ow">in</span> <span class="n">surfaces</span><span class="p">:</span>
-        <span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">update_surface</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">surf</span><span class="o">.</span><span class="n">equation</span><span class="p">,</span>
-                                     <span class="n">cmap_name</span><span class="o">=</span><span class="n">surf</span><span class="o">.</span><span class="n">cmap_name</span><span class="p">)</span>
+        <span class="n">xyz</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">update_surface</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">equation</span><span class="o">=</span><span class="n">surf</span><span class="o">.</span><span class="n">equation</span><span class="p">,</span> <span class="n">cmap_name</span><span class="o">=</span><span class="n">surf</span><span class="o">.</span><span class="n">cmap_name</span>
+        <span class="p">)</span>
         <a href="../reference/fury.utils.html#fury.utils.update_surface_actor_colors" title="fury.utils.update_surface_actor_colors" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">update_surface_actor_colors</span></a><span class="p">(</span><span class="n">surf</span><span class="p">,</span> <span class="n">colors</span><span class="p">)</span>
-        <span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">+</span> \
-            <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">surf</span><span class="o">.</span><span class="n">vertices</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">surf</span><span class="o">.</span><span class="n">initial_vertices</span> <span class="o">+</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.repeat.html#numpy.repeat" title="numpy.repeat" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">repeat</span></a><span class="p">(</span>
+            <span class="n">xyz</span><span class="p">,</span> <span class="n">surf</span><span class="o">.</span><span class="n">no_vertices_per_point</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+        <span class="p">)</span>
         <a href="../reference/fury.utils.html#fury.utils.update_actor" title="fury.utils.update_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">update_actor</span></a><span class="p">(</span><span class="n">surf</span><span class="p">)</span>
 
     <span class="n">showm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
@@ -483,8 +493,7 @@ elevation and generate the surface</p>
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span>
-              <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_animated_surfaces.png&quot;</span><span class="p">)</span>
+<a href="../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_animated_surfaces.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>

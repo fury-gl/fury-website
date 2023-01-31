@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Streaming FURY with user interaction &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Streaming FURY with user interaction &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -299,6 +299,9 @@ serve an interactive visualization through a web browser.</p>
 WebRTC is a more robust option and can be used to perform
 a live streaming with a low-latency connection for example using
 ngrok. However, to use webRTC you need to install the aiortc library.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>aiortc
+</pre></div>
+</div>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Permalink to this heading">#</a></h2>
 <p>If you don’t have ffmpeg installed, you need to install it to use WebRTC</p>
@@ -306,17 +309,18 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
 <p><cite>apt install libavdevice-dev libavfilter-dev libopus-dev libvpx-dev pkg-config</cite></p>
 <p>OS X</p>
 <p><cite>brew install ffmpeg opus libvpx pkg-config</cite></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
+<span class="kn">from</span> <span class="nn">fury.stream.client</span> <span class="kn">import</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamClient" title="fury.stream.client.FuryStreamClient" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamClient</span></a><span class="p">,</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction" title="fury.stream.client.FuryStreamInteraction" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamInteraction</span></a>
+
 <span class="c1"># if this example it&#39;s not working for you and you&#39;re using MacOs</span>
 <span class="c1"># uncoment the following line</span>
 <span class="c1"># multiprocessing.set_start_method(&#39;spawn&#39;)</span>
-<span class="kn">from</span> <span class="nn">fury.stream.server.main</span> <span class="kn">import</span> <a href="../../reference/fury.stream.html#fury.stream.server.web_server" title="fury.stream.server.web_server" class="sphx-glr-backref-module-fury-stream-server sphx-glr-backref-type-py-function"><span class="n">web_server</span></a><span class="p">,</span> <a href="../../reference/fury.stream.html#fury.stream.server.web_server_raw_array" title="fury.stream.server.web_server_raw_array" class="sphx-glr-backref-module-fury-stream-server sphx-glr-backref-type-py-function"><span class="n">web_server_raw_array</span></a>
-<span class="kn">from</span> <span class="nn">fury.stream.client</span> <span class="kn">import</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamClient" title="fury.stream.client.FuryStreamClient" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamClient</span></a><span class="p">,</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction" title="fury.stream.client.FuryStreamInteraction" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamInteraction</span></a>
-<span class="kn">from</span> <span class="nn">fury.stream.server.main</span> <span class="kn">import</span> <span class="n">WEBRTC_AVAILABLE</span>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
-
+<span class="kn">from</span> <span class="nn">fury.stream.server.main</span> <span class="kn">import</span> <span class="n">WEBRTC_AVAILABLE</span><span class="p">,</span> <a href="../../reference/fury.stream.html#fury.stream.server.web_server" title="fury.stream.server.web_server" class="sphx-glr-backref-module-fury-stream-server sphx-glr-backref-type-py-function"><span class="n">web_server</span></a><span class="p">,</span> <a href="../../reference/fury.stream.html#fury.stream.server.web_server_raw_array" title="fury.stream.server.web_server_raw_array" class="sphx-glr-backref-module-fury-stream-server sphx-glr-backref-type-py-function"><span class="n">web_server_raw_array</span></a>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
     <span class="n">interactive</span> <span class="o">=</span> <span class="kc">False</span>
@@ -348,19 +352,10 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
     <span class="c1"># max number of interactions to be stored inside the queue</span>
     <span class="n">max_queue_size</span> <span class="o">=</span> <span class="mi">17</span>
     <span class="c1">######################################################################</span>
-    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span>
-        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-    <span class="p">])</span>
-    <span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span>
-        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
-        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="p">])</span>
+    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+    <span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
 
-    <span class="n">actors</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.sphere" title="fury.actor.sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">(</span>
-        <span class="n">centers</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="mf">.4</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
+    <span class="n">actors</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.sphere" title="fury.actor.sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">radii</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
     <span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 
     <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
@@ -368,11 +363,11 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
     <span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">window_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">window_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
     <span class="n">stream</span> <span class="o">=</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamClient" title="fury.stream.client.FuryStreamClient" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamClient</span></a><span class="p">(</span>
-        <span class="n">showm</span><span class="p">,</span> <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span>
-        <span class="n">use_raw_array</span><span class="o">=</span><span class="n">use_raw_array</span><span class="p">)</span>
+        <span class="n">showm</span><span class="p">,</span> <span class="n">max_window_size</span><span class="o">=</span><span class="n">max_window_size</span><span class="p">,</span> <span class="n">use_raw_array</span><span class="o">=</span><span class="n">use_raw_array</span>
+    <span class="p">)</span>
     <span class="n">stream_interaction</span> <span class="o">=</span> <a href="../../reference/fury.stream.html#fury.stream.client.FuryStreamInteraction" title="fury.stream.client.FuryStreamInteraction" class="sphx-glr-backref-module-fury-stream-client sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FuryStreamInteraction</span></a><span class="p">(</span>
-        <span class="n">showm</span><span class="p">,</span> <span class="n">max_queue_size</span><span class="o">=</span><span class="n">max_queue_size</span><span class="p">,</span>
-        <span class="n">use_raw_array</span><span class="o">=</span><span class="n">use_raw_array</span><span class="p">)</span>
+        <span class="n">showm</span><span class="p">,</span> <span class="n">max_queue_size</span><span class="o">=</span><span class="n">max_queue_size</span><span class="p">,</span> <span class="n">use_raw_array</span><span class="o">=</span><span class="n">use_raw_array</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">use_raw_array</span><span class="p">:</span>
         <span class="n">p</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Process" title="multiprocessing.Process" class="sphx-glr-backref-module-multiprocessing sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">multiprocessing</span><span class="o">.</span><span class="n">Process</span></a><span class="p">(</span>
@@ -386,7 +381,7 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
                 <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
                 <span class="kc">True</span><span class="p">,</span>
                 <span class="n">WEBRTC_AVAILABLE</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
         <span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
@@ -401,11 +396,13 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
                 <span class="s1">&#39;localhost&#39;</span><span class="p">,</span>
                 <span class="kc">True</span><span class="p">,</span>
                 <span class="n">WEBRTC_AVAILABLE</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
         <span class="p">)</span>
     <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
     <span class="n">stream_interaction</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">ms</span><span class="o">=</span><span class="n">ms_interaction</span><span class="p">)</span>
-    <span class="n">stream</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">ms_stream</span><span class="p">,)</span>
+    <span class="n">stream</span><span class="o">.</span><span class="n">start</span><span class="p">(</span>
+        <span class="n">ms_stream</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="c1">###########################################################################</span>
     <span class="c1"># If you have aiortc in your system, you can see your live streaming</span>
     <span class="c1"># through the following url: htttp://localhost:8000/?enconding=webrtc</span>
@@ -424,8 +421,7 @@ ngrok. However, to use webRTC you need to install the aiortc library.</p>
     <span class="n">stream</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
     <span class="n">stream_interaction</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
-    <a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span>
-        <span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_interaction.png&quot;</span><span class="p">)</span>
+    <a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_interaction.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>

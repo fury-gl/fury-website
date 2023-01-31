@@ -24,19 +24,20 @@ Keyframe hierarchical Animation
 
 Creating hierarchical keyframes animation in fury
 
-.. GENERATED FROM PYTHON SOURCE LINES 9-20
+.. GENERATED FROM PYTHON SOURCE LINES 8-20
 
 .. code-block:: default
 
     import numpy as np
+
     from fury import actor, window
     from fury.animation import Animation
 
     scene = window.Scene()
 
-    showm = window.ShowManager(scene,
-                               size=(900, 768), reset_camera=False,
-                               order_transparent=True)
+    showm = window.ShowManager(
+        scene, size=(900, 768), reset_camera=False, order_transparent=True
+    )
     showm.initialize()
 
 
@@ -44,44 +45,47 @@ Creating hierarchical keyframes animation in fury
 
 Creating the road
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-25
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 .. code-block:: default
 
-    road = actor.box(np.array([[0, 0, 0]]), colors=np.array([[1, 1, 1]]),
-                     scales=np.array([[22, 0.1, 5]]))
+    road = actor.box(
+        np.array([[0, 0, 0]]), colors=np.array([[1, 1, 1]]), scales=np.array([[22, 0.1, 5]])
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-27
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 Constructing the car geometry
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-32
+.. GENERATED FROM PYTHON SOURCE LINES 28-35
 
 .. code-block:: default
 
 
-    body_actor = actor.box(np.array([[0, 0.5, 0], [-0.2, 1, 0]]),
-                           scales=((4, 1, 2), (2.5, 1.5, 1.8)),
-                           colors=(0.6, 0.3, 0.1))
+    body_actor = actor.box(
+        np.array([[0, 0.5, 0], [-0.2, 1, 0]]),
+        scales=((4, 1, 2), (2.5, 1.5, 1.8)),
+        colors=(0.6, 0.3, 0.1),
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-34
+.. GENERATED FROM PYTHON SOURCE LINES 36-37
 
 Adding the the car's body to an Animation to be able to animate it later.
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-36
+.. GENERATED FROM PYTHON SOURCE LINES 37-39
 
 .. code-block:: default
 
     car_anim = Animation(body_actor)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-38
+.. GENERATED FROM PYTHON SOURCE LINES 40-41
 
 Creating the wheels of the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-53
+.. GENERATED FROM PYTHON SOURCE LINES 41-64
 
 .. code-block:: default
 
@@ -93,20 +97,28 @@ Creating the wheels of the car
         [-1.2, 0, 1.1],
         [1.2, 0, -1.1],
         [-1.2, 0, -1.1],
-
     ]
 
-    wheels = [actor.cylinder(wheel_center, wheel_direction, (0.1, 0.7, 0.3),
-                             radius=1.7, heights=0.3, resolution=10, capped=True)
-              for _ in range(4)]
+    wheels = [
+        actor.cylinder(
+            wheel_center,
+            wheel_direction,
+            (0.1, 0.7, 0.3),
+            radius=1.7,
+            heights=0.3,
+            resolution=10,
+            capped=True,
+        )
+        for _ in range(4)
+    ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-56
+.. GENERATED FROM PYTHON SOURCE LINES 65-67
 
 Animating each wheel and setting its position to the right position using a
 single keyframe that will not change.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-64
+.. GENERATED FROM PYTHON SOURCE LINES 67-75
 
 .. code-block:: default
 
@@ -119,50 +131,51 @@ single keyframe that will not change.
         wheel_anim.set_rotation(1.0, [0, 0, 1, -1])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-66
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 Creating a radar on top of the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-69
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 First we create the shaft holding and rotating the radar
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-72
+.. GENERATED FROM PYTHON SOURCE LINES 80-84
 
 .. code-block:: default
 
-    radar_shaft = actor.cylinder(np.array([[0, 0, 0]]), np.array([[0, 1, 0]]),
-                                 (0, 1, 0), heights=1)
+    radar_shaft = actor.cylinder(
+        np.array([[0, 0, 0]]), np.array([[0, 1, 0]]), (0, 1, 0), heights=1
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-74
+.. GENERATED FROM PYTHON SOURCE LINES 85-86
 
 In order to animate the shaft actor we have to add it to an Animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-76
+.. GENERATED FROM PYTHON SOURCE LINES 86-88
 
 .. code-block:: default
 
     radar_shaft_anim = Animation(radar_shaft)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-79
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 Setting a single position keyframe will make sure the actor will be placed at
 that position
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 .. code-block:: default
 
     radar_shaft_anim.set_position(0.0, [0, 2, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Rotating the shaft around Y axis
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-87
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 .. code-block:: default
 
@@ -171,74 +184,73 @@ Rotating the shaft around Y axis
     radar_shaft_anim.set_rotation(2.0, [0, -250, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-89
+.. GENERATED FROM PYTHON SOURCE LINES 100-101
 
 Now we create the radar itself
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-92
+.. GENERATED FROM PYTHON SOURCE LINES 101-103
 
 .. code-block:: default
 
-    radar = actor.cone(np.array([[0, 0, 0]]), directions=(0, 0, 0),
-                       colors=(0.2, 0.2, 0.9))
+    radar = actor.cone(np.array([[0, 0, 0]]), directions=(0, 0, 0), colors=(0.2, 0.2, 0.9))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 93-94
+.. GENERATED FROM PYTHON SOURCE LINES 104-105
 
 Then add it to an animation in order to rotate it
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-96
+.. GENERATED FROM PYTHON SOURCE LINES 105-107
 
 .. code-block:: default
 
     radar_animation = Animation(radar)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-98
+.. GENERATED FROM PYTHON SOURCE LINES 108-109
 
 Set position and rotation as done above with the shaft.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-103
+.. GENERATED FROM PYTHON SOURCE LINES 109-114
 
 .. code-block:: default
 
-    radar_animation.set_position(0, [-.4, 0.5, 0])
+    radar_animation.set_position(0, [-0.4, 0.5, 0])
     radar_animation.set_rotation(0.0, [0, 0, 0])
     radar_animation.set_rotation(1.0, [180, 0, 0])
     radar_animation.set_rotation(2.0, [0, 0, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-107
+.. GENERATED FROM PYTHON SOURCE LINES 115-118
 
 Now, we want the radar to rotate when the shaft rotates in hierarchical way.
 To do that we must add the radar animation as a child animation of the shaft
 animation as below:
 
-.. GENERATED FROM PYTHON SOURCE LINES 107-109
+.. GENERATED FROM PYTHON SOURCE LINES 118-120
 
 .. code-block:: default
 
     radar_shaft_anim.add_child_animation(radar_animation)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-113
+.. GENERATED FROM PYTHON SOURCE LINES 121-124
 
 After that we want everything to animate related to the car.
 The wheels should always be attached to the car no matter where it moves.
 we do that by adding them as child animations of the car's body animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-115
+.. GENERATED FROM PYTHON SOURCE LINES 124-126
 
 .. code-block:: default
 
     car_anim.add_child_animation([wheels_animations, radar_shaft_anim])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 127-128
 
 Moving the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-120
+.. GENERATED FROM PYTHON SOURCE LINES 128-131
 
 .. code-block:: default
 
@@ -246,11 +258,11 @@ Moving the car
     car_anim.set_position(6.0, [10, 0.5, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-122
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 Adding the car Animation to the show manager
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-133
+.. GENERATED FROM PYTHON SOURCE LINES 133-145
 
 .. code-block:: default
 
@@ -263,8 +275,9 @@ Adding the car Animation to the show manager
     if interactive:
         showm.start()
 
-    window.record(scene, out_path='viz_keyframe_hierarchical_animation.png',
-                  size=(900, 768))
+    window.record(
+        scene, out_path='viz_keyframe_hierarchical_animation.png', size=(900, 768)
+    )
 
 
 .. rst-class:: sphx-glr-timing

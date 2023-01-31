@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Spiky Sphere &#8212; FURY 0.9.0.dev1466+g65266399 documentation</title>
+    <title>Spiky Sphere &#8212; FURY 0.9.0.dev1471+gd9924119 documentation</title>
   
   
   
@@ -294,9 +294,11 @@ to download the full example code</p>
 <section class="sphx-glr-example-title" id="spiky-sphere">
 <span id="sphx-glr-auto-tutorials-01-introductory-viz-spiky-py"></span><h1>Spiky Sphere<a class="headerlink" href="#spiky-sphere" title="Permalink to this heading">#</a></h1>
 <p>In this tutorial, we show how to create a sphere with spikes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">primitive</span>
-<span class="kn">import</span> <span class="nn">itertools</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">primitive</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
 </pre></div>
 </div>
 <p>Create a sphere actor. Define the center, radius and color of a sphere.
@@ -309,8 +311,7 @@ Let’s create a scene.</p>
 <p>The vertices are connected with triangles in order to specify the direction
 of the surface normal.
 <code class="docutils literal notranslate"><span class="pre">prim_sphere</span></code> provides a sphere with evenly distributed points</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span> <span class="o">=</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_sphere</span></a><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;symmetric362&#39;</span><span class="p">,</span>
-                                            <span class="n">gen_faces</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span> <span class="o">=</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">primitive</span><span class="o">.</span><span class="n">prim_sphere</span></a><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;symmetric362&#39;</span><span class="p">,</span> <span class="n">gen_faces</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To be able to visualize the vertices, let’s define a point actor with
@@ -328,9 +329,15 @@ whether triangles represent curved surfaces.</p>
 the surface of an object. However, here we will use them to direct the
 spikes (represented with arrows).
 So, let’s create an arrow actor at the center of each vertex.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arrow_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.arrow" title="fury.actor.arrow" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">arrow</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
-                          <span class="n">directions</span><span class="o">=</span><span class="n">normals</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">heights</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-                          <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arrow_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.arrow" title="fury.actor.arrow" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">arrow</span></a><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
+    <span class="n">directions</span><span class="o">=</span><span class="n">normals</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">heights</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">vertices</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">faces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>To be able to visualize the surface of the primitive sphere, we use
@@ -338,8 +345,12 @@ So, let’s create an arrow actor at the center of each vertex.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">primitive_colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">(</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">primitive_colors</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">180</span>
 <span class="n">primitive_actor</span> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.get_actor_from_primitive" title="fury.utils.get_actor_from_primitive" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">get_actor_from_primitive</span></a><span class="p">(</span>
-    <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span> <span class="n">triangles</span><span class="o">=</span><span class="n">triangles</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">primitive_colors</span><span class="p">,</span>
-    <span class="n">normals</span><span class="o">=</span><span class="n">normals</span><span class="p">,</span> <span class="n">backface_culling</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
+    <span class="n">triangles</span><span class="o">=</span><span class="n">triangles</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="n">primitive_colors</span><span class="p">,</span>
+    <span class="n">normals</span><span class="o">=</span><span class="n">normals</span><span class="p">,</span>
+    <span class="n">backface_culling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We add all actors (visual objects) defined above to the scene.</p>
@@ -351,9 +362,9 @@ So, let’s create an arrow actor at the center of each vertex.</p>
 </div>
 <p>The ShowManager class is the interface between the scene, the window and the
 interactor.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span>
-                           <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                           <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <p>We want to make a small animation for fun!
@@ -367,16 +378,15 @@ application will exit after the callback has been called 20 times.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">timer_callback</span><span class="p">(</span><span class="n">_obj</span><span class="p">,</span> <span class="n">_event</span><span class="p">):</span>
     <span class="n">cnt</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">counter</span><span class="p">)</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">azimuth</span><span class="p">(</span><span class="mf">0.05</span> <span class="o">*</span> <span class="n">cnt</span><span class="p">)</span>
-    <span class="n">primitive_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">cnt</span><span class="o">/</span><span class="mf">10.</span><span class="p">)</span>
+    <span class="n">primitive_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">cnt</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
     <span class="n">showm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">20</span><span class="p">:</span>
         <span class="n">showm</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
 
 
-
 <span class="n">showm</span><span class="o">.</span><span class="n">add_timer_callback</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="n">timer_callback</span><span class="p">)</span>
 <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_spiky.png&quot;</span><span class="p">)</span>
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_spiky.png&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Instead of arrows, you can choose other geometrical objects
