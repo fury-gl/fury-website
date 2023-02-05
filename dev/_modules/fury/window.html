@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.window &#8212; FURY 0.9.0.dev1478+gf256293b documentation</title>
+    <title>fury.window &#8212; FURY 0.9.0.dev1507+gdbb30918 documentation</title>
   
   
   
@@ -278,6 +278,9 @@
               
   <h1>Source code for fury.window</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
+
 <span class="kn">import</span> <span class="nn">gzip</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">tempfile</span> <span class="kn">import</span> <span class="n">TemporaryDirectory</span> <span class="k">as</span> <span class="n">InTemporaryDirectory</span>
@@ -657,8 +660,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">interactor_style</span> <span class="o">=</span> <span class="n">interactor_style</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stereo</span> <span class="o">=</span> <span class="n">stereo</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timers</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fps</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_render_time</span> <span class="o">=</span> <span class="mi">0</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset_camera</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">ResetCamera</span><span class="p">()</span>
 
@@ -790,15 +795,48 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_fps</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_render_time</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_render_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ShowManager.start"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start interaction.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ShowManager.is_done"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.is_done">[docs]</a>    <span class="k">def</span> <span class="nf">is_done</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if show manager is done.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">GetDone</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="ShowManager.start"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multithreaded</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">desired_fps</span><span class="o">=</span><span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start interaction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        multithreaded : bool</span>
+<span class="sd">            Whether to use multithreading. (Default False)</span>
+<span class="sd">        desired_fps : int</span>
+<span class="sd">            Desired frames per second when using multithreading is enabled.</span>
+<span class="sd">            (Default 60)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;FURY&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">SetWindowName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">fury_version</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">SetWindowName</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">Start</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">multithreaded</span><span class="p">:</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">GetDone</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">MakeCurrent</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">ProcessEvents</span><span class="p">()</span>  <span class="c1"># Check if we can really do that</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
+                    <span class="n">release_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">release_lock</span><span class="p">()</span>
+                    <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+                    <span class="c1"># throttle to 60fps to avoid busy wait</span>
+                    <span class="n">time_per_frame</span> <span class="o">=</span> <span class="mf">1.0</span><span class="o">/</span><span class="n">desired_fps</span>
+                    <span class="k">if</span> <span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span> <span class="o">&lt;</span> <span class="n">time_per_frame</span><span class="p">:</span>
+                        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">time_per_frame</span> <span class="o">-</span> <span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">Start</span><span class="p">()</span>
+
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span>
@@ -821,6 +859,43 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Finalize</span><span class="p">()</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">iren</span>
         <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span></div>
+
+<div class="viewcode-block" id="ShowManager.lock"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.lock">[docs]</a>    <span class="k">def</span> <span class="nf">lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock the render window.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ShowManager.release_lock"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.release_lock">[docs]</a>    <span class="k">def</span> <span class="nf">release_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the lock of the render window.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ShowManager.lock_current"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.lock_current">[docs]</a>    <span class="k">def</span> <span class="nf">lock_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lock the render window and acquire the current context and</span>
+<span class="sd">        check if the lock was sucessfully acquired.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sucessful : bool</span>
+<span class="sd">            Returns if the lock was acquired.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_done</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;window&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">MakeCurrent</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="ShowManager.release_current"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.release_current">[docs]</a>    <span class="k">def</span> <span class="nf">release_current</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release the window context and lock of the render window.&quot;&quot;&quot;</span>
+        <span class="n">release_context</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">release_lock</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ShowManager.wait"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.wait">[docs]</a>    <span class="k">def</span> <span class="nf">wait</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Wait for thread to finish. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">thread</span><span class="o">.</span><span class="n">join</span><span class="p">()</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">frame_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -976,6 +1051,10 @@
 
 <div class="viewcode-block" id="ShowManager.exit"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.exit">[docs]</a>    <span class="k">def</span> <span class="nf">exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Close window and terminate interactor.&quot;&quot;&quot;</span>
+
+        <span class="c1"># if is_osx and self.timers:</span>
+        <span class="c1"># OSX seems to not destroy correctly timers</span>
+        <span class="c1"># segfault 11 appears sometimes if we do not do it manually.</span>
         <span class="c1"># self.iren.GetRenderWindow().Finalize()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">iren</span><span class="o">.</span><span class="n">TerminateApp</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">destroy_timers</span><span class="p">()</span>
@@ -1324,7 +1403,9 @@
     <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="n">occlusion_ratio</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
     <span class="n">dpi</span><span class="o">=</span><span class="p">(</span><span class="mi">72</span><span class="p">,</span> <span class="mi">72</span><span class="p">),</span>
+    <span class="n">render_window</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
+
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Save a snapshot of the scene in a file or in memory.</span>
 
 <span class="sd">    Parameters</span>
@@ -1364,6 +1445,8 @@
 <span class="sd">    dpi : float or (float, float)</span>
 <span class="sd">        Dots per inch (dpi) for saved image.</span>
 <span class="sd">        Single values are applied as dpi for both dimensions.</span>
+<span class="sd">    render_window : RenderWindow</span>
+<span class="sd">        If provided, use this window instead of creating a new one.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -1373,19 +1456,19 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">size</span>
+    <span class="k">if</span> <span class="n">render_window</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">render_window</span> <span class="o">=</span> <span class="n">RenderWindow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">offscreen</span><span class="p">:</span>
+            <span class="n">render_window</span><span class="o">.</span><span class="n">SetOffScreenRendering</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stereo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span>
+            <span class="n">enable_stereo</span><span class="p">(</span><span class="n">render_window</span><span class="p">,</span> <span class="n">stereo</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">AddRenderer</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
 
-    <span class="n">render_window</span> <span class="o">=</span> <span class="n">RenderWindow</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">offscreen</span><span class="p">:</span>
-        <span class="n">render_window</span><span class="o">.</span><span class="n">SetOffScreenRendering</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">stereo</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;off&#39;</span><span class="p">:</span>
-        <span class="n">enable_stereo</span><span class="p">(</span><span class="n">render_window</span><span class="p">,</span> <span class="n">stereo</span><span class="p">)</span>
-    <span class="n">render_window</span><span class="o">.</span><span class="n">AddRenderer</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
-    <span class="n">render_window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">order_transparent</span><span class="p">:</span>
-        <span class="n">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">render_window</span><span class="p">,</span> <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span> <span class="n">occlusion_ratio</span><span class="p">)</span>
-
-    <span class="n">render_window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">order_transparent</span><span class="p">:</span>
+            <span class="n">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">render_window</span><span class="p">,</span> <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span>
+                         <span class="n">occlusion_ratio</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
 
     <span class="n">window_to_image_filter</span> <span class="o">=</span> <span class="n">WindowToImageFilter</span><span class="p">()</span>
     <span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">render_window</span><span class="p">)</span>
@@ -1703,6 +1786,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">gl_reset_blend</span><span class="p">(</span><span class="n">gl_state</span><span class="p">)</span>
     <span class="n">gl_state</span><span class="o">.</span><span class="n">vtkglBlendFunc</span><span class="p">(</span><span class="n">_GL</span><span class="p">[</span><span class="s1">&#39;GL_ZERO&#39;</span><span class="p">],</span> <span class="n">_GL</span><span class="p">[</span><span class="s1">&#39;GL_ONE_MINUS_SRC_COLOR&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="release_context"><a class="viewcode-back" href="../../reference/fury.window.html#fury.window.release_context">[docs]</a><span class="k">def</span> <span class="nf">release_context</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Release the context of the window</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    window : vtkRenderWindow</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">window</span><span class="o">.</span><span class="n">ReleaseCurrent</span><span class="p">()</span></div>
 </pre></div>
 
             </article>
