@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor &#8212; FURY 0.9.0.dev1723+gb06ba0b2 documentation</title>
+    <title>fury.actor &#8212; FURY 0.9.0.dev1751+gbfc883ef documentation</title>
   
   
   
@@ -18,12 +18,12 @@
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../_static/styles/bootstrap.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
 
   
-  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=12da95d707ffb74b382d" rel="stylesheet" />
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
   <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
@@ -40,8 +40,8 @@
     <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
 
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/doctools.js"></script>
@@ -56,8 +56,19 @@
     <link rel="icon" href="../../_static/logo.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
   </head>
   
   
@@ -249,8 +260,7 @@ document.write(`
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_tutorials/index.html">Tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Demos</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
@@ -326,9 +336,10 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <h1>Source code for fury.actor</h1><div class="highlight"><pre>
+<h1>Source code for fury.actor</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Module that provide actors to render.&quot;&quot;&quot;</span>
 
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
@@ -3007,12 +3018,12 @@ document.write(`
     <span class="n">gs_prog</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fs_dec</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">fs_impl</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bb_type</span><span class="o">=</span><span class="s1">&#39;spherical&#39;</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a billboard actor.</span>
-
+<span class="sd">-</span>
 <span class="sd">    Billboards are 2D elements placed in a 3D world. They offer possibility to</span>
 <span class="sd">    draw different shapes/elements at the fragment shader level.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
@@ -3033,11 +3044,15 @@ document.write(`
 <span class="sd">    fs_impl : str or list of str, optional</span>
 <span class="sd">        Fragment Shaders code that contains all variable/function</span>
 <span class="sd">        implementation.</span>
+<span class="sd">    bb_type : str, optional</span>
+<span class="sd">        Type of billboard (spherical, cylindrical_x, cylindrical_y).</span>
+<span class="sd">        If spherical, billboard will always face the camera.</span>
+<span class="sd">        If cylindrical_x or cylindrical_y, billboard will face the camera only</span>
+<span class="sd">        when rotating around x-axis and y-axis respectively.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    billboard_actor: Actor</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">verts</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">prim_square</span><span class="p">()</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">repeat_primitive</span><span class="p">(</span>
@@ -3054,24 +3069,108 @@ document.write(`
     <span class="n">bb_actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">BackfaceCullingOff</span><span class="p">()</span>
     <span class="n">attribute_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="n">big_centers</span><span class="p">,</span> <span class="s1">&#39;center&#39;</span><span class="p">)</span>
 
+    <span class="n">bb_norm</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;utils&#39;</span><span class="p">,</span>
+                                              <span class="s1">&#39;billboard_normalization.glsl&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">bb_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cylindrical_x&#39;</span><span class="p">:</span>
+        <span class="n">bb_type_sd</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;billboard&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;cylindrical_x.glsl&#39;</span><span class="p">)</span>
+                                        <span class="p">)</span>
+        <span class="n">v_pos_mc</span> <span class="o">=</span> \
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            vec3 vertexPositionMC = cylindricalXVertexPos(center, MCVCMatrix,</span>
+<span class="sd">                                        normalizedVertexMCVSOutput, shape);</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+    <span class="k">elif</span> <span class="n">bb_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cylindrical_y&#39;</span><span class="p">:</span>
+        <span class="n">bb_type_sd</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;billboard&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;cylindrical_y.glsl&#39;</span><span class="p">)</span>
+                                        <span class="p">)</span>
+        <span class="n">v_pos_mc</span> <span class="o">=</span> \
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            vec3 vertexPositionMC = cylindricalYVertexPos(center,MCVCMatrix,</span>
+<span class="sd">                                        normalizedVertexMCVSOutput, shape);</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+    <span class="k">elif</span> <span class="n">bb_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;spherical&#39;</span><span class="p">:</span>
+        <span class="n">bb_type_sd</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;billboard&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;spherical.glsl&#39;</span><span class="p">))</span>
+        <span class="n">v_pos_mc</span> <span class="o">=</span> \
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            vec3 vertexPositionMC = sphericalVertexPos(center, MCVCMatrix,</span>
+<span class="sd">                                        normalizedVertexMCVSOutput, shape);</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">bb_type_sd</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;billboard&#39;</span><span class="p">,</span>
+                                                     <span class="s1">&#39;spherical.glsl&#39;</span><span class="p">))</span>
+        <span class="n">v_pos_mc</span> <span class="o">=</span> \
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            vec3 vertexPositionMC = sphericalVertexPos(center, MCVCMatrix,</span>
+<span class="sd">                                        normalizedVertexMCVSOutput, shape);</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Invalid option. The billboard will be generated &#39;</span>
+                      <span class="s1">&#39;with the default spherical option. &#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+
+    <span class="n">gl_position</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        gl_Position = MCDCMatrix * vec4(vertexPositionMC, 1.);</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">billboard_dec_vert</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  vertex shader declaration */</span>
+<span class="sd">        in vec3 center;</span>
+<span class="sd">        </span>
+<span class="sd">        out vec3 centerVertexMCVSOutput;</span>
+<span class="sd">        out vec3 normalizedVertexMCVSOutput;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">billboard_impl_vert</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  vertex shader implementation */</span>
+<span class="sd">        centerVertexMCVSOutput = center;</span>
+<span class="sd">        normalizedVertexMCVSOutput = bbNorm(vertexMC.xyz, center);</span>
+<span class="sd">        float scalingFactor = 1. / abs(normalizedVertexMCVSOutput.x);</span>
+<span class="sd">        float size = abs((vertexMC.xyz - center).x) * 2;</span>
+<span class="sd">        vec2 shape = vec2(size, size); // Fixes the scaling issue</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">billboard_dec_frag</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  fragment shader declaration */</span>
+<span class="sd">        in vec3 centerVertexMCVSOutput;</span>
+<span class="sd">        in vec3 normalizedVertexMCVSOutput;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">billboard_impl_frag</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  Fragment shader implementation */</span>
+<span class="sd">        // Renaming variables passed from the Vertex Shader</span>
+<span class="sd">        vec3 color = vertexColorVSOutput.rgb;</span>
+<span class="sd">        vec3 point = normalizedVertexMCVSOutput;</span>
+<span class="sd">        fragOutput0 = vec4(color, 1.);</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+    <span class="n">billboard_vert_impl</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">billboard_impl_vert</span><span class="p">,</span> <span class="n">v_pos_mc</span><span class="p">,</span> <span class="n">gl_position</span><span class="p">])</span>
+
     <span class="n">vs_dec_code</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_dec.vert&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">vs_dec</span><span class="p">)]</span>
-    <span class="p">)</span>
+        <span class="p">[</span><span class="n">billboard_dec_vert</span><span class="p">,</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">vs_dec</span><span class="p">),</span> <span class="n">bb_norm</span><span class="p">,</span> <span class="n">bb_type_sd</span><span class="p">])</span>
     <span class="n">vs_impl_code</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">compose_shader</span><span class="p">(</span><span class="n">vs_impl</span><span class="p">)</span> <span class="o">+</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_impl.vert&#39;</span><span class="p">)]</span>
-    <span class="p">)</span>
+        <span class="p">[</span><span class="n">compose_shader</span><span class="p">(</span><span class="n">vs_impl</span><span class="p">),</span> <span class="n">billboard_vert_impl</span><span class="p">])</span>
+
     <span class="n">gs_code</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">gs_prog</span><span class="p">)</span>
     <span class="n">fs_dec_code</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_dec.frag&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">fs_dec</span><span class="p">)]</span>
+        <span class="p">[</span><span class="n">billboard_dec_frag</span><span class="p">,</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">fs_dec</span><span class="p">)]</span>
     <span class="p">)</span>
     <span class="n">fs_impl_code</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_impl.frag&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">fs_impl</span><span class="p">)]</span>
+        <span class="p">[</span><span class="n">billboard_impl_frag</span><span class="p">,</span> <span class="n">compose_shader</span><span class="p">(</span><span class="n">fs_impl</span><span class="p">)]</span>
     <span class="p">)</span>
 
-    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;vertex&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">vs_impl_code</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">vs_dec_code</span><span class="p">)</span>
+    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;vertex&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">vs_impl_code</span><span class="p">,</span>
+                    <span class="n">decl_code</span><span class="o">=</span><span class="n">vs_dec_code</span><span class="p">)</span>
     <span class="n">replace_shader_in_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;geometry&#39;</span><span class="p">,</span> <span class="n">gs_code</span><span class="p">)</span>
     <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec_code</span><span class="p">)</span>
-    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
+    <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">bb_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span>
+                    <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">bb_actor</span></div>
 
@@ -3835,7 +3934,6 @@ document.write(`
     <span class="n">edge_opacity</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a marker actor with different shapes.</span>
-
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    centers : ndarray, shape (N, 3)</span>
@@ -3909,14 +4007,52 @@ document.write(`
         <span class="s1">&#39;3d&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="n">vs_dec_code</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_dec.vert&#39;</span><span class="p">)</span>
+    <span class="n">bb_impl</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        vec3 vertexPositionMC = sphericalVertexPos(center, MCVCMatrix,</span>
+<span class="sd">                                    normalizedVertexMCVSOutput, shape);</span>
+<span class="sd">        gl_Position = MCDCMatrix * vec4(vertexPositionMC, 1.);</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">vs_dec_code</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  vertex shader declaration */</span>
+<span class="sd">        in vec3 center;</span>
+<span class="sd">        </span>
+<span class="sd">        out vec3 centerVertexMCVSOutput;</span>
+<span class="sd">        out vec3 normalizedVertexMCVSOutput;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="n">vs_dec_code</span> <span class="o">+=</span> \
+        <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;utils/billboard_normalization.glsl&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">vs_dec_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;billboard/spherical.glsl&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">vs_dec_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;marker_billboard_dec.vert&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-    <span class="n">vs_impl_code</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_impl.vert&#39;</span><span class="p">)</span>
+    <span class="n">vs_impl_code</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  vertex shader implementation */</span>
+<span class="sd">        centerVertexMCVSOutput = center;</span>
+<span class="sd">        normalizedVertexMCVSOutput = bbNorm(vertexMC.xyz, center);</span>
+<span class="sd">        float scalingFactor = 1. / abs(normalizedVertexMCVSOutput.x);</span>
+<span class="sd">        float size = abs((vertexMC.xyz - center).x) * 2;</span>
+<span class="sd">        vec2 shape = vec2(size, size); // Fixes the scaling issue</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+    <span class="n">vs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">compose_shader</span><span class="p">(</span><span class="n">bb_impl</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
     <span class="n">vs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;marker_billboard_impl.vert&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
 
-    <span class="n">fs_dec_code</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_dec.frag&#39;</span><span class="p">)</span>
+    <span class="n">fs_dec_code</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  fragment shader declaration */</span>
+<span class="sd">        in vec3 centerVertexMCVSOutput;</span>
+<span class="sd">        in vec3 normalizedVertexMCVSOutput;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
     <span class="n">fs_dec_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;marker_billboard_dec.frag&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-    <span class="n">fs_impl_code</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="s1">&#39;billboard_impl.frag&#39;</span><span class="p">)</span>
+    <span class="n">fs_impl_code</span> <span class="o">=</span> \
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        /* Billboard  Fragment shader implementation */</span>
+<span class="sd">        // Renaming variables passed from the Vertex Shader</span>
+<span class="sd">        vec3 color = vertexColorVSOutput.rgb;</span>
+<span class="sd">        vec3 point = normalizedVertexMCVSOutput;</span>
+<span class="sd">        fragOutput0 = vec4(color, 1.);</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
     <span class="k">if</span> <span class="n">marker</span> <span class="o">==</span> <span class="s1">&#39;3d&#39;</span><span class="p">:</span>
         <span class="n">fs_impl_code</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">import_fury_shader</span><span class="p">(</span><span class="s2">&quot;billboard_spheres_impl.frag&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
@@ -3969,15 +4105,25 @@ document.write(`
 
     <span class="k">return</span> <span class="n">sq_actor</span></div>
 </pre></div>
+<div class="section ablog__blog_comments">
+  
+  
+</div>
 
                 </article>
               
               
               
                 <footer class="bd-footer-article">
-                  <!-- Previous / next buttons -->
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
 <div class="prev-next-area">
+</div></div>
+  
 </div>
+
                 </footer>
               
             </div>
@@ -3987,7 +4133,7 @@ document.write(`
             
           </div>
           <footer class="bd-footer-content">
-            <div class="bd-footer-content__inner"></div>
+            
           </footer>
         
       </main>
@@ -3995,8 +4141,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../_static/scripts/bootstrap.js?digest=12da95d707ffb74b382d"></script>
-<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=12da95d707ffb74b382d"></script>
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
  
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -4088,7 +4234,7 @@ document.write(`
     <div class="footer-items__end">
       
         <div class="footer-item"><p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.1.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.13.3.
 </p></div>
       
     </div>
