@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.containers &#8212; FURY 0.9.0.dev1766+gb66bb975 documentation</title>
+    <title>fury.ui.containers &#8212; FURY 0.9.0.dev1768+gd8f376a7 documentation</title>
   
   
   
@@ -889,6 +889,7 @@ document.write(`
         <span class="n">active_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
         <span class="n">inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
         <span class="n">draggable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">startup_tab_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
@@ -907,6 +908,9 @@ document.write(`
 <span class="sd">            Background color of inactive tab panels.</span>
 <span class="sd">        draggable : bool</span>
 <span class="sd">            Whether the UI element is draggable or not.</span>
+<span class="sd">        startup_tab_id : int, optional</span>
+<span class="sd">            Tab to be activated and uncollapsed on startup.</span>
+<span class="sd">            by default None is activated/ all collapsed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span> <span class="o">=</span> <span class="n">nb_tabs</span>
@@ -915,7 +919,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span> <span class="o">=</span> <span class="n">draggable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span> <span class="o">=</span> <span class="n">active_color</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span> <span class="o">=</span> <span class="n">inactive_color</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="n">startup_tab_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="nb">super</span><span class="p">(</span><span class="n">TabUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
@@ -939,6 +943,10 @@ document.write(`
             <span class="n">tab_panel</span> <span class="o">=</span> <span class="n">TabPanel2D</span><span class="p">(</span><span class="n">content_panel</span><span class="o">=</span><span class="n">content_panel</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
@@ -986,32 +994,24 @@ document.write(`
 
             <span class="n">content_panel</span> <span class="o">=</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span><span class="p">:</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
-                <span class="p">)</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
-                <span class="p">)</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
-                <span class="p">)</span>
 
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
-                <span class="p">)</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
-                <span class="p">)</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
                     <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
-                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
                     <span class="k">lambda</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_comp</span><span class="p">:</span> <span class="n">i_ren</span><span class="o">.</span><span class="n">force_render</span>
-                <span class="p">)</span>
-                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> \
                     <span class="k">lambda</span> <span class="n">i_ren</span><span class="p">,</span> <span class="n">_obj</span><span class="p">,</span> <span class="n">_comp</span><span class="p">:</span> <span class="n">i_ren</span><span class="o">.</span><span class="n">force_render</span>
-                <span class="p">)</span>
 
             <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_tab_callback</span>
             <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="p">(</span>
@@ -1038,8 +1038,12 @@ document.write(`
                 <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
                 <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span>
-                <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">current_visibility</span> <span class="o">=</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">actors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">GetVisibility</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">current_visibility</span><span class="p">:</span>
+                    <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="ow">not</span> <span class="n">current_visibility</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1063,6 +1067,8 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add element to content panel after checking its existence.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span> <span class="ow">and</span> <span class="n">tab_idx</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">:</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="s1">&#39;Tab with index &#39;</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> does not exist&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">))</span></div>
 
