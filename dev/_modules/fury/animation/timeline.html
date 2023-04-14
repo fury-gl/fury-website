@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.timeline &#8212; FURY 0.9.0.dev1815+gbc8541dc documentation</title>
+    <title>fury.animation.timeline &#8212; FURY 0.9.0.dev1832+g1a31fb2f documentation</title>
   
   
   
@@ -288,10 +288,14 @@
             <article class="bd-article" role="main">
               
 <h1>Source code for fury.animation.timeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
-
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">WindowToImageFilter</span><span class="p">,</span> <span class="n">RenderWindow</span><span class="p">,</span> <span class="n">numpy_support</span>
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span>
 <span class="kn">from</span> <span class="nn">fury.animation.animation</span> <span class="kn">import</span> <span class="n">Animation</span>
 <span class="kn">from</span> <span class="nn">fury.ui.elements</span> <span class="kn">import</span> <span class="n">PlaybackPanel</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
 
 
 <div class="viewcode-block" id="Timeline"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline">[docs]</a><span class="k">class</span> <span class="nc">Timeline</span><span class="p">:</span>
@@ -318,6 +322,7 @@
 
 <div class="viewcode-block" id="Timeline.__init__"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">playback_panel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_speed</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -561,6 +566,130 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
+<div class="viewcode-block" id="Timeline.record"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.record">[docs]</a>    <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span>
+               <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">multi_samples</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+               <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">show_panel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the animation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        -----------</span>
+<span class="sd">        fname : str, optional</span>
+<span class="sd">            The file name. Save a GIF file if name ends with &#39;.gif&#39;, or mp4</span>
+<span class="sd">            video if name ends with&#39;.mp4&#39;.</span>
+<span class="sd">            If None, this method will only return an array of frames.</span>
+<span class="sd">        fps : int, optional</span>
+<span class="sd">            The number of frames per second of the record.</span>
+<span class="sd">        size : (int, int)</span>
+<span class="sd">            ``(width, height)`` of the window. Default is (900, 768).</span>
+<span class="sd">        speed : float, optional, default 1.0</span>
+<span class="sd">            The speed of the animation.</span>
+<span class="sd">        order_transparent : bool, optional</span>
+<span class="sd">            Default False. Use depth peeling to sort transparent objects.</span>
+<span class="sd">            If True also enables anti-aliasing.</span>
+<span class="sd">        multi_samples : int, optional</span>
+<span class="sd">            Number of samples for anti-aliasing (Default 8).</span>
+<span class="sd">            For no anti-aliasing use 0.</span>
+<span class="sd">        max_peels : int, optional</span>
+<span class="sd">            Maximum number of peels for depth peeling (Default 4).</span>
+<span class="sd">        show_panel : bool, optional, default False</span>
+<span class="sd">            Controls whether to show the playback (if True) panel of hide it</span>
+<span class="sd">            (if False)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray:</span>
+<span class="sd">            The recorded frames.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        It&#39;s recommended to use 50 or 30 FPS while recording to a GIF file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">mp4</span> <span class="o">=</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.mp4&#39;</span>
+
+        <span class="k">if</span> <span class="n">mp4</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">cv2</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="s1">&#39;OpenCV must be installed in order to &#39;</span>
+                                  <span class="s1">&#39;save as MP4 video.&#39;</span><span class="p">)</span>
+            <span class="n">fourcc</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="o">.</span><span class="n">fourcc</span><span class="p">(</span><span class="o">*</span><span class="s1">&#39;mp4v&#39;</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fourcc</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
+
+        <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">speed</span> <span class="o">/</span> <span class="n">fps</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scene</span><span class="p">:</span>
+            <span class="n">scene</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">_hide_panel</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">show_panel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+            <span class="n">_hide_panel</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">render_window</span> <span class="o">=</span> <span class="n">RenderWindow</span><span class="p">()</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">SetOffScreenRendering</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">AddRenderer</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="o">*</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">order_transparent</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">render_window</span><span class="p">,</span> <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span>
+                                <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">render_window</span> <span class="o">=</span> <span class="n">RenderWindow</span><span class="p">()</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">SetOffScreenRendering</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">AddRenderer</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+        <span class="n">render_window</span><span class="o">.</span><span class="n">SetSize</span><span class="p">(</span><span class="o">*</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">order_transparent</span><span class="p">:</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">antialiasing</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">render_window</span><span class="p">,</span> <span class="n">multi_samples</span><span class="p">,</span> <span class="n">max_peels</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">window_to_image_filter</span> <span class="o">=</span> <span class="n">WindowToImageFilter</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Recording...&#39;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;</span> <span class="n">duration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">render_window</span><span class="o">.</span><span class="n">Render</span><span class="p">()</span>
+            <span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">render_window</span><span class="p">)</span>
+            <span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">Update</span><span class="p">()</span>
+            <span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">Modified</span><span class="p">()</span>
+            <span class="n">vtk_image</span> <span class="o">=</span> <span class="n">window_to_image_filter</span><span class="o">.</span><span class="n">GetOutput</span><span class="p">()</span>
+            <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">vtk_image</span><span class="o">.</span><span class="n">GetDimensions</span><span class="p">()</span>
+            <span class="n">vtk_array</span> <span class="o">=</span> <span class="n">vtk_image</span><span class="o">.</span><span class="n">GetPointData</span><span class="p">()</span><span class="o">.</span><span class="n">GetScalars</span><span class="p">()</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="n">vtk_array</span><span class="o">.</span><span class="n">GetNumberOfComponents</span><span class="p">()</span>
+            <span class="n">snap</span> <span class="o">=</span> <span class="n">numpy_support</span><span class="o">.</span><span class="n">vtk_to_numpy</span><span class="p">(</span><span class="n">vtk_array</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span>
+                                                                 <span class="n">components</span><span class="p">)</span>
+            <span class="n">corrected_snap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">snap</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">mp4</span><span class="p">:</span>
+                <span class="n">cv_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">corrected_snap</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2BGR</span><span class="p">)</span>
+                <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cv_img</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pillow_snap</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">corrected_snap</span><span class="p">)</span>
+                <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pillow_snap</span><span class="p">)</span>
+
+            <span class="n">t</span> <span class="o">+=</span> <span class="n">step</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving...&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">frames</span>
+
+        <span class="k">if</span> <span class="n">mp4</span><span class="p">:</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">append_images</span><span class="o">=</span><span class="n">frames</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">loop</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                           <span class="n">duration</span><span class="o">=</span><span class="mi">1000</span> <span class="o">/</span> <span class="n">fps</span><span class="p">,</span> <span class="n">save_all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">_hide_panel</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">frames</span></div>
+
 <div class="viewcode-block" id="Timeline.add_animation"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.add_animation">[docs]</a>    <span class="k">def</span> <span class="nf">add_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Animation or list of Animations.</span>
 
@@ -620,12 +749,14 @@
 
 <div class="viewcode-block" id="Timeline.add_to_scene"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.add_to_scene">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Timeline and all of its Animations to the scene&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
         <span class="p">[</span><span class="n">animation</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Timeline.remove_from_scene"><a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.remove_from_scene">[docs]</a>    <span class="k">def</span> <span class="nf">remove_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove Timeline and all of its Animations to the scene&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span><span class="p">:</span>
             <span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">actors</span><span class="p">))</span>
         <span class="p">[</span><span class="n">animation</span><span class="o">.</span><span class="n">remove_from_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span></div></div>
