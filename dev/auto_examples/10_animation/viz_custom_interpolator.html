@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -6,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Making a custom interpolator &#8212; FURY 0.9.0 documentation</title>
+    <title>Making a custom interpolator &#8212; FURY 0.10.0.dev1+gb3467828 documentation</title>
   
   
   
@@ -48,16 +47,27 @@
     <script src="../../_static/copybutton.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/10_animation/viz_custom_interpolator';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.9.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         </script>
     <link rel="icon" href="../../_static/logo.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Shaders" href="../13_shaders/index.html" />
     <link rel="prev" title="Keyframe animation: Camera and opacity" href="viz_camera.html" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
   </head>
   
   
@@ -288,9 +298,9 @@
             
             <article class="bd-article" role="main">
               
-  <div class="sphx-glr-download-link-note admonition note">
+<div class="sphx-glr-download-link-note admonition note">
 <p class="admonition-title">Note</p>
-<p>Click <a class="reference internal" href="#sphx-glr-download-auto-examples-10-animation-viz-custom-interpolator-py"><span class="std std-ref">here</span></a>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-10-animation-viz-custom-interpolator-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code</p>
 </div>
 <section class="sphx-glr-example-title" id="making-a-custom-interpolator">
@@ -315,11 +325,11 @@ The interpolation equation for such data is in the glTF tutorials below:
 <p>Tangent based cubic spline interpolation function:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">cubicSpline</span><span class="p">(</span><span class="n">previousPoint</span><span class="p">,</span> <span class="n">previousTangent</span><span class="p">,</span> <span class="n">nextPoint</span><span class="p">,</span> <span class="n">nextTangent</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>                  <span class="n">interpolationValue</span><span class="p">):</span>
-<span class="gp">&gt;&gt;&gt; </span>    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a> <span class="o">=</span> <span class="n">interpolationValue</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">t2</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="n">t3</span> <span class="o">=</span> <span class="n">t2</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">t</span> <span class="o">=</span> <span class="n">interpolationValue</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">t2</span> <span class="o">=</span> <span class="n">t</span> <span class="o">*</span> <span class="n">t</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">t3</span> <span class="o">=</span> <span class="n">t2</span> <span class="o">*</span> <span class="n">t</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t3</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">t2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">previousPoint</span> <span class="o">+</span>
-<span class="gp">&gt;&gt;&gt; </span>           <span class="p">(</span><span class="n">t3</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t2</span> <span class="o">+</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">)</span> <span class="o">*</span> <span class="n">previousTangent</span> <span class="o">+</span>
+<span class="gp">&gt;&gt;&gt; </span>           <span class="p">(</span><span class="n">t3</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">t2</span> <span class="o">+</span> <span class="n">t</span><span class="p">)</span> <span class="o">*</span> <span class="n">previousTangent</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>           <span class="p">(</span><span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">t3</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">t2</span><span class="p">)</span> <span class="o">*</span> <span class="n">nextPoint</span> <span class="o">+</span>
 <span class="gp">&gt;&gt;&gt; </span>           <span class="p">(</span><span class="n">t3</span> <span class="o">-</span> <span class="n">t2</span><span class="p">)</span> <span class="o">*</span> <span class="n">nextTangent</span>
 </pre></div>
@@ -328,7 +338,7 @@ The interpolation equation for such data is in the glTF tutorials below:
 animation keyframes when initialized as follows:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">tan_cubic_spline_interpolator</span><span class="p">(</span><span class="n">keyframes</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="o">...</span>
-<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">):</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
 <span class="gp">&gt;&gt;&gt; </span>          <span class="k">return</span> <span class="n">interpolated_value</span>
 <span class="gp">&gt;&gt;&gt; </span>    <span class="k">return</span> <span class="n">interpolator</span>
 </pre></div>
@@ -357,16 +367,16 @@ current time as input.</p>
         <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;in_tangent&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span><span class="p">[</span><span class="s1">&#39;in_tangent&#39;</span><span class="p">]</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros_like.html#numpy.zeros_like" title="numpy.zeros_like" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span></a><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">interpolate</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
         <span class="c1"># `get_previous_timestamp`and `get_next_timestamp` functions take</span>
         <span class="c1"># timestamps array and current time as inputs and returns the</span>
         <span class="c1"># surrounding timestamps.</span>
-        <span class="n">t0</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_previous_timestamp" title="fury.animation.helpers.get_previous_timestamp" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_previous_timestamp</span></a><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">)</span>
-        <span class="n">t1</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_next_timestamp" title="fury.animation.helpers.get_next_timestamp" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_next_timestamp</span></a><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">)</span>
+        <span class="n">t0</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_previous_timestamp" title="fury.animation.helpers.get_previous_timestamp" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_previous_timestamp</span></a><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="n">t1</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_next_timestamp" title="fury.animation.helpers.get_next_timestamp" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_next_timestamp</span></a><span class="p">(</span><span class="n">timestamps</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 
         <span class="c1"># `get_time_tau` function takes current time and surrounding</span>
         <span class="c1"># timestamps and returns a value from 0 to 1</span>
-        <span class="n">dt</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_time_tau" title="fury.animation.helpers.get_time_tau" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_time_tau</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">)</span>
+        <span class="n">dt</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.helpers.get_time_tau" title="fury.animation.helpers.get_time_tau" class="sphx-glr-backref-module-fury-animation-helpers sphx-glr-backref-type-py-function"><span class="n">helpers</span><span class="o">.</span><span class="n">get_time_tau</span></a><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t0</span><span class="p">,</span> <span class="n">t1</span><span class="p">)</span>
 
         <span class="n">time_delta</span> <span class="o">=</span> <span class="n">t1</span> <span class="o">-</span> <span class="n">t0</span>
 
@@ -398,9 +408,9 @@ current time as input.</p>
     <span class="k">return</span> <span class="n">interpolate</span>
 
 
-<a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
-<a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">showm</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
-    <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+<span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -408,7 +418,7 @@ current time as input.</p>
 <section id="cubic-spline-keyframes-data-same-as-the-one-you-get-from-gltf-file">
 <h2>Cubic spline keyframes data same as the one you get from glTF file.<a class="headerlink" href="#cubic-spline-keyframes-data-same-as-the-one-you-get-from-gltf-file" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#               t    in tangent     position                   out tangent</span>
-<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">translation</span></a> <span class="o">=</span> <span class="p">[</span>
+<span class="n">translation</span> <span class="o">=</span> <span class="p">[</span>
     <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.3051798</span><span class="p">,</span> <span class="mf">6.640117</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
     <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.3051798</span><span class="p">,</span> <span class="mf">8.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
     <span class="p">[</span><span class="mf">2.0</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">3.3051798</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]],</span>
@@ -428,11 +438,11 @@ current time as input.</p>
 </section>
 <section id="setting-position-keyframes">
 <h2>Setting position keyframes<a class="headerlink" href="#setting-position-keyframes" title="Permalink to this heading">#</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">keyframe_data</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">translation</span></a><span class="p">:</span>
-    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">in_tan</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pos</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">out_tan</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">keyframe_data</span></a>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">keyframe_data</span> <span class="ow">in</span> <span class="n">translation</span><span class="p">:</span>
+    <span class="n">t</span><span class="p">,</span> <span class="n">in_tan</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">out_tan</span> <span class="o">=</span> <span class="n">keyframe_data</span>
     <span class="c1"># Since we used the name &#39;in_tangent&#39; and &#39;out_tangent&#39; in the interpolator</span>
     <span class="c1"># We must use the same name as an argument to set it in the keyframe data.</span>
-    <span class="n">animation</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">t</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">pos</span></a><span class="p">,</span> <span class="n">in_tangent</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">in_tan</span></a><span class="p">,</span> <span class="n">out_tangent</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">out_tan</span></a><span class="p">)</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">in_tangent</span><span class="o">=</span><span class="n">in_tan</span><span class="p">,</span> <span class="n">out_tangent</span><span class="o">=</span><span class="n">out_tan</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Set the new interpolator to interpolate position keyframes</p>
@@ -440,18 +450,18 @@ current time as input.</p>
 </pre></div>
 </div>
 <p>adding the animation to the show manager.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.ShowManager.add_animation" title="fury.window.ShowManager.add_animation" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">showm</span><span class="o">.</span><span class="n">add_animation</span></a><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
 
 
-<a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">interactive</span></a> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">interactive</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">interactive</span></a><span class="p">:</span>
-    <a href="../../reference/fury.window.html#fury.window.ShowManager.start" title="fury.window.ShowManager.start" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">showm</span><span class="o">.</span><span class="n">start</span></a><span class="p">()</span>
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_keyframe_custom_interpolator.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">))</span>
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_keyframe_custom_interpolator.png&#39;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">))</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_viz_custom_interpolator_001.png" srcset="../../_images/sphx_glr_viz_custom_interpolator_001.png" alt="viz custom interpolator" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.114 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-10-animation-viz-custom-interpolator-py">
 <div class="sphx-glr-download sphx-glr-download-python docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/4a6c68d172a47177e2e66c9bc5836ceb/viz_custom_interpolator.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_custom_interpolator.py</span></code></a></p>
@@ -464,6 +474,10 @@ current time as input.</p>
 </section>
 </section>
 
+<div class="section ablog__blog_comments">
+  
+  
+</div>
 
             </article>
             
