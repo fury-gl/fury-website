@@ -2,10 +2,72 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts tagged google</title>
-  <updated>2023-06-12T15:14:12.957242+00:00</updated>
+  <updated>2023-06-12T15:17:44.821307+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/tag/google/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-06-05-week-1-joaodellagli.html</id>
+    <title>The FBO Saga - Week 1</title>
+    <updated>2023-06-05T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="the-fbo-saga-week-1"&gt;
+
+&lt;section id="this-past-week"&gt;
+&lt;h2&gt;This Past Week&lt;/h2&gt;
+&lt;p&gt;As mentioned in the last week’s blogpost, the goal for that week was to investigate VTK’s Framebuffer Object framework.
+An update on that is that indeed, VTK has one more low-level working &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkOpenGLFramebufferObject.html"&gt;FBO class&lt;/a&gt; that can be used inside FURY, however,
+they come with some issues that I will explain further below.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="my-current-problems"&gt;
+&lt;h2&gt;My Current Problems&lt;/h2&gt;
+&lt;p&gt;The problems I am having with these FBO implementations are first something related to how a FBO works, and second related to how VTK works.
+In OpenGL, a custom user’s FBO needs some things to be complete (usable):&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;At least one buffer should be attached. This buffer can be the color, depth or stencil buffer.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If no color buffer will be attached then OpenGL needs to be warned no draw or read operations will be done to that buffer. Otherwise, there should be at least one color attachment.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;All attachments should have their memory allocated.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Each buffer should have the same number of samples.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;My first problem relies on the third requirement. VTK’s implementation of FBO requires a &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html"&gt;vtkTextureObject&lt;/a&gt;
+as a texture attachment. I figured out how to work with this class, however, I cannot allocate memory for it, as its methods for it, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#abc91bbf9a3414bded7a132d366ca4951"&gt;Allocate2D&lt;/a&gt;, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#a7e9dd67f377b7f91abd9df71e75a5f67"&gt;Create2D&lt;/a&gt; and &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#a0e56fe426cb0e6749cc6f2f8dbf53ed7"&gt;Create2DFromRaw&lt;/a&gt;
+does not seem to work. Every time I try to use them, my program stops with no error message nor nothing.
+For anyone interested in what is happening exactly, below is how I my tests are implemented:&lt;/p&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vtkTextureObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# color texture declaration&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Bind&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# binding of the texture for operations&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetDataType&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the datatype for unsigned char&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetInternalFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the format as RGBA&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMinificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the minfilter as linear&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMagnificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the magfilter as linear&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt;
+&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Allocate2D&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# here is where the code stops&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;In contrast, for some reason, the methods for 3D textures, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#aaeefa46bd3a24bf62126512a276819d0"&gt;Allocate3D&lt;/a&gt; works just fine.
+I could use it as a workaround, but I do not wish to, as this just does not make sense.&lt;/p&gt;
+&lt;p&gt;My second problem relies on VTK. As VTK is a library that encapsulates some OpenGL functions in more palatable forms, it comes with some costs.
+Working with FBOs is a more low-level work, that requires strict control of some OpenGL states and specific functions that would be simpler if it was the main API here.
+However, some of this states and functions are all spread and implicit through VTK’s complex classes and methods, which doubles the time expended to make some otherwise simple instructions,
+as I first need to dig in lines and lines of VTK’s documentation, and worse, the code itself.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-about-next-week"&gt;
+&lt;h2&gt;What About Next Week?&lt;/h2&gt;
+&lt;p&gt;For this next week, I plan to investigate further on why the first problem is happening. If that is accomplished, then things will be more simple, as it will be a lot easier for my project to move forward as I will finally be able
+to implement the more pythonic functions needed to finally render some kernel distributions onto my screen.&lt;/p&gt;
+&lt;p&gt;Wish me luck!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-06-05-week-1-joaodellagli.html" rel="alternate"/>
+    <summary>As mentioned in the last week’s blogpost, the goal for that week was to investigate VTK’s Framebuffer Object framework.
+An update on that is that indeed, VTK has one more low-level working FBO class that can be used inside FURY, however,
+they come with some issues that I will explain further below.</summary>
+    <category term="google" label="google"/>
+    <published>2023-06-05T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-06-03-week-1-praneeth.html</id>
     <title>Week 1: Working with SpinBox and TextBox Enhancements</title>
@@ -1290,49 +1352,6 @@ and &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/gani
 </content>
     <link href="https://fury.gl/posts/2022/2022-09-28-week-14-mohamed.html" rel="alternate"/>
     <summary>Separated the Timeline into a Timeline and an Animation. So, instead of having the Timeline do everything. It’s now more like doing animations in Blender and other 3D editing software where the timeline handles the playback of several animations #694.</summary>
-    <category term="google" label="google"/>
-    <published>2022-09-28T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2022/2022-09-28-week-14-shivam.html</id>
-    <title>Week 14 - Morphing is here!</title>
-    <updated>2022-09-28T00:00:00+00:00</updated>
-    <author>
-      <name>Shivam Anand</name>
-    </author>
-    <content type="html">&lt;section id="week-14-morphing-is-here"&gt;
-
-&lt;section id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;This week, I started with multiple actor support in skinning and managed to do it
-successfully. Here’s the preview using the BrainStem model.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;iframe id="player" type="text/html"   width="600" height="340" src="https://user-images.githubusercontent.com/74976752/195650455-927a0238-5db1-4349-99d4-c021db356b66.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Implementing multiple animation channels support (as seen in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Fox&lt;/span&gt;&lt;/code&gt; model). The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;get_skin_timelines()&lt;/span&gt;&lt;/code&gt; method now returns a dictionary of all animation channels with Timeline as their value.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;We merged two PRs, &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/689/"&gt;#689&lt;/a&gt; (colors from Material) and &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/643/"&gt;#643&lt;/a&gt; (simple animations).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Added ability to load morphing information and create timelines from it. Here’s a preview of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;AnimatedMorphCube&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;AnimatedMorphSphere&lt;/span&gt;&lt;/code&gt; models:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;iframe id="player" type="text/html"   width="600" height="340" src="https://user-images.githubusercontent.com/74976752/195654414-b290900c-b80f-40c7-a49d-5ea8413e906a.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Cleaning and Rebasing Skinning animation PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/685/"&gt;#685&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Creating a PR for morphing code.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Multi primitive (actor) support in morphing.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;No, I didn’t get stuck this week.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2022/2022-09-28-week-14-shivam.html" rel="alternate"/>
-    <summary>This week, I started with multiple actor support in skinning and managed to do it
-successfully. Here’s the preview using the BrainStem model.</summary>
     <category term="google" label="google"/>
     <published>2022-09-28T00:00:00+00:00</published>
   </entry>
