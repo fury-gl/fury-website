@@ -2,10 +2,86 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posted in 2023</title>
-  <updated>2023-06-19T19:08:31.462480+00:00</updated>
+  <updated>2023-06-19T19:10:23.637048+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/2023/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-06-12-week-2-joaodellagli.html</id>
+    <title>Week 2: The Importance of (good) Documentation</title>
+    <updated>2023-06-12T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-2-the-importance-of-good-documentation"&gt;
+
+&lt;p&gt;Hello everybody, welcome to the week 2 of this project! I must admit I thought this would be simpler than it is currently being, but I forgot that when it comes to dealing with computer graphics’ applications, things never are. Below, some updates on what I have been up to for this past week.&lt;/p&gt;
+&lt;section id="this-last-week-s-effort"&gt;
+&lt;h2&gt;This Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;Last week, I was facing some issues with a VTK feature essential so I could move forward with my project: Framebuffer Objects.
+As described in my &lt;span class="xref std std-doc"&gt;last blogpost&lt;/span&gt;, for some reason the 2D allocation methods for it weren’t working.
+In a meeting with my mentors, while we were discussing and searching through VTK’s FramebufferObject and TextureObject documentation, and the code itself for the problem,
+one TextureObject method caught my attention: &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#a0988fa2a30b640c93392c2188030537e"&gt;vtkTextureObject.SetContext()&lt;/a&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="where-the-problem-was"&gt;
+&lt;h2&gt;Where the Problem Was&lt;/h2&gt;
+&lt;p&gt;My last week’s code was:&lt;/p&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;color_texture&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vtkTextureObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# color texture declaration&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Bind&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# binding of the texture for operations&lt;/span&gt;
+
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetDataType&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the datatype for unsigned char&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetInternalFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the format as RGBA&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMinificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the minfilter as linear&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMagnificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the magfilter as linear&lt;/span&gt;
+
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Allocate2D&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# here is where the code stops&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;But it turns out that to allocate the FBO’s textures, of type vtkTextureObject, you need to also set the context where the texture object
+will be present, so it lacked a line, that should be added after &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Bind()&lt;/span&gt;&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;color_texture&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vtkTextureObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Bind&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetContext&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# set the context where the texture object will be present&lt;/span&gt;
+
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetDataType&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetInternalFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGB&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGB&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMinificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMagnificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;The code worked fine. But as my last blogpost showed, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate3D()&lt;/span&gt;&lt;/code&gt; method worked just fine without a (visible) problem, why is that?
+Well, in fact, it &lt;strong&gt;didn’t work&lt;/strong&gt;. If we check the code for the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate2D()&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate3D()&lt;/span&gt;&lt;/code&gt;, one difference can be spotted:&lt;/p&gt;
+&lt;img alt="Image comparing Allocate2D and Allocate3D methods" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/allocate-2d-3d.png" /&gt;
+&lt;p&gt;While in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate2D()&lt;/span&gt;&lt;/code&gt; there is an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;assert(this-&amp;gt;Context);&lt;/span&gt;&lt;/code&gt;, in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate3D()&lt;/span&gt;&lt;/code&gt; the assertion is translated into:&lt;/p&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;this&lt;/span&gt;&lt;span class="o"&gt;-&amp;gt;&lt;/span&gt;&lt;span class="n"&gt;Context&lt;/span&gt;&lt;span class="o"&gt;==&lt;/span&gt;&lt;span class="n"&gt;nullptr&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="n"&gt;vtkErrorMacro&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;No context specified. Cannot create texture.&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;false&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This slight difference is significant: while in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate2D()&lt;/span&gt;&lt;/code&gt; the program immediately fails, in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Allocate3D()&lt;/span&gt;&lt;/code&gt; the function is simply returned
+&lt;strong&gt;false&lt;/strong&gt;, with its error pushed to vtkErrorMacro. I could have realised that earlier if I were using vtkErrorMacro, but this difference in their
+implementation made it harder for me and my mentors to realise what was happening.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;After making that work, this week’s goal is to render something to the Framebuffer Object, now that is working. To do that,
+first I will need to do some offscreen rendering to it, and afterwards render what it was drawn to its color attachment, the Texture Object I
+was struggling to make work, into the screen, drawing its texture to a billboard. Also, I plan to start using vtkErrorMacro, as it seems like
+the main error interface when working with VTK, and that may make my life easier.&lt;/p&gt;
+&lt;p&gt;See you next week!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-06-12-week-2-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everybody, welcome to the week 2 of this project! I must admit I thought this would be simpler than it is currently being, but I forgot that when it comes to dealing with computer graphics’ applications, things never are. Below, some updates on what I have been up to for this past week.</summary>
+    <category term="google" label="google"/>
+    <published>2023-06-12T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-06-12-week-2-tvcastillod.html</id>
     <title>Week 2: Making adjustments to the Ellipsoid Actor</title>
@@ -376,27 +452,5 @@ We can also join our &lt;a class="reference external" href="https://discord.gg/6
 FURY is a free and open source software library for scientific visualization and 3D animations.</summary>
     <category term="fury" label="fury"/>
     <published>2023-04-15T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-02-01-gsoc.html</id>
-    <title>Contribute to FURY via Google Summer of Code 2023</title>
-    <updated>2023-02-01T00:00:00+00:00</updated>
-    <author>
-      <name>Serge Koudoro</name>
-    </author>
-    <content type="html">&lt;section id="contribute-to-fury-via-google-summer-of-code-2023"&gt;
-
-&lt;p&gt;FURY is participating in the &lt;a class="reference external" href="https://summerofcode.withgoogle.com"&gt;Google Summer of Code 2023&lt;/a&gt; under the umbrella of the &lt;a class="reference external" href="https://python-gsoc.org/"&gt;Python Software Foundation&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;FURY is a free and open source software library for scientific visualization and 3D animations. FURY contains many tools for visualizing a series of scientific data including graph and imaging data.&lt;/p&gt;
-&lt;p&gt;A list of project ideas and application info is on our &lt;a class="reference external" href="https://github.com/fury-gl/fury/wiki/Google-Summer-of-Code-2023-(GSOC2023)"&gt;GitHub Wiki&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;If you are interested in talking to us about projects, applications join us to our &lt;a class="reference external" href="https://discord.gg/aXRZmmM"&gt;discord community&lt;/a&gt; or drop us a line on our &lt;a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org"&gt;mailing list&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Be part of our community and Enjoy your summer of code!&lt;/p&gt;
-&lt;p&gt;Serge K.&lt;/p&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-02-01-gsoc.html" rel="alternate"/>
-    <summary>FURY is participating in the Google Summer of Code 2023 under the umbrella of the Python Software Foundation.</summary>
-    <category term="google" label="google"/>
-    <published>2023-02-01T00:00:00+00:00</published>
   </entry>
 </feed>
