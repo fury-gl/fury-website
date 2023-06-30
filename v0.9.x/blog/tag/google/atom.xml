@@ -2,10 +2,89 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts tagged google</title>
-  <updated>2023-06-23T14:23:08.428071+00:00</updated>
+  <updated>2023-06-30T16:19:26.143113+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/tag/google/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-06-26-week-4-joaodellagli.html</id>
+    <title>Week 4: Nothing is Ever Lost</title>
+    <updated>2023-06-26T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-4-nothing-is-ever-lost"&gt;
+
+&lt;p&gt;Welcome again to another weekly blogpost! Today, let’s talk about the importance of guidance throughout a project.&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;So, last week my project was struggling with some supposedly simple in concept, yet intricate in execution issues. If you recall from
+my &lt;span class="xref std std-doc"&gt;last blogpost&lt;/span&gt;, I could not manage to make the Framebuffer Object setup work, as its method,
+&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SetContext()&lt;/span&gt;&lt;/code&gt;, wasn’t being able to generate the FBO inside OpenGL. Well, after some (more) research about that as I also dived in my
+plan B, that involved studying numba as a way to accelerate a data structure I implemented on my PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/783"&gt;#783&lt;/a&gt;,
+me and one of my mentors decided we needed a pair programming session, that finally happened on thursday. After that session,
+we could finally understand what was going on.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="where-the-problem-was"&gt;
+&lt;h2&gt;Where the Problem Was&lt;/h2&gt;
+&lt;p&gt;Apparently, for the FBO generation to work, it is first needed to initialize the context interactor:&lt;/p&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;FBO&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vtkOpenGLFramebufferObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+
+&lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetOffScreenRendering&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# so the window doesn&amp;#39;t show up, but important for later as well&lt;/span&gt;
+&lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;initialize&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# missing part that made everything work&lt;/span&gt;
+
+&lt;span class="n"&gt;FBO&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetContext&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# Sets the context for the FBO. Finally, it works&lt;/span&gt;
+&lt;span class="n"&gt;FBO&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;PopulateFramebuffer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kc"&gt;False&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;24&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# And now I could populate the FBO with textures&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-06-26-week-4-joaodellagli.rst&lt;/span&gt;, line 37)&lt;/p&gt;
+&lt;p&gt;Possible title underline, too short for the title.
+Treating it as ordinary text because it’s so short.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;This simple missing line of code was responsible for ending weeks of suffer, as after that, I called:&lt;/p&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-06-26-week-4-joaodellagli.rst&lt;/span&gt;, line 38)&lt;/p&gt;
+&lt;p&gt;Unexpected indentation.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;FBO of index:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FBO&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetFBOIndex&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;span class="nb"&gt;print&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Number of color attachments:&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;FBO&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;GetNumberOfColorAttachments&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-06-26-week-4-joaodellagli.rst&lt;/span&gt;, line 42)&lt;/p&gt;
+&lt;p&gt;Possible title underline, too short for the title.
+Treating it as ordinary text because it’s so short.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;That outputted:&lt;/p&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: ERROR/3 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-06-26-week-4-joaodellagli.rst&lt;/span&gt;, line 43)&lt;/p&gt;
+&lt;p&gt;Unexpected indentation.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;FBO&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;index&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;
+&lt;span class="n"&gt;Number&lt;/span&gt; &lt;span class="n"&gt;of&lt;/span&gt; &lt;span class="n"&gt;color&lt;/span&gt; &lt;span class="n"&gt;attachments&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;That means the FBO generation was successful! One explanation that seems reasonable to me on why was that happening is that, as it was
+not initialized, the context was being passed &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;null&lt;/span&gt;&lt;/code&gt; to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SetContext()&lt;/span&gt;&lt;/code&gt; method, that returned without any warning of what was happening.&lt;/p&gt;
+&lt;p&gt;Here, I would like to point out how my mentor was &lt;strong&gt;essential&lt;/strong&gt; to this solution to come: I had struggled for some time with that, and could
+not find a way out, but a single session of synchronous pair programming where I could expose clearly my problem and talk to someone
+way more experienced than I, someone designated for that, was my way out of this torment, so value your mentors! Thanks Bruno!&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;Now, with the FBO working, I plan to finally &lt;em&gt;render&lt;/em&gt; something to it. For this week, I plan to come back to my original plan and
+experiment with simple shaders just as a proof of concept that the FBO will be really useful for this project. I hope the road is less
+bumpier by now and I don’t step on any other complicated problem.&lt;/p&gt;
+&lt;p&gt;Wish me luck!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-06-26-week-4-joaodellagli.html" rel="alternate"/>
+    <summary>Welcome again to another weekly blogpost! Today, let’s talk about the importance of guidance throughout a project.</summary>
+    <category term="google" label="google"/>
+    <published>2023-06-26T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-06-19-week-3-tvcastillod.html</id>
     <title>Week 3: Working on uncertainty and details of the first PR</title>
@@ -390,28 +469,5 @@ they come with some issues that I will explain further below.</summary>
     <summary>This week, my focus was on reviewing pull requests (PRs) and issues related to the user interface (UI) of the project. I meticulously went through each PR and issue, identifying those specifically associated with UI improvements. To streamline the process, I categorized them accordingly under the UI category. One of the key tasks was PR #499, which involved the implementation of SpinBoxUI. After rebasing the PR, I identified an alignment issue with the textbox component.</summary>
     <category term="google" label="google"/>
     <published>2023-06-03T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-02-week-0-praneeth.html</id>
-    <title>Week 0: Community Bounding Period</title>
-    <updated>2023-06-02T00:00:00+00:00</updated>
-    <author>
-      <name>Praneeth Shetty</name>
-    </author>
-    <content type="html">&lt;section id="week-0-community-bounding-period"&gt;
-
-&lt;section id="gsoc-2023-community-bonding-period"&gt;
-&lt;h2&gt;GSoC 2023: Community Bonding Period&lt;/h2&gt;
-&lt;p&gt;Hello All!&lt;/p&gt;
-&lt;p&gt;I’m thrilled to announce that I’ll be participating in Google Summer of Code (GSoC) for yet another year. To catch a glimpse of my previous journey, check out my experiences &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/ganimtron_10s-blog/"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;During the community bonding period, we had our first GSoC meet, where we got acquainted with the program’s rules and regulations. It was an excellent opportunity to virtually meet my fellow contributors and discuss our upcoming projects. Excitement filled the air as we exchanged ideas and set goals for the summer ahead.&lt;/p&gt;
-&lt;p&gt;Stay tuned for updates on my GSoC project as I share my progress, challenges, and breakthroughs along the way. I’m grateful for the opportunity to be part of this remarkable community.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-02-week-0-praneeth.html" rel="alternate"/>
-    <summary>Hello All!</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-02T00:00:00+00:00</published>
   </entry>
 </feed>
