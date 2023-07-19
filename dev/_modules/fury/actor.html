@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor &#8212; FURY 0.10.0.dev123+g6c0991a6 documentation</title>
+    <title>fury.actor &#8212; FURY 0.10.0.dev135+g2bba1b9a documentation</title>
   
   
   
@@ -299,6 +299,7 @@
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">layout</span>
 <span class="kn">from</span> <span class="nn">fury.actors.odf_slicer</span> <span class="kn">import</span> <span class="n">OdfSlicerActor</span>
 <span class="kn">from</span> <span class="nn">fury.actors.peak</span> <span class="kn">import</span> <span class="n">PeakActor</span>
+<span class="kn">from</span> <span class="nn">fury.actors.tensor</span> <span class="kn">import</span> <span class="n">tensor_ellipsoid</span>
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <span class="n">colormap_lookup_table</span>
 <span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecate_with_version</span><span class="p">,</span> <span class="n">deprecated_params</span>
 <span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
@@ -4084,6 +4085,78 @@
     <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">sq_actor</span><span class="p">,</span> <span class="s1">&#39;fragment&#39;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl_code</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="s1">&#39;light&#39;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sq_actor</span></div>
+
+
+<div class="viewcode-block" id="ellipsoid"><a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.ellipsoid">[docs]</a><span class="k">def</span> <span class="nf">ellipsoid</span><span class="p">(</span>
+    <span class="n">centers</span><span class="p">,</span>
+    <span class="n">axes</span><span class="p">,</span>
+    <span class="n">lengths</span><span class="p">,</span>
+    <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    VTK actor for visualizing ellipsoids.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    centers : ndarray(N, 3)</span>
+<span class="sd">        Ellipsoid positions.</span>
+<span class="sd">    axes : ndarray (3, 3) or (N, 3, 3)</span>
+<span class="sd">        Axes of the ellipsoid.</span>
+<span class="sd">    lengths : ndarray (3, ) or (N, 3)</span>
+<span class="sd">        Axes lengths.</span>
+<span class="sd">    colors : ndarray (N,3) or tuple (3,), optional</span>
+<span class="sd">        Default red color. R, G and B should be in the range [0, 1].</span>
+<span class="sd">    scales : float or ndarray (N, ), optional</span>
+<span class="sd">        Ellipsoid size, default(1.0).</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque), default(1.0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tensor_ellipsoid: Actor</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">centers</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">centers</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">axes</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">axes</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">axes</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">axes</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;number of axes defined does not match with number of&#39;</span>
+                         <span class="s1">&#39;centers&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lengths</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lengths</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">lengths</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;number of lengths defined does not match with number&#39;</span>
+                         <span class="s1">&#39;of centers&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">centers</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">scales</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])),</span> <span class="n">axis</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">colors</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">tensor_ellipsoid</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span></div>
+
 </pre></div>
 <div class="section ablog__blog_comments">
   
