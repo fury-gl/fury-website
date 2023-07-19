@@ -2,10 +2,74 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2023-07-19T14:07:36.043552+00:00</updated>
+  <updated>2023-07-19T14:14:26.307658+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-07-10-week-6-joaodellagli.html</id>
+    <title>Week 6: Things are Starting to Build Up</title>
+    <updated>2023-07-10T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-6-things-are-starting-to-build-up"&gt;
+
+&lt;p&gt;Hello everyone, time for a other weekly blogpost! Today, I will show you my current progress on my project and latest activities.&lt;/p&gt;
+&lt;section id="what-i-did-last-week"&gt;
+&lt;h2&gt;What I did Last Week&lt;/h2&gt;
+&lt;p&gt;Last week I had the goal to implement KDE rendering to the screen (if you want to understand what this is, check my &lt;a href="#id1"&gt;&lt;span class="problematic" id="id2"&gt;:doc:`last blogpost &amp;lt;2023-07-03-week-5-joaodellagli&amp;gt;`_&lt;/span&gt;&lt;/a&gt;).
+After some days diving into the code, I finally managed to do it:&lt;/p&gt;
+&lt;aside class="system-message" id="id1"&gt;
+&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-07-10-week-6-joaodellagli.rst&lt;/span&gt;, line 14); &lt;em&gt;&lt;a href="#id2"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Mismatch: both interpreted text role prefix and reference suffix.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;img alt="KDE render to a billboard" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/buffer_compose.png" /&gt;
+&lt;p&gt;This render may seem clean and working, but the code isn’t exactly like that. For this to work, some tricks and work arounds needed to
+be done, as I will describe in the section below.&lt;/p&gt;
+&lt;p&gt;Also, I reviewed the shader part of Tania’s PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/791"&gt;#791&lt;/a&gt;, that implement ellipsoid actors inside
+FURY. It was my first review of a PR that isn’t a blogpost, so it was an interesting experience and I hope I can get better at it.&lt;/p&gt;
+&lt;p&gt;It is important as well to point out that I had to dedicate myself to finishing my graduation capstone project’s presentation that I will attend
+to this week, so I had limited time to polish my code, which I plan to do better this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="where-the-problem-was"&gt;
+&lt;h2&gt;Where the Problem Was&lt;/h2&gt;
+&lt;p&gt;The KDE render basically works rendering the KDE of a point to a texture and summing that texture to the next render. For this to work,
+the texture, rendered to a billboard, needs to be the same size of the screen, otherwise the captured texture will include the black background.
+The problem I faced with that is that the billboard scaling isn’t exactly well defined, so I had to guess for a fixed screen size
+(in this example, I worked with &lt;em&gt;600x600&lt;/em&gt;) what scaling value made the billboard fit exactly inside the screen (it’s &lt;em&gt;3.4&lt;/em&gt;). That is far from ideal as I
+will need to modularize this behavior inside a function that needs to work for every case, so I will need to figure out a way to fix that
+for every screen size. For that, I have two options:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Find the scaling factor function that makes the billboard fit into any screen size.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Figure out how the scaling works inside the billboard actor to understand if it needs to be refactored.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first seems ok to do, but it is kind of a work around as well. The second one is a good general solution, but it is a more delicate one,
+as it deals with how the billboard works and already existing applications of it may suffer problems if the scaling is changed.
+I will see what is better talking with my mentors.&lt;/p&gt;
+&lt;p&gt;Another problem I faced (that is already fixed) relied on shaders. I didn’t fully understood how shaders work inside FURY so I was
+using my own fragment shader implementation, replacing the already existing one completely. That was working, but I was having an issue
+with the texture coordinates of the rendering texture. As I completely replaced the fragment shader, I had to pass custom texture coordinates
+to it, resulting in distorted textures that ruined the calculations. Those issues motivated me to learn the shaders API, which allowed me
+to use the right texture coordinates and finally render the results you see above.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;For this week, I plan to try a different approach Filipi, one of my mentors, told me to do. This approach was supposed to be the original
+one, but a communication failure lead to this path I am currently in. This approach renders each KDE calculation into its own billboard,
+and those are rendered together with additive blending. After this first pass, this render is captured into a texture and then rendered to
+another big billboard.&lt;/p&gt;
+&lt;p&gt;Also, I plan to refactor my draft PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/804"&gt;#804&lt;/a&gt; to make it more understandable, as its description still dates back to the time I was using the
+flawed Framebuffer implementation, and my fellow GSoC contributors will eventually review it, and to do so, they will need to understand it.&lt;/p&gt;
+&lt;p&gt;Wish me luck!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-07-10-week-6-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, time for a other weekly blogpost! Today, I will show you my current progress on my project and latest activities.</summary>
+    <category term="google" label="google"/>
+    <published>2023-07-10T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-07-03-week-5-joaodellagli.html</id>
     <title>Week 5: All Roads Lead to Rome</title>
@@ -453,36 +517,5 @@ the main error interface when working with VTK, and that may make my life easier
     <summary>This week, I continued tweaking the text justification PR #790 and encountered a new issue when combining both justification and vertical_justification. The problem arose because the vertical_justification did not take into account the applied justification, resulting in unexpected behavior. I focused on resolving this issue by ensuring that both justifications work together correctly. Additionally, during the weekly meeting, we discussed the problem and decided to introduce new properties such as boundaries and padding to enhance the functionality of the text justification feature.</summary>
     <category term="google" label="google"/>
     <published>2023-06-11T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-05-week-1-tvcastillod.html</id>
-    <title>Week 1: Ellipsoid actor implemented with SDF</title>
-    <updated>2023-06-05T00:00:00+00:00</updated>
-    <author>
-      <name>Tania Castillo</name>
-    </author>
-    <content type="html">&lt;section id="week-1-ellipsoid-actor-implemented-with-sdf"&gt;
-
-&lt;section id="what-did-i-do-this-week"&gt;
-&lt;h2&gt;What did I do this week?&lt;/h2&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/791"&gt;PR #791: Ellipsoid actor implemented with SDF&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;I made a first PR with the implementation of the ellipsoid actor defined with a SDF using raymarching. The current &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/c2e5151e5f0d676501c0aee9f476d9d292cadc61/fury/actor.py#L3537"&gt;sdf&lt;/a&gt; actor allows the creation of ellipsoids, but it lacks control over their shape, and the displayed direction does not match the intended orientation. For this reason, a new actor just focused on ellipsoids was made, this one is defined by its axes (3x3 orthogonal matrix) and their corresponding lengths (3x1 vector), along with other attributes like color, opacity, and scale. The goal is to make an implementation that allows displaying a large amount of data, with good visual quality, and without compromising performance. I’m still working on this but here is a first glance of how it looks like:&lt;/p&gt;
-&lt;img alt="https://user-images.githubusercontent.com/31288525/244503195-a626718f-4a13-4275-a2b7-6773823e553c.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/244503195-a626718f-4a13-4275-a2b7-6773823e553c.png" style="width: 376px;" /&gt;
-&lt;p&gt;This will be used later to create the tensor ellipsoids used on &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/c2e5151e5f0d676501c0aee9f476d9d292cadc61/fury/actor.py#L1172"&gt;tensor_slicer&lt;/a&gt;.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;I need to talk to my mentors first but the idea is to start making improvements on the SDF definition and raymarching algorithm, I have already started looking for information about how I can do it, and if I get good ideas, I will compare if there is an improvement in performance respect to the implementation I have right now. I also need to keep working on tests, the most common way of doing it is to check the number of objects and colors displayed, but I would like to test other things related to performance.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Not yet, I need to get feedback first to see if there is anything I need to review or correct.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-05-week-1-tvcastillod.html" rel="alternate"/>
-    <summary>PR #791: Ellipsoid actor implemented with SDF</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-05T00:00:00+00:00</published>
   </entry>
 </feed>
