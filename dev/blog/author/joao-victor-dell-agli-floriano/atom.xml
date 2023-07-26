@@ -2,10 +2,74 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts by João Victor Dell Agli Floriano</title>
-  <updated>2023-07-26T17:17:52.478396+00:00</updated>
+  <updated>2023-07-26T17:19:48.240102+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/author/joao-victor-dell-agli-floriano/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-07-17-week-7-joaodellagli.html</id>
+    <title>Week 7: Experimentation Done</title>
+    <updated>2023-07-17T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-7-experimentation-done"&gt;
+
+&lt;p&gt;Hello everyone, welcome to another weekly blogpost! Let’s talk about the current status of my project (spoiler: it is beautiful).&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;Having accomplished a KDE rendering to a billboard last week, I was then tasked with trying a different approach to how the
+rendering was done. So, to recap, below was how I was doing it:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Render one point’s KDE offscreen to a single billboard, passing its position and sigma to the fragment shader as uniforms.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the last rendering’s screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the next point’s KDE, and sum it up with the last rendering’s texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Do this until the end of the points.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the final render screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Apply post processing effects (colormapping).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the result to the screen.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This approach was good, but it had some later limitations and issues that would probably take more processing time and attention to details (correct matrix
+transformations, etc) than the ideal. The different idea is pretty similar, but with some differences:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Activate additive blending in OpenGL.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render each point’s KDE to its own billboard, with position defined by the point’s position, all together in one pass.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the rendered screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Pass this texture to a billboard.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Apply post processing effects (colormapping).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the result to the screen.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So I needed to basically do that.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="was-it-hard"&gt;
+&lt;h2&gt;Was it Hard?&lt;/h2&gt;
+&lt;p&gt;Fortunately, it wasn’t so hard to do it in the end. Following those steps turned out pretty smooth, and after some days,
+I had the below result:&lt;/p&gt;
+&lt;img alt="Final 2D KDE render" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/final_2d_plot.png" /&gt;
+&lt;p&gt;This is a 2D KDE render of random 1000 points. For this I used the &lt;em&gt;“viridis”&lt;/em&gt; colormap from &lt;cite&gt;matplotlib&lt;/cite&gt;. Some details worth noting:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;For this to work, I have implemented three texture helper functions: &lt;cite&gt;window_to_texture()&lt;/cite&gt;, &lt;cite&gt;texture_to_actor()&lt;/cite&gt; and &lt;cite&gt;colormap_to_texture()&lt;/cite&gt;. The first one captures a window and pass it as a texture to an actor, the second one passes an imported texture to an actor, and the last one passes a colormap, prior passed as an array, as a texture to an actor.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The colormap is directly get from &lt;cite&gt;matplotlib&lt;/cite&gt;, available in its &lt;cite&gt;colormaps&lt;/cite&gt; object.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;This was only a 2D flatten plot. At first, I could not figure out how to make the connection between the offscreen interactor and the onscreen one, so rotating and moving around the render was not happening. After some ponder and talk to my mentors, they told me to use &lt;em&gt;callback&lt;/em&gt; functions inside the interactor, and after doing that, I managed to make the 3D render work, which had the following result:&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="3D KDE render" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/3d_kde_gif.gif" /&gt;
+&lt;p&gt;After those results, I refactored my PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/804"&gt;#804&lt;/a&gt; to better fit its current status, and it is
+now ready for review. Success!&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;After finishing the first iteration of my experimental program, the next step is to work on an API for KDE rendering. I plan to meet
+with my mentors and talk about the details of this API, so expect an update next week. Also, I plan to take a better look on my fellow GSoC FURY
+contributors work so when their PRs are ready for review, I will have to be better prepared for it.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-07-17-week-7-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, welcome to another weekly blogpost! Let’s talk about the current status of my project (spoiler: it is beautiful).</summary>
+    <category term="google" label="google"/>
+    <published>2023-07-17T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-07-10-week-6-joaodellagli.html</id>
     <title>Week 6: Things are Starting to Build Up</title>

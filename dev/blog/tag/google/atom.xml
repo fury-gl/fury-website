@@ -2,10 +2,74 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts tagged google</title>
-  <updated>2023-07-26T17:17:53.479098+00:00</updated>
+  <updated>2023-07-26T17:19:49.156615+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/tag/google/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-07-17-week-7-joaodellagli.html</id>
+    <title>Week 7: Experimentation Done</title>
+    <updated>2023-07-17T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-7-experimentation-done"&gt;
+
+&lt;p&gt;Hello everyone, welcome to another weekly blogpost! Let’s talk about the current status of my project (spoiler: it is beautiful).&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;Having accomplished a KDE rendering to a billboard last week, I was then tasked with trying a different approach to how the
+rendering was done. So, to recap, below was how I was doing it:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Render one point’s KDE offscreen to a single billboard, passing its position and sigma to the fragment shader as uniforms.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the last rendering’s screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the next point’s KDE, and sum it up with the last rendering’s texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Do this until the end of the points.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the final render screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Apply post processing effects (colormapping).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the result to the screen.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;This approach was good, but it had some later limitations and issues that would probably take more processing time and attention to details (correct matrix
+transformations, etc) than the ideal. The different idea is pretty similar, but with some differences:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Activate additive blending in OpenGL.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render each point’s KDE to its own billboard, with position defined by the point’s position, all together in one pass.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Capture the rendered screen as a texture.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Pass this texture to a billboard.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Apply post processing effects (colormapping).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Render the result to the screen.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;So I needed to basically do that.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="was-it-hard"&gt;
+&lt;h2&gt;Was it Hard?&lt;/h2&gt;
+&lt;p&gt;Fortunately, it wasn’t so hard to do it in the end. Following those steps turned out pretty smooth, and after some days,
+I had the below result:&lt;/p&gt;
+&lt;img alt="Final 2D KDE render" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/final_2d_plot.png" /&gt;
+&lt;p&gt;This is a 2D KDE render of random 1000 points. For this I used the &lt;em&gt;“viridis”&lt;/em&gt; colormap from &lt;cite&gt;matplotlib&lt;/cite&gt;. Some details worth noting:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;For this to work, I have implemented three texture helper functions: &lt;cite&gt;window_to_texture()&lt;/cite&gt;, &lt;cite&gt;texture_to_actor()&lt;/cite&gt; and &lt;cite&gt;colormap_to_texture()&lt;/cite&gt;. The first one captures a window and pass it as a texture to an actor, the second one passes an imported texture to an actor, and the last one passes a colormap, prior passed as an array, as a texture to an actor.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The colormap is directly get from &lt;cite&gt;matplotlib&lt;/cite&gt;, available in its &lt;cite&gt;colormaps&lt;/cite&gt; object.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;This was only a 2D flatten plot. At first, I could not figure out how to make the connection between the offscreen interactor and the onscreen one, so rotating and moving around the render was not happening. After some ponder and talk to my mentors, they told me to use &lt;em&gt;callback&lt;/em&gt; functions inside the interactor, and after doing that, I managed to make the 3D render work, which had the following result:&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="3D KDE render" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/3d_kde_gif.gif" /&gt;
+&lt;p&gt;After those results, I refactored my PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/804"&gt;#804&lt;/a&gt; to better fit its current status, and it is
+now ready for review. Success!&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;After finishing the first iteration of my experimental program, the next step is to work on an API for KDE rendering. I plan to meet
+with my mentors and talk about the details of this API, so expect an update next week. Also, I plan to take a better look on my fellow GSoC FURY
+contributors work so when their PRs are ready for review, I will have to be better prepared for it.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-07-17-week-7-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, welcome to another weekly blogpost! Let’s talk about the current status of my project (spoiler: it is beautiful).</summary>
+    <category term="google" label="google"/>
+    <published>2023-07-17T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-07-15-week-7-praneeth.html</id>
     <title>Week 7: Sowing the seeds for TreeUI</title>
@@ -434,41 +498,5 @@ Also, I plan to keep working on my current project to find the solution I will n
 I will talk about how you should watch your expectations when working with any project.</summary>
     <category term="google" label="google"/>
     <published>2023-06-19T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-17-week-3-praneeth.html</id>
-    <title>Week 3: Resolving Combobox Icon Flaw and TextBox Justification</title>
-    <updated>2023-06-17T00:00:00+00:00</updated>
-    <author>
-      <name>Praneeth Shetty</name>
-    </author>
-    <content type="html">&lt;section id="week-3-resolving-combobox-icon-flaw-and-textbox-justification"&gt;
-
-&lt;section id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;This week, I tackled the &lt;strong&gt;ComboBox2D&lt;/strong&gt; icon flaw, which was addressed using Pull Request (PR) &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/576"&gt;#576&lt;/a&gt;. The problem arose when we added a &lt;strong&gt;ComboBox2D&lt;/strong&gt; to the &lt;strong&gt;TabUI&lt;/strong&gt;. The &lt;strong&gt;TabUI&lt;/strong&gt; would propagate the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;set_visibility&lt;/span&gt; &lt;span class="pre"&gt;=&lt;/span&gt; &lt;span class="pre"&gt;true&lt;/span&gt;&lt;/code&gt; for all its child elements, causing the combobox to appear on the screen without the icon change. To fix this issue, PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/768"&gt;#768&lt;/a&gt; updated the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;set_visibility&lt;/span&gt;&lt;/code&gt; method of the UI class, ensuring that the icon change was applied correctly.&lt;/p&gt;
-&lt;figure class="align-center"&gt;
-&lt;img alt="Combobox Icon" src="https://user-images.githubusercontent.com/98275514/215267056-a0fd94d9-ae6d-4cf8-8475-ab95fe0ef303.png" /&gt;
-&lt;/figure&gt;
-&lt;p&gt;Next, I focused on the textbox justification. As discussed in our meeting, I added a new property called &lt;strong&gt;boundingbox&lt;/strong&gt; to the &lt;strong&gt;TextBlock2D&lt;/strong&gt;. However, I encountered a problem when resizing the &lt;strong&gt;TextBlock2D&lt;/strong&gt;. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;vtkTextActor&lt;/span&gt;&lt;/code&gt; property would switch from &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SetTextScaleModeToNone&lt;/span&gt;&lt;/code&gt; to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SetTextScaleModeToProp&lt;/span&gt;&lt;/code&gt;, which would scale the font according to the position1 (lower left corner) and position2 (upper right corner) of the UI. This inconsistency in font scaling resulted in misaligned text actors. I spent some time investigating this issue, and you can find my progress in the ongoing PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/803"&gt;#803&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Additionally, I started working on creating a Scrollbar component by inheriting the &lt;strong&gt;LineSlider2D&lt;/strong&gt;. I made adjustments to the position and other attributes to make it function as a scrollbar. However, I encountered some confusion regarding how to separate the scrollbar component from other elements and determine what should be included in the scrollbar itself.&lt;/p&gt;
-&lt;figure class="align-center"&gt;
-&lt;img alt="Scrollbar" src="https://github.com/fury-gl/fury/assets/64432063/d9c8d60e-3ade-49ff-804a-fd0b340b0b24" /&gt;
-&lt;/figure&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;I faced a challenge while working on the text justification. It took me several days to identify the root cause of the occasional malfunctioning of the &lt;strong&gt;TextBlock2D&lt;/strong&gt;. At last, I found out the reason behind the issue.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;Next week, I have several tasks lined up. Firstly, I will be working on the &lt;strong&gt;CardUI&lt;/strong&gt; PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/398"&gt;#398&lt;/a&gt;. Additionally, I plan to complete the segregation of the scrollbar component, ensuring its independence and clarity. Lastly, I will be working on issue &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/540"&gt;#540&lt;/a&gt;, which involves updating the use of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpy_to_vtk_image_data&lt;/span&gt;&lt;/code&gt; utility function.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-17-week-3-praneeth.html" rel="alternate"/>
-    <summary>This week, I tackled the ComboBox2D icon flaw, which was addressed using Pull Request (PR) #576. The problem arose when we added a ComboBox2D to the TabUI. The TabUI would propagate the set_visibility = true for all its child elements, causing the combobox to appear on the screen without the icon change. To fix this issue, PR #768 updated the set_visibility method of the UI class, ensuring that the icon change was applied correctly.</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-17T00:00:00+00:00</published>
   </entry>
 </feed>
