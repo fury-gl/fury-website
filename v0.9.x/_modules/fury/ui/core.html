@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.core &#8212; FURY 0.10.0.dev157+g0baaf037 documentation</title>
+    <title>fury.ui.core &#8212; FURY 0.10.0.dev184+g924d024c documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=1a039eab"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=570fcca7"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -990,6 +990,8 @@
         <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
         <span class="n">bg_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">auto_font_scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">dynamic_bbox</span><span class="o">=</span><span class="kc">False</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.</span>
 
@@ -1019,23 +1021,34 @@
 <span class="sd">            Adds text shadow.</span>
 <span class="sd">        size : (int, int)</span>
 <span class="sd">            Size (width, height) in pixels of the text bounding box.</span>
+<span class="sd">        auto_font_scale : bool, optional</span>
+<span class="sd">            Automatically scale font according to the text bounding box.</span>
+<span class="sd">        dynamic_bbox : bool, optional</span>
+<span class="sd">            Automatically resize the bounding box according to the content.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">TextBlock2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">bg_color</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">background_color</span> <span class="o">=</span> <span class="n">bg_color</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">font_family</span> <span class="o">=</span> <span class="n">font_family</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">justification</span> <span class="o">=</span> <span class="n">justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_justification</span> <span class="o">=</span> <span class="n">justification</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="n">bold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">italic</span> <span class="o">=</span> <span class="n">italic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span> <span class="o">=</span> <span class="n">shadow</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">vertical_justification</span> <span class="o">=</span> <span class="n">vertical_justification</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertical_justification</span> <span class="o">=</span> <span class="n">vertical_justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span> <span class="o">=</span> <span class="n">auto_font_scale</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span> <span class="o">=</span> <span class="n">dynamic_bbox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span><span class="p">:</span>
+            <span class="c1"># raise ValueError(&quot;TextBlock size is required as it is not dynamic.&quot;)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">actor</span> <span class="o">=</span> <span class="n">TextActor</span><span class="p">()</span>
@@ -1051,10 +1064,7 @@
 <span class="sd">        size : (int, int)</span>
 <span class="sd">            Text bounding box size(width, height) in pixels.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetPosition2</span><span class="p">(</span><span class="o">*</span><span class="n">size</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
@@ -1067,11 +1077,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        scene : scene</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">scene</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextScaleMode</span><span class="p">():</span>
-            <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetSize</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
         <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -1095,6 +1100,8 @@
 <span class="sd">            The message to be set.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetInput</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">font_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1116,21 +1123,12 @@
 <span class="sd">        size : int</span>
 <span class="sd">            Text font size.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToNone</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetFontSize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToNone</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetFontSize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span><span class="p">:</span>
-            <span class="n">bb_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetSize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">bb_size</span><span class="p">)</span>
-            <span class="n">bg_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span>
-            <span class="k">if</span> <span class="n">bb_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">bg_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">bb_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">bg_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">warn</span><span class="p">(</span>
-                    <span class="s1">&#39;Font size exceeds background bounding box.&#39;</span>
-                    <span class="s1">&#39; Font Size will not be updated.&#39;</span><span class="p">,</span>
-                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetPosition2</span><span class="p">(</span><span class="o">*</span><span class="n">bg_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">font_family</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1170,13 +1168,7 @@
 <span class="sd">        str</span>
 <span class="sd">            Text justification.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">justification</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span><span class="o">.</span><span class="n">GetJustificationAsString</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;Left&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;left&#39;</span>
-        <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;Centered&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;center&#39;</span>
-        <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;Right&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;right&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_justification</span>
 
     <span class="nd">@justification</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">justification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">justification</span><span class="p">):</span>
@@ -1188,16 +1180,8 @@
 <span class="sd">            Possible values are left, right, center.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">text_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToLeft</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToCentered</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">justification</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToRight</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Text can only be justified left, right and center.&#39;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_justification</span> <span class="o">=</span> <span class="n">justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_alignment</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertical_justification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1209,14 +1193,7 @@
 <span class="sd">            Text vertical justification.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">text_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
-        <span class="n">vjustification</span> <span class="o">=</span> <span class="n">text_property</span><span class="o">.</span><span class="n">GetVerticalJustificationAsString</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">vjustification</span> <span class="o">==</span> <span class="s1">&#39;Bottom&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;bottom&#39;</span>
-        <span class="k">elif</span> <span class="n">vjustification</span> <span class="o">==</span> <span class="s1">&#39;Centered&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;middle&#39;</span>
-        <span class="k">elif</span> <span class="n">vjustification</span> <span class="o">==</span> <span class="s1">&#39;Top&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s1">&#39;top&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertical_justification</span>
 
     <span class="nd">@vertical_justification</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">vertical_justification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertical_justification</span><span class="p">):</span>
@@ -1228,16 +1205,8 @@
 <span class="sd">            Possible values are bottom, middle, top.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">text_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">vertical_justification</span> <span class="o">==</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToBottom</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">vertical_justification</span> <span class="o">==</span> <span class="s1">&#39;middle&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToCentered</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">vertical_justification</span> <span class="o">==</span> <span class="s1">&#39;top&#39;</span><span class="p">:</span>
-            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToTop</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Vertical justification must be: bottom, middle or top.&#39;</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_vertical_justification</span> <span class="o">=</span> <span class="n">vertical_justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_alignment</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1367,6 +1336,71 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
 
+<div class="viewcode-block" id="TextBlock2D.update_alignment"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.TextBlock2D.update_alignment">[docs]</a>    <span class="k">def</span> <span class="nf">update_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update Text Alignment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text_property</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextProperty</span><span class="p">()</span>
+        <span class="n">updated_text_position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToLeft</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToCentered</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetJustificationToRight</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Text can only be justified left, right and center.&#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertical_justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;bottom&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToBottom</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertical_justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;middle&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToCentered</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> \
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">//</span><span class="mi">2</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">vertical_justification</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;top&#39;</span><span class="p">:</span>
+            <span class="n">text_property</span><span class="o">.</span><span class="n">SetVerticalJustificationToTop</span><span class="p">()</span>
+            <span class="n">updated_text_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Vertical justification must be: bottom, middle or top.&#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">updated_text_position</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="TextBlock2D.cal_size_from_message"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.TextBlock2D.cal_size_from_message">[docs]</a>    <span class="k">def</span> <span class="nf">cal_size_from_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Calculate size of background according to the message it contains.&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">max_length</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="TextBlock2D.update_bounding_box"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.TextBlock2D.update_bounding_box">[docs]</a>    <span class="k">def</span> <span class="nf">update_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update Text Bounding Box.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : (int, int) or None</span>
+<span class="sd">            If None, calculates bounding box.</span>
+<span class="sd">            Otherwise, uses the given size.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_size_from_message</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetPosition2</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_alignment</span><span class="p">()</span></div>
+
     <span class="k">def</span> <span class="nf">_set_position</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set text actor position.</span>
 
@@ -1380,22 +1414,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span>
 
     <span class="k">def</span> <span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetTextScaleMode</span><span class="p">():</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetSize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">size</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">warn</span><span class="p">(</span>
-                    <span class="s1">&#39;TextBlock2D must be added to the scene before &#39;</span>
-                    <span class="s1">&#39;querying its size while TextScaleMode is set to None.&#39;</span><span class="p">,</span>
-                    <span class="ne">RuntimeWarning</span><span class="p">,</span>
-                <span class="p">)</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">GetPosition2</span><span class="p">()</span></div>
+        <span class="n">bb_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                   <span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">boundingbox</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span> <span class="ow">or</span> <span class="nb">sum</span><span class="p">(</span><span class="n">bb_size</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">bb_size</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cal_size_from_message</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Button2D"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.Button2D">[docs]</a><span class="k">class</span> <span class="nc">Button2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
