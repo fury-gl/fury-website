@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.core &#8212; FURY 0.10.0.dev192+g2551b7f4 documentation</title>
+    <title>fury.ui.core &#8212; FURY 0.10.0.dev197+g9a9cf7f0 documentation</title>
   
   
   
@@ -24,7 +24,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
 
-    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b76e3c8a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom_github.css?v=b0433979" />
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
-    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=e64bb27e"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=b2bab32c"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -974,6 +974,10 @@
 <span class="sd">        Adds text shadow.</span>
 <span class="sd">    size : (int, int)</span>
 <span class="sd">        Size (width, height) in pixels of the text bounding box.</span>
+<span class="sd">    auto_font_scale : bool</span>
+<span class="sd">        Automatically scale font according to the text bounding box.</span>
+<span class="sd">    dynamic_bbox : bool</span>
+<span class="sd">        Automatically resize the bounding box according to the content.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="TextBlock2D.__init__"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.TextBlock2D.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -1038,10 +1042,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">italic</span> <span class="o">=</span> <span class="n">italic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shadow</span> <span class="o">=</span> <span class="n">shadow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_vertical_justification</span> <span class="o">=</span> <span class="n">vertical_justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dynamic_bbox</span> <span class="o">=</span> <span class="n">dynamic_bbox</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span> <span class="o">=</span> <span class="n">auto_font_scale</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_font_scale</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dynamic_bbox</span> <span class="o">=</span> <span class="n">dynamic_bbox</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
         <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -1335,6 +1337,58 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">have_bg</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">auto_font_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether text font is automatically scaled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Text is auto_font_scaled if True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auto_font_scale</span>
+
+    <span class="nd">@auto_font_scale</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">auto_font_scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add/remove text auto_font_scale.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flag : bool</span>
+<span class="sd">            Automatically scales the text font if True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auto_font_scale</span> <span class="o">=</span> <span class="n">flag</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToProp</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_justification</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">SetTextScaleModeToNone</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dynamic_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Automatically resize the bounding box according to the content.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            Bounding box is dynamic if True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dynamic_bbox</span>
+
+    <span class="nd">@dynamic_bbox</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">dynamic_bbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add/remove dynamic_bbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flag : bool</span>
+<span class="sd">            The text bounding box is dynamic if True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dynamic_bbox</span> <span class="o">=</span> <span class="n">flag</span>
+        <span class="k">if</span> <span class="n">flag</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">()</span>
 
 <div class="viewcode-block" id="TextBlock2D.update_alignment"><a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.core.TextBlock2D.update_alignment">[docs]</a>    <span class="k">def</span> <span class="nf">update_alignment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update Text Alignment.</span>
