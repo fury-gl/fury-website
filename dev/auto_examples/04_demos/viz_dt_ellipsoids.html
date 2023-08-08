@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Display Tensor Ellipsoids for DTI using tensor_slicer vs ellipsoid actor &#8212; FURY 0.10.0.dev211+g2aecb57b documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bfc71b0b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=fa8deb39"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/04_demos/viz_dt_ellipsoids';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Interactive PBR demo" href="viz_pbr_interactive.html" />
+    <link rel="prev" title="Visualize Networks (Animated version)" href="viz_network_animated.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    <div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text" style="color: #990000;">FURY</div>
+    </a>
+</div>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#introductory">Introductory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#demos">Demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#user-interface-elements">User Interface Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#animation">Animation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#shaders">Shaders</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#streaming">Streaming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+<div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-04-demos-viz-dt-ellipsoids-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="display-tensor-ellipsoids-for-dti-using-tensor-slicer-vs-ellipsoid-actor">
+<span id="sphx-glr-auto-examples-04-demos-viz-dt-ellipsoids-py"></span><h1>Display Tensor Ellipsoids for DTI using tensor_slicer vs ellipsoid actor<a class="headerlink" href="#display-tensor-ellipsoids-for-dti-using-tensor-slicer-vs-ellipsoid-actor" title="Permalink to this heading">#</a></h1>
+<p>This tutorial is intended to show two ways of displaying diffusion tensor
+ellipsoids for DTI visualization. The first is using the usual
+<code class="docutils literal notranslate"><span class="pre">tensor_slicer</span></code> that allows us to slice many tensors as ellipsoids. The
+second is the generic <code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> actor that can be used to display different
+amount of ellipsoids.</p>
+<p>We start by importing the necessary modules:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">itertools</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">dipy.io.image</span> <span class="kn">import</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a>
+
+<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">ui</span>
+<span class="kn">from</span> <span class="nn">fury.actor</span> <span class="kn">import</span> <span class="n">_fa</span><span class="p">,</span> <span class="n">_color_fa</span>
+<span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">fetch_viz_dmri</span><span class="p">,</span> <span class="n">read_viz_dmri</span>
+<span class="kn">from</span> <span class="nn">fury.primitive</span> <span class="kn">import</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">prim_sphere</span></a>
+</pre></div>
+</div>
+<p>Now, we fetch and load the data needed to display the Diffusion Tensor
+Images.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_viz_dmri</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The tensor ellipsoids are expressed as eigenvalues and eigenvectors which are
+the decomposition of the diffusion tensor that describes the water diffusion
+within a voxel.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">slice_evecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;slice_evecs.nii.gz&#39;</span><span class="p">))</span>
+<span class="n">slice_evals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;slice_evals.nii.gz&#39;</span><span class="p">))</span>
+<span class="n">roi_evecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;roi_evecs.nii.gz&#39;</span><span class="p">))</span>
+<span class="n">roi_evals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;roi_evals.nii.gz&#39;</span><span class="p">))</span>
+<span class="n">whole_brain_evecs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;whole_brain_evecs.nii.gz&#39;</span><span class="p">))</span>
+<span class="n">whole_brain_evals</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <a href="https://dipy.org/documentation/latest/reference/dipy.io/#dipy.io.image.load_nifti" title="dipy.io.image.load_nifti" class="sphx-glr-backref-module-dipy-io-image sphx-glr-backref-type-py-function"><span class="n">load_nifti</span></a><span class="p">(</span><span class="n">read_viz_dmri</span><span class="p">(</span><span class="s1">&#39;whole_brain_evals.nii.gz&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+<section id="using-tensor-slicer-actor">
+<h2>Using tensor_slicer actor<a class="headerlink" href="#using-tensor-slicer-actor" title="Permalink to this heading">#</a></h2>
+<p>First we must define the 3 parameters needed to use the <code class="docutils literal notranslate"><span class="pre">tensor_slicer</span></code>
+actor, which correspond to the eigenvalues, the eigenvectors, and the sphere.
+For the sphere we use <code class="docutils literal notranslate"><span class="pre">prim_sphere</span></code> which provide vertices and triangles of
+the spheres. These are labeled as ‘repulsionN’ with N been the number of
+vertices that made up the sphere, which have a standard number of 100, 200,
+and 724 vertices.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">prim_sphere</span></a><span class="p">(</span><span class="s1">&#39;repulsion100&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>As we need to provide a sphere object we create a class Sphere to which we
+assign the values obtained from vertices and faces.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Sphere</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">vertices</span> <span class="o">=</span> <span class="n">vertices</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">faces</span> <span class="o">=</span> <span class="n">faces</span>
+
+
+<span class="n">sphere100</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we are ready to create the <code class="docutils literal notranslate"><span class="pre">tensor_slicer</span></code> actor with the values of a
+brain slice. We also define the scale so that the tensors are not so large
+and overlap each other.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor_slice</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.tensor_slicer" title="fury.actor.tensor_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">tensor_slicer</span></a><span class="p">(</span><span class="n">evals</span><span class="o">=</span><span class="n">slice_evals</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="n">slice_evecs</span><span class="p">,</span>
+                                   <span class="n">sphere</span><span class="o">=</span><span class="n">sphere100</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we set up a new scene to add and visualize the tensor ellipsoids
+created.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">([</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tensor_slice</span><span class="p">)</span>
+
+<span class="c1"># Create show manager</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+
+<span class="c1"># Enables/disables interactive visualization</span>
+<span class="n">interactive</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_slice_100.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If we zoom in at the scene to see with detail the tensor ellipsoids displayed
+with the different spheres, we get the following results.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">pitch</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_slice_100_zoom.png&#39;</span><span class="p">,</span>
+              <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To render the same tensor slice using a different sphere we redefine the
+vertices and faces of the sphere using prim_sphere with other sphere
+specification, as ‘repulsion200’ or ‘repulsion724’.</p>
+<p>Now we clear the scene for the next visualization, and revert the scene
+rotations.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">pitch</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-ellipsoid-actor">
+<h2>Using ellipsoid actor<a class="headerlink" href="#using-ellipsoid-actor" title="Permalink to this heading">#</a></h2>
+<p>In order to use the <code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> actor to display the same tensor slice we
+need to set additional parameters. For this purpose, we define a helper
+function to facilitate the correct setting of the parameters before passing
+them to the actor.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_params</span><span class="p">(</span><span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="p">):</span>
+    <span class="c1"># We define the centers which corresponds to the ellipsoids positions.</span>
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">evecs</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">indices</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.nonzero.html#numpy.nonzero" title="numpy.nonzero" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">nonzero</span></a><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+    <span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="numpy.asarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">asarray</span></a><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+
+    <span class="c1"># We need to pass the data of the axes and lengths of the ellipsoid as a</span>
+    <span class="c1"># ndarray, so it is necessary to rearrange the data of the eigenvectors and</span>
+    <span class="c1"># eigenvalues.</span>
+    <span class="n">fevecs</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="n">fevals</span> <span class="o">=</span> <span class="n">evals</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+    <span class="c1"># We need to define the colors of the ellipsoids following the default</span>
+    <span class="c1"># coloring in tensor_slicer that is uses _color_fa that is a way to map</span>
+    <span class="c1"># colors to each tensor based on the fractional anisotropy (FA) of each</span>
+    <span class="c1"># diffusion tensor.</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">_color_fa</span><span class="p">(</span><span class="n">_fa</span><span class="p">(</span><span class="n">fevals</span><span class="p">),</span> <span class="n">fevecs</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">centers</span><span class="p">,</span> <span class="n">fevecs</span><span class="p">,</span> <span class="n">fevals</span><span class="p">,</span> <span class="n">colors</span>
+</pre></div>
+</div>
+<p>With this we now have the values we need to define the centers, axes,
+lengths, and colors of the ellipsoids.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">slice_evecs</span><span class="p">,</span> <span class="n">slice_evals</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now, we can use the <code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> actor to create the tensor ellipsoids as
+follows.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensors</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.ellipsoid" title="fury.actor.ellipsoid" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">ellipsoid</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                          <span class="n">lengths</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="mf">.6</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_slice_sdf.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Thus, one can see that the same result is obtained, however there is a
+difference in the visual quality and this is because the <code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> actor
+uses raymarching technique, so the objects that are generated are smoother
+since they are not made with polygons but defined by an SDF function. Next we
+can see in more detail the tensor ellipsoids generated.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">pitch</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_slice_sdf_zoom.png&#39;</span><span class="p">,</span>
+              <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">pitch</span><span class="p">(</span><span class="o">-</span><span class="mi">90</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">roll</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visual-quality-comparison">
+<h2>Visual quality comparison<a class="headerlink" href="#visual-quality-comparison" title="Permalink to this heading">#</a></h2>
+<p>One can see that there is a different on the visual quality of both ways of
+displaying tensors and this is because <code class="docutils literal notranslate"><span class="pre">tensor_slicer</span></code> uses polygons while
+<code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> uses raymarching. Let’s display both implementations at the
+same time, so we can see this in more detail.</p>
+<p>We first set up the required data and create the actors.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mevals</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">])</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">mevecs</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([[</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">]])</span>
+
+<span class="n">evals</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">evecs</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="n">evals</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mevals</span>
+<span class="n">evecs</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">mevecs</span>
+
+<span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">prim_sphere</span></a><span class="p">(</span><span class="s1">&#39;repulsion200&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">sphere200</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+<span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <a href="../../reference/fury.primitive.html#fury.primitive.prim_sphere" title="fury.primitive.prim_sphere" class="sphx-glr-backref-module-fury-primitive sphx-glr-backref-type-py-function"><span class="n">prim_sphere</span></a><span class="p">(</span><span class="s1">&#39;repulsion724&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">sphere724</span> <span class="o">=</span> <span class="n">Sphere</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">)</span>
+
+<span class="n">tensor_100</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.tensor_slicer" title="fury.actor.tensor_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">tensor_slicer</span></a><span class="p">(</span><span class="n">evals</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                                 <span class="n">sphere</span><span class="o">=</span><span class="n">sphere100</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">tensor_200</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.tensor_slicer" title="fury.actor.tensor_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">tensor_slicer</span></a><span class="p">(</span><span class="n">evals</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                                 <span class="n">sphere</span><span class="o">=</span><span class="n">sphere200</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">tensor_724</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.tensor_slicer" title="fury.actor.tensor_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">tensor_slicer</span></a><span class="p">(</span><span class="n">evals</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                                 <span class="n">sphere</span><span class="o">=</span><span class="n">sphere724</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="n">centers</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">evecs</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="o">=</span><span class="n">evals</span><span class="p">)</span>
+<span class="n">tensor_sdf</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.ellipsoid" title="fury.actor.ellipsoid" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">ellipsoid</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span> <span class="n">lengths</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span>
+                             <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="mf">2.0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Next, we made use of <cite>GridUI</cite> which allows us to add the actors in a grid and
+interact with them individually.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">objects</span> <span class="o">=</span> <span class="p">[</span><span class="n">tensor_100</span><span class="p">,</span> <span class="n">tensor_200</span><span class="p">,</span> <span class="n">tensor_724</span><span class="p">,</span> <span class="n">tensor_sdf</span><span class="p">]</span>
+<span class="n">text</span> <span class="o">=</span> <span class="p">[</span><a href="../../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span><span class="s1">&#39;Tensor 100&#39;</span><span class="p">),</span> <a href="../../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span><span class="s1">&#39;Tensor 200&#39;</span><span class="p">),</span>
+        <a href="../../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span><span class="s1">&#39;Tensor 724&#39;</span><span class="p">),</span> <a href="../../reference/fury.actor.html#fury.actor.vector_text" title="fury.actor.vector_text" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">vector_text</span></a><span class="p">(</span><span class="s1">&#39;Tensor SDF&#39;</span><span class="p">)]</span>
+
+<span class="n">grid_ui</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">GridUI</span><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">objects</span><span class="p">,</span> <span class="n">captions</span><span class="o">=</span><span class="n">text</span><span class="p">,</span> <span class="n">cell_padding</span><span class="o">=</span><span class="mf">.1</span><span class="p">,</span>
+                    <span class="n">caption_offset</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">([</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">])</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">zoom</span><span class="p">(</span><span class="mf">3.5</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">set_camera</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">3.2</span><span class="p">,</span> <span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">focal_point</span><span class="o">=</span><span class="p">(</span><span class="mf">3.2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">560</span><span class="p">,</span> <span class="mi">200</span><span class="p">))</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">grid_ui</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">560</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_comparison.png&#39;</span><span class="p">,</span>
+              <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">magnification</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="visualize-a-larger-amount-of-data">
+<h2>Visualize a larger amount of data<a class="headerlink" href="#visualize-a-larger-amount-of-data" title="Permalink to this heading">#</a></h2>
+<p>With <code class="docutils literal notranslate"><span class="pre">tensor_slicer</span></code> is possible to visualize more than one slice using
+<code class="docutils literal notranslate"><span class="pre">display_extent()</span></code>. Here we can see an example of a region of interest
+(ROI) using a sphere of 100 vertices.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tensor_roi</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.tensor_slicer" title="fury.actor.tensor_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">tensor_slicer</span></a><span class="p">(</span><span class="n">evals</span><span class="o">=</span><span class="n">roi_evals</span><span class="p">,</span> <span class="n">evecs</span><span class="o">=</span><span class="n">roi_evecs</span><span class="p">,</span>
+                                 <span class="n">sphere</span><span class="o">=</span><span class="n">sphere100</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+
+<span class="n">data_shape</span> <span class="o">=</span> <span class="n">roi_evals</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">tensor_roi</span><span class="o">.</span><span class="n">display_extent</span><span class="p">(</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">background</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tensor_roi</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">azimuth</span><span class="p">(</span><span class="mi">87</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_roi_100.png&#39;</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>We can do it also with a sphere of 200 vertices, but if we try to do it with
+one of 724 the visualization can no longer be rendered. In contrast, we can
+visualize the ROI with the <code class="docutils literal notranslate"><span class="pre">ellipsoid</span></code> actor without compromising the
+quality of the visualization.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">roi_evecs</span><span class="p">,</span> <span class="n">roi_evals</span><span class="p">)</span>
+
+<span class="n">tensors</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.ellipsoid" title="fury.actor.ellipsoid" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">ellipsoid</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                          <span class="n">lengths</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="mf">.6</span><span class="p">)</span>
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_roi_sdf.png&#39;</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>In fact, although with a low performance, this actor allows us to visualize
+the whole brain, which contains a much larger amount of data, to be exact
+184512 tensor ellipsoids are displayed at the same time.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">centers</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">evals</span><span class="p">,</span> <span class="n">colors</span> <span class="o">=</span> <span class="n">get_params</span><span class="p">(</span><span class="n">whole_brain_evecs</span><span class="p">,</span>
+                                           <span class="n">whole_brain_evals</span><span class="p">)</span>
+
+<span class="c1"># We remove all the noise around the brain to have a better visualization.</span>
+<span class="n">fil</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">elem</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">evals</span><span class="p">]</span>
+<span class="n">centers</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.compress" title="itertools.compress" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span></a><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">fil</span><span class="p">)))</span>
+<span class="n">colors</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.compress" title="itertools.compress" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span></a><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">fil</span><span class="p">)))</span>
+<span class="n">evecs</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.compress" title="itertools.compress" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span></a><span class="p">(</span><span class="n">evecs</span><span class="p">,</span> <span class="n">fil</span><span class="p">)))</span>
+<span class="n">evals</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="nb">list</span><span class="p">(</span><a href="https://docs.python.org/3/library/itertools.html#itertools.compress" title="itertools.compress" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">compress</span></a><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">fil</span><span class="p">)))</span>
+
+<span class="n">tensors</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.ellipsoid" title="fury.actor.ellipsoid" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">ellipsoid</span></a><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">evecs</span><span class="p">,</span>
+                          <span class="n">lengths</span><span class="o">=</span><span class="n">evals</span><span class="p">,</span> <span class="n">scales</span><span class="o">=</span><span class="mf">.6</span><span class="p">)</span>
+
+<span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">pitch</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>
+<span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+              <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;tensor_whole_brain_sdf.png&#39;</span><span class="p">)</span>
+
+<span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> ( 0 minutes  0.000 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-04-demos-viz-dt-ellipsoids-py">
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/c5580fbbf92d43a5a1e9ea1d9fc0854d/viz_dt_ellipsoids.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_dt_ellipsoids.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/a45e245b3472717786fb1ffc09a9f1c5/viz_dt_ellipsoids.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_dt_ellipsoids.ipynb</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+</div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="viz_network_animated.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Visualize Networks (Animated version)</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="viz_pbr_interactive.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Interactive PBR demo</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-tensor-slicer-actor">
+   Using tensor_slicer actor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#using-ellipsoid-actor">
+   Using ellipsoid actor
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#visual-quality-comparison">
+   Visual quality comparison
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#visualize-a-larger-amount-of-data">
+   Visualize a larger amount of data
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/auto_examples/04_demos/viz_dt_ellipsoids.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+ 
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2023, FURY. All rights reserved.</div>
+    </div>
+</div>
+  </div>
+  
+</div>
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>
