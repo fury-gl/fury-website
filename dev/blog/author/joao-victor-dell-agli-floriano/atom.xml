@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts by João Victor Dell Agli Floriano</title>
-  <updated>2023-08-11T13:45:35.394481+00:00</updated>
+  <updated>2023-08-11T13:51:16.880247+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/author/joao-victor-dell-agli-floriano/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
@@ -45,6 +45,110 @@ will also invest some time on refactoring it.&lt;/p&gt;
     <summary>Hello everyone, it’s time for another weekly blogpost!</summary>
     <category term="google" label="google"/>
     <published>2023-08-07T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html</id>
+    <title>Week 9: It is Polishing Time!</title>
+    <updated>2023-07-31T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-9-it-is-polishing-time"&gt;
+
+&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;After having finished a first draft of the API that will be used for the KDE rendering, and showing how it could be used
+for other post-processing effects, my goal was to clean the code and try some details that would add to it so it could be better
+complete. Having that in mind, I invested in three work fronts:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Fixing some bugs related to the rendering more than one post-processing effect actor.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Experimenting with other rendering kernels (I was using the &lt;em&gt;gaussian&lt;/em&gt; one only).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Completing the KDE render by renormalizing the values in relation to the number of points (one of the core KDE details).&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both three turned out more complicated than it initially seemed, as I will show below.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="so-how-did-it-go"&gt;
+&lt;h2&gt;So how did it go?&lt;/h2&gt;
+&lt;p&gt;The first one I did on monday-tuesday, and I had to deal with some issues regarding scaling and repositioning. Due to implementation
+choices, the final post-processed effects were rendered either bigger than they were in reality, or out of their original place.
+After some time dedicated to finding the root of the problems, I could fix the scaling issue, however I realised I would need to,
+probably, rethink the way the API was implemented. As this general post-processing effects is a side-project that comes as a consequence of
+my main one, I decided to leave that investment to another time, as I would need to guarantee the quality of the second.&lt;/p&gt;
+&lt;p&gt;The second was an easy and rather interesting part of my week, as I just needed to setup new kernel shaders. Based on
+&lt;a class="reference external" href="https://scikit-learn.org/stable/modules/density.html"&gt;scikit-learn KDE documentation&lt;/a&gt;, I could successfully implement the following kernels:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Gaussian&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = e^{\frac{-(x^2 + y^2)}{2\sigma^2}}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Tophat&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1.0, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Epanechnikov&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1 - \frac{x^2 + y^2}{\sigma^2}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Exponential&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = e^{\frac{-|x^2 + y^2|}{\sigma}}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Linear&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1 - \frac{|x^2 + y^2|}{\sigma}, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Cosine&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = cos(\frac{\pi|x^2 + y^2|}{2\sigma})\]&lt;/div&gt;
+&lt;p&gt;That outputted the following (beautiful) results for a set of 1000 random points with random sigmas:&lt;/p&gt;
+&lt;img alt="Different kernel approaches" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/kernels.png" /&gt;
+&lt;p&gt;The third one is still being a trickier challenge. If you recall from my first blogposts, I spent something around &lt;em&gt;one month&lt;/em&gt; trying to setup
+float framebuffer objects to FURY with VTK so I could use them in my project. After spending all of that time with no results,
+me and Bruno, my mentor, &lt;span class="xref std std-doc"&gt;found a way&lt;/span&gt; to do what we wanted to do, but using a different VTK class,
+&lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkWindowToImageFilter.html"&gt;vtkWindowToImageFilter&lt;/a&gt;. Well, it was a good workaround back then and
+it lead me all the way here, however now it is costing a price. The float framebuffers were an important part of the project because they
+would allow us to pass &lt;em&gt;32-bit float information&lt;/em&gt; from one shader to another, which would be important as they would allow the densities to
+have higher precision and more fidelity to the calculations. When rendering a KDE of a given set of points, we use the below function:&lt;/p&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[KDE(x, y) = \frac{1}{n} \sum_{i = 0}^n K(x, y)\]&lt;/div&gt;
+&lt;p&gt;If the number of points &lt;span class="math notranslate nohighlight"&gt;\(n\)&lt;/span&gt; is big enough, some KDE results will be really low. This presents a real problem to our implementation because, without
+the float framebuffers, it is currently only being possible to pass &lt;em&gt;8-bit unsigned char&lt;/em&gt; information, that only allows 256 values.
+This is far from ideal, as low values would have alone densities low enough to disappear. This presented a problem as to renormalize the
+densities, I was retrieving the texture to the CPU, calculating its minimum and maximum values, and passing to the fragment shader as uniforms
+for the renormalization, which didn’t work if the maximum values calculated were zero.&lt;/p&gt;
+&lt;p&gt;One solution I thought to solve that was a really heavy workaround: if an unsigned float is 32-bit and I have exactly 4 8-bit
+unsigned chars, why not try to pack this float into these 4 chars? Well, this is an interesting approach which I figured out is already an
+old one, being reported in &lt;a class="reference external" href="https://developer.nvidia.com/gpugems/gpugems/part-ii-lighting-and-shadows/chapter-12-omnidirectional-shadow-mapping"&gt;GPU Gems’s chapter 12&lt;/a&gt;.
+Unfortunately I haven’t tried yet this implementation yet, and went for one I thought myself, which haven’t exactly worked. I also tried
+this implementation from &lt;a class="reference external" href="https://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/"&gt;Aras Pranckevičius’ website&lt;/a&gt;, which seems
+to be working, even though not perfectly:&lt;/p&gt;
+&lt;img alt="Noisy float to RGBA encoding" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/noisy%20kde.png" /&gt;
+&lt;p&gt;As you can see, this implementation is &lt;em&gt;really noisy&lt;/em&gt;. I think this has to deal with floating point rounding errors, so to try to mitigate
+that, I experimented applying a &lt;em&gt;13x13 gaussian blur&lt;/em&gt; to it. Below, what I got from that:&lt;/p&gt;
+&lt;img alt="Blurred KDE result" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/blurred_kde.png" /&gt;
+&lt;p&gt;That looks way better, even though not ideal yet.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;Talking with my mentors, we decided it was better if I focused on the version without the renormalization for now, as it was already
+done and running fine. So for this week, I plan to clean my PR to finally have it ready for a first review, and maybe add to it a little
+UI tool to control the intensity of the densities. That should take me some time and discussion, but I hope for it to be ready by the
+end of the week.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.</summary>
+    <category term="google" label="google"/>
+    <published>2023-07-31T00:00:00+00:00</published>
   </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-07-24-week-8-joaodellagli.html</id>
@@ -609,42 +713,5 @@ An update on that is that indeed, VTK has one more low-level working FBO class t
 they come with some issues that I will explain further below.</summary>
     <category term="google" label="google"/>
     <published>2023-06-05T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-05-29-week-0-joaodellagli.html</id>
-    <title>The Beginning of Everything - Week 0</title>
-    <updated>2023-05-29T00:00:00+00:00</updated>
-    <author>
-      <name>João Victor Dell Agli Floriano</name>
-    </author>
-    <content type="html">&lt;section id="the-beginning-of-everything-week-0"&gt;
-
-&lt;section id="so-it-begins"&gt;
-&lt;h2&gt;So it begins…&lt;/h2&gt;
-&lt;p&gt;Hello everyone, welcome to the beginning of my journey through GSoC 2023! I would like to thank everyone involved for the opportunity provided, it is an honour to be working side by side with professionals and so many experienced people from around the world.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="the-community-bonding-period"&gt;
-&lt;h2&gt;The Community Bonding Period&lt;/h2&gt;
-&lt;p&gt;During my community bonding period, I had the opportunity to meet my mentors and some people from the FURY team. It was a great time to learn about community guidelines and everything I will need to work with them during this summer.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="the-project-s-goal"&gt;
-&lt;h2&gt;The Project’s Goal&lt;/h2&gt;
-&lt;p&gt;Briefly explaining this project, I plan to implement a real-time Kernel Density Estimation shader inside FURY library, based on &lt;a class="reference external" href="https://github.com/filipinascimento/PACSExplorer/blob/782e52334a635528ec3ab4c7a4409cc88958d3ba/lib/density-gl.js"&gt;Filipi Nascimento’s WebGL implementation&lt;/a&gt;. KDE, or Kernel Density Estimation, is a visualization technique that provides a good macro visualization of large and complex data sets, like point clouds, well summarizing their spatial distribution in smooth areas. I really think FURY will benefit from this as a scientific library, knowing it is a computer graphics library that originated in 2018 based on the Visualization Toolkit API (VTK), and has been improving since then.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="this-week-s-goal"&gt;
-&lt;h2&gt;This Week’s Goal&lt;/h2&gt;
-&lt;p&gt;For all of this to work, the project needs one component working: the &lt;strong&gt;KDE framebuffer&lt;/strong&gt;. As this &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/Framebuffer"&gt;Khronos wiki page well explains&lt;/a&gt;:&lt;/p&gt;
-&lt;p&gt;“A Framebuffer is a collection of buffers that can be used as the destination for rendering. OpenGL has two kinds of framebuffers: the &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/Default_Framebuffer"&gt;Default Framebuffer&lt;/a&gt;,
-which is provided by the &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/OpenGL_Context"&gt;OpenGL Context&lt;/a&gt;; and user-created framebuffers called &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/Framebuffer_Object"&gt;Framebuffer Objects&lt;/a&gt; (FBOs).
-The buffers for default framebuffers are part of the context and usually represent a window or display device. The buffers for FBOs reference images from either &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/Texture"&gt;Textures&lt;/a&gt; or &lt;a class="reference external" href="https://www.khronos.org/opengl/wiki/Renderbuffer_Object"&gt;Renderbuffers&lt;/a&gt;; they are never directly visible.”&lt;/p&gt;
-&lt;p&gt;Which means that a framebuffer is an object that stores data related to a frame. So the goal for this week is to investigate whether VTK, the API which FURY is written on, has a framebuffer object interface, and if it has, to understand how it works and how to use it for the project.&lt;/p&gt;
-&lt;p&gt;Let’s get to work!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-05-29-week-0-joaodellagli.html" rel="alternate"/>
-    <summary>Hello everyone, welcome to the beginning of my journey through GSoC 2023! I would like to thank everyone involved for the opportunity provided, it is an honour to be working side by side with professionals and so many experienced people from around the world.</summary>
-    <category term="google" label="google"/>
-    <published>2023-05-29T00:00:00+00:00</published>
   </entry>
 </feed>
