@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posted in 2023</title>
-  <updated>2023-08-11T13:45:36.167952+00:00</updated>
+  <updated>2023-08-11T13:51:17.451173+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/2023/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
@@ -45,6 +45,110 @@ will also invest some time on refactoring it.&lt;/p&gt;
     <summary>Hello everyone, it’s time for another weekly blogpost!</summary>
     <category term="google" label="google"/>
     <published>2023-08-07T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html</id>
+    <title>Week 9: It is Polishing Time!</title>
+    <updated>2023-07-31T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-9-it-is-polishing-time"&gt;
+
+&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;After having finished a first draft of the API that will be used for the KDE rendering, and showing how it could be used
+for other post-processing effects, my goal was to clean the code and try some details that would add to it so it could be better
+complete. Having that in mind, I invested in three work fronts:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Fixing some bugs related to the rendering more than one post-processing effect actor.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Experimenting with other rendering kernels (I was using the &lt;em&gt;gaussian&lt;/em&gt; one only).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Completing the KDE render by renormalizing the values in relation to the number of points (one of the core KDE details).&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Both three turned out more complicated than it initially seemed, as I will show below.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="so-how-did-it-go"&gt;
+&lt;h2&gt;So how did it go?&lt;/h2&gt;
+&lt;p&gt;The first one I did on monday-tuesday, and I had to deal with some issues regarding scaling and repositioning. Due to implementation
+choices, the final post-processed effects were rendered either bigger than they were in reality, or out of their original place.
+After some time dedicated to finding the root of the problems, I could fix the scaling issue, however I realised I would need to,
+probably, rethink the way the API was implemented. As this general post-processing effects is a side-project that comes as a consequence of
+my main one, I decided to leave that investment to another time, as I would need to guarantee the quality of the second.&lt;/p&gt;
+&lt;p&gt;The second was an easy and rather interesting part of my week, as I just needed to setup new kernel shaders. Based on
+&lt;a class="reference external" href="https://scikit-learn.org/stable/modules/density.html"&gt;scikit-learn KDE documentation&lt;/a&gt;, I could successfully implement the following kernels:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Gaussian&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = e^{\frac{-(x^2 + y^2)}{2\sigma^2}}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Tophat&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1.0, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Epanechnikov&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1 - \frac{x^2 + y^2}{\sigma^2}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Exponential&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = e^{\frac{-|x^2 + y^2|}{\sigma}}\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Linear&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = 1 - \frac{|x^2 + y^2|}{\sigma}, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Cosine&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[K(x, y) = cos(\frac{\pi|x^2 + y^2|}{2\sigma})\]&lt;/div&gt;
+&lt;p&gt;That outputted the following (beautiful) results for a set of 1000 random points with random sigmas:&lt;/p&gt;
+&lt;img alt="Different kernel approaches" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/kernels.png" /&gt;
+&lt;p&gt;The third one is still being a trickier challenge. If you recall from my first blogposts, I spent something around &lt;em&gt;one month&lt;/em&gt; trying to setup
+float framebuffer objects to FURY with VTK so I could use them in my project. After spending all of that time with no results,
+me and Bruno, my mentor, &lt;span class="xref std std-doc"&gt;found a way&lt;/span&gt; to do what we wanted to do, but using a different VTK class,
+&lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkWindowToImageFilter.html"&gt;vtkWindowToImageFilter&lt;/a&gt;. Well, it was a good workaround back then and
+it lead me all the way here, however now it is costing a price. The float framebuffers were an important part of the project because they
+would allow us to pass &lt;em&gt;32-bit float information&lt;/em&gt; from one shader to another, which would be important as they would allow the densities to
+have higher precision and more fidelity to the calculations. When rendering a KDE of a given set of points, we use the below function:&lt;/p&gt;
+&lt;div class="math notranslate nohighlight"&gt;
+\[KDE(x, y) = \frac{1}{n} \sum_{i = 0}^n K(x, y)\]&lt;/div&gt;
+&lt;p&gt;If the number of points &lt;span class="math notranslate nohighlight"&gt;\(n\)&lt;/span&gt; is big enough, some KDE results will be really low. This presents a real problem to our implementation because, without
+the float framebuffers, it is currently only being possible to pass &lt;em&gt;8-bit unsigned char&lt;/em&gt; information, that only allows 256 values.
+This is far from ideal, as low values would have alone densities low enough to disappear. This presented a problem as to renormalize the
+densities, I was retrieving the texture to the CPU, calculating its minimum and maximum values, and passing to the fragment shader as uniforms
+for the renormalization, which didn’t work if the maximum values calculated were zero.&lt;/p&gt;
+&lt;p&gt;One solution I thought to solve that was a really heavy workaround: if an unsigned float is 32-bit and I have exactly 4 8-bit
+unsigned chars, why not try to pack this float into these 4 chars? Well, this is an interesting approach which I figured out is already an
+old one, being reported in &lt;a class="reference external" href="https://developer.nvidia.com/gpugems/gpugems/part-ii-lighting-and-shadows/chapter-12-omnidirectional-shadow-mapping"&gt;GPU Gems’s chapter 12&lt;/a&gt;.
+Unfortunately I haven’t tried yet this implementation yet, and went for one I thought myself, which haven’t exactly worked. I also tried
+this implementation from &lt;a class="reference external" href="https://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/"&gt;Aras Pranckevičius’ website&lt;/a&gt;, which seems
+to be working, even though not perfectly:&lt;/p&gt;
+&lt;img alt="Noisy float to RGBA encoding" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/noisy%20kde.png" /&gt;
+&lt;p&gt;As you can see, this implementation is &lt;em&gt;really noisy&lt;/em&gt;. I think this has to deal with floating point rounding errors, so to try to mitigate
+that, I experimented applying a &lt;em&gt;13x13 gaussian blur&lt;/em&gt; to it. Below, what I got from that:&lt;/p&gt;
+&lt;img alt="Blurred KDE result" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/blurred_kde.png" /&gt;
+&lt;p&gt;That looks way better, even though not ideal yet.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;Talking with my mentors, we decided it was better if I focused on the version without the renormalization for now, as it was already
+done and running fine. So for this week, I plan to clean my PR to finally have it ready for a first review, and maybe add to it a little
+UI tool to control the intensity of the densities. That should take me some time and discussion, but I hope for it to be ready by the
+end of the week.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.</summary>
+    <category term="google" label="google"/>
+    <published>2023-07-31T00:00:00+00:00</published>
   </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-07-29-week-9-praneeth.html</id>
@@ -434,35 +538,5 @@ flawed Framebuffer implementation, and my fellow GSoC contributors will eventual
     <summary>#PR 818: Tutorial on using ellipsoid actor to visualize tensor ellipsoids for DTI</summary>
     <category term="google" label="google"/>
     <published>2023-07-10T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-07-08-week-6-praneeth.html</id>
-    <title>Week 6: BoundingBox for TextBlock2D!</title>
-    <updated>2023-07-08T00:00:00+00:00</updated>
-    <author>
-      <name>Praneeth Shetty</name>
-    </author>
-    <content type="html">&lt;section id="week-6-boundingbox-for-textblock2d"&gt;
-
-&lt;section id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;This week, I worked on improving the &lt;strong&gt;TextBlock2D&lt;/strong&gt; component in the UI system. I started from scratch to address alignment and scaling issues. When resizing the &lt;strong&gt;TextBlock2D&lt;/strong&gt;, the text alignment and justification with the background rectangle were inconsistent. To resolve this, I introduced a new “boundingbox” property that calculates the text bounding box based on its content. Additionally, I separated the scaling mode from the resizing action with the new “auto_font_scale” property, enabling automatic font scaling according to the bounding box. This will provide better alignment, justified text, and smoother font scaling for the &lt;strong&gt;TextBlock2D&lt;/strong&gt; component. Try it out at &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/803"&gt;PR #803&lt;/a&gt;.&lt;/p&gt;
-&lt;img alt="TextBlock2D will different justifications" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/94212105-7259-48da-8fdc-41ee987bda84" /&gt;
-&lt;p&gt;As discussed last week, we also made a decision regarding the scrollbar. After exploring different use cases, we concluded that creating an independent scrollbar is not necessary at the moment. Therefore, we will close the related pull requests. You can find out more about it in the discussion &lt;a class="reference external" href="https://github.com/fury-gl/fury/discussions/816"&gt;here&lt;/a&gt;.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Implementing the bounding box feature took some extra time as I needed to carefully consider its impact on other UI elements that rely on the &lt;strong&gt;TextBlock2D&lt;/strong&gt; component.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;Next, I will focus on completing the TextBlock2D Bounding Box PR, which will also indirectly finalize the Spinbox PR.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-07-08-week-6-praneeth.html" rel="alternate"/>
-    <summary>This week, I worked on improving the TextBlock2D component in the UI system. I started from scratch to address alignment and scaling issues. When resizing the TextBlock2D, the text alignment and justification with the background rectangle were inconsistent. To resolve this, I introduced a new “boundingbox” property that calculates the text bounding box based on its content. Additionally, I separated the scaling mode from the resizing action with the new “auto_font_scale” property, enabling automatic font scaling according to the bounding box. This will provide better alignment, justified text, and smoother font scaling for the TextBlock2D component. Try it out at PR #803.</summary>
-    <category term="google" label="google"/>
-    <published>2023-07-08T00:00:00+00:00</published>
   </entry>
 </feed>
