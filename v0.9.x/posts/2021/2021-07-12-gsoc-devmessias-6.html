@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en" data-content_root="../../">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Network layout algorithms using IPC &#8212; FURY 0.10.0.dev288+gb29a518a documentation</title>
+    <title>Network layout algorithms using IPC &#8212; FURY 0.10.0.dev292+g8573404d documentation</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=e5fbc548" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bfc71b0b" />
     <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
@@ -40,9 +40,9 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
-    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=28b0f0f2"></script>
+    <script src="../../_static/documentation_options.js?v=5b57ca66"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
-    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2021/2021-07-12-gsoc-devmessias-6';</script>
@@ -288,7 +288,7 @@
             <article class="bd-article" role="main">
               
 <section id="network-layout-algorithms-using-ipc">
-<h1>Network layout algorithms using IPC<a class="headerlink" href="#network-layout-algorithms-using-ipc" title="Permalink to this heading">#</a></h1>
+<h1>Network layout algorithms using IPC<a class="headerlink" href="#network-layout-algorithms-using-ipc" title="Link to this heading">#</a></h1>
 <p>Hi all. In the past weeks, I’ve been focusing on developing Helios; the
 network visualization library for FURY. I improved the visual aspects of
 the network rendering as well as implemented the most relevant network
@@ -296,7 +296,7 @@ layout methods.</p>
 <p>In this post I will discuss the most challenging task that I faced to
 implement those new network layout methods and how I solved it.</p>
 <section id="the-problem-network-layout-algorithm-implementations-with-a-blocking-behavior">
-<h2>The problem: network layout algorithm implementations with a blocking behavior<a class="headerlink" href="#the-problem-network-layout-algorithm-implementations-with-a-blocking-behavior" title="Permalink to this heading">#</a></h2>
+<h2>The problem: network layout algorithm implementations with a blocking behavior<a class="headerlink" href="#the-problem-network-layout-algorithm-implementations-with-a-blocking-behavior" title="Link to this heading">#</a></h2>
 <p><strong>Case 1:</strong> Suppose that you need to monitor a hashtag and build a
 social graph. You want to interact with the graph and at the same time
 get insights about the structure of the user interactions. To get those
@@ -323,7 +323,7 @@ computation and user interaction in your network visualization. How to
 solve this problem?</p>
 </section>
 <section id="why-is-using-the-python-threading-is-not-a-good-solution">
-<h2>Why is using the python threading is not a good solution?<a class="headerlink" href="#why-is-using-the-python-threading-is-not-a-good-solution" title="Permalink to this heading">#</a></h2>
+<h2>Why is using the python threading is not a good solution?<a class="headerlink" href="#why-is-using-the-python-threading-is-not-a-good-solution" title="Link to this heading">#</a></h2>
 <p>One solution to remove the blocking behavior of the network layout libs
 like PyMDE is to use the threading module from python. However, remember
 the GIL problem: only one thread can execute python code at once.
@@ -331,7 +331,7 @@ Therefore, this solution will be unfeasible for networks with more than
 some hundreds of nodes or even less! Ok, then how to solve it well?</p>
 </section>
 <section id="ipc-using-python">
-<h2>IPC using python<a class="headerlink" href="#ipc-using-python" title="Permalink to this heading">#</a></h2>
+<h2>IPC using python<a class="headerlink" href="#ipc-using-python" title="Link to this heading">#</a></h2>
 <p>As I said in my previous posts I’ve created a streaming system for data
 visualization for FURY using webrtc. The streaming system is already
 working and an important piece in this system was implemented using the
@@ -362,7 +362,7 @@ edges , weights, positions</p></li>
 FURY/VTK window instance, which can consume a lot of computational
 resources.</p>
 <section id="how-have-i-implemented-the-code-for-a-and-b">
-<h3>How have I implemented the code for A and B?<a class="headerlink" href="#how-have-i-implemented-the-code-for-a-and-b" title="Permalink to this heading">#</a></h3>
+<h3>How have I implemented the code for A and B?<a class="headerlink" href="#how-have-i-implemented-the-code-for-a-and-b" title="Link to this heading">#</a></h3>
 <p>Because we need to deal with a lot of different data and share them
 between different processes I’ve created a set of tools to deal with
 that, take a look for example in the <a class="reference external" href="https://github.com/fury-gl/helios/blob/14e39e0350b4b9666775ba0c4840d2e9887678c2/helios/layouts/ipc_tools.py#L188">ShmManagerMultiArrays
@@ -392,7 +392,7 @@ for the network layout method, see the link
 </section>
 </section>
 <section id="results">
-<h2>Results<a class="headerlink" href="#results" title="Permalink to this heading">#</a></h2>
+<h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
 <p>Until now Helios has three network layout methods implemented: Force
 Directed , Minimum Distortion Embeddings and Force Atlas 2. Here
 <a class="reference external" href="https://github.com/fury-gl/helios/blob/a0a24525697ec932a398db6413899495fb5633dd/docs/examples/viz_helios_mde.ipynb">docs/examples/viz_helios_mde.ipynb</a>
@@ -403,14 +403,14 @@ application into a network with a set of anchored nodes.</p>
 <p><img alt="image1" src="https://user-images.githubusercontent.com/6979335/125310065-a3a9f480-e308-11eb-98d9-0ff5406a0e96.gif" /></p>
 </section>
 <section id="next-steps">
-<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading">#</a></h2>
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Link to this heading">#</a></h2>
 <p>I’ll probably focus on the Helios network visualization system.
 Improving the documentation and testing the ForceAtlas2 in a computer
 with cuda installed. See the list of opened
 <a class="reference external" href="https://github.com/fury-gl/helios/issues">issues</a></p>
 </section>
 <section id="summary-of-most-important-pull-requests">
-<h2>Summary of most important pull-requests:<a class="headerlink" href="#summary-of-most-important-pull-requests" title="Permalink to this heading">#</a></h2>
+<h2>Summary of most important pull-requests:<a class="headerlink" href="#summary-of-most-important-pull-requests" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>IPC tools for network layout methods (helios issue #7)
 <a class="reference external" href="https://github.com/fury-gl/helios/pull/6">fury-gl/helios/pull/6</a></p></li>
