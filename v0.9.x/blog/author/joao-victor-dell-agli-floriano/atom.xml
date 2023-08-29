@@ -2,10 +2,92 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts by João Victor Dell Agli Floriano</title>
-  <updated>2023-08-18T15:18:47.363539+00:00</updated>
+  <updated>2023-08-29T16:49:44.262361+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/author/joao-victor-dell-agli-floriano/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html</id>
+    <title>Week 11: A Refactor is Sometimes Needed</title>
+    <updated>2023-08-14T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-11-a-refactor-is-sometimes-needed"&gt;
+
+&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today I am going to share some updates on the API refactoring
+I was working on with my mentors.&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;As I shared with you &lt;span class="xref std std-doc"&gt;last week&lt;/span&gt;, the first draft of my API was finally ready for review, as
+I finished tweaking some remaining details missing. I was tasked with finding a good example of the usage of the tools we proposed,
+and I started to do that, however after testing it with some examples, I figured out some significant bugs were to be fixed. Also,
+after some reviews and hints from some of my mentors and other GSoC contributors, we realised that some refactoring should be done,
+mainly focused on avoiding bad API usage from the user.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="so-how-did-it-go"&gt;
+&lt;h2&gt;So how did it go?&lt;/h2&gt;
+&lt;p&gt;Initially, I thought only one bug was the source of the issues the rendering presented, but it turned out to be two, which I will
+explain further.&lt;/p&gt;
+&lt;p&gt;The first bug was related to scaling and misalignment of the KDE render. The render of the points being post-processed was not only
+with sizes different from the original set size, but it was also misaligned, making it appear in positions different from the points’
+original ones. After some time spent, I figured out the bug was related to the texture coordinates I was using. Before, this is how
+my fragment shader looked:&lt;/p&gt;
+&lt;div class="highlight-C notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res_factor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res_factor&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;normalizedVertexMCVSOutput&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xy&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;float&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;intensity&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;texture&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;screenTexture&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;It turns out using this texture coordinates for &lt;em&gt;this case&lt;/em&gt; was not the best choice, as even though it matches the fragment positions,
+the idea here was to render the offscreen window, which has the same size as the onscreen one, to the billboard actor. With that in mind,
+I realised the best choice was using texture coordinates that matched the whole screen positions, coordinates that were derived from the
+&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;gl_FragCoord.xy&lt;/span&gt;&lt;/code&gt;, being the division of that by the resolution of the screen, for normalization. Below, the change made:&lt;/p&gt;
+&lt;div class="highlight-C notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gl_FragCoord&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xy&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;float&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;intensity&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;texture&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;screenTexture&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This change worked initially, although with some problems, that later revealed the resolution of the offscreen window needed to be
+updated inside the callback function as well. Fixing that, it was perfectly aligned and scaled!&lt;/p&gt;
+&lt;p&gt;The second bug was related with the handling of the bandwidth, former sigma parameter. I realised I wasn’t dealing properly with the option of the user passing only
+one single bandwidth value being passed, so when trying that, only the first point was being rendered. I also fixed that and it worked,
+so cheers!&lt;/p&gt;
+&lt;p&gt;As I previously said, the bugs were not the only details I spent my time on last week. Being reviewed, the API design, even
+though simple, showed itself vulnerable to bad usage from the user side, requiring some changes. The changes suggested by mentors were,
+to, basically, take the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;kde&lt;/span&gt;&lt;/code&gt; method out of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;EffectManager&lt;/span&gt;&lt;/code&gt; class, and create a new class from it inside an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;effects&lt;/span&gt;&lt;/code&gt; module,
+like it was a special effects class. With this change, the KDE setup would go from:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;em&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EffectManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;kde_actor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;em&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kde&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;scene&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kde_actor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;To:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;em&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EffectManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;kde_effect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;KDE&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;em&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kde_effect&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Not a gain in line shortening, however, a gain in security, as preventing users from misusing the kde_actor. Something worth noting is
+that I learned how to use the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;functools.partial&lt;/span&gt;&lt;/code&gt; function, that allowed me to partially call the callback function with only some
+parameters passed.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;Having that refactoring made, now I am awaiting for a second review so we could finally wrap it up and merge the first stage of this API.
+With that being done, I will write the final report and wrap this all up.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, it’s time for another weekly blogpost! Today I am going to share some updates on the API refactoring
+I was working on with my mentors.</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-14T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-07-week-10-joaodellagli.html</id>
     <title>Week 10: Ready for Review!</title>
@@ -651,67 +733,5 @@ the main error interface when working with VTK, and that may make my life easier
     <summary>Hello everybody, welcome to the week 2 of this project! I must admit I thought this would be simpler than it is currently being, but I forgot that when it comes to dealing with computer graphics’ applications, things never are. Below, some updates on what I have been up to for this past week.</summary>
     <category term="google" label="google"/>
     <published>2023-06-12T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-05-week-1-joaodellagli.html</id>
-    <title>The FBO Saga - Week 1</title>
-    <updated>2023-06-05T00:00:00+00:00</updated>
-    <author>
-      <name>João Victor Dell Agli Floriano</name>
-    </author>
-    <content type="html">&lt;section id="the-fbo-saga-week-1"&gt;
-
-&lt;section id="this-past-week"&gt;
-&lt;h2&gt;This Past Week&lt;/h2&gt;
-&lt;p&gt;As mentioned in the last week’s blogpost, the goal for that week was to investigate VTK’s Framebuffer Object framework.
-An update on that is that indeed, VTK has one more low-level working &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkOpenGLFramebufferObject.html"&gt;FBO class&lt;/a&gt; that can be used inside FURY, however,
-they come with some issues that I will explain further below.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="my-current-problems"&gt;
-&lt;h2&gt;My Current Problems&lt;/h2&gt;
-&lt;p&gt;The problems I am having with these FBO implementations are first something related to how a FBO works, and second related to how VTK works.
-In OpenGL, a custom user’s FBO needs some things to be complete (usable):&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;At least one buffer should be attached. This buffer can be the color, depth or stencil buffer.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;If no color buffer will be attached then OpenGL needs to be warned no draw or read operations will be done to that buffer. Otherwise, there should be at least one color attachment.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;All attachments should have their memory allocated.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Each buffer should have the same number of samples.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;My first problem relies on the third requirement. VTK’s implementation of FBO requires a &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html"&gt;vtkTextureObject&lt;/a&gt;
-as a texture attachment. I figured out how to work with this class, however, I cannot allocate memory for it, as its methods for it, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#abc91bbf9a3414bded7a132d366ca4951"&gt;Allocate2D&lt;/a&gt;, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#a7e9dd67f377b7f91abd9df71e75a5f67"&gt;Create2D&lt;/a&gt; and &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#a0e56fe426cb0e6749cc6f2f8dbf53ed7"&gt;Create2DFromRaw&lt;/a&gt;
-does not seem to work. Every time I try to use them, my program stops with no error message nor nothing.
-For anyone interested in what is happening exactly, below is how I my tests are implemented:&lt;/p&gt;
-&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;vtkTextureObject&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# color texture declaration&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Bind&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="c1"&gt;# binding of the texture for operations&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetDataType&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the datatype for unsigned char&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetInternalFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the format as RGBA&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetFormat&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_RGBA&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMinificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the minfilter as linear&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SetMagnificationFilter&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# setting the magfilter as linear&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt;
-&lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;color_texture&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Allocate2D&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;vtk&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;VTK_UNSIGNED_CHAR&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="c1"&gt;# here is where the code stops&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;In contrast, for some reason, the methods for 3D textures, &lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkTextureObject.html#aaeefa46bd3a24bf62126512a276819d0"&gt;Allocate3D&lt;/a&gt; works just fine.
-I could use it as a workaround, but I do not wish to, as this just does not make sense.&lt;/p&gt;
-&lt;p&gt;My second problem relies on VTK. As VTK is a library that encapsulates some OpenGL functions in more palatable forms, it comes with some costs.
-Working with FBOs is a more low-level work, that requires strict control of some OpenGL states and specific functions that would be simpler if it was the main API here.
-However, some of this states and functions are all spread and implicit through VTK’s complex classes and methods, which doubles the time expended to make some otherwise simple instructions,
-as I first need to dig in lines and lines of VTK’s documentation, and worse, the code itself.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-about-next-week"&gt;
-&lt;h2&gt;What About Next Week?&lt;/h2&gt;
-&lt;p&gt;For this next week, I plan to investigate further on why the first problem is happening. If that is accomplished, then things will be more simple, as it will be a lot easier for my project to move forward as I will finally be able
-to implement the more pythonic functions needed to finally render some kernel distributions onto my screen.&lt;/p&gt;
-&lt;p&gt;Wish me luck!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-05-week-1-joaodellagli.html" rel="alternate"/>
-    <summary>As mentioned in the last week’s blogpost, the goal for that week was to investigate VTK’s Framebuffer Object framework.
-An update on that is that indeed, VTK has one more low-level working FBO class that can be used inside FURY, however,
-they come with some issues that I will explain further below.</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-05T00:00:00+00:00</published>
   </entry>
 </feed>
