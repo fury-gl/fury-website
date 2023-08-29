@@ -2,10 +2,47 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2023-08-29T17:02:01.150334+00:00</updated>
+  <updated>2023-08-29T17:17:13.961107+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html</id>
+    <title>Week 12 : Experimenting with ODFs implementation</title>
+    <updated>2023-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Tania Castillo</name>
+    </author>
+    <content type="html">&lt;section id="week-12-experimenting-with-odfs-implementation"&gt;
+
+&lt;section id="what-did-i-do-this-week"&gt;
+&lt;h2&gt;What did I do this week?&lt;/h2&gt;
+&lt;p&gt;There were different issues I needed to address for the ODF implementation. Even though I could not solve any of them completely, I did check each of the issues and made some progress. All the work in progress is being recorded in the following branch &lt;a class="reference external" href="https://github.com/tvcastillod/fury/tree/SH-for-ODF-impl"&gt;SH-for-ODF-impl&lt;/a&gt;, which when ready will be associated with a well-structured PR.&lt;/p&gt;
+&lt;p&gt;First, about the scaling, I was suggested to check Generalized Fractional Anisotropy &lt;strong&gt;gfa&lt;/strong&gt; metric to adjust the scaling depending on the shape of the ODF glyph, i.e., the less the &lt;strong&gt;gfa&lt;/strong&gt; the more sphere-shaped and smaller, so I had to associate a greater scaling for those. However, this did not work very well as I was unable to define an appropriate scale relation that would give an equitable result for each glyph. For this reason, I opted to use peak values which are extracted from the ODFs, setting the scales as 1/peak_value*0.4 and I got a more uniformly sized glyph without the need of setting it manually. That is a temporal solution as I would like to see better why this happens and if possible do the adjustment inside the shader instead of a precalculation.&lt;/p&gt;
+&lt;p&gt;Second, for the direction, I made a small adjustment to the spherical coordinates which affected the direction of the ODF glyph. As you can see below,&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122770-b9ee19d2-d82b-4d7f-a5bb-1cbbf5907049.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122770-b9ee19d2-d82b-4d7f-a5bb-1cbbf5907049.png" style="width: 400px;" /&gt;
+&lt;p&gt;All the glyphs are aligned over the y-axis but not over the z-axis, to correct this I precalculated the main direction of each glyph using peaks and passed it to the shader as a &lt;em&gt;vec3&lt;/em&gt;, then used &lt;em&gt;vec2vecrotmat&lt;/em&gt; to align the main axis vector of the ODF to the required direction vector, the only problem with this is that not all the glyps are equally aligned to the axis, i.e., the first 3 glyphs are aligned with the x-axis but the last one is aligned with the y-axis, so the final rotation gives a different result for that one.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122752-b2aa696f-62a5-4b09-b8dd-0cb1ec49431c.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122752-b2aa696f-62a5-4b09-b8dd-0cb1ec49431c.png" style="width: 400px;" /&gt;
+&lt;p&gt;As with the first small adjustment of the coordinates the direction was partially correct, I need to double check the theta, phi and r definitions to see if I can get the right direction without the need of the additional data of direction. Also, there might be a way to get the specific rotation angles associated to each individual glyph from the data associated with the ODFs.&lt;/p&gt;
+&lt;p&gt;Third, about passing the coefficients data through textures, I understand better now how to pass textures to the shaders but I still have problems understanding how to retrieve the data inside the shader. I used &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/master/docs/experimental/viz_shader_texture.py"&gt;this base implementation&lt;/a&gt;, suggested by one of my mentors, to store the data as a &lt;a class="reference external" href="http://www.khronos.org/opengl/wiki/Cubemap_Texture#:~:text=A%20Cubemap%20Texture%20is%20a,the%20value%20to%20be%20accessed."&gt;texture cubemap&lt;/a&gt;, “a texture, where each mipmap level consists of six 2D images which must be square. The 6 images represent the faces of a cube”. I had 4x15 coefficients and inside the function, a grid of RGB colors is made so then it can be mapped as a texture. To check if was passing the data correctly, I used the same value, .5, for all the textures, so then I could pick a random texel get a specific color (gray), and pass it as &lt;em&gt;fragOutput0&lt;/em&gt; to see if the value was correct. However, it didn’t appear to work correctly as I couldn’t get the expected color. To get the specific color I used &lt;a class="reference external" href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/texture.xhtml"&gt;texture(sampler, P)&lt;/a&gt; which samples texels from the texture bound to sampler at texture coordinate P. Now, what I still need to figure out is which should be the corresponding texture coordinate. I have tried with random coordinates, as they are supposed to correspond to a point on the cube and since the information I have encoded in the texture is all the same, I assumed that I would get the expected result for any set of values. It might be a problem with the data normalization, or maybe there is something failing on the texture definition, but I need to review it in more detail to see where is the problem.&lt;/p&gt;
+&lt;p&gt;Lastly, about the colormapping, I created the texture based on a generic colormap from &lt;a class="reference external" href="https://matplotlib.org/stable/tutorials/colors/colormaps.html"&gt;matplotlib&lt;/a&gt;. I was able to give some color to the glyph but it does not match correctly its shape. Some adjustment must be done regarding the texels, as the colormap is mapped on a cube, but I need it to fit the shape of the glyph correctly.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122760-7d1fff5e-7787-473c-8053-ea69f3009fb4.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122760-7d1fff5e-7787-473c-8053-ea69f3009fb4.png" style="width: 250px;" /&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;I will continue to explore more on how to handle textures so I can solve the issues related to the coefficient data and colormapping. Also, take a deeper look at the SH implementation and check what is the information needed to adjust the main direction of the ODF correctly.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-i-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;As I mentioned I had some drawbacks in understanding the use of textures and how to retrieve the data inside the shaders. This is a topic that might take some time to manage properly but if I can master it and understand it better, it is a tool that can be useful later. Additionally, there are details of the SH implementation that I still need to understand and explore better in order to make sure I get exactly the same result as the current &lt;em&gt;odf_slicer&lt;/em&gt; implementation.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html" rel="alternate"/>
+    <summary>There were different issues I needed to address for the ODF implementation. Even though I could not solve any of them completely, I did check each of the issues and made some progress. All the work in progress is being recorded in the following branch SH-for-ODF-impl, which when ready will be associated with a well-structured PR.</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-24T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-21-week-12-joaodellagli.html</id>
     <title>Week 12: Now That is (almost) a Wrap!</title>
@@ -375,110 +412,6 @@ will also invest some time on refactoring it.&lt;/p&gt;
 </content>
     <link href="https://fury.gl/posts/2023/2023-07-31-week-9-tvcastillod.html" rel="alternate"/>
     <summary>I addressed the comments from the tutorial of PR #818  related to how to display specific visualizations I wanted to make. I was suggested to use ShowManager to handle the zoom of the scene and also to use GridUI to display several actors at the same time for a visual quality comparison of the tensors. Below are some images generated for the tutorial that is almost done.</summary>
-    <category term="google" label="google"/>
-    <published>2023-07-31T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html</id>
-    <title>Week 9: It is Polishing Time!</title>
-    <updated>2023-07-31T00:00:00+00:00</updated>
-    <author>
-      <name>João Victor Dell Agli Floriano</name>
-    </author>
-    <content type="html">&lt;section id="week-9-it-is-polishing-time"&gt;
-
-&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.&lt;/p&gt;
-&lt;section id="last-week-s-effort"&gt;
-&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
-&lt;p&gt;After having finished a first draft of the API that will be used for the KDE rendering, and showing how it could be used
-for other post-processing effects, my goal was to clean the code and try some details that would add to it so it could be better
-complete. Having that in mind, I invested in three work fronts:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Fixing some bugs related to the rendering more than one post-processing effect actor.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Experimenting with other rendering kernels (I was using the &lt;em&gt;gaussian&lt;/em&gt; one only).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Completing the KDE render by renormalizing the values in relation to the number of points (one of the core KDE details).&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Both three turned out more complicated than it initially seemed, as I will show below.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="so-how-did-it-go"&gt;
-&lt;h2&gt;So how did it go?&lt;/h2&gt;
-&lt;p&gt;The first one I did on monday-tuesday, and I had to deal with some issues regarding scaling and repositioning. Due to implementation
-choices, the final post-processed effects were rendered either bigger than they were in reality, or out of their original place.
-After some time dedicated to finding the root of the problems, I could fix the scaling issue, however I realised I would need to,
-probably, rethink the way the API was implemented. As this general post-processing effects is a side-project that comes as a consequence of
-my main one, I decided to leave that investment to another time, as I would need to guarantee the quality of the second.&lt;/p&gt;
-&lt;p&gt;The second was an easy and rather interesting part of my week, as I just needed to setup new kernel shaders. Based on
-&lt;a class="reference external" href="https://scikit-learn.org/stable/modules/density.html"&gt;scikit-learn KDE documentation&lt;/a&gt;, I could successfully implement the following kernels:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Gaussian&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = e^{\frac{-(x^2 + y^2)}{2\sigma^2}}\]&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Tophat&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = 1.0, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Epanechnikov&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = 1 - \frac{x^2 + y^2}{\sigma^2}\]&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Exponential&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = e^{\frac{-|x^2 + y^2|}{\sigma}}\]&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Linear&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = 1 - \frac{|x^2 + y^2|}{\sigma}, \ \ |x^2 + y^2| &amp;lt; \sigma\]&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Cosine&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[K(x, y) = cos(\frac{\pi|x^2 + y^2|}{2\sigma})\]&lt;/div&gt;
-&lt;p&gt;That outputted the following (beautiful) results for a set of 1000 random points with random sigmas:&lt;/p&gt;
-&lt;img alt="Different kernel approaches" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/kernels.png" /&gt;
-&lt;p&gt;The third one is still being a trickier challenge. If you recall from my first blogposts, I spent something around &lt;em&gt;one month&lt;/em&gt; trying to setup
-float framebuffer objects to FURY with VTK so I could use them in my project. After spending all of that time with no results,
-me and Bruno, my mentor, &lt;span class="xref std std-doc"&gt;found a way&lt;/span&gt; to do what we wanted to do, but using a different VTK class,
-&lt;a class="reference external" href="https://vtk.org/doc/nightly/html/classvtkWindowToImageFilter.html"&gt;vtkWindowToImageFilter&lt;/a&gt;. Well, it was a good workaround back then and
-it lead me all the way here, however now it is costing a price. The float framebuffers were an important part of the project because they
-would allow us to pass &lt;em&gt;32-bit float information&lt;/em&gt; from one shader to another, which would be important as they would allow the densities to
-have higher precision and more fidelity to the calculations. When rendering a KDE of a given set of points, we use the below function:&lt;/p&gt;
-&lt;div class="math notranslate nohighlight"&gt;
-\[KDE(x, y) = \frac{1}{n} \sum_{i = 0}^n K(x, y)\]&lt;/div&gt;
-&lt;p&gt;If the number of points &lt;span class="math notranslate nohighlight"&gt;\(n\)&lt;/span&gt; is big enough, some KDE results will be really low. This presents a real problem to our implementation because, without
-the float framebuffers, it is currently only being possible to pass &lt;em&gt;8-bit unsigned char&lt;/em&gt; information, that only allows 256 values.
-This is far from ideal, as low values would have alone densities low enough to disappear. This presented a problem as to renormalize the
-densities, I was retrieving the texture to the CPU, calculating its minimum and maximum values, and passing to the fragment shader as uniforms
-for the renormalization, which didn’t work if the maximum values calculated were zero.&lt;/p&gt;
-&lt;p&gt;One solution I thought to solve that was a really heavy workaround: if an unsigned float is 32-bit and I have exactly 4 8-bit
-unsigned chars, why not try to pack this float into these 4 chars? Well, this is an interesting approach which I figured out is already an
-old one, being reported in &lt;a class="reference external" href="https://developer.nvidia.com/gpugems/gpugems/part-ii-lighting-and-shadows/chapter-12-omnidirectional-shadow-mapping"&gt;GPU Gems’s chapter 12&lt;/a&gt;.
-Unfortunately I haven’t tried yet this implementation yet, and went for one I thought myself, which haven’t exactly worked. I also tried
-this implementation from &lt;a class="reference external" href="https://aras-p.info/blog/2009/07/30/encoding-floats-to-rgba-the-final/"&gt;Aras Pranckevičius’ website&lt;/a&gt;, which seems
-to be working, even though not perfectly:&lt;/p&gt;
-&lt;img alt="Noisy float to RGBA encoding" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/noisy%20kde.png" /&gt;
-&lt;p&gt;As you can see, this implementation is &lt;em&gt;really noisy&lt;/em&gt;. I think this has to deal with floating point rounding errors, so to try to mitigate
-that, I experimented applying a &lt;em&gt;13x13 gaussian blur&lt;/em&gt; to it. Below, what I got from that:&lt;/p&gt;
-&lt;img alt="Blurred KDE result" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/blurred_kde.png" /&gt;
-&lt;p&gt;That looks way better, even though not ideal yet.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="this-week-s-goals"&gt;
-&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
-&lt;p&gt;Talking with my mentors, we decided it was better if I focused on the version without the renormalization for now, as it was already
-done and running fine. So for this week, I plan to clean my PR to finally have it ready for a first review, and maybe add to it a little
-UI tool to control the intensity of the densities. That should take me some time and discussion, but I hope for it to be ready by the
-end of the week.&lt;/p&gt;
-&lt;p&gt;Let’s get to work!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-07-31-week-9-joaodellagli.html" rel="alternate"/>
-    <summary>Hello everyone, it’s time for another weekly blogpost! Today, I am going to update you on my project’s latest changes.</summary>
     <category term="google" label="google"/>
     <published>2023-07-31T00:00:00+00:00</published>
   </entry>
