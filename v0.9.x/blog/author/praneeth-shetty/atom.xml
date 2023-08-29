@@ -2,10 +2,53 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts by Praneeth Shetty</title>
-  <updated>2023-08-29T16:49:44.418837+00:00</updated>
+  <updated>2023-08-29T16:54:12.105809+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/author/praneeth-shetty/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html</id>
+    <title>Week 12: FileDialog Quest Begins!</title>
+    <updated>2023-08-19T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-12-filedialog-quest-begins"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;During this week, I initiated my work on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; PR, which had been started by Soham. The initial version of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; can be found at &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/294"&gt;#294&lt;/a&gt;. To start, I focused on rebasing the PR. Since this PR was based on an older version, there were some updates to the overall UI structure that needed to be addressed for compatibility. While handling this, I identified a set of issues that I documented in the current PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/832"&gt;#832&lt;/a&gt;. These mainly revolved around:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Resizing &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; and related components.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Rectifying the text overflow problem.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Dealing with a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ZeroDivisionError&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixing the positioning of items in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I systematically approached each of these challenges:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Resizing FileMenu and Related Components:&lt;/strong&gt; This was a fairly complex task since it involved intricate dependencies, such as the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; relying on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileMenu&lt;/span&gt;&lt;/code&gt;, which, in turn, was dependent on &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Panel2D&lt;/span&gt;&lt;/code&gt; resizing. To make the process manageable, I decided to progress incrementally in a separate PR a bit later.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Text Overflow Issue:&lt;/strong&gt; The problem with text overflow was rooted in our previous approach, which involved executing these actions only when the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; had a scene property. Although this approach suited the previous version of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt;, the recent refactoring led to the removal of this property. The scene was previously utilized to determine the text actor’s size. However, we had new methodologies to calculate these sizes, which are detailed in &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/803"&gt;#803&lt;/a&gt;.&lt;/p&gt;
+&lt;img alt="Text Overflow Before" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/b001f9d3-a5e8-45ad-8605-85df595b5654" /&gt;
+&lt;img alt="Text Overflow After" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/d3c9c3a3-e601-45ab-8975-2b1e98acf1d3" /&gt;
+&lt;p&gt;&lt;strong&gt;Addressing ZeroDivisionError:&lt;/strong&gt; The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ZeroDivisionError&lt;/span&gt;&lt;/code&gt; emerged when the total number of values was the same as the number of slots. The issue lay in the separation of these values for calculating the scrollbar’s height parameter. Unfortunately, this calculation error occurred when this would return us zero while updating the scrollbar. To counter this, I implemented a conditional check to ascertain whether the value is zero or not.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Correcting ``ListBox2D`` Item Positioning:&lt;/strong&gt; Another challenge I encountered related to the improper positioning of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; item’s background. When a slot was not visible, its background was resized to zero, and visibility was set to off. Consequently, during the calculation of updated positions, the height was considered zero, leading to mispositioning. I resolved this by refraining from resizing and solely toggling visibility, achieving the desired result.&lt;/p&gt;
+&lt;img alt="ListBox2D mispositioning Before" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/e2805934-b037-47fd-872c-0b284b298d3c" /&gt;
+&lt;img alt="Fixed ListBox2D mispositioning" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/3bc1aabb-bb79-4e26-817d-a2a2ddd20ea3" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Among the challenges I faced, one notable instance involved addressing the visibility issue in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt;. Despite my attempts at various solutions, none yielded the desired outcome. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt; exhibited either full visibility or no visibility at all. In this situation, I sought guidance from my mentor to find a viable solution.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; implementation is nearly finalized, and my plan is to work on any review, feedback or suggestions that might arise. Following this, I will shift my attention towards addressing the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html" rel="alternate"/>
+    <summary>During this week, I initiated my work on the FileDialog PR, which had been started by Soham. The initial version of the FileDialog can be found at #294. To start, I focused on rebasing the PR. Since this PR was based on an older version, there were some updates to the overall UI structure that needed to be addressed for compatibility. While handling this, I identified a set of issues that I documented in the current PR #832. These mainly revolved around:</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-19T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-12-week-11-praneeth.html</id>
     <title>Week 11: Bye Bye SpinBox</title>
@@ -311,43 +354,5 @@ This PR includes changes for the new compatibility section on the FURY home page
     <summary>This week, I tackled the ComboBox2D icon flaw, which was addressed using Pull Request (PR) #576. The problem arose when we added a ComboBox2D to the TabUI. The TabUI would propagate the set_visibility = true for all its child elements, causing the combobox to appear on the screen without the icon change. To fix this issue, PR #768 updated the set_visibility method of the UI class, ensuring that the icon change was applied correctly.</summary>
     <category term="google" label="google"/>
     <published>2023-06-17T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-11-week-2-praneeth.html</id>
-    <title>Week 2: Tackling Text Justification and Icon Flaw Issues</title>
-    <updated>2023-06-11T00:00:00+00:00</updated>
-    <author>
-      <name>Praneeth Shetty</name>
-    </author>
-    <content type="html">&lt;section id="week-2-tackling-text-justification-and-icon-flaw-issues"&gt;
-
-&lt;section id="what-did-you-do-this-week"&gt;
-&lt;h2&gt;What did you do this week?&lt;/h2&gt;
-&lt;p&gt;This week, I continued tweaking the text justification PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/790"&gt;#790&lt;/a&gt; and encountered a new issue when combining both &lt;strong&gt;justification&lt;/strong&gt; and &lt;strong&gt;vertical_justification&lt;/strong&gt;. The problem arose because the &lt;strong&gt;vertical_justification&lt;/strong&gt; did not take into account the applied &lt;strong&gt;justification&lt;/strong&gt;, resulting in unexpected behavior. I focused on resolving this issue by ensuring that both justifications work together correctly. Additionally, during the weekly meeting, we discussed the problem and decided to introduce new properties such as boundaries and padding to enhance the functionality of the text justification feature.&lt;/p&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2023/2023-06-11-week-2-praneeth.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id6"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “#768”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;Furthermore, I started working on PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/576"&gt;#576&lt;/a&gt;, which aimed to address the flaw in the icon of the &lt;strong&gt;combobox&lt;/strong&gt;. While investigating this issue, I discovered related problems and PRs, including &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/562"&gt;#562&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/731"&gt;#731&lt;/a&gt;, and &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/768"&gt;#768&lt;/a&gt;. The main challenge was related to the propagation of the &lt;strong&gt;set_visibility&lt;/strong&gt; feature of the UI, causing the &lt;strong&gt;combobox&lt;/strong&gt; to automatically open its options. To overcome this issue, I requested the author of PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/768"&gt;#768&lt;/a&gt; to rebase their pull request as it can be a solution for the issue.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;A significant portion of my time was dedicated to resolving the text justification issue when both justification types were combined. It required careful analysis and adjustments to ensure the desired behavior.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;For the upcoming week, I have the following plans:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Work on modifying the text justification implementation to address any remaining issues and ensure compatibility with other features.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Begin the implementation of the scrollbar class from scratch to provide a robust and customizable scrollbar element.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Focus on completing the resolution of the icon flaw issue by collaborating with the relevant stakeholders and ensuring the necessary modifications are made.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-11-week-2-praneeth.html" rel="alternate"/>
-    <summary>This week, I continued tweaking the text justification PR #790 and encountered a new issue when combining both justification and vertical_justification. The problem arose because the vertical_justification did not take into account the applied justification, resulting in unexpected behavior. I focused on resolving this issue by ensuring that both justifications work together correctly. Additionally, during the weekly meeting, we discussed the problem and decided to introduce new properties such as boundaries and padding to enhance the functionality of the text justification feature.</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-11T00:00:00+00:00</published>
   </entry>
 </feed>

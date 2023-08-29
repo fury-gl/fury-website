@@ -2,10 +2,53 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog</title>
-  <updated>2023-08-29T16:49:44.112923+00:00</updated>
+  <updated>2023-08-29T16:54:11.729388+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html</id>
+    <title>Week 12: FileDialog Quest Begins!</title>
+    <updated>2023-08-19T00:00:00+00:00</updated>
+    <author>
+      <name>Praneeth Shetty</name>
+    </author>
+    <content type="html">&lt;section id="week-12-filedialog-quest-begins"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;p&gt;During this week, I initiated my work on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; PR, which had been started by Soham. The initial version of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; can be found at &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/294"&gt;#294&lt;/a&gt;. To start, I focused on rebasing the PR. Since this PR was based on an older version, there were some updates to the overall UI structure that needed to be addressed for compatibility. While handling this, I identified a set of issues that I documented in the current PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/832"&gt;#832&lt;/a&gt;. These mainly revolved around:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;Resizing &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; and related components.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Rectifying the text overflow problem.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Dealing with a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ZeroDivisionError&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixing the positioning of items in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;I systematically approached each of these challenges:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Resizing FileMenu and Related Components:&lt;/strong&gt; This was a fairly complex task since it involved intricate dependencies, such as the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; relying on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileMenu&lt;/span&gt;&lt;/code&gt;, which, in turn, was dependent on &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Panel2D&lt;/span&gt;&lt;/code&gt; resizing. To make the process manageable, I decided to progress incrementally in a separate PR a bit later.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Text Overflow Issue:&lt;/strong&gt; The problem with text overflow was rooted in our previous approach, which involved executing these actions only when the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt; had a scene property. Although this approach suited the previous version of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBlock2D&lt;/span&gt;&lt;/code&gt;, the recent refactoring led to the removal of this property. The scene was previously utilized to determine the text actor’s size. However, we had new methodologies to calculate these sizes, which are detailed in &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/803"&gt;#803&lt;/a&gt;.&lt;/p&gt;
+&lt;img alt="Text Overflow Before" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/b001f9d3-a5e8-45ad-8605-85df595b5654" /&gt;
+&lt;img alt="Text Overflow After" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/d3c9c3a3-e601-45ab-8975-2b1e98acf1d3" /&gt;
+&lt;p&gt;&lt;strong&gt;Addressing ZeroDivisionError:&lt;/strong&gt; The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ZeroDivisionError&lt;/span&gt;&lt;/code&gt; emerged when the total number of values was the same as the number of slots. The issue lay in the separation of these values for calculating the scrollbar’s height parameter. Unfortunately, this calculation error occurred when this would return us zero while updating the scrollbar. To counter this, I implemented a conditional check to ascertain whether the value is zero or not.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Correcting ``ListBox2D`` Item Positioning:&lt;/strong&gt; Another challenge I encountered related to the improper positioning of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox2D&lt;/span&gt;&lt;/code&gt; item’s background. When a slot was not visible, its background was resized to zero, and visibility was set to off. Consequently, during the calculation of updated positions, the height was considered zero, leading to mispositioning. I resolved this by refraining from resizing and solely toggling visibility, achieving the desired result.&lt;/p&gt;
+&lt;img alt="ListBox2D mispositioning Before" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/e2805934-b037-47fd-872c-0b284b298d3c" /&gt;
+&lt;img alt="Fixed ListBox2D mispositioning" class="align-center" src="https://github.com/fury-gl/fury/assets/64432063/3bc1aabb-bb79-4e26-817d-a2a2ddd20ea3" /&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Among the challenges I faced, one notable instance involved addressing the visibility issue in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt;. Despite my attempts at various solutions, none yielded the desired outcome. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt; exhibited either full visibility or no visibility at all. In this situation, I sought guidance from my mentor to find a viable solution.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FileDialog&lt;/span&gt;&lt;/code&gt; implementation is nearly finalized, and my plan is to work on any review, feedback or suggestions that might arise. Following this, I will shift my attention towards addressing the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeUI&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html" rel="alternate"/>
+    <summary>During this week, I initiated my work on the FileDialog PR, which had been started by Soham. The initial version of the FileDialog can be found at #294. To start, I focused on rebasing the PR. Since this PR was based on an older version, there were some updates to the overall UI structure that needed to be addressed for compatibility. While handling this, I identified a set of issues that I documented in the current PR #832. These mainly revolved around:</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-19T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-16-week-11-tvcastillod.html</id>
     <title>Week 11 : Adjusting ODF implementation and looking for solutions on issues found</title>
@@ -423,33 +466,5 @@ end of the week.&lt;/p&gt;
     <summary>Continuing from the previous week, it seemed like we were almost done with the TextBlock2D, but there remained a final task of addressing conflicting issues. Being a core part of the UI, TextBlock2D had a few compatibility problems with certain other UI elements.</summary>
     <category term="google" label="google"/>
     <published>2023-07-29T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-07-25-week-8-tvcastillod.html</id>
-    <title>Week 8: Working on Ellipsoid Tutorial and exploring SH</title>
-    <updated>2023-07-25T00:00:00+00:00</updated>
-    <author>
-      <name>Tania Castillo</name>
-    </author>
-    <content type="html">&lt;section id="week-8-working-on-ellipsoid-tutorial-and-exploring-sh"&gt;
-
-&lt;section id="what-did-i-do-this-week"&gt;
-&lt;h2&gt;What did I do this week?&lt;/h2&gt;
-&lt;p&gt;I mainly worked on the ellipsoid actor tutorial, as &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/791"&gt;PR #791&lt;/a&gt; is finally merged, so I was able to complete the tutorial by adding my implementation. In addition, during the weekly meeting, I received a good overview of the next issue I will be working on, which is using raymarching SDFs to display spherical harmonics (SH) for visualizing ODF glyphs for DTI. I got several ideas and resources which I can start experimenting with, such as &lt;a class="reference external" href="https://www.shadertoy.com/results?query=Spherical+Harmonics"&gt;Shadertoy&lt;/a&gt; and some base implementations from other FURY contributors. The main drawback when creating these objects is the amount of data required to create them, because depending on the SH order, the number of parameters that the function receives may vary, also unlike the tensors, which are represented only with a 3x3 matrix, here we could have more than 9 values associated with a single glyph, so passing the information from python to the shaders is not so trivial, besides requiring more resources as there is more information that needs to be processed. Some ideas I received were using matrixes instead of vectors, using templating, or even using texture to pass the data. I started to explore these options further, as well as to review in more detail the existing implementations of SH with raymarching, in order to understand them better.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;I currently have two PRs under review, so I will address the comments I receive and update them accordingly. I also will continue to explore and start working on the implementation of these objects so that I can start making adjustments and further discuss possible improvements to the implementation I will make.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Fortunately, I did not encounter any drawbacks this week.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-07-25-week-8-tvcastillod.html" rel="alternate"/>
-    <summary>I mainly worked on the ellipsoid actor tutorial, as PR #791 is finally merged, so I was able to complete the tutorial by adding my implementation. In addition, during the weekly meeting, I received a good overview of the next issue I will be working on, which is using raymarching SDFs to display spherical harmonics (SH) for visualizing ODF glyphs for DTI. I got several ideas and resources which I can start experimenting with, such as Shadertoy and some base implementations from other FURY contributors. The main drawback when creating these objects is the amount of data required to create them, because depending on the SH order, the number of parameters that the function receives may vary, also unlike the tensors, which are represented only with a 3x3 matrix, here we could have more than 9 values associated with a single glyph, so passing the information from python to the shaders is not so trivial, besides requiring more resources as there is more information that needs to be processed. Some ideas I received were using matrixes instead of vectors, using templating, or even using texture to pass the data. I started to explore these options further, as well as to review in more detail the existing implementations of SH with raymarching, in order to understand them better.</summary>
-    <category term="google" label="google"/>
-    <published>2023-07-25T00:00:00+00:00</published>
   </entry>
 </feed>
