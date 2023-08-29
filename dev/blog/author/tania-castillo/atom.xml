@@ -2,10 +2,47 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts by Tania Castillo</title>
-  <updated>2023-08-29T17:02:01.068075+00:00</updated>
+  <updated>2023-08-29T17:17:13.874133+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/author/tania-castillo/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html</id>
+    <title>Week 12 : Experimenting with ODFs implementation</title>
+    <updated>2023-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Tania Castillo</name>
+    </author>
+    <content type="html">&lt;section id="week-12-experimenting-with-odfs-implementation"&gt;
+
+&lt;section id="what-did-i-do-this-week"&gt;
+&lt;h2&gt;What did I do this week?&lt;/h2&gt;
+&lt;p&gt;There were different issues I needed to address for the ODF implementation. Even though I could not solve any of them completely, I did check each of the issues and made some progress. All the work in progress is being recorded in the following branch &lt;a class="reference external" href="https://github.com/tvcastillod/fury/tree/SH-for-ODF-impl"&gt;SH-for-ODF-impl&lt;/a&gt;, which when ready will be associated with a well-structured PR.&lt;/p&gt;
+&lt;p&gt;First, about the scaling, I was suggested to check Generalized Fractional Anisotropy &lt;strong&gt;gfa&lt;/strong&gt; metric to adjust the scaling depending on the shape of the ODF glyph, i.e., the less the &lt;strong&gt;gfa&lt;/strong&gt; the more sphere-shaped and smaller, so I had to associate a greater scaling for those. However, this did not work very well as I was unable to define an appropriate scale relation that would give an equitable result for each glyph. For this reason, I opted to use peak values which are extracted from the ODFs, setting the scales as 1/peak_value*0.4 and I got a more uniformly sized glyph without the need of setting it manually. That is a temporal solution as I would like to see better why this happens and if possible do the adjustment inside the shader instead of a precalculation.&lt;/p&gt;
+&lt;p&gt;Second, for the direction, I made a small adjustment to the spherical coordinates which affected the direction of the ODF glyph. As you can see below,&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122770-b9ee19d2-d82b-4d7f-a5bb-1cbbf5907049.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122770-b9ee19d2-d82b-4d7f-a5bb-1cbbf5907049.png" style="width: 400px;" /&gt;
+&lt;p&gt;All the glyphs are aligned over the y-axis but not over the z-axis, to correct this I precalculated the main direction of each glyph using peaks and passed it to the shader as a &lt;em&gt;vec3&lt;/em&gt;, then used &lt;em&gt;vec2vecrotmat&lt;/em&gt; to align the main axis vector of the ODF to the required direction vector, the only problem with this is that not all the glyps are equally aligned to the axis, i.e., the first 3 glyphs are aligned with the x-axis but the last one is aligned with the y-axis, so the final rotation gives a different result for that one.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122752-b2aa696f-62a5-4b09-b8dd-0cb1ec49431c.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122752-b2aa696f-62a5-4b09-b8dd-0cb1ec49431c.png" style="width: 400px;" /&gt;
+&lt;p&gt;As with the first small adjustment of the coordinates the direction was partially correct, I need to double check the theta, phi and r definitions to see if I can get the right direction without the need of the additional data of direction. Also, there might be a way to get the specific rotation angles associated to each individual glyph from the data associated with the ODFs.&lt;/p&gt;
+&lt;p&gt;Third, about passing the coefficients data through textures, I understand better now how to pass textures to the shaders but I still have problems understanding how to retrieve the data inside the shader. I used &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/master/docs/experimental/viz_shader_texture.py"&gt;this base implementation&lt;/a&gt;, suggested by one of my mentors, to store the data as a &lt;a class="reference external" href="http://www.khronos.org/opengl/wiki/Cubemap_Texture#:~:text=A%20Cubemap%20Texture%20is%20a,the%20value%20to%20be%20accessed."&gt;texture cubemap&lt;/a&gt;, “a texture, where each mipmap level consists of six 2D images which must be square. The 6 images represent the faces of a cube”. I had 4x15 coefficients and inside the function, a grid of RGB colors is made so then it can be mapped as a texture. To check if was passing the data correctly, I used the same value, .5, for all the textures, so then I could pick a random texel get a specific color (gray), and pass it as &lt;em&gt;fragOutput0&lt;/em&gt; to see if the value was correct. However, it didn’t appear to work correctly as I couldn’t get the expected color. To get the specific color I used &lt;a class="reference external" href="https://registry.khronos.org/OpenGL-Refpages/gl4/html/texture.xhtml"&gt;texture(sampler, P)&lt;/a&gt; which samples texels from the texture bound to sampler at texture coordinate P. Now, what I still need to figure out is which should be the corresponding texture coordinate. I have tried with random coordinates, as they are supposed to correspond to a point on the cube and since the information I have encoded in the texture is all the same, I assumed that I would get the expected result for any set of values. It might be a problem with the data normalization, or maybe there is something failing on the texture definition, but I need to review it in more detail to see where is the problem.&lt;/p&gt;
+&lt;p&gt;Lastly, about the colormapping, I created the texture based on a generic colormap from &lt;a class="reference external" href="https://matplotlib.org/stable/tutorials/colors/colormaps.html"&gt;matplotlib&lt;/a&gt;. I was able to give some color to the glyph but it does not match correctly its shape. Some adjustment must be done regarding the texels, as the colormap is mapped on a cube, but I need it to fit the shape of the glyph correctly.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/263122760-7d1fff5e-7787-473c-8053-ea69f3009fb4.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/263122760-7d1fff5e-7787-473c-8053-ea69f3009fb4.png" style="width: 250px;" /&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next"&gt;
+&lt;h2&gt;What is coming up next?&lt;/h2&gt;
+&lt;p&gt;I will continue to explore more on how to handle textures so I can solve the issues related to the coefficient data and colormapping. Also, take a deeper look at the SH implementation and check what is the information needed to adjust the main direction of the ODF correctly.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-i-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;As I mentioned I had some drawbacks in understanding the use of textures and how to retrieve the data inside the shaders. This is a topic that might take some time to manage properly but if I can master it and understand it better, it is a tool that can be useful later. Additionally, there are details of the SH implementation that I still need to understand and explore better in order to make sure I get exactly the same result as the current &lt;em&gt;odf_slicer&lt;/em&gt; implementation.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html" rel="alternate"/>
+    <summary>There were different issues I needed to address for the ODF implementation. Even though I could not solve any of them completely, I did check each of the issues and made some progress. All the work in progress is being recorded in the following branch SH-for-ODF-impl, which when ready will be associated with a well-structured PR.</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-24T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-16-week-11-tvcastillod.html</id>
     <title>Week 11 : Adjusting ODF implementation and looking for solutions on issues found</title>
@@ -278,37 +315,5 @@
     <summary>I made some adjustments to the ellipsoid actor definition, now called tensor. This was something discussed in the weekly meeting as the coming changes are related to this actor, the idea now is to have a tensor actor that allows choosing between displaying the tensor ellipsoids or the uncertainty cones (later on). I also worked on the uncertainty calculation, and the cone SDF for the visualization, so I plan to do a WIP PR next to start getting feedback on this new addition.</summary>
     <category term="google" label="google"/>
     <published>2023-06-19T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-06-12-week-2-tvcastillod.html</id>
-    <title>Week 2: Making adjustments to the Ellipsoid Actor</title>
-    <updated>2023-06-12T00:00:00+00:00</updated>
-    <author>
-      <name>Tania Castillo</name>
-    </author>
-    <content type="html">&lt;section id="week-2-making-adjustments-to-the-ellipsoid-actor"&gt;
-
-&lt;section id="what-did-i-do-this-week"&gt;
-&lt;h2&gt;What did I do this week?&lt;/h2&gt;
-&lt;p&gt;I made some minor adjustments to the last PR I submitted. Last time it was a draft since I was waiting for the weekly meeting to know how to proceed, but now it is ready. I am waiting for the review so I can make the necessary corrections and adjustments to merge this first PR soon.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;As I receive feedback, I will continue to work on the &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/791"&gt;PR #791&lt;/a&gt; and make adjustments and changes as needed. That said, I will start working on another part of the project, which is the visualization of uncertainty. Without going into details (for now) what I have to do is:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Create a double_cone or dti_uncertainty actor. I’m going to work on the double cone made also with raymarching and SDF, since the implementation is pretty much the same as the ellipsoid I already have.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Make a function that returns the level of the uncertainty given by the angle of the uncertainty cone we want to visualize. For this I need to double-check the maths behind the uncertainty calculation to make sure I’m getting the right results.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Not exactly, but one of the things that were mentioned in the last meeting is that we should try to simplify the shader code as much as we can, that is, to break down the entire implementation into simple and easy-to-understand lines of code, which also allows the definition of functions that can be reused later on. I need to keep working on this, so I can make my code even more readable and fit the new shader structure.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-06-12-week-2-tvcastillod.html" rel="alternate"/>
-    <summary>I made some minor adjustments to the last PR I submitted. Last time it was a draft since I was waiting for the weekly meeting to know how to proceed, but now it is ready. I am waiting for the review so I can make the necessary corrections and adjustments to merge this first PR soon.</summary>
-    <category term="google" label="google"/>
-    <published>2023-06-12T00:00:00+00:00</published>
   </entry>
 </feed>
