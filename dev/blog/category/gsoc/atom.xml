@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2023-08-18T15:18:47.904947+00:00</updated>
+  <updated>2023-08-29T16:49:44.704055+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.4.post1">ABlog</generator>
@@ -45,6 +45,88 @@
     <summary>I continued to experiment with the ODF glyph implementation. Thanks to one of my mentors I figured out how to get the missing data corresponding to the SH coefficients a^l_m part of the function f(\theta, \phi) described here. I also was told to make sure to implement the correct SH basis since there are different definitions from the literature, I have to focus now in the one proposed by Descoteaux, described in this paper, which is labeled in dipy as descoteaux07. To do this I had to make a small adjustment to the base implementation that I took as a reference, from which I obtained a first result using SH of order 4.</summary>
     <category term="google" label="google"/>
     <published>2023-08-16T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html</id>
+    <title>Week 11: A Refactor is Sometimes Needed</title>
+    <updated>2023-08-14T00:00:00+00:00</updated>
+    <author>
+      <name>João Victor Dell Agli Floriano</name>
+    </author>
+    <content type="html">&lt;section id="week-11-a-refactor-is-sometimes-needed"&gt;
+
+&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today I am going to share some updates on the API refactoring
+I was working on with my mentors.&lt;/p&gt;
+&lt;section id="last-week-s-effort"&gt;
+&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
+&lt;p&gt;As I shared with you &lt;span class="xref std std-doc"&gt;last week&lt;/span&gt;, the first draft of my API was finally ready for review, as
+I finished tweaking some remaining details missing. I was tasked with finding a good example of the usage of the tools we proposed,
+and I started to do that, however after testing it with some examples, I figured out some significant bugs were to be fixed. Also,
+after some reviews and hints from some of my mentors and other GSoC contributors, we realised that some refactoring should be done,
+mainly focused on avoiding bad API usage from the user.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="so-how-did-it-go"&gt;
+&lt;h2&gt;So how did it go?&lt;/h2&gt;
+&lt;p&gt;Initially, I thought only one bug was the source of the issues the rendering presented, but it turned out to be two, which I will
+explain further.&lt;/p&gt;
+&lt;p&gt;The first bug was related to scaling and misalignment of the KDE render. The render of the points being post-processed was not only
+with sizes different from the original set size, but it was also misaligned, making it appear in positions different from the points’
+original ones. After some time spent, I figured out the bug was related to the texture coordinates I was using. Before, this is how
+my fragment shader looked:&lt;/p&gt;
+&lt;div class="highlight-C notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res_factor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;y&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;x&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;1.0&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;res_factor&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="n"&gt;normalizedVertexMCVSOutput&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xy&lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mf"&gt;0.5&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;float&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;intensity&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;texture&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;screenTexture&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;It turns out using this texture coordinates for &lt;em&gt;this case&lt;/em&gt; was not the best choice, as even though it matches the fragment positions,
+the idea here was to render the offscreen window, which has the same size as the onscreen one, to the billboard actor. With that in mind,
+I realised the best choice was using texture coordinates that matched the whole screen positions, coordinates that were derived from the
+&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;gl_FragCoord.xy&lt;/span&gt;&lt;/code&gt;, being the division of that by the resolution of the screen, for normalization. Below, the change made:&lt;/p&gt;
+&lt;div class="highlight-C notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;vec2&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;gl_FragCoord&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;xy&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;res&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kt"&gt;float&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;intensity&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;texture&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;screenTexture&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;tex_coords&lt;/span&gt;&lt;span class="p"&gt;).&lt;/span&gt;&lt;span class="n"&gt;r&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;This change worked initially, although with some problems, that later revealed the resolution of the offscreen window needed to be
+updated inside the callback function as well. Fixing that, it was perfectly aligned and scaled!&lt;/p&gt;
+&lt;p&gt;The second bug was related with the handling of the bandwidth, former sigma parameter. I realised I wasn’t dealing properly with the option of the user passing only
+one single bandwidth value being passed, so when trying that, only the first point was being rendered. I also fixed that and it worked,
+so cheers!&lt;/p&gt;
+&lt;p&gt;As I previously said, the bugs were not the only details I spent my time on last week. Being reviewed, the API design, even
+though simple, showed itself vulnerable to bad usage from the user side, requiring some changes. The changes suggested by mentors were,
+to, basically, take the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;kde&lt;/span&gt;&lt;/code&gt; method out of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;EffectManager&lt;/span&gt;&lt;/code&gt; class, and create a new class from it inside an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;effects&lt;/span&gt;&lt;/code&gt; module,
+like it was a special effects class. With this change, the KDE setup would go from:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;em&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EffectManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;kde_actor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;em&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kde&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;scene&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kde_actor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;To:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;em&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EffectManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;show_manager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;kde_effect&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;KDE&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;em&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kde_effect&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p&gt;Not a gain in line shortening, however, a gain in security, as preventing users from misusing the kde_actor. Something worth noting is
+that I learned how to use the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;functools.partial&lt;/span&gt;&lt;/code&gt; function, that allowed me to partially call the callback function with only some
+parameters passed.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="this-week-s-goals"&gt;
+&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
+&lt;p&gt;Having that refactoring made, now I am awaiting for a second review so we could finally wrap it up and merge the first stage of this API.
+With that being done, I will write the final report and wrap this all up.&lt;/p&gt;
+&lt;p&gt;Let’s get to work!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html" rel="alternate"/>
+    <summary>Hello everyone, it’s time for another weekly blogpost! Today I am going to share some updates on the API refactoring
+I was working on with my mentors.</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-14T00:00:00+00:00</published>
   </entry>
   <entry>
     <id>https://fury.gl/posts/2023/2023-08-12-week-11-praneeth.html</id>
@@ -369,108 +451,5 @@ end of the week.&lt;/p&gt;
     <summary>I mainly worked on the ellipsoid actor tutorial, as PR #791 is finally merged, so I was able to complete the tutorial by adding my implementation. In addition, during the weekly meeting, I received a good overview of the next issue I will be working on, which is using raymarching SDFs to display spherical harmonics (SH) for visualizing ODF glyphs for DTI. I got several ideas and resources which I can start experimenting with, such as Shadertoy and some base implementations from other FURY contributors. The main drawback when creating these objects is the amount of data required to create them, because depending on the SH order, the number of parameters that the function receives may vary, also unlike the tensors, which are represented only with a 3x3 matrix, here we could have more than 9 values associated with a single glyph, so passing the information from python to the shaders is not so trivial, besides requiring more resources as there is more information that needs to be processed. Some ideas I received were using matrixes instead of vectors, using templating, or even using texture to pass the data. I started to explore these options further, as well as to review in more detail the existing implementations of SH with raymarching, in order to understand them better.</summary>
     <category term="google" label="google"/>
     <published>2023-07-25T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-07-24-week-8-joaodellagli.html</id>
-    <title>Week 8: The Birth of a Versatile API</title>
-    <updated>2023-07-24T00:00:00+00:00</updated>
-    <author>
-      <name>João Victor Dell Agli Floriano</name>
-    </author>
-    <content type="html">&lt;section id="week-8-the-birth-of-a-versatile-api"&gt;
-
-&lt;p&gt;Hello everyone, it’s time for another weekly blogpost! Today, I am going to tell you all about how is the KDE API development going, and
-to show you the potential this holds for the future!&lt;/p&gt;
-&lt;section id="last-week-s-effort"&gt;
-&lt;h2&gt;Last Week’s Effort&lt;/h2&gt;
-&lt;p&gt;Last week I told you how I managed to render some KDE renders to the screen, both in 2D and 3D, as you may check by my last blogpost.
-My new task was, as I had this example working, to start the API development. In a meeting with Bruno, one of my mentors, we debated
-on how could this work, reaching two options:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Implement the KDE in a single, simple actor.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Implement a KDE rendering manager, as a class.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;The first one would have the advantage of being simple and pretty straightforward, as a user would only need to call the actor and have
-it working on their hands, having the tradeoff of leaving some important steps for a clean API hidden and static. These steps I mention
-are related to how this rendering works, as I have previously &lt;span class="xref std std-doc"&gt;showed you&lt;/span&gt;, it relies on post-processing effects,
-which need an offscreen rendering, that for example are done by the &lt;em&gt;callback functions&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;In short, these functions are instructions the user gives to the interactor to run inside the interaction loop. Inside FURY there are tree
-types of callbacks passed to the window interactor:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Timer Callbacks&lt;/strong&gt;: Added to the window interactor, they are a set of instructions that will be called from time to time, with interval defined by the user.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Window Callbacks&lt;/strong&gt;: Added directly to the window, they are  a set of instructions called whenever an specific event is triggered.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Interactor Callbacks&lt;/strong&gt;: Added to the window interactor, they are a set of instructions called whenever an specific interaction, for example a mouse left-click, is triggered.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;In this API, I will be using the &lt;em&gt;Interactor Callback&lt;/em&gt;, set by the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;window.add_iren_callback()&lt;/span&gt;&lt;/code&gt; function, that will be called whenever a &lt;em&gt;Render&lt;/em&gt;
-interaction is detected, and needs to be first passed to the onscreen manager.&lt;/p&gt;
-&lt;p&gt;These details are more complicated, and would need, for example, for the user to pass the onscreen manager to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;actor.kde()&lt;/span&gt;&lt;/code&gt; function.
-Also, in the case of a kde actor not being used anymore and being declared, the callback then passed would still exist inside the manager and
-be called even when the kde actor is not on screen anymore, which is not ideal.&lt;/p&gt;
-&lt;p&gt;Knowing these problems, we thought of a second option, that would have the advantage of not leaving those details and steps behind. It has
-the tradeoff of maybe complicating things as it would need to be called after calling the effects manager, but as I will show you below,
-it is not that complicated &lt;em&gt;at all&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;I also reviewed my fellow GSoC contributors PR’s as well, PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/810"&gt;#810&lt;/a&gt; and
-&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/803"&gt;#803&lt;/a&gt;. Bruno told me to take a look as well on &lt;a class="reference external" href="https://www.conventionalcommits.org"&gt;Conventional Commits&lt;/a&gt; , a way to standardize
-commits by prefixes, so I did that as well.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="so-how-did-it-go"&gt;
-&lt;h2&gt;So how did it go?&lt;/h2&gt;
-&lt;p&gt;Well, the implemented manager class is named &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;EffectManager()&lt;/span&gt;&lt;/code&gt; and to initialize it you only need to pass the onscreen manager.
-The onscreen manager is the standard FURY window manager you would use in a normal FURY-based program:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# Onscreen manager setup&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;fury&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;window&lt;/span&gt;
-
-&lt;span class="n"&gt;scene&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Scene&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-
-&lt;span class="n"&gt;onscreen_manager&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;window&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ShowManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;scene&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;demo&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;width&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;height&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
-
-&lt;span class="n"&gt;effects&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;EffectManager&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;onscreen_manager&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;After that, to render a KDE calculation of points to the screen, you need only to call its &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;kde()&lt;/span&gt;&lt;/code&gt; function:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;kde_actor&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;effects&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;kde&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;center&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;points&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;sigmas&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;scale&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mf"&gt;10.0&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colormap&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;inferno&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="c1"&gt;# Those last two are optional&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;Pass it to the onscreen manager scene:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;onscreen_manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;scene&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;add&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;kde_actor&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;And to start it, as usual:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;onscreen_manager&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;start&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;As simple as that. This three lines of code output the same result as I showed you last week, this time, with different sigmas for each
-point:&lt;/p&gt;
-&lt;img alt="3D KDE render" class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/3d_kde_gif.gif" /&gt;
-&lt;p&gt;After having that working, I experimented beyond. See, as I previously said, we are dealing here with &lt;em&gt;post-processing effects&lt;/em&gt;, with KDE
-being only one of the many existing ones, as this &lt;a class="reference external" href="https://en.wikipedia.org/wiki/Video_post-processing"&gt;Wikipedia Page&lt;/a&gt; on post processing shows.
-Knowing that, I tried one of the first filters I learned, the Laplacian one. This filter is, as its name hints, applying the
-&lt;a class="reference external" href="https://en.wikipedia.org/wiki/Discrete_Laplace_operator"&gt;Discrete Laplace Operator&lt;/a&gt; in an image. This filter shows sudden changes of value, a
-good way to detect borders. The process is the same as the kde actor, requiring only the actor you want to apply the filter to.
-Below, the result I got from applying that to a box actor:&lt;/p&gt;
-&lt;img alt="Laplacian filter applied to a cube object." class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/laplacian1.gif" /&gt;
-&lt;p&gt;Something I found important to leave as an option was filter compositing. What if an user wanted to, for example, apply one laplacian filter
-after another? Well, the example below shows that is possible as well:&lt;/p&gt;
-&lt;img alt="Double laplacian application on the box actor." class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/laplacian2.gif" /&gt;
-&lt;p&gt;It still needs some tweaks and suffers from some bugs, but it works! Those represent important progress as it shows the versatility this
-API may present. I have also already implemented &lt;cite&gt;grayscale&lt;/cite&gt; and &lt;cite&gt;3x3 gaussian blur&lt;/cite&gt; as well:&lt;/p&gt;
-&lt;img alt="3x3 Gaussian Blur filter applied to a cube." class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/gaussian_blur.png" /&gt;
-&lt;img alt="Grayscale filter applied to a cube." class="align-center" src="https://raw.githubusercontent.com/JoaoDell/gsoc_assets/main/images/grayscale.png" /&gt;
-&lt;/section&gt;
-&lt;section id="this-week-s-goals"&gt;
-&lt;h2&gt;This Week’s Goals&lt;/h2&gt;
-&lt;p&gt;My plans for this week are to keep working and polishing the API, mainly the KDE part, so it can be ready for a first review.
-When that is ready, I plan to experiment with more filters and make this more dynamic, maybe implementing a way to apply custom kernel
-transformations, passed by the user, to the rendering process. This has been a really exciting journey and I am getting happy with the results!&lt;/p&gt;
-&lt;p&gt;Wish me luck!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-07-24-week-8-joaodellagli.html" rel="alternate"/>
-    <summary>Hello everyone, it’s time for another weekly blogpost! Today, I am going to tell you all about how is the KDE API development going, and
-to show you the potential this holds for the future!</summary>
-    <category term="google" label="google"/>
-    <published>2023-07-24T00:00:00+00:00</published>
   </entry>
 </feed>
