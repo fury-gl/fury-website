@@ -50,7 +50,7 @@ Let's start by importing the necessary modules:
 
 .. GENERATED FROM PYTHON SOURCE LINES 32-41
 
-.. code-block:: default
+.. code-block:: Python
 
 
     import os
@@ -68,7 +68,7 @@ Now set up a new scene to place our actors in.
 
 .. GENERATED FROM PYTHON SOURCE LINES 43-45
 
-.. code-block:: default
+.. code-block:: Python
 
     scene = window.Scene()
 
@@ -87,7 +87,7 @@ follows:
 
 .. GENERATED FROM PYTHON SOURCE LINES 54-64
 
-.. code-block:: default
+.. code-block:: Python
 
     centers = np.array([
         [0, 0, 0], [-6, -6, -6], [8, 8, 8], [8.5, 9.5, 9.5], [10, -10, 10],
@@ -108,7 +108,7 @@ them to the previously created `scene` and set the following variable to
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-77
 
-.. code-block:: default
+.. code-block:: Python
 
     scene.add(spheres_actor)
 
@@ -129,7 +129,7 @@ visualize them, we want to transform our representation from *Surface* to
 
 .. GENERATED FROM PYTHON SOURCE LINES 82-89
 
-.. code-block:: default
+.. code-block:: Python
 
     represent_actor_as_wireframe(spheres_actor)
 
@@ -145,7 +145,7 @@ Let's clean the scene and play with the parameters `phi` and `theta`.
 
 .. GENERATED FROM PYTHON SOURCE LINES 91-102
 
-.. code-block:: default
+.. code-block:: Python
 
     scene.clear()
     spheres_actor = actor.sphere(
@@ -182,7 +182,7 @@ but first, let's clear the scene.
 
 .. GENERATED FROM PYTHON SOURCE LINES 119-121
 
-.. code-block:: default
+.. code-block:: Python
 
     scene.clear()
 
@@ -194,7 +194,7 @@ create and visualize it, we can use the following instructions:
 
 .. GENERATED FROM PYTHON SOURCE LINES 124-134
 
-.. code-block:: default
+.. code-block:: Python
 
     billboards_actor = actor.billboard(centers, colors=colors, scales=scales)
     represent_actor_as_wireframe(billboards_actor)
@@ -216,7 +216,7 @@ Spheres. Let's clear our scene first.
 
 .. GENERATED FROM PYTHON SOURCE LINES 139-141
 
-.. code-block:: default
+.. code-block:: Python
 
     scene.clear()
 
@@ -228,7 +228,7 @@ Distance Sphere. So we can load it and use it like this:
 
 .. GENERATED FROM PYTHON SOURCE LINES 144-146
 
-.. code-block:: default
+.. code-block:: Python
 
     sd_sphere = import_fury_shader(os.path.join('sdf', 'sd_sphere.frag'))
 
@@ -241,7 +241,7 @@ radius distance allowed by our billboards.
 
 .. GENERATED FROM PYTHON SOURCE LINES 150-152
 
-.. code-block:: default
+.. code-block:: Python
 
     sphere_radius = 'const float RADIUS = 1.;'
 
@@ -253,7 +253,7 @@ defined variables.
 
 .. GENERATED FROM PYTHON SOURCE LINES 155-157
 
-.. code-block:: default
+.. code-block:: Python
 
     sphere_dist = 'float dist = sdSphere(point, RADIUS);'
 
@@ -264,7 +264,7 @@ Now, evaluate the signed distance function.
 
 .. GENERATED FROM PYTHON SOURCE LINES 159-167
 
-.. code-block:: default
+.. code-block:: Python
 
     sdf_eval = \
         """
@@ -282,7 +282,7 @@ Putting all of our declarations (constants and function) and implementations
 
 .. GENERATED FROM PYTHON SOURCE LINES 170-173
 
-.. code-block:: default
+.. code-block:: Python
 
     fs_dec = compose_shader([sphere_radius, sd_sphere])
     fs_impl = compose_shader([sphere_dist, sdf_eval])
@@ -294,7 +294,7 @@ We are ready to create and visualize our SDF-billboard actors.
 
 .. GENERATED FROM PYTHON SOURCE LINES 175-185
 
-.. code-block:: default
+.. code-block:: Python
 
     spheres_actor = actor.billboard(
         centers, colors=colors, scales=scales, fs_dec=fs_dec, fs_impl=fs_impl)
@@ -316,7 +316,7 @@ add shading to our SDF billboard actors.
 
 .. GENERATED FROM PYTHON SOURCE LINES 190-192
 
-.. code-block:: default
+.. code-block:: Python
 
     scene.clear()
 
@@ -331,7 +331,7 @@ function:
 
 .. GENERATED FROM PYTHON SOURCE LINES 198-201
 
-.. code-block:: default
+.. code-block:: Python
 
     central_diffs_normal = import_fury_shader(
         os.path.join('sdf', 'central_diffs.frag'))
@@ -344,7 +344,7 @@ that wraps our SDF and evaluates only a point.
 
 .. GENERATED FROM PYTHON SOURCE LINES 204-212
 
-.. code-block:: default
+.. code-block:: Python
 
     sd_sphere_normal = \
         """
@@ -361,7 +361,7 @@ Then we can load the Blinn-Phong illumination model.
 
 .. GENERATED FROM PYTHON SOURCE LINES 214-217
 
-.. code-block:: default
+.. code-block:: Python
 
     blinn_phong_model = import_fury_shader(
         os.path.join('lighting', 'blinn_phong_model.frag'))
@@ -374,7 +374,7 @@ together.
 
 .. GENERATED FROM PYTHON SOURCE LINES 220-224
 
-.. code-block:: default
+.. code-block:: Python
 
     fs_dec = compose_shader([
         sphere_radius, sd_sphere, sd_sphere_normal, central_diffs_normal,
@@ -391,7 +391,7 @@ operation and, in that way, add a very efficient form of antialiasing.
 
 .. GENERATED FROM PYTHON SOURCE LINES 230-232
 
-.. code-block:: default
+.. code-block:: Python
 
     sdf_eval = 'opacity *= 1 - step(0, dist);'
 
@@ -403,7 +403,7 @@ for the depth of the SDF sphere.
 
 .. GENERATED FROM PYTHON SOURCE LINES 235-237
 
-.. code-block:: default
+.. code-block:: Python
 
     abs_dist = 'float absDist = abs(dist);'
 
@@ -414,7 +414,7 @@ We are ready to calculate the normals.
 
 .. GENERATED FROM PYTHON SOURCE LINES 239-241
 
-.. code-block:: default
+.. code-block:: Python
 
     normal = 'vec3 normal = centralDiffsNormals(vec3(point.xy, absDist), .0001);'
 
@@ -425,7 +425,7 @@ With the normals we can calculate a light attenuation factor.
 
 .. GENERATED FROM PYTHON SOURCE LINES 243-245
 
-.. code-block:: default
+.. code-block:: Python
 
     light_attenuation = 'float lightAttenuation = normal.z;'
 
@@ -436,7 +436,7 @@ Now, we are ready to calculate the color and output it.
 
 .. GENERATED FROM PYTHON SOURCE LINES 247-256
 
-.. code-block:: default
+.. code-block:: Python
 
     color = \
         """
@@ -454,7 +454,7 @@ As before, we can bring our implementation code together.
 
 .. GENERATED FROM PYTHON SOURCE LINES 258-262
 
-.. code-block:: default
+.. code-block:: Python
 
     fs_impl = compose_shader([
         sphere_dist, sdf_eval, abs_dist, normal, light_attenuation, color,
@@ -467,7 +467,7 @@ Finally, recreate the SDF billboard actors and visualize them.
 
 .. GENERATED FROM PYTHON SOURCE LINES 264-274
 
-.. code-block:: default
+.. code-block:: Python
 
     spheres_actor = actor.billboard(
         centers, colors=colors, scales=scales, fs_dec=fs_dec, fs_impl=fs_impl)
@@ -491,27 +491,19 @@ References
 .. include:: ../links_names.inc
 
 
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 0.000 seconds)
-
-
 .. _sphx_glr_download_auto_examples_13_shaders_viz_billboard_sdf_spheres.py:
 
 .. only:: html
 
   .. container:: sphx-glr-footer sphx-glr-footer-example
 
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
 
-
+      :download:`Download Jupyter notebook: viz_billboard_sdf_spheres.ipynb <viz_billboard_sdf_spheres.ipynb>`
 
     .. container:: sphx-glr-download sphx-glr-download-python
 
       :download:`Download Python source code: viz_billboard_sdf_spheres.py <viz_billboard_sdf_spheres.py>`
-
-    .. container:: sphx-glr-download sphx-glr-download-jupyter
-
-      :download:`Download Jupyter notebook: viz_billboard_sdf_spheres.ipynb <viz_billboard_sdf_spheres.ipynb>`
 
 
 .. only:: html
