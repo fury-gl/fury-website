@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posted in 2023</title>
-  <updated>2023-12-05T17:26:23.444329+00:00</updated>
+  <updated>2024-02-23T17:36:42.808046+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/2023/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.6">ABlog</generator>
@@ -38,8 +38,203 @@
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-24-week-12-tvcastillod.html"/>
     <summary>There were different issues I needed to address for the ODF implementation. Even though I could not solve any of them completely, I did check each of the issues and made some progress. All the work in progress is being recorded in the following branch SH-for-ODF-impl, which when ready will be associated with a well-structured PR.</summary>
+    <category term="google" label="google"/>
+    <published>2023-08-24T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-08-24-final-report-tvcastillod.html</id>
+    <title>Google Summer of Code Final Work Product</title>
+    <updated>2023-08-24T00:00:00+00:00</updated>
+    <author>
+      <name>Tania Castillo</name>
+    </author>
+    <content type="html">&lt;a class="reference external image-reference" href="https://summerofcode.withgoogle.com/programs/2023/projects/ymwnLwtT"&gt;&lt;img alt="https://developers.google.com/open-source/gsoc/resources/downloads/GSoC-logo-horizontal.svg" class="align-center" height="50" src="https://developers.google.com/open-source/gsoc/resources/downloads/GSoC-logo-horizontal.svg" /&gt;&lt;/a&gt;
+&lt;a class="reference external image-reference" href="https://summerofcode.withgoogle.com/programs/2023/organizations/python-software-foundation"&gt;&lt;img alt="https://www.python.org/static/community_logos/python-logo.png" src="https://www.python.org/static/community_logos/python-logo.png" style="width: 40%;" /&gt;&lt;/a&gt;
+&lt;a class="reference external image-reference" href="https://fury.gl/latest/index.html"&gt;&lt;img alt="https://python-gsoc.org/logos/FURY.png" src="https://python-gsoc.org/logos/FURY.png" style="width: 25%;" /&gt;&lt;/a&gt;
+&lt;section id="google-summer-of-code-final-work-product"&gt;
+
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Name:&lt;/strong&gt; Tania Castillo&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Organisation:&lt;/strong&gt; Python Software Foundation&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sub-Organisation:&lt;/strong&gt; FURY&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Project:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/wiki/Google-Summer-of-Code-2023-(GSOC2023)#project-3-sdf-based-uncertainty-representation-for-dmri-glyphs"&gt;SDF-based uncertainty representation for dMRI glyphs&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;section id="abstract"&gt;
+&lt;h2&gt;Abstract&lt;/h2&gt;
+&lt;p&gt;Diffusion Magnetic Resonance Imaging (dMRI) is a non-invasive imaging technique used by neuroscientists to measure the diffusion of water molecules in biological tissue. The directional information is reconstructed using either a Diffusion Tensor Imaging (DTI) or High Angular Resolution Diffusion Imaging (HARDI) based model, which is graphically represented as tensors and Orientation Distribution Functions (ODF). Traditional rendering engines discretize Tensor and ODF surfaces using triangles or quadrilateral polygons, making their visual quality depending on the number of polygons used to build the 3D mesh, which might compromise real-time display performance. This project proposes a methodological approach to further improve the visualization of DTI tensors and HARDI ODFs glyphs by using well-established techniques in the field of computer graphics, such as geometry amplification, billboarding, signed distance functions (SDFs), and ray marching.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="proposed-objectives"&gt;
+&lt;h2&gt;Proposed Objectives&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Implement a parallelized version of computer-generated billboards using geometry shaders for amplification.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Model the mathematical functions that express the geometry of ellipsoid glyphs and implement them using Ray Marching techniques.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Model the mathematical functions that express the geometry of ODF glyphs and implement them using Ray Marching techniques.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Use SDF properties and techniques to represent the uncertainty of dMRI reconstruction models.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="objectives-completed"&gt;
+&lt;h2&gt;Objectives Completed&lt;/h2&gt;
+&lt;section id="ellipsoid-actor-implemented-with-sdf"&gt;
+&lt;h3&gt;Ellipsoid actor implemented with SDF&lt;/h3&gt;
+&lt;p&gt;A first approach for tensor glyph generation has been made, using ray marching and SDF applied to a box. The current implementation (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;tensor_slicer&lt;/span&gt;&lt;/code&gt;) requires a sphere with a specific number of vertices to be deformed. Based on this model, a sphere with more vertices is needed to get a higher resolution. Because the ray marching technique does not use polygonal meshes, it is possible to define perfectly smooth surfaces and still obtain a fast rendering.&lt;/p&gt;
+&lt;p&gt;Details of the implementation:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Vertex shader pre-calculations&lt;/em&gt;: Some minor calculations are done in the vertex shader. One, corresponding to the eigenvalues constraining and min-max normalization, are to avoid incorrect visualizations when the difference between the eigenvalues is too large. And the other is related to the tensor matrix calculation given by the diffusion tensor definition &lt;span class="math notranslate nohighlight"&gt;\(T = R^{−1}\Lambda R\)&lt;/span&gt;, where &lt;span class="math notranslate nohighlight"&gt;\(R\)&lt;/span&gt; is a rotation matrix that transforms the standard basis onto the eigenvector basis, and &lt;span class="math notranslate nohighlight"&gt;\(\Lambda\)&lt;/span&gt; is the diagonal matrix of eigenvalues &lt;a class="footnote-reference brackets" href="#id10" id="id1" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;4&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Ellipsoid SDF definition&lt;/em&gt;: The definition of the SDF is done in the fragment shader inside the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;map&lt;/span&gt;&lt;/code&gt; function, which is used later for the ray marching algorithm and the normals calculation. We define the SDF more simply by transforming a sphere into an ellipsoid, considering that the SDF of a sphere is easily computed and the definition of a tensor gives us a linear transformation of a given geometry. Also, as scaling is not a rigid body transformation, we multiply the final result by a factor to compensate for the difference, which gave us the SDF of the ellipsoid defined as &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;sdSphere(tensorMatrix&lt;/span&gt; &lt;span class="pre"&gt;*&lt;/span&gt; &lt;span class="pre"&gt;(position&lt;/span&gt; &lt;span class="pre"&gt;-&lt;/span&gt; &lt;span class="pre"&gt;centerMCVSOutput),&lt;/span&gt; &lt;span class="pre"&gt;scaleVSOutput*0.48)&lt;/span&gt; &lt;span class="pre"&gt;*&lt;/span&gt; &lt;span class="pre"&gt;scFactor&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Ray marching algorithm and lighting&lt;/em&gt;: For the ray marching algorithm, a small value of 20 was taken as the maximum distance since we apply the technique to each individual object and not all at the same time. Additionally, we set the convergence precision to 0.001. We use the central differences method to compute the normals necessary for the scene’s illumination, besides the Blinn-Phong lighting technique, which is high-quality and computationally cheap.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Visualization example&lt;/em&gt;: Below is a detailed visualization of the ellipsoids created from this new implementation.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/244503195-a626718f-4a13-4275-a2b7-6773823e553c.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/244503195-a626718f-4a13-4275-a2b7-6773823e553c.png" style="width: 376px;" /&gt;
+&lt;p&gt;This implementation does show a better quality in the displayed glyphs, and supports the display of a large amount of data, as seen in the image below. For this reason, a tutorial was made to justify in more detail the value of this new implementation. Below are some images generated for the tutorial.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/260906510-d422e7b4-3ba3-4de6-bfd0-09c04bec8876.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/260906510-d422e7b4-3ba3-4de6-bfd0-09c04bec8876.png" style="width: 600px;" /&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Ellipsoid actor implemented with SDF (Merged)&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/791"&gt;fury-gl/fury#791&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Tutorial on using ellipsoid actor to visualize tensor ellipsoids for DTI (Merged)&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/818"&gt;fury-gl/fury#818&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Future work:&lt;/strong&gt; In line with one of the initial objectives, it is expected to implement billboards later on to improve the performance, i.e., higher frame rate and less memory usage for the tensor ellipsoid creation. In addition to looking for ways to optimize the naive ray marching algorithm and the definition of SDFs.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+&lt;section id="objectives-in-progress"&gt;
+&lt;h2&gt;Objectives in Progress&lt;/h2&gt;
+&lt;section id="dti-uncertainty-visualization"&gt;
+&lt;h3&gt;DTI uncertainty visualization&lt;/h3&gt;
+&lt;p&gt;The DTI visualization pipeline is fairly complex, as a level of uncertainty arises, which, if visualized, helps to assess the model’s accuracy. This measure is not currently implemented, and even though there are several methods to calculate and visualize the uncertainty in the DTI model, because of its simplicity and visual representation, we considered Matrix Perturbation Analysis (MPA) proposed by Basser &lt;a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;1&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;. This measurement is visualized as double cones representing the variance of the main direction of diffusion, for which the ray marching technique was also used to create these objects.&lt;/p&gt;
+&lt;p&gt;Details of the implementation:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Source of uncertainty&lt;/em&gt;: The method of MPA arises from the susceptibility of DTI to dMRI noise present in diffusion-weighted images (DWIs), and also because the model is inherently statistical, making the tensor estimation and other derived quantities to be random variables &lt;a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;1&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;. For this reason, this method focus on the premise that image noise produces a random perturbation in the diffusion tensor estimation, and therefore in the calculation of eigenvalues and eigenvectors, particularly in the first eigenvector associated with the main diffusion direction.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Mathematical equation&lt;/em&gt;: The description of the perturbation of the principal eigenvector is given by math formula where &lt;span class="math notranslate nohighlight"&gt;\(\Delta D\)&lt;/span&gt; corresponds to the estimated perturbation matrix of &lt;span class="math notranslate nohighlight"&gt;\(D\)&lt;/span&gt; given by the diagonal elements of the covariance matrix &lt;span class="math notranslate nohighlight"&gt;\(\Sigma_{\alpha} \approx (B^T\Sigma^{−1}_{e}B)^{−1}\)&lt;/span&gt;, where &lt;span class="math notranslate nohighlight"&gt;\(\Sigma_{e}\)&lt;/span&gt; is the covariance matrix of the error e, defined as a diagonal matrix made with the diagonal elements of &lt;span class="math notranslate nohighlight"&gt;\((\Sigma^{−1}_{e}) = ⟨S(b)⟩^2 / \sigma^{2}_{\eta}\)&lt;/span&gt;. Then, to get the angle &lt;span class="math notranslate nohighlight"&gt;\(\theta\)&lt;/span&gt; between the perturbed principal eigenvector of &lt;span class="math notranslate nohighlight"&gt;\(D\)&lt;/span&gt;, &lt;span class="math notranslate nohighlight"&gt;\(\varepsilon_1 + \Delta\varepsilon_1\)&lt;/span&gt;, and the estimated eigenvector &lt;span class="math notranslate nohighlight"&gt;\(\varepsilon_1\)&lt;/span&gt;, it can be approximated by &lt;span class="math notranslate nohighlight"&gt;\(\theta = \tan^{−1}( \| \Delta\varepsilon_1 \|)\)&lt;/span&gt; &lt;a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;2&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;. Taking into account the above, we define the function &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;main_dir_uncertainty(evals,&lt;/span&gt; &lt;span class="pre"&gt;evecs,&lt;/span&gt; &lt;span class="pre"&gt;signal,&lt;/span&gt; &lt;span class="pre"&gt;sigma,&lt;/span&gt; &lt;span class="pre"&gt;b_matrix)&lt;/span&gt;&lt;/code&gt; that calculates the uncertainty of the eigenvector associated to the main direction of diffusion.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Double cone SDF definition&lt;/em&gt;: The final SDF is composed by the union of 2 separately cones using the definition taken from this list of &lt;a class="reference external" href="https://iquilezles.org/articles/distfunctions/#:~:text=Cone%20%2D%20exact,sign(s)%3B%0A%7D"&gt;distance functions&lt;/a&gt;, in this way we have the SDF for the double cone defined as &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;opUnion(sdCone(p,a,h),&lt;/span&gt; &lt;span class="pre"&gt;sdCone(-p,a,h))&lt;/span&gt; &lt;span class="pre"&gt;*&lt;/span&gt; &lt;span class="pre"&gt;scaleVSOutput&lt;/span&gt;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Visualization example&lt;/em&gt;: Below is a demo of how this new feature is intended to be used, an image of diffusion tensor ellipsoids and their associated uncertainty cones.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/254747296-09a8674e-bfc0-4b3f-820f-8a1b1ad8c5c9.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/254747296-09a8674e-bfc0-4b3f-820f-8a1b1ad8c5c9.png" style="width: 610px;" /&gt;
+&lt;p&gt;The implementation is almost complete, but as it is a new addition that includes mathematical calculations and for which there is no direct reference for comparison, it requires a more detail review before it can be incorporated.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Request:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;DTI uncertainty visualization (Under Review)&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/810"&gt;fury-gl/fury#810&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Future work:&lt;/strong&gt; A tutorial will be made explaining in more detail how to calculate the parameters needed for the uncertainty cones using &lt;strong&gt;dipy&lt;/strong&gt; functions, specifically: &lt;a class="reference external" href="https://github.com/dipy/dipy/blob/321e06722ef42b5add3a7f570f6422845177eafa/dipy/denoise/noise_estimate.py#L272"&gt;estimate_sigma&lt;/a&gt; for the noise variance calculation, &lt;a class="reference external" href="https://github.com/dipy/dipy/blob/321e06722ef42b5add3a7f570f6422845177eafa/dipy/reconst/dti.py#L2112"&gt;design_matrix&lt;/a&gt; to get the b-matrix, and &lt;a class="reference external" href="https://github.com/dipy/dipy/blob/321e06722ef42b5add3a7f570f6422845177eafa/dipy/reconst/dti.py#L639"&gt;tensor_prediction&lt;/a&gt; for the signal estimation. Additionally, when the ODF implementation is complete, uncertainty for this other reconstruction model is expected to be added, using semitransparent glyphs representing the mean directional information proposed by Tournier &lt;a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;3&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="odf-actor-implemented-with-sdf"&gt;
+&lt;h3&gt;ODF actor implemented with SDF&lt;/h3&gt;
+&lt;p&gt;HARDI-based techniques require more images than DTI, however, they model the diffusion directions as probability distribution functions (PDFs), and the fitted values are returned as orientation distribution functions (ODFs). ODFs are more diffusion sensitive than the diffusion tensor and, therefore, can determine the structure of multi-directional voxels very common in the white matter regions of the brain &lt;a class="footnote-reference brackets" href="#id9" id="id6" role="doc-noteref"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;3&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/a&gt;. The current actor to display this kind of glyphs is the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;odf_slicer&lt;/span&gt;&lt;/code&gt; which, given an array of spherical harmonics (SH) coefficients renders a grid of ODFs, which are created from a sphere with a specific number of vertices that fit the data.&lt;/p&gt;
+&lt;p&gt;For the application of this model using the same SDF ray marching techniques, we need the data of the SH coefficients, which are used to calculate the orientation distribution function (ODF) described &lt;a class="reference external" href="https://dipy.org/documentation/1.7.0/theory/sh_basis/"&gt;here&lt;/a&gt;. Different SH bases can be used, but for this first approach we focus on &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;descoteaux07&lt;/span&gt;&lt;/code&gt; (as labeled in dipy). After performing the necessary calculations, we obtain an approximate result of the current implementation of FURY, as seen below.&lt;/p&gt;
+&lt;img alt="https://user-images.githubusercontent.com/31288525/260909561-fd90033c-018a-465b-bd16-3586bb31ca36.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/260909561-fd90033c-018a-465b-bd16-3586bb31ca36.png" style="width: 580px;" /&gt;
+&lt;p&gt;With a first implementation we start to solve some issues related to direction, color, and data handling, to obtain exactly the same results as the current implementation.&lt;/p&gt;
+&lt;p&gt;Details on the issues:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;The direction and the scaling&lt;/em&gt;: When the shape of the ODF is more sphere-like, the size of the glyph is smaller, so for the moment it needs to be adjusted manually, but the idea is to find a relationship between the coefficients and the final object size so it can be automatically scaled. Additionally, as seen in the image, the direction does not match. To fix this, an adjustment in the calculation of the spherical coordinates can be made, or pass the direction information directly.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Pass the coefficients data efficiently&lt;/em&gt;: I’m currently creating one actor per glyph since I’m using a &lt;em&gt;uniform&lt;/em&gt; array to pass the coefficients, but the idea is to pass all the data simultaneously. The first idea is to encode the coefficients data through a texture and retrieve them in the fragment shader.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;The colormapping and the lighting&lt;/em&gt;: As these objects present curvatures with quite a bit of detail in some cases, this requires more specific lighting work, in addition to having now not only one color but a color map. This can also be done with texture, but it is necessary to see in more detail how to adjust the texture to the glyph’s shape.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;More details on current progress can be seen in blogpost of &lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-08-16-week-11-tvcastillod.html"&gt;week 11&lt;/a&gt; and &lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-08-24-week-12-tvcastillod.html"&gt;week 12&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Working branch:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;ODF implementation (Under Development)&lt;/strong&gt;
+&lt;a class="github reference external" href="https://github.com/tvcastillod/fury/tree/SH-for-ODF-impl"&gt;tvcastillod/fury&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+&lt;section id="gsoc-weekly-blogs"&gt;
+&lt;h2&gt;GSoC Weekly Blogs&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;My blog posts can be found on the &lt;a class="reference external" href="https://fury.gl/latest/blog/author/tania-castillo.html"&gt;FURY website&lt;/a&gt; and the &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/"&gt;Python GSoC blog&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="timeline"&gt;
+&lt;h2&gt;Timeline&lt;/h2&gt;
+&lt;table class="table"&gt;
+&lt;thead&gt;
+&lt;tr class="row-odd"&gt;&lt;th class="head"&gt;&lt;p&gt;Date&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Description&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Blog Post Link&lt;/p&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 0(02-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Community Bounding Period&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-06-02-week-0-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-0-2"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 1(05-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Ellipsoid actor implemented with SDF&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-06-05-week-1-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-1-23"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 2(12-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Making adjustments to the Ellipsoid Actor&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-06-12-week-2-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-2-18"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 3(19-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Working on uncertainty and details of the first PR&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-06-19-week-3-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-3-27"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 4(27-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;First draft of the DTI uncertainty visualization&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-06-27-week-4-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-4-24"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 5(03-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Preparing the data for the Ellipsoid tutorial&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-07-03-week-5-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-5-27"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 6(10-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;First draft of the Ellipsoid tutorial&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-07-10-week-6-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-6-26"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 7(17-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Adjustments on the Uncertainty Cones visualization&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-07-17-week-7-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-7-26"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 8(25-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Working on Ellipsoid Tutorial and exploring SH&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-07-25-week-8-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-8-17"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 9(31-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Tutorial done and polishing DTI uncertainty&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-07-31-week-9-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-9-22"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 10(08-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Start of SH implementation experiments&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-08-08-week-10-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-10-16"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 11(16-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Adjusting ODF implementation and looking for solutions on issues found&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-08-16-week-11-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-11-17"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 12(24-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Experimenting with ODFs implementation&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2023/2023-08-24-week-12-tvcastillod.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/tvcastillods-blog/weekly-check-in-12-9"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/section&gt;
+&lt;section id="references"&gt;
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;aside class="footnote-list brackets"&gt;
+&lt;aside class="footnote brackets" id="id7" role="doc-footnote"&gt;
+&lt;span class="label"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;1&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="backrefs"&gt;(&lt;a role="doc-backlink" href="#id2"&gt;1&lt;/a&gt;,&lt;a role="doc-backlink" href="#id3"&gt;2&lt;/a&gt;)&lt;/span&gt;
+&lt;p&gt;Basser, P. J. (1997). Quantifying errors in fiber direction and diffusion tensor field maps resulting from MR noise. In 5th Scientific Meeting of the ISMRM (Vol. 1740).&lt;/p&gt;
+&lt;/aside&gt;
+&lt;aside class="footnote brackets" id="id8" role="doc-footnote"&gt;
+&lt;span class="label"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;&lt;a role="doc-backlink" href="#id4"&gt;2&lt;/a&gt;&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;p&gt;Chang, L. C., Koay, C. G., Pierpaoli, C., &amp;amp; Basser, P. J. (2007). Variance of estimated DTI‐derived parameters via first‐order perturbation methods. Magnetic Resonance in Medicine: An Official Journal of the International Society for Magnetic Resonance in Medicine, 57(1), 141-149.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;aside class="footnote brackets" id="id9" role="doc-footnote"&gt;
+&lt;span class="label"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;3&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;span class="backrefs"&gt;(&lt;a role="doc-backlink" href="#id5"&gt;1&lt;/a&gt;,&lt;a role="doc-backlink" href="#id6"&gt;2&lt;/a&gt;)&lt;/span&gt;
+&lt;p&gt;J-Donald Tournier, Fernando Calamante, David G Gadian, and Alan Connelly. Direct estimation of the fiber orientation density function from diffusion-weighted mri data using spherical deconvolution. Neuroimage, 23(3):1176–1185, 2004.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;aside class="footnote brackets" id="id10" role="doc-footnote"&gt;
+&lt;span class="label"&gt;&lt;span class="fn-bracket"&gt;[&lt;/span&gt;&lt;a role="doc-backlink" href="#id1"&gt;4&lt;/a&gt;&lt;span class="fn-bracket"&gt;]&lt;/span&gt;&lt;/span&gt;
+&lt;p&gt;Gordon Kindlmann. Superquadric tensor glyphs. In Proceedings of the Sixth Joint Eurographics-IEEE TCVG conference on Visualization, pages 147–154, 2004.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;/aside&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-08-24-final-report-tvcastillod.html"/>
+    <summary>Name: Tania Castillo</summary>
     <category term="google" label="google"/>
     <published>2023-08-24T00:00:00+00:00</published>
   </entry>
@@ -82,7 +277,7 @@ a way to control the intensities of the distributions.&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-21-week-12-joaodellagli.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-21-week-12-joaodellagli.html"/>
     <summary>Hello everyone, it’s time for another GSoC blogpost! Today, I am going to talk about some minor details I worked on last week on my
 project.</summary>
     <category term="google" label="google"/>
@@ -126,7 +321,7 @@ project.</summary>
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-19-week-12-praneeth.html"/>
     <summary>During this week, I initiated my work on the FileDialog PR, which had been started by Soham. The initial version of the FileDialog can be found at #294. To start, I focused on rebasing the PR. Since this PR was based on an older version, there were some updates to the overall UI structure that needed to be addressed for compatibility. While handling this, I identified a set of issues that I documented in the current PR #832. These mainly revolved around:</summary>
     <category term="google" label="google"/>
     <published>2023-08-19T00:00:00+00:00</published>
@@ -166,7 +361,7 @@ project.</summary>
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-16-week-11-tvcastillod.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-16-week-11-tvcastillod.html"/>
     <summary>I continued to experiment with the ODF glyph implementation. Thanks to one of my mentors I figured out how to get the missing data corresponding to the SH coefficients a^l_m part of the function f(\theta, \phi) described here. I also was told to make sure to implement the correct SH basis since there are different definitions from the literature, I have to focus now in the one proposed by Descoteaux, described in this paper, which is labeled in dipy as descoteaux07. To do this I had to make a small adjustment to the base implementation that I took as a reference, from which I obtained a first result using SH of order 4.</summary>
     <category term="google" label="google"/>
     <published>2023-08-16T00:00:00+00:00</published>
@@ -247,7 +442,7 @@ With that being done, I will write the final report and wrap this all up.&lt;/p&
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-14-week-11-joaodellagli.html"/>
     <summary>Hello everyone, it’s time for another weekly blogpost! Today I am going to share some updates on the API refactoring
 I was working on with my mentors.</summary>
     <category term="google" label="google"/>
@@ -282,7 +477,7 @@ I was working on with my mentors.</summary>
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-12-week-11-praneeth.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-12-week-11-praneeth.html"/>
     <summary>Building upon the progress of the previous week, a major milestone was reached with the merging of PR #830. This PR added essential “getters” and “setters” for the new features of TextBlock, making it easier to handle changes. This, in turn, facilitated the integration of SpinBoxUI with the updated TextBlock.</summary>
     <category term="google" label="google"/>
     <published>2023-08-12T00:00:00+00:00</published>
@@ -312,7 +507,7 @@ I was working on with my mentors.</summary>
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-08-week-10-tvcastillod.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-08-week-10-tvcastillod.html"/>
     <summary>I started formally working on SH implementation. I was told to start first doing a simple program where I can modify in real-time the order l and degree m, parameters corresponding to the Spherical Harmonics function Y^m_l(\theta,\phi)=, based on previous work. That is just one part of the final ODF calculation, but here is what a first experimental script looks like.</summary>
     <category term="google" label="google"/>
     <published>2023-08-08T00:00:00+00:00</published>
@@ -352,7 +547,7 @@ will also invest some time on refactoring it.&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-07-week-10-joaodellagli.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-07-week-10-joaodellagli.html"/>
     <summary>Hello everyone, it’s time for another weekly blogpost!</summary>
     <category term="google" label="google"/>
     <published>2023-08-07T00:00:00+00:00</published>
@@ -381,38 +576,9 @@ will also invest some time on refactoring it.&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2023/2023-08-05-week-10-praneeth.html" rel="alternate"/>
+    <link href="https://fury.gl/posts/2023/2023-08-05-week-10-praneeth.html"/>
     <summary>This week, my focus shifted to the SpinBoxUI after wrapping up work on TextBlock2D. SpinBoxUI is a component that allows users to select a value by spinning through a range. To ensure a smooth transition, I made adjustments in SpinBoxUI to align it with the recent updates in TextBlock2D. To make things even clearer and more user-friendly, I initiated a continuous code improvement process. I introduced setters and getters that enable easier customization of TextBlock2D’s new features, such as auto_font_scale and dynamic_bbox. These tools simplify the process of adjusting these settings, and you can see the ongoing changes in pull request #830.</summary>
     <category term="google" label="google"/>
     <published>2023-08-05T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2023/2023-07-31-week-9-tvcastillod.html</id>
-    <title>Week 9: Tutorial done and polishing DTI uncertainty</title>
-    <updated>2023-07-31T00:00:00+00:00</updated>
-    <author>
-      <name>Tania Castillo</name>
-    </author>
-    <content type="html">&lt;section id="week-9-tutorial-done-and-polishing-dti-uncertainty"&gt;
-
-&lt;section id="what-did-i-do-this-week"&gt;
-&lt;h2&gt;What did I do this week?&lt;/h2&gt;
-&lt;p&gt;I addressed the comments from the tutorial of &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/818"&gt;PR #818&lt;/a&gt;  related to how to display specific visualizations I wanted to make. I was suggested to use &lt;em&gt;ShowManager&lt;/em&gt; to handle the zoom of the scene and also to use &lt;em&gt;GridUI&lt;/em&gt; to display several actors at the same time for a visual quality comparison of the tensors. Below are some images generated for the tutorial that is almost done.&lt;/p&gt;
-&lt;img alt="https://user-images.githubusercontent.com/31288525/260906510-d422e7b4-3ba3-4de6-bfd0-09c04bec8876.png" class="align-center" src="https://user-images.githubusercontent.com/31288525/260906510-d422e7b4-3ba3-4de6-bfd0-09c04bec8876.png" style="width: 600px;" /&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next"&gt;
-&lt;h2&gt;What is coming up next?&lt;/h2&gt;
-&lt;p&gt;There are some issues with the tests of the uncertainty implementation, specifically a segmentation problem that has to be with the shaders, so I expect to correct the problem by next week.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;I’m still thinking about how to approach the implementation of the spherical harmonics for ODF glyphs. Most of the implementations I have found are static so my task would be to try to parametrize the existing functions, so I can pass data from Python to the shaders properly so that I can obtain the same result as the current &lt;em&gt;odf_slicer&lt;/em&gt;.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2023/2023-07-31-week-9-tvcastillod.html" rel="alternate"/>
-    <summary>I addressed the comments from the tutorial of PR #818  related to how to display specific visualizations I wanted to make. I was suggested to use ShowManager to handle the zoom of the scene and also to use GridUI to display several actors at the same time for a visual quality comparison of the tensors. Below are some images generated for the tutorial that is almost done.</summary>
-    <category term="google" label="google"/>
-    <published>2023-07-31T00:00:00+00:00</published>
   </entry>
 </feed>
