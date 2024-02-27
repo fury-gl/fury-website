@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.timeline &#8212; FURY 0.10.0.dev381+ga165c531 documentation</title>
+    <title>fury.animation.timeline &#8212; FURY 0.10.0.dev382+g148d18b2 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
-    <script src="../../../_static/documentation_options.js?v=a39306c1"></script>
+    <script src="../../../_static/documentation_options.js?v=25c2161f"></script>
     <script src="../../../_static/doctools.js?v=888ff710"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -288,13 +288,15 @@
               
 <h1>Source code for fury.animation.timeline</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">WindowToImageFilter</span><span class="p">,</span> <span class="n">RenderWindow</span><span class="p">,</span> <span class="n">numpy_support</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">window</span>
 <span class="kn">from</span> <span class="nn">fury.animation.animation</span> <span class="kn">import</span> <span class="n">Animation</span>
+<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">RenderWindow</span><span class="p">,</span> <span class="n">WindowToImageFilter</span><span class="p">,</span> <span class="n">numpy_support</span>
 <span class="kn">from</span> <span class="nn">fury.ui.elements</span> <span class="kn">import</span> <span class="n">PlaybackPanel</span>
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">perf_counter</span>
 
 
 <div class="viewcode-block" id="Timeline">
@@ -319,6 +321,7 @@
 <span class="sd">         its length from the animations that it controls automatically.</span>
 <span class="sd">    loop : bool, optional</span>
 <span class="sd">        Whether loop playing the timeline or play once.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Timeline.__init__">
@@ -365,6 +368,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
 <span class="sd">            The duration of the Timeline.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
@@ -385,6 +389,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
 <span class="sd">            The duration of the Timeline.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span>
 
@@ -501,6 +506,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            True if the Timeline is playing.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_playing</span>
 
@@ -526,7 +532,6 @@
 <span class="sd">            True if the Timeline is paused.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
@@ -537,6 +542,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
 <span class="sd">            The speed of the timeline&#39;s playback.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_speed</span>
 
@@ -566,6 +572,7 @@
 <span class="sd">        bool</span>
 <span class="sd">            Whether the playback is in loop mode (True) or play one mode</span>
 <span class="sd">            (False).</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span>
 
@@ -578,6 +585,7 @@
 <span class="sd">        loop: bool</span>
 <span class="sd">            The loop condition to be set. (True) to loop the playback, and</span>
 <span class="sd">            (False) to play only once.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">loop</span>
 
@@ -588,6 +596,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool: &#39;True&#39; if the `Timeline` has a playback panel. otherwise, &#39;False&#39;</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -599,7 +608,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the animation</span>
 
 <span class="sd">        Parameters</span>
-<span class="sd">        -----------</span>
+<span class="sd">        ----------</span>
 <span class="sd">        fname : str, optional</span>
 <span class="sd">            The file name. Save a GIF file if name ends with &#39;.gif&#39;, or mp4</span>
 <span class="sd">            video if name ends with&#39;.mp4&#39;.</span>
@@ -630,8 +639,8 @@
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        It&#39;s recommended to use 50 or 30 FPS while recording to a GIF file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
 
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
         <span class="n">mp4</span> <span class="o">=</span> <span class="n">ext</span> <span class="o">==</span> <span class="s1">&#39;.mp4&#39;</span>
@@ -727,6 +736,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        animation: Animation or list[Animation] or tuple[Animation]</span>
 <span class="sd">            Animation/s to be added.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">anim</span><span class="p">)</span> <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="n">animation</span><span class="p">]</span>
@@ -746,6 +756,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        list:</span>
 <span class="sd">            List of Animations controlled by the timeline.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span>
 
