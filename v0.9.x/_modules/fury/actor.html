@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor &#8212; FURY 0.10.0.dev364+gc8aa25b6 documentation</title>
+    <title>fury.actor &#8212; FURY 0.10.0.dev379+g74fd1bc7 documentation</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
 
-    <script src="../../_static/documentation_options.js?v=01f462c8"></script>
+    <script src="../../_static/documentation_options.js?v=1596a899"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -299,7 +299,8 @@
 <span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">layout</span>
 <span class="kn">from</span> <span class="nn">fury.actors.odf_slicer</span> <span class="kn">import</span> <span class="n">OdfSlicerActor</span>
 <span class="kn">from</span> <span class="nn">fury.actors.peak</span> <span class="kn">import</span> <span class="n">PeakActor</span>
-<span class="kn">from</span> <span class="nn">fury.actors.tensor</span> <span class="kn">import</span> <span class="n">tensor_ellipsoid</span>
+<span class="kn">from</span> <span class="nn">fury.actors.tensor</span> <span class="kn">import</span> <span class="n">double_cone</span><span class="p">,</span> <span class="n">main_dir_uncertainty</span><span class="p">,</span> \
+    <span class="n">tensor_ellipsoid</span>
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <span class="n">colormap_lookup_table</span>
 <span class="kn">from</span> <span class="nn">fury.deprecator</span> <span class="kn">import</span> <span class="n">deprecate_with_version</span><span class="p">,</span> <span class="n">deprecated_params</span>
 <span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <span class="n">load_image</span>
@@ -4361,6 +4362,65 @@
 
     <span class="k">return</span> <span class="n">tensor_ellipsoid</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">axes</span><span class="p">,</span> <span class="n">lengths</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span></div>
 
+
+
+<div class="viewcode-block" id="uncertainty_cone">
+<a class="viewcode-back" href="../../reference/fury.actor.html#fury.actor.uncertainty_cone">[docs]</a>
+<span class="k">def</span> <span class="nf">uncertainty_cone</span><span class="p">(</span>
+    <span class="n">evals</span><span class="p">,</span>
+    <span class="n">evecs</span><span class="p">,</span>
+    <span class="n">signal</span><span class="p">,</span>
+    <span class="n">sigma</span><span class="p">,</span>
+    <span class="n">b_matrix</span><span class="p">,</span>
+    <span class="n">scales</span><span class="o">=</span><span class="mf">.6</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    VTK actor for visualizing the cone of uncertainty representing the</span>
+<span class="sd">    variance of the main direction of diffusion.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    evals : ndarray (3, ) or (N, 3)</span>
+<span class="sd">        Eigenvalues.</span>
+<span class="sd">    evecs : ndarray (3, 3) or (N, 3, 3)</span>
+<span class="sd">        Eigenvectors.</span>
+<span class="sd">    signal : 3D or 4D ndarray</span>
+<span class="sd">        Predicted signal.</span>
+<span class="sd">    sigma : ndarray</span>
+<span class="sd">        Standard deviation of the noise.</span>
+<span class="sd">    b_matrix : array (N, 7)</span>
+<span class="sd">        Design matrix for DTI.</span>
+<span class="sd">    scales : float or ndarray (N, ), optional</span>
+<span class="sd">        Cones of uncertainty size.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque), default(1.0).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    double_cone: Actor</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">valid_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">evecs</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">valid_mask</span><span class="p">)</span>
+
+    <span class="n">evecs</span> <span class="o">=</span> <span class="n">evecs</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="n">evals</span> <span class="o">=</span> <span class="n">evals</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+    <span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+
+    <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">107</span><span class="p">,</span> <span class="mi">107</span><span class="p">,</span> <span class="mi">107</span><span class="p">])</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">evecs</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scales</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scales</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+
+    <span class="n">angles</span> <span class="o">=</span> <span class="n">main_dir_uncertainty</span><span class="p">(</span><span class="n">evals</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">signal</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">b_matrix</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">double_cone</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">evecs</span><span class="p">,</span> <span class="n">angles</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">scales</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span></div>
 
 </pre></div>
 <div class="section ablog__blog_comments">
