@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>A Stadia-like system for data visualization &#8212; FURY 0.10.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bfc71b0b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script src="../../_static/documentation_options.js?v=7e54ce6f"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2021/2021-06-12-gsoc-devmessias-2';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.10.0';
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    <div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text" style="color: #990000;">FURY</div>
+    </a>
+</div>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+<section id="a-stadia-like-system-for-data-visualization">
+<h1>A Stadia-like system for data visualization<a class="headerlink" href="#a-stadia-like-system-for-data-visualization" title="Link to this heading">#</a></h1>
+<p>Hi all! In this post I’ll talk about the PR
+<a class="reference external" href="https://github.com/fury-gl/fury/pull/437">#437</a>.</p>
+<p>There are several reasons to have a streaming system for data
+visualization. Because I’m doing a PhD in a developing country I always
+need to think of the cheapest way to use the computational resources
+available. For example, with the GPUs prices increasing, it’s necessary
+to share a machine with a GPU with different users in different
+locations. Therefore, to convince my Brazilian friends to use FURY I
+need to code thinking inside of the (a) low-budget scenario.</p>
+<p>To construct the streaming system for my project I’m thinking about the
+following properties and behaviors:</p>
+<ol class="arabic simple">
+<li><p>I want to avoid blocking the code execution in the main thread (where
+the vtk/fury instance resides).</p></li>
+<li><p>The streaming should work inside of a low bandwidth environment.</p></li>
+<li><p>I need an easy way to share the rendering result. For example, using
+the free version of ngrok.</p></li>
+</ol>
+<p>To achieve the property <strong>1.</strong> we need to circumvent the GIL problem.
+Using the threading module alone it’s not good enough because we can’t
+use the python-threading for parallel CPU computation. In addition, to
+achieve a better organization it’s better to define the server system as
+an uncoupled module. Therefore, I believe that multiprocessing-lib in
+python will fit very well for our proposes.</p>
+<p>For the streaming system to work smoothly in a low-bandwidth scenario we
+need to choose the protocol wisely. In the recent years the WebRTC
+protocol has been used in a myriad of applications like google hangouts
+and Google Stadia aiming low latency behavior. Therefore, I choose the
+webrtc as my first protocol to be available in the streaming system
+proposal.</p>
+<p>To achieve the third property, we must be economical in adding
+requirements and dependencies.</p>
+<p>Currently, the system has some issues, but it’s already working. You can
+see some tutorials about how to use this streaming system
+<a class="reference external" href="https://github.com/devmessias/fury/tree/feature_fury_stream_client/docs/tutorials/04_stream">here</a>.
+After running one of these examples you can easily share the results and
+interact with other users. For example, using the ngrok For example,
+using the ngrok</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">ngrok</span> <span class="n">http</span> <span class="mi">8000</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<section id="how-does-it-works">
+<h2>How does it works?<a class="headerlink" href="#how-does-it-works" title="Link to this heading">#</a></h2>
+<p>The image below it’s a simple representation of the streaming system.</p>
+<p><img alt="image1" src="https://user-images.githubusercontent.com/6979335/121934889-33ff1480-cd1e-11eb-89a4-562fbb953ba4.png" /></p>
+<p>As you can see, the streaming system is made up of different processes
+that share some memory blocks with each other. One of the hardest part
+of this PR was to code this sharing between different objects like VTK,
+numpy and the webserver. I’ll discuss next some of technical issues that
+I had to learn/circumvent.</p>
+<section id="sharing-data-between-process">
+<h3>Sharing data between process<a class="headerlink" href="#sharing-data-between-process" title="Link to this heading">#</a></h3>
+<p>We want to avoid any kind of unnecessary duplication of data or
+expensive copy/write actions. We can achieve this economy of
+computational resources using the multiprocessing module from python.</p>
+<section id="multiprocessing-rawarray">
+<h4>multiprocessing RawArray<a class="headerlink" href="#multiprocessing-rawarray" title="Link to this heading">#</a></h4>
+<div class="line-block">
+<div class="line">The
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.sharedctypes.RawArray">RawArray</a>
+from multiprocessing allows to share resources between different
+processes. However, there are some tricks to get a better performance
+when we are dealing with RawArray’s. For example, <a class="reference external" href="https://github.com/devmessias/fury/tree/6ae82fd239dbde6a577f9cccaa001275dcb58229">take a look at my
+PR in a older
+stage.</a>
+In this older stage my streaming system was working well. However, one
+of my mentors (Filipi Nascimento) saw a huge latency for
+high-resolutions examples. My first thought was that latency was
+caused by the GPU-CPU copy from the opengl context. However, I
+discovered that I’ve been using RawArray’s wrong in my entire life!</div>
+<div class="line">See for example this line of code
+<a class="reference external" href="https://github.com/devmessias/fury/blob/6ae82fd239dbde6a577f9cccaa001275dcb58229/fury/stream/client.py#L101">fury/stream/client.py#L101</a>
+The code below shows how I’ve been updating the raw arrays</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">raw_arr_buffer</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_data</span>
+</pre></div>
+</div>
+<p>This works fine for small and medium sized arrays, but for large ones it
+takes a large amount of time, more than GPU-CPU copy. The explanation
+for this bad performance is available here : <a class="reference external" href="https://stackoverflow.com/questions/33853543/demystifying-sharedctypes-performance">Demystifying sharedctypes
+performance.</a>
+The solution which gives a stupendous performance improvement is quite
+simple. RawArrays implements the buffer protocol. Therefore, we just
+need to use the memoryview:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">memview</span><span class="p">(</span><span class="n">arr_buffer</span><span class="p">)[:]</span> <span class="o">=</span> <span class="n">new_data</span>
+</pre></div>
+</div>
+<p>The memview is really good, but there it’s a little issue when we are
+dealing with uint8 RawArrays. The following code will cause an exception:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">memview</span><span class="p">(</span><span class="n">arr_buffer_uint8</span><span class="p">)[:]</span> <span class="o">=</span> <span class="n">new_data_uint8</span>
+</pre></div>
+</div>
+<p>There is a solution for uint8 rawarrays using just memview and cast
+methods. However, numpy comes to rescue and offers a simple and a
+generic solution. You just need to convert the rawarray to a np
+representation in the following way:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arr_uint8_repr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ctypeslib</span><span class="o">.</span><span class="n">as_array</span><span class="p">(</span><span class="n">arr_buffer_uint8</span><span class="p">)</span>
+<span class="n">arr_uint8_repr</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">new_data_uint8</span>
+</pre></div>
+</div>
+<p>You can navigate to my repository in this specific <a class="reference external" href="https://github.com/devmessias/fury/commit/b1b0caf30db762cc018fc99dd4e77ba0390b2f9e">commit
+position</a>
+and test the streaming examples to see how this little modification
+improves the performance.</p>
+</section>
+</section>
+<section id="multiprocessing-inside-of-different-operating-systems">
+<h3>Multiprocessing inside of different Operating Systems<a class="headerlink" href="#multiprocessing-inside-of-different-operating-systems" title="Link to this heading">#</a></h3>
+<p>Serge Koudoro, who is one of my mentors, has pointed out an issue of the
+streaming system running in MacOs. I don’t know many things about MacOs,
+and as pointed out by Filipi the way that MacOs deals with
+multiprocessing is very different than the Linux approach. Although we
+solved the issue discovered by Serge, I need to be more careful to
+assume that different operating systems will behave in the same way. If
+you want to know more,I recommend that you read this post <a class="reference external" href="https://britishgeologicalsurvey.github.io/science/python-forking-vs-spawn/">Python:
+Forking vs
+Spawm</a>.
+And it’s also important to read the official documentation from python.
+It can save you a lot of time. Take a look what the
+official python documentation says about the multiprocessing method</p>
+<p><img alt="image2" src="https://user-images.githubusercontent.com/6979335/121958121-b0ebb780-cd39-11eb-862a-37244f7f635b.png" /> Source:<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html">https://docs.python.org/3/library/multiprocessing.html</a></p>
+</section>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+
+
+<div class="section ablog__prev-next">
+  <span class="ablog__prev">
+    
+    
+    Previous:
+    
+    <a href="2021-06-08-week-1-sajag.html">
+      
+      <span>Welcome to my GSoC Blog!</span>
+    </a>
+    
+  </span>
+  <span class="ablog__spacer">&nbsp;</span>
+  <span class="ablog__next">
+    
+    
+    Next:
+    
+    <a href="2021-06-13-week-2-antriksh.html">
+      <span>Week #2: Feature additions in UI and IO modules</span>
+      
+    </a>
+    
+  </span>
+</div>
+
+  
+  
+</div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-does-it-works">
+   How does it works?
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#sharing-data-between-process">
+     Sharing data between process
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#multiprocessing-rawarray">
+       multiprocessing RawArray
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#multiprocessing-inside-of-different-operating-systems">
+     Multiprocessing inside of different Operating Systems
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/posts/2021/2021-06-12-gsoc-devmessias-2.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+ 
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+    </div>
+</div>
+  </div>
+  
+</div>
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>

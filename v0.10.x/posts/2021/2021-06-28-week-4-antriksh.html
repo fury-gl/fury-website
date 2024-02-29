@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Week #4: Adding Tree UI to the UI module &#8212; FURY 0.10.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bfc71b0b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script src="../../_static/documentation_options.js?v=7e54ce6f"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2021/2021-06-28-week-4-antriksh';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.10.0';
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    <div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text" style="color: #990000;">FURY</div>
+    </a>
+</div>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+<section id="week-4-adding-tree-ui-to-the-ui-module">
+<h1>Week #4: Adding Tree UI to the UI module<a class="headerlink" href="#week-4-adding-tree-ui-to-the-ui-module" title="Link to this heading">#</a></h1>
+<section id="what-did-i-do-this-week">
+<h2>What did I do this week?<a class="headerlink" href="#what-did-i-do-this-week" title="Link to this heading">#</a></h2>
+<p>This week I had very few tasks to do, almost all of them revolved around UI elements and adding stuff to the UI module. Earlier, it was pointed out that due to some design issues, importing certain modules into others caused circular imports which led to importing the specific modules inside a class/method which is not the best approach. This will be resolved as soon as the PR that fixes this issue is reviewed/merged in the codebase. In the meantime, all the PR’s related to UI will be on hold, which is why this I had few tasks this week. The tasks are described below in detail:</p>
+<ul>
+<li><p><a class="reference external" href="https://github.com/fury-gl/fury/pull/448">Addition of watcher class in UI</a> :This is finally done, as described in the previous blogs this was something that was on hold for a long time. Primarily, due to other tasks I couldn’t work on this but this week due to less tasks I was able to complete the watcher class and create a PR. This PR adds support for a watcher class in the UI elements. The purpose of this class is to monitor a particular attribute from the UI element after it has been added to the scene. If the attribute changes in the real time, a user defined callback is triggered and the scene is force rendered. Currently, if any attribute of the UI element changes after it is added to the scene it does not get updated accordingly. The only way to update the UI element would be to add a custom user hook that will be triggered when a particular event that can change the attribute is invoked. This is highly ambiguous as some unmonitored event can easily change many attributes of the UI element. Also it would be really hard to add user hooks for so many events. The watcher class does this automatically, it monitors the attribute for changes and if the attribute changes, a user defined callback is triggered. If this is something that is required in the UI module, then in the future a good addition would be to monitor the UI element instance as a whole instead of a single attribute .</p></li>
+<li><p><a class="reference external" href="https://github.com/antrikshmisri/fury/blob/bb45d1c5b6fc0495dfe4d7814fab9aefbf9f7727/fury/ui.py#L5249">Addition of Tree UI in the UI module</a> : Another task for this week was to work on either Tree UI or the Accordion UI. I chose to work on Tree UI as it is very interesting to implement and the logic for Tree is almost similar to that of an Accordion. So far, I have managed to implement TreeNode2D. The Tree UI contains several nodes and each node can have its own sub-nodes/children. Also, each node has an expand/collapse button which can be used to chow/hide the underlying children. The Tree UI would take some sort of data structure that contains nodes/sub-nodes and convert each node to TreeNode2D and add all the processed node to the main Panel. So far this the result I have achieved:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="https://i.imgur.com/WIMWsrp.png"><img alt="https://i.imgur.com/WIMWsrp.png" src="https://i.imgur.com/WIMWsrp.png" style="width: 200px; height: 200px;" /></a>
+<a class="reference internal image-reference" href="https://i.imgur.com/u33D7Qi.png"><img alt="https://i.imgur.com/u33D7Qi.png" src="https://i.imgur.com/u33D7Qi.png" style="width: 200px; height: 200px;" /></a>
+</div></blockquote>
+</li>
+<li><p><a class="reference external" href="https://github.com/fury-gl/fury/pull/446">Resize Panel2D on window resizing</a> : This PR adds support for resizing Panel2D on WindowResizeEvent. This means that the Panle2D resizes itself with respect to the changed window size. It also retains its maximum possible size and does not overflow. Also, this PR adds support for resizing the Panel2D for the bottom right corner. A placeholder button is placed at the bottom right corner of the Panel2D and when it is dragged by the placeholder the Panel2D resize accordingly. Below is an example:</p>
+<blockquote>
+<div><a class="reference internal image-reference" href="https://i.imgur.com/87PN7TQ.gif"><img alt="https://i.imgur.com/87PN7TQ.gif" src="https://i.imgur.com/87PN7TQ.gif" style="width: 200px; height: 200px;" /></a>
+</div></blockquote>
+</li>
+<li><p>Also, I did some testing of GridLayout when placed inside a resizable Panel2D. This will need to be worked on before advancing any further. Currently the elements present in the Panel2D do not resize properly w.r.t the changed panel size. Hopefully, this will be fixed in the future PRs.</p></li>
+</ul>
+</section>
+<section id="did-i-get-stuck-anywhere">
+<h2>Did I get stuck anywhere?<a class="headerlink" href="#did-i-get-stuck-anywhere" title="Link to this heading">#</a></h2>
+<p>Fortunately, I did not get stuck this week.</p>
+</section>
+<section id="what-is-coming-up-next">
+<h2>What is coming up next?<a class="headerlink" href="#what-is-coming-up-next" title="Link to this heading">#</a></h2>
+<p>The tasks for the next week will be decided in this weeks meeting.</p>
+<p><strong>See you guys next week!</strong></p>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+
+
+<div class="section ablog__prev-next">
+  <span class="ablog__prev">
+    
+    
+    Previous:
+    
+    <a href="2021-06-28-week-4-sajag.html">
+      
+      <span>Third week of coding!</span>
+    </a>
+    
+  </span>
+  <span class="ablog__spacer">&nbsp;</span>
+  <span class="ablog__next">
+    
+    
+    Next:
+    
+    <a href="2021-07-05-week-5-sajag.html">
+      <span>Fourth week of coding!</span>
+      
+    </a>
+    
+  </span>
+</div>
+
+  
+  
+</div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-did-i-do-this-week">
+   What did I do this week?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#did-i-get-stuck-anywhere">
+   Did I get stuck anywhere?
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#what-is-coming-up-next">
+   What is coming up next?
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/posts/2021/2021-06-28-week-4-antriksh.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+ 
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+    </div>
+</div>
+  </div>
+  
+</div>
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>
