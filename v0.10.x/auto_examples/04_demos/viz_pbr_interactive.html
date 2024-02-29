@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Interactive PBR demo &#8212; FURY 0.10.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css?v=7f9a90b1" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=bfc71b0b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script src="../../_static/documentation_options.js?v=7e54ce6f"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/04_demos/viz_pbr_interactive';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.10.0';
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="User Interface Elements" href="../07_ui/index.html" />
+    <link rel="prev" title="Display Tensor Ellipsoids for DTI using tensor_slicer vs ellipsoid actor" href="viz_dt_ellipsoids.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    <div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text" style="color: #990000;">FURY</div>
+    </a>
+</div>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul><ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#introductory">Introductory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#demos">Demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#user-interface-elements">User Interface Elements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#animation">Animation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#shaders">Shaders</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#integrate-physics-using-pybullet">Integrate Physics using pybullet</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#streaming">Streaming</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+<div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-04-demos-viz-pbr-interactive-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code</p>
+</div>
+<section class="sphx-glr-example-title" id="interactive-pbr-demo">
+<span id="sphx-glr-auto-examples-04-demos-viz-pbr-interactive-py"></span><h1>Interactive PBR demo<a class="headerlink" href="#interactive-pbr-demo" title="Link to this heading">#</a></h1>
+<p>This is a demonstration of how Physically-Based Rendering (PBR) can be used to
+simulate different materials.</p>
+<p>Let’s start by importing the necessary modules:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">window</span>
+<span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">fetch_viz_cubemaps</span><span class="p">,</span> <span class="n">read_viz_cubemap</span>
+<span class="kn">from</span> <span class="nn">fury.io</span> <span class="kn">import</span> <a href="../../reference/fury.io.html#fury.io.load_cubemap_texture" title="fury.io.load_cubemap_texture" class="sphx-glr-backref-module-fury-io sphx-glr-backref-type-py-function"><span class="n">load_cubemap_texture</span></a>
+<span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <a href="../../reference/fury.utils.html#fury.utils.normals_from_actor" title="fury.utils.normals_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">normals_from_actor</span></a><span class="p">,</span>
+    <a href="../../reference/fury.utils.html#fury.utils.tangents_from_direction_of_anisotropy" title="fury.utils.tangents_from_direction_of_anisotropy" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_from_direction_of_anisotropy</span></a><span class="p">,</span>
+    <a href="../../reference/fury.utils.html#fury.utils.tangents_to_actor" title="fury.utils.tangents_to_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_to_actor</span></a><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>The following functions will help us to manage the sliders events.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">change_slice_metallic</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">metallic</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">roughness</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_anisotropy</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_x</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <span class="n">sphere</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.tangents_from_direction_of_anisotropy" title="fury.utils.tangents_from_direction_of_anisotropy" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_from_direction_of_anisotropy</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">)</span>
+    <a href="../../reference/fury.utils.html#fury.utils.tangents_to_actor" title="fury.utils.tangents_to_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_to_actor</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_y</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <span class="n">sphere</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.tangents_from_direction_of_anisotropy" title="fury.utils.tangents_from_direction_of_anisotropy" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_from_direction_of_anisotropy</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">)</span>
+    <a href="../../reference/fury.utils.html#fury.utils.tangents_to_actor" title="fury.utils.tangents_to_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_to_actor</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_z</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <span class="n">sphere</span>
+    <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.tangents_from_direction_of_anisotropy" title="fury.utils.tangents_from_direction_of_anisotropy" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_from_direction_of_anisotropy</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">)</span>
+    <a href="../../reference/fury.utils.html#fury.utils.tangents_to_actor" title="fury.utils.tangents_to_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_to_actor</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_anisotropy_rotation</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy_rotation</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_coat_strength</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_strength</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_coat_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_roughness</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_base_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">base_ior</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">change_slice_coat_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">pbr_params</span>
+    <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_ior</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
+</pre></div>
+</div>
+<p>Last, but not least, we define the following function to help us to
+reposition the UI elements every time we resize the window.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">win_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">control_panel</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a>
+    <span class="k">if</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="n">GetSize</span><span class="p">():</span>
+        <span class="n">size_old</span> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a>
+        <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
+        <span class="n">size_change</span> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">size_old</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">control_panel</span><span class="o">.</span><span class="n">re_align</span><span class="p">(</span><span class="n">size_change</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s fetch a skybox texture from the FURY data repository.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_viz_cubemaps</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder /Users/skoudoro/.fury/cubemaps
+
+({&#39;skybox-nx.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-nx.jpg&#39;, &#39;12B1CE6C91AA3AAF258A8A5944DF739A6C1CC76E89D4D7119D1F795A30FC1BF2&#39;), &#39;skybox-ny.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-ny.jpg&#39;, &#39;E18FE2206B63D3DF2C879F5E0B9937A61D99734B6C43AC288226C58D2418D23E&#39;), &#39;skybox-nz.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-nz.jpg&#39;, &#39;00DDDD1B715D5877AF2A74C014FF6E47891F07435B471D213CD0673A8C47F2B2&#39;), &#39;skybox-px.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-px.jpg&#39;, &#39;BF20ACD6817C9E7073E485BBE2D2CE56DACFF73C021C2B613BA072BA2DF2B754&#39;), &#39;skybox-py.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-py.jpg&#39;, &#39;16F0D692AF0B80E46929D8D8A7E596123C76729CC5EB7DFD1C9184B115DD143A&#39;), &#39;skybox-pz.jpg&#39;: (&#39;https://raw.githubusercontent.com/fury-gl/fury-data/master/cubemaps/skybox-pz.jpg&#39;, &#39;B850B5E882889DF26BE9289D7C25BA30524B37E56BC2075B968A83197AD977F3&#39;)}, &#39;/Users/skoudoro/.fury/cubemaps&#39;)
+</pre></div>
+</div>
+<p>The following function returns the full path of the 6 images composing the
+skybox.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">textures</span></a> <span class="o">=</span> <span class="n">read_viz_cubemap</span><span class="p">(</span><span class="s1">&#39;skybox&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Now that we have the location of the textures, let’s load them and create a
+Cube Map Texture object.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">cubemap</span> <span class="o">=</span> <a href="../../reference/fury.io.html#fury.io.load_cubemap_texture" title="fury.io.load_cubemap_texture" class="sphx-glr-backref-module-fury-io sphx-glr-backref-type-py-function"><span class="n">load_cubemap_texture</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">textures</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>The Scene object in FURY can handle cube map textures and extract light
+information from them, so it can be used to create more plausible materials
+interactions. The <code class="docutils literal notranslate"><span class="pre">skybox</span></code> parameter takes as input a cube map texture and
+performs the previously described process.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">(</span><span class="n">skybox</span><span class="o">=</span><span class="n">cubemap</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With the scene created, we can then populate it. In this demo we will only
+add a sphere actor.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">sphere</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.sphere" title="fury.actor.sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">sphere</span></a><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">),</span> <span class="n">radii</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The direction of anisotropy (DoA) defines the direction at which all the
+tangents of our actor are pointing.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>The following process gets the normals of the actor and computes the tangents
+that are aligned to the provided DoA. Then it registers those tangents to the
+actor.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.normals_from_actor" title="fury.utils.normals_from_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">normals_from_actor</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a> <span class="o">=</span> <a href="../../reference/fury.utils.html#fury.utils.tangents_from_direction_of_anisotropy" title="fury.utils.tangents_from_direction_of_anisotropy" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_from_direction_of_anisotropy</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">normals</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">)</span>
+<a href="../../reference/fury.utils.html#fury.utils.tangents_to_actor" title="fury.utils.tangents_to_actor" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">tangents_to_actor</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tangents</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;vtkmodules.vtkRenderingOpenGL2.vtkOpenGLActor(0x2a1ad4b90) at 0x2a19ccb20&gt;
+</pre></div>
+</div>
+<p>With the tangents computed and in place, we have all the elements needed to
+add some material properties to the actor.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pbr_params</span> <span class="o">=</span> <a href="../../reference/fury.material.html#fury.material.manifest_pbr" title="fury.material.manifest_pbr" class="sphx-glr-backref-module-fury-material sphx-glr-backref-type-py-function"><span class="n">material</span><span class="o">.</span><span class="n">manifest_pbr</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Our actor is now ready to be added to the scene.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.Scene.add" title="fury.window.Scene.add" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">scene</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><span class="n">sphere</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s setup now the window and the UI.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">show_m</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+    <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="o">=</span><a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>We will create one single panel with all of our labels and sliders.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">control_panel</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">Panel2D</span></a><span class="p">(</span>
+    <span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">),</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span> <span class="n">align</span><span class="o">=</span><span class="s1">&#39;right&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>By using our previously defined function, we can easily create all the labels
+we need for this demo. And then add them to the panel.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slider_label_metallic</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Metallic&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_roughness</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Roughness&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_anisotropy</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Anisotropy&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_anisotropy_rotation</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Anisotropy Rotation&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span>
+<span class="p">)</span>
+<span class="n">slider_label_anisotropy_direction_x</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Anisotropy Direction X&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span>
+<span class="p">)</span>
+<span class="n">slider_label_anisotropy_direction_y</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Anisotropy Direction Y&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span>
+<span class="p">)</span>
+<span class="n">slider_label_anisotropy_direction_z</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Anisotropy Direction Z&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span>
+<span class="p">)</span>
+<span class="n">slider_label_coat_strength</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Coat Strength&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_coat_roughness</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Coat Roughness&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_base_ior</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Base IoR&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="n">slider_label_coat_ior</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">TextBlock2D</span></a><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;Coat IoR&#39;</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_metallic</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_roughness</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.86</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_anisotropy</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.77</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_anisotropy_rotation</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_anisotropy_direction_x</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.59</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_anisotropy_direction_y</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_anisotropy_direction_z</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.41</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_coat_strength</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_coat_roughness</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_base_ior</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_label_coat_ior</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Our sliders are created and added to the panel in the following way.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slider_slice_metallic</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">metallic</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_roughness</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">roughness</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_anisotropy</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_anisotropy_rotation</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy_rotation</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_coat_strength</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_strength</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_coat_roughness</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_roughness</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Notice that we are defining a range of [-1, 1] for the DoA. This is because
+within that range we cover all the possible 3D directions needed to align the
+tangents.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slider_slice_anisotropy_direction_x</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">min_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_anisotropy_direction_y</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+    <span class="n">min_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_anisotropy_direction_z</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">doa</span></a><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+    <span class="n">min_value</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.1f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Another special case are the Index of Refraction (IoR) sliders. In these
+cases, the values are defined in the range [1, 2.3] according to the
+documentation of the material.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slider_slice_base_ior</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">base_ior</span><span class="p">,</span>
+    <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.02f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">slider_slice_coat_ior</span> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.core.UI" title="fury.ui.core.UI" class="sphx-glr-backref-module-fury-ui-core sphx-glr-backref-type-py-class"><span class="n">ui</span><span class="o">.</span><span class="n">LineSlider2D</span></a><span class="p">(</span>
+    <span class="n">initial_value</span><span class="o">=</span><span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_ior</span><span class="p">,</span>
+    <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">max_value</span><span class="o">=</span><span class="mf">2.3</span><span class="p">,</span>
+    <span class="n">length</span><span class="o">=</span><span class="mi">195</span><span class="p">,</span>
+    <span class="n">text_template</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{value:.02f}</span><span class="s1">&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Let’s add the event handlers functions to the corresponding sliders.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slider_slice_metallic</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_metallic</span>
+<span class="n">slider_slice_roughness</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_roughness</span>
+<span class="n">slider_slice_anisotropy</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_anisotropy</span>
+<span class="n">slider_slice_anisotropy_rotation</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_anisotropy_rotation</span>
+<span class="n">slider_slice_anisotropy_direction_x</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_anisotropy_direction_x</span>
+<span class="n">slider_slice_anisotropy_direction_y</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_anisotropy_direction_y</span>
+<span class="n">slider_slice_anisotropy_direction_z</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_anisotropy_direction_z</span>
+<span class="n">slider_slice_coat_strength</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_coat_strength</span>
+<span class="n">slider_slice_coat_roughness</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_coat_roughness</span>
+<span class="n">slider_slice_base_ior</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_base_ior</span>
+<span class="n">slider_slice_coat_ior</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="n">change_slice_coat_ior</span>
+</pre></div>
+</div>
+<p>And then add the sliders to the panel.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_metallic</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_roughness</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.86</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_anisotropy</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.77</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_anisotropy_rotation</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_anisotropy_direction_x</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.59</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_anisotropy_direction_y</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_anisotropy_direction_z</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.41</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_coat_strength</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.32</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_coat_roughness</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.23</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_base_ior</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">))</span>
+<span class="n">control_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">slider_slice_coat_ior</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>Consequently, we add the panel to the scene.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.window.html#fury.window.Scene.add" title="fury.window.Scene.add" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">scene</span><span class="o">.</span><span class="n">add</span></a><span class="p">(</span><span class="n">control_panel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Previously we defined a function to help us when we resize the window, so
+let’s capture the current size and add our helper function as a
+<cite>window_callback</cite> to the window.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="o">.</span><span class="n">GetSize</span><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.ShowManager.add_window_callback" title="fury.window.ShowManager.add_window_callback" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">show_m</span><span class="o">.</span><span class="n">add_window_callback</span></a><span class="p">(</span><span class="n">win_callback</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Finally, let’s visualize our demo.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">interactive</span></a> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">if</span> <a href="https://docs.python.org/3/library/functions.html#bool" title="builtins.bool" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">interactive</span></a><span class="p">:</span>
+    <a href="../../reference/fury.window.html#fury.window.ShowManager.start" title="fury.window.ShowManager.start" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-method"><span class="n">show_m</span><span class="o">.</span><span class="n">start</span></a><span class="p">()</span>
+
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scene</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="o">=</span><span class="p">(</span><span class="mi">1920</span><span class="p">,</span> <span class="mi">1080</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s1">&#39;viz_pbr_interactive.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_viz_pbr_interactive_001.png" srcset="../../_images/sphx_glr_viz_pbr_interactive_001.png" alt="viz pbr interactive" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.974 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-04-demos-viz-pbr-interactive-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e22a09689bdb9d1c7847fe275f1e83ba/viz_pbr_interactive.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_pbr_interactive.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ea42b6e1d50eac5b2d3d01d0757008ef/viz_pbr_interactive.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_pbr_interactive.py</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+</div>
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="viz_dt_ellipsoids.html" title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Display Tensor Ellipsoids for DTI using tensor_slicer vs ellipsoid actor</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="../07_ui/index.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">User Interface Elements</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/auto_examples/04_demos/viz_pbr_interactive.rst.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+ 
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+    </div>
+</div>
+  </div>
+  
+</div>
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>
