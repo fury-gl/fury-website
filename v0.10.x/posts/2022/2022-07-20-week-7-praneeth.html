@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Week 7 - Working on Rotation PR and Trying Freehand Drawing &#8212; FURY 0.11.0.dev3+ga4d67924 documentation</title>
+    <title>Week 7 - Working on Rotation PR and Trying Freehand Drawing &#8212; FURY 0.11.0.dev5+g0ff602a6 documentation</title>
   
   
   
@@ -36,7 +36,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=7963a43b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=522a8817" />
     <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -44,8 +44,8 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=1f587739"></script>
-    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/documentation_options.js?v=49526ad3"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
@@ -376,19 +376,23 @@ document.write(`
 <section id="what-did-you-do-this-week">
 <h2>What did you do this week?<a class="headerlink" href="#what-did-you-do-this-week" title="Link to this heading">#</a></h2>
 <p>I continued PR <a class="reference external" href="https://github.com/fury-gl/fury/pull/623">#623</a> and fixed the displacement of the shape from its original position when applying rotation. This was happening because most of the calculations resulted in <cite>float</cite> values, but as the pixel position were integers we had to explicitly convert these values into <cite>int</cite>. This conversion rounded off the values and as we call this function continuously, each time the round-off would happen, the shape would get displaced.</p>
-<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif"><img alt="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif"><img alt="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723334-ef9ec75d-d3bf-4b79-83bf-272545c4dd12.gif" style="width: 400px;" />
+</a>
 <p>To fix this, I converted all the calculations into integer calculations using floor division <code class="docutils literal notranslate"><span class="pre">//</span></code> instead of normal division <code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
-<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif"><img alt="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif"><img alt="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181723783-352092aa-b7a7-4d13-8d26-553315c7e1aa.gif" style="width: 400px;" />
+</a>
 <p>The tests were failing in <cite>Ubuntu</cite> and the <cite>macOS</cite> because the mouse click event wasn’t propagated to the line due to some unknown reasons. When investigating more about the issue, Mohamed suggested and helped me implement another approach to select the shapes. In this approach, we calculate the distance between the mouse click event position and each of the shapes, and if any of the distances is less than a specific value (which I call as limit value), then we send this current event to that element.</p>
 <p><a class="reference external" href="https://github.com/ganimtron-10/fury/tree/new-selection">New shape selection technique:</a></p>
-<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif"><img alt="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif"><img alt="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181730428-debd0617-dc32-4232-93ab-18ab903e92de.gif" style="width: 400px;" />
+</a>
 <p>I also tried to implement a freehand drawing mode by adding <code class="docutils literal notranslate"><span class="pre">Disk2D</span></code> as points. But as you can see below, there are many flaws in this.</p>
 <ul class="simple">
 <li><p>First of all, we add many <code class="docutils literal notranslate"><span class="pre">Disk2D</span></code> objects which make it memory consuming process.</p></li>
 <li><p>If the mouse moves very fast, then we can see the gaps between points.</p></li>
 <li><p>Storing, managing, and transforming are difficult.</p></li>
 </ul>
-<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif"><img alt="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" style="width: 400px;" /></a>
+<a class="reference internal image-reference" href="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif"><img alt="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" class="align-center" src="https://user-images.githubusercontent.com/64432063/181731181-1f242c65-ccb8-4589-a2ed-40bfb3718cfd.gif" style="width: 400px;" />
+</a>
 </section>
 <section id="did-you-get-stuck-anywhere">
 <h2>Did you get stuck anywhere?<a class="headerlink" href="#did-you-get-stuck-anywhere" title="Link to this heading">#</a></h2>
