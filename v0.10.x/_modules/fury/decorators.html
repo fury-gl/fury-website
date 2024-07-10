@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.decorators &#8212; FURY 0.11.0.dev48+g7651a24f documentation</title>
+    <title>fury.decorators &#8212; FURY 0.11.0.dev49+g56a61776 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=b94c6c6f"></script>
+    <script src="../../_static/documentation_options.js?v=cb189ff1"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -375,9 +375,16 @@ document.write(`
 <h1>Source code for fury.decorators</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Decorators for FURY tests.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">wraps</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">signature</span>
 <span class="kn">import</span> <span class="nn">platform</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">warnings</span> <span class="kn">import</span> <span class="n">warn</span>
+
+<span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
+
+<span class="kn">import</span> <span class="nn">fury</span>
 
 <span class="n">skip_linux</span> <span class="o">=</span> <span class="n">is_linux</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;linux&quot;</span>
 <span class="n">skip_osx</span> <span class="o">=</span> <span class="n">is_osx</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span>
@@ -420,6 +427,163 @@ document.write(`
         <span class="n">new_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
     <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">new_lines</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">func</span></div>
+
+
+
+<div class="viewcode-block" id="warn_on_args_to_kwargs">
+<a class="viewcode-back" href="../../reference/fury.decorators.html#fury.decorators.warn_on_args_to_kwargs">[docs]</a>
+<span class="k">def</span> <span class="nf">warn_on_args_to_kwargs</span><span class="p">(</span>
+    <span class="n">from_version</span><span class="o">=</span><span class="s2">&quot;0.1.0&quot;</span><span class="p">,</span>
+    <span class="n">until_version</span><span class="o">=</span><span class="s2">&quot;0.11.0&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to enforce keyword-only arguments.</span>
+
+<span class="sd">    This decorator enforces that all arguments after the first one are</span>
+<span class="sd">    keyword-only arguments. It also checks that all keyword arguments are</span>
+<span class="sd">    expected by the function.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    from_version: str, optional</span>
+<span class="sd">        The version of fury from which the function was supported.</span>
+<span class="sd">    until_version: str, optional</span>
+<span class="sd">        The version of fury until which the function was supported.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    decorator: Callable</span>
+<span class="sd">        Decorator function.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from fury.decorators import warn_on_args_to_kwargs</span>
+<span class="sd">    &gt;&gt;&gt; import fury</span>
+<span class="sd">    &gt;&gt;&gt; @warn_on_args_to_kwargs()</span>
+<span class="sd">    ... def f(a, b, *, c, d=1, e=1):</span>
+<span class="sd">    ...     return a + b + c + d + e</span>
+<span class="sd">    &gt;&gt;&gt; CURRENT_VERSION = fury.__version__</span>
+<span class="sd">    &gt;&gt;&gt; fury.__version__ = &quot;0.11.0&quot;</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, 3, 4, 5)</span>
+<span class="sd">    15</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, c=3, d=4, e=5)</span>
+<span class="sd">    15</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, 2, 4, e=5)</span>
+<span class="sd">    14</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, c=3, d=4)</span>
+<span class="sd">    11</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, d=3, e=5)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: f() missing 1 required keyword-only argument: &#39;c&#39;</span>
+<span class="sd">    &gt;&gt;&gt; fury.__version__ = &quot;0.12.0&quot;</span>
+<span class="sd">    &gt;&gt;&gt; f(1, 2, 3, 4, e=5)</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    TypeError: f() takes 2 positional arguments but 4 positional arguments (and 1 keyword-only argument) were given</span>
+<span class="sd">    &gt;&gt;&gt; fury.__version__ = CURRENT_VERSION</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+
+    <span class="k">def</span> <span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator function. This function enforces that all arguments after</span>
+<span class="sd">        the first one are keyword-only arguments. It also checks that all</span>
+<span class="sd">        keyword arguments are expected by the function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        func: function</span>
+<span class="sd">            Function to be decorated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        wrapper: Callable</span>
+<span class="sd">            Decorated function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span>
+            <span class="c1">#</span>
+            <span class="n">KEYWORD_ONLY_ARGS</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arg</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">arg</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span>
+            <span class="p">]</span>
+            <span class="n">POSITIONAL_ARGS</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arg</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Keyword-only arguments that do not have default values and not in kwargs</span>
+            <span class="n">missing_kwargs</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arg</span>
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">KEYWORD_ONLY_ARGS</span>
+                <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="o">==</span> <span class="n">params</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Keyword-only arguments that have default values</span>
+            <span class="n">ARG_DEFAULT</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">arg</span>
+                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">KEYWORD_ONLY_ARGS</span>
+                <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="n">params</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span><span class="o">.</span><span class="n">default</span> <span class="o">!=</span> <span class="n">params</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span><span class="o">.</span><span class="n">empty</span>
+            <span class="p">]</span>
+            <span class="n">func_params_sample</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Create a sample of the function parameters</span>
+            <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">kind</span> <span class="ow">in</span> <span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">POSITIONAL_OR_KEYWORD</span><span class="p">,</span> <span class="n">arg</span><span class="o">.</span><span class="n">POSITIONAL_ONLY</span><span class="p">):</span>
+                    <span class="n">func_params_sample</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_value&quot;</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">arg</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">:</span>
+                    <span class="n">func_params_sample</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=&#39;value&#39;&quot;</span><span class="p">)</span>
+            <span class="n">func_params_sample</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">func_params_sample</span><span class="p">)</span>
+            <span class="n">args_kwargs_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">params_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">FURY_CURRENT_VERSION</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">__version__</span>
+
+                <span class="k">if</span> <span class="n">ARG_DEFAULT</span><span class="p">:</span>
+                    <span class="n">missing_kwargs</span> <span class="o">+=</span> <span class="n">ARG_DEFAULT</span>
+                <span class="k">if</span> <span class="n">missing_kwargs</span> <span class="ow">and</span> <span class="n">params_len</span> <span class="o">&gt;=</span> <span class="n">args_kwargs_len</span><span class="p">:</span>
+                    <span class="c1"># if the version of fury is greater than until_version,</span>
+                    <span class="c1"># an error should be displayed,</span>
+                    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">FURY_CURRENT_VERSION</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+                        <span class="n">until_version</span>
+                    <span class="p">):</span>
+                        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+                    <span class="n">positional_args_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">POSITIONAL_ARGS</span><span class="p">)</span>
+                    <span class="n">args_k</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">positional_args_len</span><span class="p">:])</span>
+                    <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[:</span><span class="n">positional_args_len</span><span class="p">])</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">missing_kwargs</span><span class="p">,</span> <span class="n">args_k</span><span class="p">)))</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+                    <span class="c1"># if from_version is less or equal to fury.__version__ and,</span>
+                    <span class="c1"># less or equal to until_version</span>
+                    <span class="c1"># a warning should be displayed.</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">from_version</span><span class="p">)</span>
+                        <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">FURY_CURRENT_VERSION</span><span class="p">)</span>
+                        <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">until_version</span><span class="p">)</span>
+                    <span class="p">):</span>
+                        <span class="n">warn</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;We&#39;ll no longer accept the way you call the &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> function in future versions of FURY.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                            <span class="s2">&quot;Here&#39;s how to call the Function </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">(</span><span class="si">{}</span><span class="s2">)</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                                <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">func_params_sample</span>
+                            <span class="p">),</span>
+                            <span class="ne">UserWarning</span><span class="p">,</span>
+                            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="p">)</span>
+
+                <span class="c1"># if the current version of fury is less than from_version,</span>
+                <span class="c1"># the function should be called without any changes.</span>
+
+                <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorator</span></div>
 
 </pre></div>
 <div class="section ablog__blog_comments">

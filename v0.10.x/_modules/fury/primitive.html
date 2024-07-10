@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.primitive &#8212; FURY 0.11.0.dev48+g7651a24f documentation</title>
+    <title>fury.primitive &#8212; FURY 0.11.0.dev49+g56a61776 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=b94c6c6f"></script>
+    <script src="../../_static/documentation_options.js?v=cb189ff1"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -384,6 +384,7 @@ document.write(`
 <span class="kn">from</span> <span class="nn">scipy.version</span> <span class="kn">import</span> <span class="n">short_version</span>
 
 <span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">DATA_DIR</span>
+<span class="kn">from</span> <span class="nn">fury.decorators</span> <span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
 <span class="kn">from</span> <span class="nn">fury.transform</span> <span class="kn">import</span> <span class="n">cart2sphere</span><span class="p">,</span> <span class="n">sphere2cart</span>
 <span class="kn">from</span> <span class="nn">fury.utils</span> <span class="kn">import</span> <span class="n">fix_winding_order</span>
 
@@ -426,8 +427,9 @@ document.write(`
 
 <div class="viewcode-block" id="repeat_primitive_function">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.repeat_primitive_function">[docs]</a>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">repeat_primitive_function</span><span class="p">(</span>
-    <span class="n">func</span><span class="p">,</span> <span class="n">centers</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scales</span><span class="o">=</span><span class="mi">1</span>
+    <span class="n">func</span><span class="p">,</span> <span class="n">centers</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">func_args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">directions</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">scales</span><span class="o">=</span><span class="mi">1</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Repeat Vertices and triangles of a specific primitive function.</span>
 
@@ -471,12 +473,11 @@ document.write(`
             <span class="s2">&quot;sq_params should 1 or equal to the numbers </span><span class="se">\</span>
 <span class="s2">                        of centers&quot;</span>
         <span class="p">)</span>
-
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">func</span><span class="p">(</span><span class="n">i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">func_args</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">repeat_primitive</span><span class="p">(</span>
-        <span class="n">vertices</span><span class="o">=</span><span class="n">vertices</span><span class="p">,</span>
-        <span class="n">faces</span><span class="o">=</span><span class="n">faces</span><span class="p">,</span>
-        <span class="n">centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span>
+        <span class="n">vertices</span><span class="p">,</span>
+        <span class="n">faces</span><span class="p">,</span>
+        <span class="n">centers</span><span class="p">,</span>
         <span class="n">directions</span><span class="o">=</span><span class="n">directions</span><span class="p">,</span>
         <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
         <span class="n">scales</span><span class="o">=</span><span class="n">scales</span><span class="p">,</span>
@@ -487,10 +488,12 @@ document.write(`
 
 <div class="viewcode-block" id="repeat_primitive">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.repeat_primitive">[docs]</a>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">repeat_primitive</span><span class="p">(</span>
     <span class="n">vertices</span><span class="p">,</span>
     <span class="n">faces</span><span class="p">,</span>
     <span class="n">centers</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
     <span class="n">directions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
     <span class="n">scales</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -556,7 +559,8 @@ document.write(`
         <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">big_triangles</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">normalize_input</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">arr_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">normalize_input</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">arr_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
             <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
@@ -575,12 +579,12 @@ document.write(`
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
 
     <span class="c1"># update colors</span>
-    <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_input</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="s2">&quot;colors&quot;</span><span class="p">)</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_input</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">arr_name</span><span class="o">=</span><span class="s2">&quot;colors&quot;</span><span class="p">)</span>
     <span class="n">big_colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">unit_verts_size</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">big_colors</span> <span class="o">*=</span> <span class="mi">255</span>
 
     <span class="c1"># update orientations</span>
-    <span class="n">directions</span> <span class="o">=</span> <span class="n">normalize_input</span><span class="p">(</span><span class="n">directions</span><span class="p">,</span> <span class="s2">&quot;directions&quot;</span><span class="p">)</span>
+    <span class="n">directions</span> <span class="o">=</span> <span class="n">normalize_input</span><span class="p">(</span><span class="n">directions</span><span class="p">,</span> <span class="n">arr_name</span><span class="o">=</span><span class="s2">&quot;directions&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">pts</span><span class="p">,</span> <span class="n">dirs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">directions</span><span class="p">):</span>
         <span class="c1"># Normal vector of the object.</span>
         <span class="n">dir_abs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dirs</span><span class="p">)</span>
@@ -687,7 +691,8 @@ document.write(`
 
 <div class="viewcode-block" id="prim_sphere">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_sphere">[docs]</a>
-<span class="k">def</span> <span class="nf">prim_sphere</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;symmetric362&quot;</span><span class="p">,</span> <span class="n">gen_faces</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">prim_sphere</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;symmetric362&quot;</span><span class="p">,</span> <span class="n">gen_faces</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Provide vertices and triangles of the spheres.</span>
 
 <span class="sd">    Parameters</span>
@@ -808,7 +813,7 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a different kind of exponentiation.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">**</span> <span class="n">p</span><span class="p">)</span>
 
-    <span class="n">sphere_verts</span><span class="p">,</span> <span class="n">sphere_triangles</span> <span class="o">=</span> <span class="n">prim_sphere</span><span class="p">(</span><span class="n">sphere_name</span><span class="p">)</span>
+    <span class="n">sphere_verts</span><span class="p">,</span> <span class="n">sphere_triangles</span> <span class="o">=</span> <span class="n">prim_sphere</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">sphere_name</span><span class="p">)</span>
     <span class="n">_</span><span class="p">,</span> <span class="n">sphere_phi</span><span class="p">,</span> <span class="n">sphere_theta</span> <span class="o">=</span> <span class="n">cart2sphere</span><span class="p">(</span><span class="o">*</span><span class="n">sphere_verts</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
 
     <span class="n">phi</span><span class="p">,</span> <span class="n">theta</span> <span class="o">=</span> <span class="n">roundness</span>
@@ -1012,7 +1017,8 @@ document.write(`
 
 <div class="viewcode-block" id="prim_star">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_star">[docs]</a>
-<span class="k">def</span> <span class="nf">prim_star</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">prim_star</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return vertices and triangle for star geometry.</span>
 
 <span class="sd">    Parameters</span>
@@ -1340,7 +1346,8 @@ document.write(`
 
 <div class="viewcode-block" id="prim_cylinder">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_cylinder">[docs]</a>
-<span class="k">def</span> <span class="nf">prim_cylinder</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">prim_cylinder</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">=</span><span class="mi">36</span><span class="p">,</span> <span class="n">capped</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return vertices and triangles for a cylinder.</span>
 
 <span class="sd">    Parameters</span>
@@ -1470,8 +1477,14 @@ document.write(`
 
 <div class="viewcode-block" id="prim_arrow">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_arrow">[docs]</a>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">prim_arrow</span><span class="p">(</span>
-    <span class="n">height</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">tip_radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shaft_radius</span><span class="o">=</span><span class="mf">0.03</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">height</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">resolution</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">tip_length</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span>
+    <span class="n">tip_radius</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">shaft_radius</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return vertices and triangle for arrow geometry.</span>
 
@@ -1563,7 +1576,8 @@ document.write(`
 
 <div class="viewcode-block" id="prim_cone">
 <a class="viewcode-back" href="../../reference/fury.primitive.html#fury.primitive.prim_cone">[docs]</a>
-<span class="k">def</span> <span class="nf">prim_cone</span><span class="p">(</span><span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">prim_cone</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">radius</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sectors</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return vertices and triangle of a Cone.</span>
 
 <span class="sd">    Parameters</span>
