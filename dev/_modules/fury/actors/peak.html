@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actors.peak &#8212; FURY 0.11.0.dev50+g43540d35 documentation</title>
+    <title>fury.actors.peak &#8212; FURY 0.11.0.dev51+g868ba901 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=84bc5b14"></script>
+    <script src="../../../_static/documentation_options.js?v=77f14049"></script>
     <script src="../../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -378,6 +378,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <span class="n">boys2rgb</span><span class="p">,</span> <span class="n">colormap_lookup_table</span><span class="p">,</span> <span class="n">orient2rgb</span>
+<span class="kn">from</span> <span class="nn">fury.decorators</span> <span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
 <span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">VTK_OBJECT</span><span class="p">,</span>
     <span class="n">Actor</span><span class="p">,</span>
@@ -441,10 +442,12 @@ document.write(`
 
 <div class="viewcode-block" id="PeakActor.__init__">
 <a class="viewcode-back" href="../../../reference/fury.actors.html#fury.actors.peak.PeakActor.__init__">[docs]</a>
+    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">directions</span><span class="p">,</span>
         <span class="n">indices</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
         <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">affine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -589,12 +592,13 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">__cross_section</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__high_ranges</span> <span class="o">//</span> <span class="mi">2</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__mapper</span><span class="o">.</span><span class="n">AddObserver</span><span class="p">(</span>
-            <span class="n">Command</span><span class="o">.</span><span class="n">UpdateShaderEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__display_peaks_vtk_callback</span>
+            <span class="n">Command</span><span class="o">.</span><span class="n">UpdateShaderEvent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__display_peaks_vtk_callback</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="p">)</span></div>
 
 
+    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="nd">@calldata_type</span><span class="p">(</span><span class="n">VTK_OBJECT</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">__display_peaks_vtk_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__display_peaks_vtk_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">caller</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">calldata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformi</span><span class="p">(</span><span class="s2">&quot;isRange&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_range</span><span class="p">)</span>
             <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniform3f</span><span class="p">(</span><span class="s2">&quot;highRanges&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__high_ranges</span><span class="p">)</span>
@@ -662,7 +666,8 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_orientation_colors</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rgb_standard&quot;</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_orientation_colors</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;rgb_standard&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -693,7 +698,8 @@ document.write(`
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">col_list</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_peaks_colors_from_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">points_per_line</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_peaks_colors_from_points</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">points_per_line</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a VTK scalar array containing colors information for each one of</span>
 <span class="sd">    the peaks according to the policy defined by the parameter colors.</span>
 
@@ -763,7 +769,8 @@ document.write(`
     <span class="k">return</span> <span class="n">color_array</span><span class="p">,</span> <span class="n">colors_are_scalars</span><span class="p">,</span> <span class="n">global_opacity</span>
 
 
-<span class="k">def</span> <span class="nf">_points_to_vtk_cells</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">points_per_line</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_points_to_vtk_cells</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">points_per_line</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the VTK cell array for the peaks given the set of points</span>
 <span class="sd">    coordinates.</span>
 
