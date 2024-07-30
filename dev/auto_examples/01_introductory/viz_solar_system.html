@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Solar System Animation &#8212; FURY 0.11.0.dev66+g69f3b1c9 documentation</title>
+    <title>Solar System Animation &#8212; FURY 0.11.0.dev67+gb909ea32 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=01ff011e"></script>
+    <script src="../../_static/documentation_options.js?v=f1be79e5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -401,20 +401,23 @@ to simulate orbital motion.</p>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <a href="../../reference/fury.actor.html#module-fury.actor" title="fury.actor" class="sphx-glr-backref-module-fury sphx-glr-backref-type-py-module"><span class="n">actor</span></a><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">ui</span><span class="p">,</span> <span class="n">utils</span><span class="p">,</span> <span class="n">window</span>
-<span class="kn">from</span> <span class="nn">fury.data</span> <span class="kn">import</span> <span class="n">fetch_viz_textures</span><span class="p">,</span> <span class="n">read_viz_icons</span><span class="p">,</span> <span class="n">read_viz_textures</span>
+<span class="kn">import</span> <span class="nn">fury</span>
 </pre></div>
 </div>
 <p>Create a scene to start.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 
 <span class="c1"># Create a panel and the start/pause buttons</span>
 
-<span class="n">panel</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
+<span class="n">panel</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">align</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">)</span>
 <span class="n">panel</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
 
-<span class="n">pause_button</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">Button2D</span><span class="p">(</span><span class="n">icon_fnames</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;pause2.png&quot;</span><span class="p">))])</span>
-<span class="n">start_button</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">Button2D</span><span class="p">(</span><span class="n">icon_fnames</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;play3.png&quot;</span><span class="p">))])</span>
+<span class="n">pause_button</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button2D</span><span class="p">(</span>
+    <span class="n">icon_fnames</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="n">fury</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;pause2.png&quot;</span><span class="p">))]</span>
+<span class="p">)</span>
+<span class="n">start_button</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">ui</span><span class="o">.</span><span class="n">Button2D</span><span class="p">(</span>
+    <span class="n">icon_fnames</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;square&quot;</span><span class="p">,</span> <span class="n">fury</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;play3.png&quot;</span><span class="p">))]</span>
+<span class="p">)</span>
 
 <span class="c1"># Add the buttons on the panel</span>
 
@@ -476,7 +479,7 @@ texture name, relative position, and scale.</p>
     <span class="p">},</span>
     <span class="p">{</span><span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;8k_sun.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;position&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;earth_days&quot;</span><span class="p">:</span> <span class="mi">27</span><span class="p">,</span> <span class="s2">&quot;scale&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)},</span>
 <span class="p">]</span>
-<span class="n">fetch_viz_textures</span><span class="p">()</span>
+<span class="n">fury</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fetch_viz_textures</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>To take advantage of the previously defined data structure we are going to
@@ -497,12 +500,12 @@ and add the actor to a previously created scene.</p>
 <span class="sd">    planet_actor: actor</span>
 <span class="sd">        The corresponding sphere actor with texture applied.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">planet_file</span> <span class="o">=</span> <span class="n">read_viz_textures</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
-    <span class="n">planet_image</span> <span class="o">=</span> <a href="../../reference/fury.io.html#fury.io.load_image" title="fury.io.load_image" class="sphx-glr-backref-module-fury-io sphx-glr-backref-type-py-function"><span class="n">io</span><span class="o">.</span><span class="n">load_image</span></a><span class="p">(</span><span class="n">planet_file</span><span class="p">)</span>
-    <span class="n">planet_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.texture_on_sphere" title="fury.actor.texture_on_sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span></a><span class="p">(</span><span class="n">planet_image</span><span class="p">)</span>
+    <span class="n">planet_file</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">read_viz_textures</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span>
+    <span class="n">planet_image</span> <span class="o">=</span> <a href="../../reference/fury.io.html#fury.io.load_image" title="fury.io.load_image" class="sphx-glr-backref-module-fury-io sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">load_image</span></a><span class="p">(</span><span class="n">planet_file</span><span class="p">)</span>
+    <span class="n">planet_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.texture_on_sphere" title="fury.actor.texture_on_sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span></a><span class="p">(</span><span class="n">planet_image</span><span class="p">)</span>
     <span class="n">planet_actor</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">planet_data</span><span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;8k_saturn_ring_alpha.png&quot;</span><span class="p">:</span>
-        <a href="../../reference/fury.utils.html#fury.utils.rotate" title="fury.utils.rotate" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">rotate</span></a><span class="p">(</span><span class="n">planet_actor</span><span class="p">,</span> <span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <a href="../../reference/fury.utils.html#fury.utils.rotate" title="fury.utils.rotate" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">rotate</span></a><span class="p">(</span><span class="n">planet_actor</span><span class="p">,</span> <span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
     <span class="n">planet_actor</span><span class="o">.</span><span class="n">SetScale</span><span class="p">(</span><span class="n">planet_data</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">])</span>
     <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">planet_actor</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">planet_actor</span>
@@ -556,10 +559,10 @@ of each planet.</p>
 <p>Let’s define a function to rotate the planet actor axially, we’ll be defining
 axis of each planet and angle by which it should be rotated using
 <code class="docutils literal notranslate"><span class="pre">rotate_axial</span></code> funtction</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rotate_axial</span><span class="p">(</span><a href="../../reference/fury.actor.html#module-fury.actor" title="fury.actor" class="sphx-glr-backref-module-fury sphx-glr-backref-type-py-module"><span class="n">actor</span></a><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">rotate_axial</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
     <span class="n">axis</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
     <span class="n">angle</span> <span class="o">=</span> <span class="mi">50</span> <span class="o">/</span> <span class="n">time</span>
-    <a href="../../reference/fury.utils.html#fury.utils.rotate" title="fury.utils.rotate" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">utils</span><span class="o">.</span><span class="n">rotate</span></a><span class="p">(</span><a href="../../reference/fury.actor.html#module-fury.actor" title="fury.actor" class="sphx-glr-backref-module-fury sphx-glr-backref-type-py-module"><span class="n">actor</span></a><span class="p">,</span> <span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <a href="../../reference/fury.utils.html#fury.utils.rotate" title="fury.utils.rotate" class="sphx-glr-backref-module-fury-utils sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">rotate</span></a><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="p">(</span><span class="n">angle</span><span class="p">,</span> <span class="n">axis</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
     <span class="k">return</span> <span class="n">angle</span>
 </pre></div>
 </div>
@@ -569,7 +572,7 @@ axis of each planet and angle by which it should be rotated using
 </div>
 <p>Next, create a ShowManager object. The ShowManager class is the interface
 between the scene, the window and the interactor.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.ShowManager" title="fury.window.ShowManager" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span></a><span class="p">(</span>
     <span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">reset_camera</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order_transparent</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">panel</span><span class="p">)</span>
@@ -638,7 +641,7 @@ around itself.</p>
 </div>
 <p>This is for orbit visualization. We are using line actor for orbits.
 After creating an actor we add it to the scene.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">orbit_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">planet_tracks</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">orbit_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">planet_tracks</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">orbit_actor</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -684,7 +687,9 @@ each planet’s position with the newly calculated ones.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">showm</span><span class="o">.</span><span class="n">add_timer_callback</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">timer_callback</span><span class="p">)</span>
 <span class="n">showm</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_solar_system_animation.png&quot;</span><span class="p">)</span>
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span>
+    <span class="n">showm</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span> <span class="mi">768</span><span class="p">),</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;viz_solar_system_animation.png&quot;</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-01-introductory-viz-solar-system-py">

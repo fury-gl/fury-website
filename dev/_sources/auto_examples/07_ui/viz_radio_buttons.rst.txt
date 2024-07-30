@@ -27,42 +27,41 @@ create a Sphere and control its color using radio buttons.
 
 First, some imports.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-17
+.. GENERATED FROM PYTHON SOURCE LINES 11-16
 
 .. code-block:: Python
 
 
     import numpy as np
 
-    from fury import actor, ui, utils, window
-    from fury.data import fetch_viz_icons
+    import fury
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-19
+.. GENERATED FROM PYTHON SOURCE LINES 17-18
 
 First we need to fetch some icons that are included in FURY.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-22
+.. GENERATED FROM PYTHON SOURCE LINES 18-21
 
 .. code-block:: Python
 
 
-    fetch_viz_icons()
+    fury.data.fetch_viz_icons()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-27
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 Sphere and Radio Buttons
 ========================
 
 Add a Sphere to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-60
+.. GENERATED FROM PYTHON SOURCE LINES 26-59
 
 .. code-block:: Python
 
 
-    sphere = actor.sphere(
+    sphere = fury.actor.sphere(
         centers=np.array([[50, 0, 0]]),
         colors=np.array([[0, 0, 1]]),
         radii=11.0,
@@ -73,7 +72,7 @@ Add a Sphere to the scene.
     # Creating a dict of possible options and mapping it with their values.
     options = {"Blue": (0, 0, 255), "Red": (255, 0, 0), "Green": (0, 255, 0)}
 
-    color_toggler = ui.RadioButton(
+    color_toggler = fury.ui.RadioButton(
         list(options),
         checked_labels=["Blue"],
         padding=1,
@@ -85,17 +84,17 @@ Add a Sphere to the scene.
 
     # A callback which will set the values for the box
     def toggle_color(radio):
-        vcolors = utils.colors_from_actor(sphere)
+        vcolors = fury.utils.colors_from_actor(sphere)
         color = options[radio.checked_labels[0]]
         vcolors[:] = np.array(color)
-        utils.update_actor(sphere)
+        fury.utils.update_actor(sphere)
 
 
     color_toggler.on_change = toggle_color
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-66
+.. GENERATED FROM PYTHON SOURCE LINES 60-65
 
 Show Manager
 ============
@@ -103,23 +102,23 @@ Show Manager
 Now that all the elements have been initialised, we add them to the show
 manager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-73
+.. GENERATED FROM PYTHON SOURCE LINES 65-72
 
 .. code-block:: Python
 
 
     current_size = (800, 800)
-    show_manager = window.ShowManager(size=current_size, title="FURY Sphere Example")
+    show_manager = fury.window.ShowManager(size=current_size, title="FURY Sphere Example")
 
     show_manager.scene.add(sphere)
     show_manager.scene.add(color_toggler)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-75
+.. GENERATED FROM PYTHON SOURCE LINES 73-74
 
 Set camera for better visualization
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-86
+.. GENERATED FROM PYTHON SOURCE LINES 74-87
 
 .. code-block:: Python
 
@@ -133,7 +132,9 @@ Set camera for better visualization
     if interactive:
         show_manager.start()
 
-    window.record(show_manager.scene, size=current_size, out_path="viz_radio_buttons.png")
+    fury.window.record(
+        show_manager.scene, size=current_size, out_path="viz_radio_buttons.png"
+    )
 
 
 .. _sphx_glr_download_auto_examples_07_ui_viz_radio_buttons.py:

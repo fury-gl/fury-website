@@ -25,58 +25,56 @@ Varying Color
 This example shows how to use shaders to generate a shaded output. We will
 demonstrate how to load polydata then use a custom shader calls to render
 a custom shaded model.
-First, a bunch of imports.
+First, let's import FURY
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-17
+.. GENERATED FROM PYTHON SOURCE LINES 12-15
 
 .. code-block:: Python
 
 
-    from fury import io, ui, utils, window
-    from fury.data.fetcher import fetch_viz_models, read_viz_models
-    from fury.shaders import add_shader_callback, shader_to_actor
+    import fury
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 18-19
+.. GENERATED FROM PYTHON SOURCE LINES 16-17
 
 Let's download  and load the model
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-25
+.. GENERATED FROM PYTHON SOURCE LINES 17-23
 
 .. code-block:: Python
 
 
 
-    fetch_viz_models()
-    model = read_viz_models("utah.obj")
+    fury.data.fetch_viz_models()
+    model = fury.data.read_viz_models("utah.obj")
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 26-29
+.. GENERATED FROM PYTHON SOURCE LINES 24-27
 
 Let's start by loading the polydata of choice.
 For this example we use the standard utah teapot model.
 currently supported formats include OBJ, VTK, FIB, PLY, STL and XML
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-37
+.. GENERATED FROM PYTHON SOURCE LINES 28-35
 
 .. code-block:: Python
 
 
-    utah = io.load_polydata(model)
-    utah = utils.get_polymapper_from_polydata(utah)
-    utah = utils.get_actor_from_polymapper(utah)
+    utah = fury.io.load_polydata(model)
+    utah = fury.utils.get_polymapper_from_polydata(utah)
+    utah = fury.utils.get_actor_from_polymapper(utah)
     mapper = utah.GetMapper()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-41
+.. GENERATED FROM PYTHON SOURCE LINES 36-39
 
 To change the default shader we add a shader replacement.
 Specify vertex shader using vtkShader.Vertex
 Specify fragment shader using vtkShader.Fragment
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-67
+.. GENERATED FROM PYTHON SOURCE LINES 39-67
 
 .. code-block:: Python
 
@@ -100,11 +98,13 @@ Specify fragment shader using vtkShader.Fragment
         fragOutput0 = vec4(col, fragOutput0.a);
         """
 
-    shader_to_actor(
+    fury.shaders.shader_to_actor(
         utah, "vertex", impl_code=vertex_shader_code_impl, decl_code=vertex_shader_code_decl
     )
-    shader_to_actor(utah, "fragment", decl_code=fragment_shader_code_decl)
-    shader_to_actor(utah, "fragment", impl_code=fragment_shader_code_impl, block="light")
+    fury.shaders.shader_to_actor(utah, "fragment", decl_code=fragment_shader_code_decl)
+    fury.shaders.shader_to_actor(
+        utah, "fragment", impl_code=fragment_shader_code_impl, block="light"
+    )
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 68-69
@@ -116,7 +116,7 @@ Let's create a scene.
 .. code-block:: Python
 
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
 
     global timer
     timer = 0
@@ -161,7 +161,7 @@ the timer variable.
                 pass
 
 
-    add_shader_callback(utah, shader_callback)
+    fury.shaders.add_shader_callback(utah, shader_callback)
 
 .. GENERATED FROM PYTHON SOURCE LINES 103-104
 
@@ -172,7 +172,7 @@ Let's add a textblock to the scene with a custom message
 .. code-block:: Python
 
 
-    tb = ui.TextBlock2D()
+    tb = fury.ui.TextBlock2D()
     tb.message = "Hello Shaders"
 
 
@@ -189,7 +189,7 @@ manager.
 
 
     current_size = (1024, 720)
-    showm = window.ShowManager(scene, size=current_size, reset_camera=False)
+    showm = fury.window.ShowManager(scene, size=current_size, reset_camera=False)
 
 
     showm.add_timer_callback(True, 30, timer_callback)
@@ -201,7 +201,7 @@ manager.
     if interactive:
         showm.start()
 
-    window.record(showm.scene, size=current_size, out_path="viz_shader.png")
+    fury.window.record(showm.scene, size=current_size, out_path="viz_shader.png")
 
 
 .. _sphx_glr_download_auto_examples_13_shaders_viz_shader.py:

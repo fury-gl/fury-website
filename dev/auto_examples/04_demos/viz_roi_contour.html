@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Visualization of ROI Surface Rendered with Streamlines &#8212; FURY 0.11.0.dev66+g69f3b1c9 documentation</title>
+    <title>Visualization of ROI Surface Rendered with Streamlines &#8212; FURY 0.11.0.dev67+gb909ea32 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=01ff011e"></script>
+    <script src="../../_static/documentation_options.js?v=f1be79e5"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -412,8 +412,7 @@ then display them with the seed ROI rendered in 3D with 50% transparency.</p>
 <span class="kn">from</span> <span class="nn">dipy.tracking</span> <span class="kn">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">dipy.tracking.streamline</span> <span class="kn">import</span> <span class="n">Streamlines</span>
 
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
-<span class="kn">from</span> <span class="nn">fury.colormap</span> <span class="kn">import</span> <span class="n">line_colors</span>
+<span class="kn">import</span> <span class="nn">fury</span>
 </pre></div>
 </div>
 <p>First, we need to generate some streamlines. For a more complete
@@ -426,7 +425,7 @@ Tutorial.</p>
 
 <span class="n">white_matter</span> <span class="o">=</span> <span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
 
-<span class="n">csa_model</span> <span class="o">=</span> <a href="https://docs.dipy.org/stable/reference/dipy.reconst.html#dipy.reconst.shm.CsaOdfModel" title="dipy.reconst.shm.CsaOdfModel" class="sphx-glr-backref-module-dipy-reconst-shm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CsaOdfModel</span></a><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">sh_order</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">csa_model</span> <span class="o">=</span> <a href="https://docs.dipy.org/stable/reference/dipy.reconst.html#dipy.reconst.shm.CsaOdfModel" title="dipy.reconst.shm.CsaOdfModel" class="sphx-glr-backref-module-dipy-reconst-shm sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CsaOdfModel</span></a><span class="p">(</span><span class="n">gtab</span><span class="p">,</span> <span class="n">sh_order_max</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
 <span class="n">csa_peaks</span> <span class="o">=</span> <span class="n">peaks_from_model</span><span class="p">(</span>
     <span class="n">csa_model</span><span class="p">,</span>
     <span class="n">data</span><span class="p">,</span>
@@ -449,7 +448,7 @@ Tutorial.</p>
 </pre></div>
 </div>
 <p>We will create a streamline actor from the streamlines.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">streamlines_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <span class="n">line_colors</span><span class="p">(</span><span class="n">streamlines</span><span class="p">))</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">streamlines_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.line" title="fury.actor.line" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">line</span></a><span class="p">(</span><span class="n">streamlines</span><span class="p">,</span> <a href="../../reference/fury.colormap.html#fury.colormap.line_colors" title="fury.colormap.line_colors" class="sphx-glr-backref-module-fury-colormap sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">colormap</span><span class="o">.</span><span class="n">line_colors</span></a><span class="p">(</span><span class="n">streamlines</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>Next, we create a surface actor from the corpus callosum seed ROI. We
@@ -459,14 +458,14 @@ a decimal between zero and one. Here, we set the color as blue/green with
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">surface_opacity</span> <span class="o">=</span> <span class="mf">0.5</span>
 <span class="n">surface_color</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 
-<span class="n">seedroi_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">contour_from_roi</span><span class="p">(</span>
+<span class="n">seedroi_actor</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.contour_from_roi" title="fury.actor.contour_from_roi" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">contour_from_roi</span></a><span class="p">(</span>
     <span class="n">seed_mask</span><span class="p">,</span> <span class="n">affine</span><span class="p">,</span> <span class="n">surface_color</span><span class="p">,</span> <span class="n">surface_opacity</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <p>Next, we initialize a ‘’Scene’’ object and add both actors
 to the rendering.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <a href="../../reference/fury.window.html#fury.window.Scene" title="fury.window.Scene" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">Scene</span></a><span class="p">()</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">streamlines_actor</span><span class="p">)</span>
 <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">seedroi_actor</span><span class="p">)</span>
 </pre></div>
@@ -475,12 +474,12 @@ to the rendering.</p>
 interactive window.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">interactive</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">if</span> <span class="n">interactive</span><span class="p">:</span>
-    <a href="../../reference/fury.window.html#fury.window.show" title="fury.window.show" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+    <a href="../../reference/fury.window.html#fury.window.show" title="fury.window.show" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
 
 <span class="c1"># scene.zoom(1.5)</span>
 <span class="c1"># scene.reset_clipping_range()</span>
 
-<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;contour_from_roi_tutorial.png&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
+<a href="../../reference/fury.window.html#fury.window.record" title="fury.window.record" class="sphx-glr-backref-module-fury-window sphx-glr-backref-type-py-function"><span class="n">fury</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">record</span></a><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="s2">&quot;contour_from_roi_tutorial.png&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">))</span>
 </pre></div>
 </div>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-04-demos-viz-roi-contour-py">
