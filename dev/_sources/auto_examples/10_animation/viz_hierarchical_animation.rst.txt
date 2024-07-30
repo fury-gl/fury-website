@@ -24,69 +24,68 @@ Keyframe hierarchical Animation
 
 Creating hierarchical keyframes animation in fury
 
-.. GENERATED FROM PYTHON SOURCE LINES 8-21
+.. GENERATED FROM PYTHON SOURCE LINES 8-20
 
 .. code-block:: Python
 
 
     import numpy as np
 
-    from fury import actor, window
-    from fury.animation import Animation
+    import fury
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
 
-    showm = window.ShowManager(
+    showm = fury.window.ShowManager(
         scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
     showm.initialize()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-23
+.. GENERATED FROM PYTHON SOURCE LINES 21-22
 
 Creating the road
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-27
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 .. code-block:: Python
 
-    road = actor.box(
+    road = fury.actor.box(
         np.array([[0, 0, 0]]), colors=np.array([[1, 1, 1]]), scales=np.array([[22, 0.1, 5]])
     )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-29
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 Constructing the car geometry
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-36
+.. GENERATED FROM PYTHON SOURCE LINES 28-35
 
 .. code-block:: Python
 
 
-    body_actor = actor.box(
+    body_actor = fury.actor.box(
         np.array([[0, 0.5, 0], [-0.2, 1, 0]]),
         scales=((4, 1, 2), (2.5, 1.5, 1.8)),
         colors=(0.6, 0.3, 0.1),
     )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-38
+.. GENERATED FROM PYTHON SOURCE LINES 36-37
 
 Adding the the car's body to an Animation to be able to animate it later.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-40
+.. GENERATED FROM PYTHON SOURCE LINES 37-39
 
 .. code-block:: Python
 
-    car_anim = Animation(body_actor)
+    car_anim = fury.animation.Animation(body_actor)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-42
+.. GENERATED FROM PYTHON SOURCE LINES 40-41
 
 Creating the wheels of the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-65
+.. GENERATED FROM PYTHON SOURCE LINES 41-64
 
 .. code-block:: Python
 
@@ -101,7 +100,7 @@ Creating the wheels of the car
     ]
 
     wheels = [
-        actor.cylinder(
+        fury.actor.cylinder(
             wheel_center,
             wheel_direction,
             (0.1, 0.7, 0.3),
@@ -114,17 +113,17 @@ Creating the wheels of the car
     ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-68
+.. GENERATED FROM PYTHON SOURCE LINES 65-67
 
 Animating each wheel and setting its position to the right position using a
 single keyframe that will not change.
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-76
+.. GENERATED FROM PYTHON SOURCE LINES 67-75
 
 .. code-block:: Python
 
 
-    wheels_animations = [Animation(wheel) for wheel in wheels]
+    wheels_animations = [fury.animation.Animation(wheel) for wheel in wheels]
 
     for wheel_anim in wheels_animations:
         wheel_anim.set_position(0.0, wheel_positions.pop())
@@ -132,51 +131,51 @@ single keyframe that will not change.
         wheel_anim.set_rotation(1.0, [0, 0, 1, -1])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-78
+.. GENERATED FROM PYTHON SOURCE LINES 76-77
 
 Creating a radar on top of the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 80-81
+.. GENERATED FROM PYTHON SOURCE LINES 79-80
 
 First we create the shaft holding and rotating the radar
 
-.. GENERATED FROM PYTHON SOURCE LINES 81-85
+.. GENERATED FROM PYTHON SOURCE LINES 80-84
 
 .. code-block:: Python
 
-    radar_shaft = actor.cylinder(
+    radar_shaft = fury.actor.cylinder(
         np.array([[0, 0, 0]]), np.array([[0, 1, 0]]), (0, 1, 0), heights=1
     )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-87
+.. GENERATED FROM PYTHON SOURCE LINES 85-86
 
 In order to animate the shaft actor we have to add it to an Animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-89
+.. GENERATED FROM PYTHON SOURCE LINES 86-88
 
 .. code-block:: Python
 
-    radar_shaft_anim = Animation(radar_shaft)
+    radar_shaft_anim = fury.animation.Animation(radar_shaft)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-92
+.. GENERATED FROM PYTHON SOURCE LINES 89-91
 
 Setting a single position keyframe will make sure the actor will be placed at
 that position
 
-.. GENERATED FROM PYTHON SOURCE LINES 92-94
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 .. code-block:: Python
 
     radar_shaft_anim.set_position(0.0, [0, 2, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-96
+.. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Rotating the shaft around Y axis
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-100
+.. GENERATED FROM PYTHON SOURCE LINES 95-99
 
 .. code-block:: Python
 
@@ -185,33 +184,35 @@ Rotating the shaft around Y axis
     radar_shaft_anim.set_rotation(2.0, [0, -250, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-102
+.. GENERATED FROM PYTHON SOURCE LINES 100-101
 
 Now we create the radar itself
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-104
+.. GENERATED FROM PYTHON SOURCE LINES 101-105
 
 .. code-block:: Python
 
-    radar = actor.cone(np.array([[0, 0, 0]]), directions=(0, 0, 0), colors=(0.2, 0.2, 0.9))
+    radar = fury.actor.cone(
+        np.array([[0, 0, 0]]), directions=(0, 0, 0), colors=(0.2, 0.2, 0.9)
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-106
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 Then add it to an animation in order to rotate it
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-108
+.. GENERATED FROM PYTHON SOURCE LINES 107-109
 
 .. code-block:: Python
 
-    radar_animation = Animation(radar)
+    radar_animation = fury.animation.Animation(radar)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-110
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 Set position and rotation as done above with the shaft.
 
-.. GENERATED FROM PYTHON SOURCE LINES 110-115
+.. GENERATED FROM PYTHON SOURCE LINES 111-116
 
 .. code-block:: Python
 
@@ -221,37 +222,37 @@ Set position and rotation as done above with the shaft.
     radar_animation.set_rotation(2.0, [0, 0, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-119
+.. GENERATED FROM PYTHON SOURCE LINES 117-120
 
 Now, we want the radar to rotate when the shaft rotates in hierarchical way.
 To do that we must add the radar animation as a child animation of the shaft
 animation as below:
 
-.. GENERATED FROM PYTHON SOURCE LINES 119-121
+.. GENERATED FROM PYTHON SOURCE LINES 120-122
 
 .. code-block:: Python
 
     radar_shaft_anim.add_child_animation(radar_animation)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-125
+.. GENERATED FROM PYTHON SOURCE LINES 123-126
 
 After that we want everything to animate related to the car.
 The wheels should always be attached to the car no matter where it moves.
 we do that by adding them as child animations of the car's body animation
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-127
+.. GENERATED FROM PYTHON SOURCE LINES 126-128
 
 .. code-block:: Python
 
     car_anim.add_child_animation([wheels_animations, radar_shaft_anim])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-129
+.. GENERATED FROM PYTHON SOURCE LINES 129-130
 
 Moving the car
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-132
+.. GENERATED FROM PYTHON SOURCE LINES 130-133
 
 .. code-block:: Python
 
@@ -259,11 +260,11 @@ Moving the car
     car_anim.set_position(6.0, [10, 0.5, 0])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-134
+.. GENERATED FROM PYTHON SOURCE LINES 134-135
 
 Adding the car Animation to the show manager
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-146
+.. GENERATED FROM PYTHON SOURCE LINES 135-147
 
 .. code-block:: Python
 
@@ -276,7 +277,7 @@ Adding the car Animation to the show manager
     if interactive:
         showm.start()
 
-    window.record(
+    fury.window.record(
         scene, out_path="viz_keyframe_hierarchical_animation.png", size=(900, 768)
     )
 

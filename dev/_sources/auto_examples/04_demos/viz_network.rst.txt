@@ -30,7 +30,7 @@ indicates a citation between two of them.
 
 First, let's import some useful functions
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-21
+.. GENERATED FROM PYTHON SOURCE LINES 13-20
 
 .. code-block:: Python
 
@@ -39,29 +39,27 @@ First, let's import some useful functions
 
     import numpy as np
 
-    from fury import actor, colormap as cmap, window
-    from fury.data import fetch_viz_wiki_nw
+    import fury
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 22-23
+.. GENERATED FROM PYTHON SOURCE LINES 21-22
 
 Then let's download some available datasets.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-28
+.. GENERATED FROM PYTHON SOURCE LINES 22-26
 
 .. code-block:: Python
 
 
-
-    files, folder = fetch_viz_wiki_nw()
+    files, folder = fury.data.fetch_viz_wiki_nw()
     categories_file, edges_file, positions_file = sorted(files.keys())
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-30
+.. GENERATED FROM PYTHON SOURCE LINES 27-28
 
 We read our datasets
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-35
+.. GENERATED FROM PYTHON SOURCE LINES 28-33
 
 .. code-block:: Python
 
@@ -71,12 +69,12 @@ We read our datasets
     edges = np.loadtxt(pjoin(folder, edges_file), dtype=int)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-38
+.. GENERATED FROM PYTHON SOURCE LINES 34-36
 
 We attribute a color to each category of our dataset which correspond to our
 nodes colors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 38-47
+.. GENERATED FROM PYTHON SOURCE LINES 36-45
 
 .. code-block:: Python
 
@@ -85,16 +83,16 @@ nodes colors.
 
     index2category = np.unique(categories)
 
-    categoryColors = cmap.distinguishable_colormap(nb_colors=len(index2category))
+    categoryColors = fury.colormap.distinguishable_colormap(nb_colors=len(index2category))
 
     colors = np.array([categoryColors[category2index[category]] for category in categories])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 48-49
+.. GENERATED FROM PYTHON SOURCE LINES 46-47
 
 We define our node size
 
-.. GENERATED FROM PYTHON SOURCE LINES 49-52
+.. GENERATED FROM PYTHON SOURCE LINES 47-50
 
 .. code-block:: Python
 
@@ -102,13 +100,13 @@ We define our node size
     radii = 1 + np.random.rand(len(positions))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-56
+.. GENERATED FROM PYTHON SOURCE LINES 51-54
 
 Lets create our edges now. They will indicate a citation between two nodes.
 OF course, the colors of each edges will be an interpolation between the two
 node that it connects.
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-66
+.. GENERATED FROM PYTHON SOURCE LINES 54-64
 
 .. code-block:: Python
 
@@ -123,18 +121,18 @@ node that it connects.
     edgesColors = np.average(np.array(edgesColors), axis=1)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-70
+.. GENERATED FROM PYTHON SOURCE LINES 65-68
 
 Our data preparation is ready, it is time to visualize them all. We start to
 build 2 actors that we represent our data : sphere_actor for the nodes and
 lines_actor for the edges.
 
-.. GENERATED FROM PYTHON SOURCE LINES 70-85
+.. GENERATED FROM PYTHON SOURCE LINES 68-83
 
 .. code-block:: Python
 
 
-    sphere_actor = actor.sphere(
+    sphere_actor = fury.actor.sphere(
         centers=positions,
         colors=colors,
         radii=radii * 0.5,
@@ -142,35 +140,35 @@ lines_actor for the edges.
         phi=8,
     )
 
-    lines_actor = actor.line(
+    lines_actor = fury.actor.line(
         edgesPositions,
         colors=edgesColors,
         opacity=0.1,
     )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 84-86
 
 All actors need to be added in a scene, so we build one and add our
 lines_actor and sphere_actor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-94
+.. GENERATED FROM PYTHON SOURCE LINES 86-92
 
 .. code-block:: Python
 
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
 
     scene.add(lines_actor)
     scene.add(sphere_actor)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 93-95
 
 The final step ! Visualize and save the result of our creation! Please,
 switch interactive variable to True if you want to visualize it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-105
+.. GENERATED FROM PYTHON SOURCE LINES 95-103
 
 .. code-block:: Python
 
@@ -178,12 +176,12 @@ switch interactive variable to True if you want to visualize it.
     interactive = False
 
     if interactive:
-        window.show(scene, size=(600, 600))
+        fury.window.show(scene, size=(600, 600))
 
-    window.record(scene, out_path="journal_networks.png", size=(600, 600))
+    fury.window.record(scene, out_path="journal_networks.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-108
+.. GENERATED FROM PYTHON SOURCE LINES 104-106
 
 This example can be improved by adding some interactivy with slider,
 picking, etc. Play with it, improve it!

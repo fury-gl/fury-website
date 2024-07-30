@@ -33,40 +33,35 @@ using the PBR material.
 
 Let's start by importing the necessary modules:
 
-.. GENERATED FROM PYTHON SOURCE LINES 17-27
+.. GENERATED FROM PYTHON SOURCE LINES 17-22
 
 .. code-block:: Python
 
 
     import numpy as np
 
-    from fury import actor, material, window
-    from fury.utils import (
-        normals_from_actor,
-        tangents_from_direction_of_anisotropy,
-        tangents_to_actor,
-    )
+    import fury
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-29
+.. GENERATED FROM PYTHON SOURCE LINES 23-24
 
 Now set up a new scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-33
+.. GENERATED FROM PYTHON SOURCE LINES 24-28
 
 .. code-block:: Python
 
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
     scene.background((0.9, 0.9, 0.9))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-36
+.. GENERATED FROM PYTHON SOURCE LINES 29-31
 
 Let's define the parameters we are going to showcase in this tutorial.
 These subset of parameters have their values constrained in the 0 to 1 range.
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-49
+.. GENERATED FROM PYTHON SOURCE LINES 31-44
 
 .. code-block:: Python
 
@@ -84,13 +79,13 @@ These subset of parameters have their values constrained in the 0 to 1 range.
     ]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-53
+.. GENERATED FROM PYTHON SOURCE LINES 45-48
 
 Now we can start to add our actors to the scene and see how different values
 of the parameters produce interesting effects. For the purpose of this
 tutorial, we will see the effect of 11 different values of each parameter.
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-71
+.. GENERATED FROM PYTHON SOURCE LINES 48-68
 
 .. code-block:: Python
 
@@ -103,22 +98,24 @@ tutorial, we will see the effect of 11 different values of each parameter.
         center = [[0, -5 * i, 0]]
         for j in range(num_values):
             center[0][0] = -25 + 5 * j
-            sphere = actor.sphere(center, color, radii=2, theta=32, phi=32)
-            normals = normals_from_actor(sphere)
-            tangents = tangents_from_direction_of_anisotropy(normals, (0, 1, 0.5))
-            tangents_to_actor(sphere, tangents)
+            sphere = fury.actor.sphere(center, color, radii=2, theta=32, phi=32)
+            normals = fury.utils.normals_from_actor(sphere)
+            tangents = fury.utils.tangents_from_direction_of_anisotropy(
+                normals, (0, 1, 0.5)
+            )
+            fury.utils.tangents_to_actor(sphere, tangents)
             keys = list(params)
             params[keys[0]] = np.round(0.1 * j, decimals=1)
-            material.manifest_pbr(sphere, **params)
+            fury.material.manifest_pbr(sphere, **params)
             scene.add(sphere)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-74
+.. GENERATED FROM PYTHON SOURCE LINES 69-71
 
 For interpretability purposes we will add some labels to guide us through our
 visualization.
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-99
+.. GENERATED FROM PYTHON SOURCE LINES 71-98
 
 .. code-block:: Python
 
@@ -134,12 +131,14 @@ visualization.
 
     for i, name in enumerate(labels):
         pos = [-40, -5 * i, 0]
-        label = actor.vector_text(name, pos=pos, scale=(0.8, 0.8, 0.8), color=(0, 0, 0))
+        label = fury.actor.vector_text(
+            name, pos=pos, scale=(0.8, 0.8, 0.8), color=(0, 0, 0)
+        )
         scene.add(label)
 
     for j in range(num_values):
         pos = [-26 + 5 * j, 3, 0]
-        label = actor.vector_text(
+        label = fury.actor.vector_text(
             str(np.round(j * 0.1, decimals=1)),
             pos=pos,
             scale=(0.8, 0.8, 0.8),
@@ -148,14 +147,14 @@ visualization.
         scene.add(label)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 100-104
+.. GENERATED FROM PYTHON SOURCE LINES 99-103
 
 Some parameters of this material have their values constrained to be between
 1 and 2.3. These parameters are the Base Index of Refraction (IOR) and the
 Clear coat Index of Refraction (IOR). Therefore, we will interpolate some
 values within this range and see how they affect the rendering.
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-132
+.. GENERATED FROM PYTHON SOURCE LINES 103-131
 
 .. code-block:: Python
 
@@ -181,18 +180,18 @@ values within this range and see how they affect the rendering.
         center = [[0, -35 - (5 * i), 0]]
         for j in range(num_values):
             center[0][0] = -25 + 5 * j
-            sphere = actor.sphere(center, color, radii=2, theta=32, phi=32)
+            sphere = fury.actor.sphere(center, color, radii=2, theta=32, phi=32)
             keys = list(params)
             params[keys[0]] = iors[j]
-            material.manifest_pbr(sphere, **params)
+            fury.material.manifest_pbr(sphere, **params)
             scene.add(sphere)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-134
+.. GENERATED FROM PYTHON SOURCE LINES 132-133
 
 Let's add the respective labels to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-149
+.. GENERATED FROM PYTHON SOURCE LINES 133-150
 
 .. code-block:: Python
 
@@ -201,31 +200,33 @@ Let's add the respective labels to the scene.
 
     for i, name in enumerate(labels):
         pos = [-40, -35 - (5 * i), 0]
-        label = actor.vector_text(name, pos=pos, scale=(0.8, 0.8, 0.8), color=(0, 0, 0))
+        label = fury.actor.vector_text(
+            name, pos=pos, scale=(0.8, 0.8, 0.8), color=(0, 0, 0)
+        )
         scene.add(label)
 
     for j in range(num_values):
         pos = [-26 + 5 * j, -32, 0]
-        label = actor.vector_text(
+        label = fury.actor.vector_text(
             "{:.02f}".format(iors[j]), pos=pos, scale=(0.8, 0.8, 0.8), color=(0, 0, 0)
         )
         scene.add(label)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 150-151
+.. GENERATED FROM PYTHON SOURCE LINES 151-152
 
 Finally, let's visualize our tutorial.
 
-.. GENERATED FROM PYTHON SOURCE LINES 151-157
+.. GENERATED FROM PYTHON SOURCE LINES 152-158
 
 .. code-block:: Python
 
 
     interactive = False
     if interactive:
-        window.show(scene)
+        fury.window.show(scene)
 
-    window.record(scene, size=(600, 600), out_path="viz_pbr_spheres.png")
+    fury.window.record(scene, size=(600, 600), out_path="viz_pbr_spheres.png")
 
 
 .. _sphx_glr_download_auto_examples_13_shaders_viz_pbr_spheres.py:

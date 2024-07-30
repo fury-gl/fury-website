@@ -27,7 +27,7 @@ using textured spheres. We will also show how to manipulate the
 position of these sphere actors in a timer_callback function
 to simulate orbital motion.
 
-.. GENERATED FROM PYTHON SOURCE LINES 11-19
+.. GENERATED FROM PYTHON SOURCE LINES 11-18
 
 .. code-block:: Python
 
@@ -36,28 +36,31 @@ to simulate orbital motion.
 
     import numpy as np
 
-    from fury import actor, io, ui, utils, window
-    from fury.data import fetch_viz_textures, read_viz_icons, read_viz_textures
+    import fury
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-21
+.. GENERATED FROM PYTHON SOURCE LINES 19-20
 
 Create a scene to start.
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-38
+.. GENERATED FROM PYTHON SOURCE LINES 20-41
 
 .. code-block:: Python
 
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
 
     # Create a panel and the start/pause buttons
 
-    panel = ui.Panel2D(size=(300, 100), color=(1, 1, 1), align="right")
+    panel = fury.ui.Panel2D(size=(300, 100), color=(1, 1, 1), align="right")
     panel.center = (400, 50)
 
-    pause_button = ui.Button2D(icon_fnames=[("square", read_viz_icons(fname="pause2.png"))])
-    start_button = ui.Button2D(icon_fnames=[("square", read_viz_icons(fname="play3.png"))])
+    pause_button = fury.ui.Button2D(
+        icon_fnames=[("square", fury.data.read_viz_icons(fname="pause2.png"))]
+    )
+    start_button = fury.ui.Button2D(
+        icon_fnames=[("square", fury.data.read_viz_icons(fname="play3.png"))]
+    )
 
     # Add the buttons on the panel
 
@@ -66,12 +69,12 @@ Create a scene to start.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-41
+.. GENERATED FROM PYTHON SOURCE LINES 42-44
 
 Define information relevant for each planet actor including its
 texture name, relative position, and scale.
 
-.. GENERATED FROM PYTHON SOURCE LINES 41-96
+.. GENERATED FROM PYTHON SOURCE LINES 44-99
 
 .. code-block:: Python
 
@@ -128,17 +131,17 @@ texture name, relative position, and scale.
         },
         {"filename": "8k_sun.jpg", "position": 0, "earth_days": 27, "scale": (5, 5, 5)},
     ]
-    fetch_viz_textures()
+    fury.data.fetch_viz_textures()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-101
+.. GENERATED FROM PYTHON SOURCE LINES 100-104
 
 To take advantage of the previously defined data structure we are going to
 create an auxiliary function that will load and apply the respective
 texture, set its respective properties (relative position and scale),
 and add the actor to a previously created scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-128
+.. GENERATED FROM PYTHON SOURCE LINES 104-131
 
 .. code-block:: Python
 
@@ -158,25 +161,25 @@ and add the actor to a previously created scene.
         planet_actor: actor
             The corresponding sphere actor with texture applied.
         """
-        planet_file = read_viz_textures(planet_data["filename"])
-        planet_image = io.load_image(planet_file)
-        planet_actor = actor.texture_on_sphere(planet_image)
+        planet_file = fury.data.read_viz_textures(planet_data["filename"])
+        planet_image = fury.io.load_image(planet_file)
+        planet_actor = fury.actor.texture_on_sphere(planet_image)
         planet_actor.SetPosition(planet_data["position"], 0, 0)
         if planet_data["filename"] != "8k_saturn_ring_alpha.png":
-            utils.rotate(planet_actor, (90, 1, 0, 0))
+            fury.utils.rotate(planet_actor, (90, 1, 0, 0))
         planet_actor.SetScale(planet_data["scale"])
         scene.add(planet_actor)
         return planet_actor
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-132
+.. GENERATED FROM PYTHON SOURCE LINES 132-135
 
 Use the ``map`` function to create actors for each of the texture files
 in the ``planet_files`` list. Then, assign each actor to its corresponding
 actor in the list.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-147
+.. GENERATED FROM PYTHON SOURCE LINES 135-150
 
 .. code-block:: Python
 
@@ -196,14 +199,14 @@ actor in the list.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 148-152
+.. GENERATED FROM PYTHON SOURCE LINES 151-155
 
 Define the gravitational constant G, the orbital radii of each of the
 planets, and the central mass of the sun. The gravity and mass will be
 used to calculate the orbital position, so multiply these two together to
 create a new constant, which we will call miu.
 
-.. GENERATED FROM PYTHON SOURCE LINES 152-161
+.. GENERATED FROM PYTHON SOURCE LINES 155-164
 
 .. code-block:: Python
 
@@ -217,14 +220,14 @@ create a new constant, which we will call miu.
     miu = m_constant * g_constant
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-166
+.. GENERATED FROM PYTHON SOURCE LINES 165-169
 
 Let's define two functions that will help us calculate the position of each
 planet as it orbits around the sun: ``get_orbit_period`` and
 ``get_orbital_position``, using the constant miu and the orbital radii
 of each planet.
 
-.. GENERATED FROM PYTHON SOURCE LINES 166-179
+.. GENERATED FROM PYTHON SOURCE LINES 169-182
 
 .. code-block:: Python
 
@@ -242,13 +245,13 @@ of each planet.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-183
+.. GENERATED FROM PYTHON SOURCE LINES 183-186
 
 Let's define a function to rotate the planet actor axially, we'll be defining
 axis of each planet and angle by which it should be rotated using
 ``rotate_axial`` funtction
 
-.. GENERATED FROM PYTHON SOURCE LINES 183-192
+.. GENERATED FROM PYTHON SOURCE LINES 186-195
 
 .. code-block:: Python
 
@@ -257,16 +260,16 @@ axis of each planet and angle by which it should be rotated using
     def rotate_axial(actor, time, radius):
         axis = (0, radius, 0)
         angle = 50 / time
-        utils.rotate(actor, (angle, axis[0], axis[1], axis[2]))
+        fury.utils.rotate(actor, (angle, axis[0], axis[1], axis[2]))
         return angle
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-194
+.. GENERATED FROM PYTHON SOURCE LINES 196-197
 
 Let's change the camera position to visualize the planets better.
 
-.. GENERATED FROM PYTHON SOURCE LINES 194-197
+.. GENERATED FROM PYTHON SOURCE LINES 197-200
 
 .. code-block:: Python
 
@@ -274,29 +277,29 @@ Let's change the camera position to visualize the planets better.
     scene.set_camera(position=(-20, 60, 100))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-200
+.. GENERATED FROM PYTHON SOURCE LINES 201-203
 
 Next, create a ShowManager object. The ShowManager class is the interface
 between the scene, the window and the interactor.
 
-.. GENERATED FROM PYTHON SOURCE LINES 200-206
+.. GENERATED FROM PYTHON SOURCE LINES 203-209
 
 .. code-block:: Python
 
 
-    showm = window.ShowManager(
+    showm = fury.window.ShowManager(
         scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
     scene.add(panel)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 207-210
+.. GENERATED FROM PYTHON SOURCE LINES 210-213
 
 Next, let's focus on creating the animation.
 We can determine the duration of animation with using the ``counter``.
 Use itertools to avoid global variables.
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-213
+.. GENERATED FROM PYTHON SOURCE LINES 213-216
 
 .. code-block:: Python
 
@@ -304,12 +307,12 @@ Use itertools to avoid global variables.
     counter = itertools.count()
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 214-216
+.. GENERATED FROM PYTHON SOURCE LINES 217-219
 
 Define one new function to use in ``timer_callback`` to update the planet
 positions ``update_planet_position``.
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-224
+.. GENERATED FROM PYTHON SOURCE LINES 219-227
 
 .. code-block:: Python
 
@@ -322,12 +325,12 @@ positions ``update_planet_position``.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 225-227
+.. GENERATED FROM PYTHON SOURCE LINES 228-230
 
 ``calculate_path`` function is for calculating the path/orbit
 of every planet.
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-237
+.. GENERATED FROM PYTHON SOURCE LINES 230-240
 
 .. code-block:: Python
 
@@ -342,7 +345,7 @@ of every planet.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 238-243
+.. GENERATED FROM PYTHON SOURCE LINES 241-246
 
 First we are making a list that will contain radius from `planets_data`.
 Here we are not taking the radius of orbit/path for sun and saturn ring.
@@ -350,7 +353,7 @@ Here we are not taking the radius of orbit/path for sun and saturn ring.
 `r_times` will contain time taken (in days) by the planets to rotate
 around itself.
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-271
+.. GENERATED FROM PYTHON SOURCE LINES 246-274
 
 .. code-block:: Python
 
@@ -383,11 +386,11 @@ around itself.
     r_times = [p_data["earth_days"] for p_data in planets_data]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 272-273
+.. GENERATED FROM PYTHON SOURCE LINES 275-276
 
 Here we are calculating and updating the path/orbit before animation starts.
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-276
+.. GENERATED FROM PYTHON SOURCE LINES 276-279
 
 .. code-block:: Python
 
@@ -395,28 +398,28 @@ Here we are calculating and updating the path/orbit before animation starts.
     planet_tracks = [calculate_path(rplanet, rplanet * 85) for rplanet in r_planets]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 277-279
+.. GENERATED FROM PYTHON SOURCE LINES 280-282
 
 This is for orbit visualization. We are using line actor for orbits.
 After creating an actor we add it to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 279-283
+.. GENERATED FROM PYTHON SOURCE LINES 282-286
 
 .. code-block:: Python
 
 
-    orbit_actor = actor.line(planet_tracks, colors=(1, 1, 1), linewidth=0.1)
+    orbit_actor = fury.actor.line(planet_tracks, colors=(1, 1, 1), linewidth=0.1)
     scene.add(orbit_actor)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-288
+.. GENERATED FROM PYTHON SOURCE LINES 287-291
 
 Define the ``timer_callback`` function, which controls what events happen
 at certain times, using the counter. Update the position of each planet
 actor using ``update_planet_position,`` assigning the x and y values of
 each planet's position with the newly calculated ones.
 
-.. GENERATED FROM PYTHON SOURCE LINES 288-311
+.. GENERATED FROM PYTHON SOURCE LINES 291-314
 
 .. code-block:: Python
 
@@ -444,11 +447,11 @@ each planet's position with the newly calculated ones.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 312-313
+.. GENERATED FROM PYTHON SOURCE LINES 315-316
 
 We add a callback to each button to perform some action.
 
-.. GENERATED FROM PYTHON SOURCE LINES 313-327
+.. GENERATED FROM PYTHON SOURCE LINES 316-330
 
 .. code-block:: Python
 
@@ -467,11 +470,11 @@ We add a callback to each button to perform some action.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 328-329
+.. GENERATED FROM PYTHON SOURCE LINES 331-332
 
 Watch the planets orbit the sun in your new animation!
 
-.. GENERATED FROM PYTHON SOURCE LINES 329-335
+.. GENERATED FROM PYTHON SOURCE LINES 332-340
 
 .. code-block:: Python
 
@@ -480,7 +483,9 @@ Watch the planets orbit the sun in your new animation!
     showm.add_timer_callback(True, 10, timer_callback)
     showm.start()
 
-    window.record(showm.scene, size=(900, 768), out_path="viz_solar_system_animation.png")
+    fury.window.record(
+        showm.scene, size=(900, 768), out_path="viz_solar_system_animation.png"
+    )
 
 
 .. _sphx_glr_download_auto_examples_01_introductory_viz_solar_system.py:
