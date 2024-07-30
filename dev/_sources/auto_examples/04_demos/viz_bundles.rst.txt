@@ -32,9 +32,9 @@ which provides metrics and bundles.
 
     from dipy.data import fetch_bundles_2_subjects, read_bundles_2_subjects
     from dipy.tracking.streamline import length, transform_streamlines
+    import fury
     import numpy as np
 
-    from fury import actor, window
 
     interactive = False  # set to True to show the interactive display window
 
@@ -106,9 +106,9 @@ This is the default option when you are using ``line`` or ``streamtube``.
 .. code-block:: Python
 
 
-    scene = window.Scene()
+    scene = fury.window.Scene()
 
-    stream_actor = actor.line(bundle_native)
+    stream_actor = fury.actor.line(bundle_native)
 
     scene.set_camera(
         position=(-176.42, 118.52, 128.20),
@@ -119,15 +119,15 @@ This is the default option when you are using ``line`` or ``streamtube``.
     scene.add(stream_actor)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle1.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle1.png", size=(600, 600))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 69-73
 
 You may wonder how we knew how to set the camera. This is very easy. You just
-need to run ``window.show`` once see how you want to see the object and then
+need to run ``fury.window.show`` once see how you want to see the object and then
 close the window and call the ``camera_info`` method which prints the
 position, focal point and view up vectors of the camera.
 
@@ -152,7 +152,7 @@ Here we will need to input the ``fa`` map in ``streamtube`` or ``line``.
 
 
     scene.clear()
-    stream_actor2 = actor.line(bundle_native, fa, linewidth=0.1)
+    stream_actor2 = fury.actor.line(bundle_native, fa, linewidth=0.1)
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 86-87
@@ -164,15 +164,15 @@ We can also show the scalar bar.
 .. code-block:: Python
 
 
-    bar = actor.scalar_bar()
+    bar = fury.actor.scalar_bar()
 
     scene.add(stream_actor2)
     scene.add(bar)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle2.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle2.png", size=(600, 600))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 99-103
@@ -182,7 +182,7 @@ Show every point with a value from a volume with your colormap
 
 Here we will need to input the ``fa`` map in ``streamtube``
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-122
+.. GENERATED FROM PYTHON SOURCE LINES 103-124
 
 .. code-block:: Python
 
@@ -192,21 +192,23 @@ Here we will need to input the ``fa`` map in ``streamtube``
     hue = (0.0, 0.0)  # red only
     saturation = (0.0, 1.0)  # white to red
 
-    lut_cmap = actor.colormap_lookup_table(hue_range=hue, saturation_range=saturation)
+    lut_cmap = fury.actor.colormap_lookup_table(hue_range=hue, saturation_range=saturation)
 
-    stream_actor3 = actor.line(bundle_native, fa, linewidth=0.1, lookup_colormap=lut_cmap)
-    bar2 = actor.scalar_bar(lut_cmap)
+    stream_actor3 = fury.actor.line(
+        bundle_native, fa, linewidth=0.1, lookup_colormap=lut_cmap
+    )
+    bar2 = fury.actor.scalar_bar(lut_cmap)
 
     scene.add(stream_actor3)
     scene.add(bar2)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle3.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle3.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-128
+.. GENERATED FROM PYTHON SOURCE LINES 125-130
 
 Show every bundle with a specific color
 ========================================
@@ -214,23 +216,23 @@ Show every bundle with a specific color
 You can have a bundle with a specific color. In this example, we are choosing
 orange.
 
-.. GENERATED FROM PYTHON SOURCE LINES 128-139
+.. GENERATED FROM PYTHON SOURCE LINES 130-141
 
 .. code-block:: Python
 
 
     scene.clear()
-    stream_actor4 = actor.line(bundle_native, (1.0, 0.5, 0), linewidth=0.1)
+    stream_actor4 = fury.actor.line(bundle_native, (1.0, 0.5, 0), linewidth=0.1)
 
     scene.add(stream_actor4)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle4.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle4.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-145
+.. GENERATED FROM PYTHON SOURCE LINES 142-147
 
 Show every streamline of a bundle with a different color
 ========================================================
@@ -238,7 +240,7 @@ Show every streamline of a bundle with a different color
 Let's make a colormap where every streamline of the bundle is colored by its
 length.
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-173
+.. GENERATED FROM PYTHON SOURCE LINES 147-175
 
 .. code-block:: Python
 
@@ -250,28 +252,28 @@ length.
     hue = (0.5, 0.5)  # blue only
     saturation = (0.0, 1.0)  # black to white
 
-    lut_cmap = actor.colormap_lookup_table(
+    lut_cmap = fury.actor.colormap_lookup_table(
         scale_range=(lengths.min(), lengths.max()),
         hue_range=hue,
         saturation_range=saturation,
     )
 
-    stream_actor5 = actor.line(
+    stream_actor5 = fury.actor.line(
         bundle_native, lengths, linewidth=0.1, lookup_colormap=lut_cmap
     )
 
     scene.add(stream_actor5)
-    bar3 = actor.scalar_bar(lut_cmap)
+    bar3 = fury.actor.scalar_bar(lut_cmap)
 
     scene.add(bar3)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle5.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle5.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-180
+.. GENERATED FROM PYTHON SOURCE LINES 176-182
 
 Show every point of every streamline with a different color
 ============================================================
@@ -280,7 +282,7 @@ In this case in which we want to have a color per point and per streamline,
 we can create a list of the colors to correspond to the list of streamlines
 (bundles). Here in ``colors`` we will insert some random RGB colors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 180-194
+.. GENERATED FROM PYTHON SOURCE LINES 182-196
 
 .. code-block:: Python
 
@@ -289,17 +291,17 @@ we can create a list of the colors to correspond to the list of streamlines
 
     colors = [np.random.rand(*streamline.shape) for streamline in bundle_native]
 
-    stream_actor6 = actor.line(bundle_native, np.vstack(colors), linewidth=0.2)
+    stream_actor6 = fury.actor.line(bundle_native, np.vstack(colors), linewidth=0.2)
 
     scene.add(stream_actor6)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle6.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle6.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 195-203
+.. GENERATED FROM PYTHON SOURCE LINES 197-205
 
 Add depth cues to streamline rendering
 ============================================================
@@ -310,24 +312,24 @@ their distance from the camera. To increase realism, we can enable
 will return to the default color scheme from the first example. Note that
 ``depth_cue`` works best for ``linewidth`` <= 1.
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-215
+.. GENERATED FROM PYTHON SOURCE LINES 205-217
 
 .. code-block:: Python
 
 
     scene.clear()
 
-    stream_actor7 = actor.line(bundle_native, linewidth=0.5, depth_cue=True)
+    stream_actor7 = fury.actor.line(bundle_native, linewidth=0.5, depth_cue=True)
 
     scene.add(stream_actor7)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle7.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle7.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 216-221
+.. GENERATED FROM PYTHON SOURCE LINES 218-223
 
 Render streamlines as fake tubes
 ============================================================
@@ -335,24 +337,24 @@ Render streamlines as fake tubes
 We can simulate the look of streamtubes by adding shading to streamlines with
 ``fake_tube``. Note that ``fake_tube`` requires ``linewidth`` > 1.
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-233
+.. GENERATED FROM PYTHON SOURCE LINES 223-235
 
 .. code-block:: Python
 
 
     scene.clear()
 
-    stream_actor8 = actor.line(bundle_native, linewidth=3, fake_tube=True)
+    stream_actor8 = fury.actor.line(bundle_native, linewidth=3, fake_tube=True)
 
     scene.add(stream_actor8)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle8.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle8.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 234-240
+.. GENERATED FROM PYTHON SOURCE LINES 236-242
 
 Combine depth cues with fake tubes
 ============================================================
@@ -361,24 +363,26 @@ It is possible to fully simulate streamtubes by enabling both ``depth_cue``
 and ``fake_tube``. However, it can be challenging to choose a ``linewidth``
 that demonstrates both techniques well.
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-252
+.. GENERATED FROM PYTHON SOURCE LINES 242-256
 
 .. code-block:: Python
 
 
     scene.clear()
 
-    stream_actor9 = actor.line(bundle_native, linewidth=3, depth_cue=True, fake_tube=True)
+    stream_actor9 = fury.actor.line(
+        bundle_native, linewidth=3, depth_cue=True, fake_tube=True
+    )
 
     scene.add(stream_actor9)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle9.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle9.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-260
+.. GENERATED FROM PYTHON SOURCE LINES 257-264
 
 Render streamlines as tubes
 ============================================================
@@ -388,24 +392,24 @@ generates much more geometry than ``line``, so it is more computationally
 expensive. For large datasets, it may be better to approximate tubes using
 the methods described above.
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-272
+.. GENERATED FROM PYTHON SOURCE LINES 264-276
 
 .. code-block:: Python
 
 
     scene.clear()
 
-    stream_actor10 = actor.streamtube(bundle_native, linewidth=0.5)
+    stream_actor10 = fury.actor.streamtube(bundle_native, linewidth=0.5)
 
     scene.add(stream_actor10)
 
     if interactive:
-        window.show(scene, size=(600, 600), reset_camera=False)
+        fury.window.show(scene, size=(600, 600), reset_camera=False)
 
-    window.record(scene, out_path="bundle10.png", size=(600, 600))
+    fury.window.record(scene, out_path="bundle10.png", size=(600, 600))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 273-275
+.. GENERATED FROM PYTHON SOURCE LINES 277-279
 
 In summary, we showed that there are many useful ways for visualizing maps
 on bundles.

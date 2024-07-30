@@ -28,7 +28,7 @@ wall.
 
 First some imports.
 
-.. GENERATED FROM PYTHON SOURCE LINES 12-20
+.. GENERATED FROM PYTHON SOURCE LINES 12-19
 
 .. code-block:: Python
 
@@ -37,16 +37,15 @@ First some imports.
 
     import numpy as np
     import pybullet as p
+    import fury
 
-    from fury import actor, ui, utils, window
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 21-23
+.. GENERATED FROM PYTHON SOURCE LINES 20-22
 
 Next, we initialize a pybullet client to render the physics. We use `DIRECT`
 mode to initialize pybullet without a GUI.
 
-.. GENERATED FROM PYTHON SOURCE LINES 23-26
+.. GENERATED FROM PYTHON SOURCE LINES 22-25
 
 .. code-block:: Python
 
@@ -54,23 +53,23 @@ mode to initialize pybullet without a GUI.
     p.connect(p.DIRECT)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 27-28
+.. GENERATED FROM PYTHON SOURCE LINES 26-27
 
 Apply gravity to the scene. In pybullet all values are in SI units.
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-30
+.. GENERATED FROM PYTHON SOURCE LINES 27-29
 
 .. code-block:: Python
 
     p.setGravity(0, 0, -10)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-33
+.. GENERATED FROM PYTHON SOURCE LINES 30-32
 
 We define some global parameters so that its easier for us to tweak the
 tweak the simulation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 33-53
+.. GENERATED FROM PYTHON SOURCE LINES 32-52
 
 .. code-block:: Python
 
@@ -95,17 +94,17 @@ tweak the simulation.
     brick_size = np.array([0.2, 0.4, 0.2])
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-55
+.. GENERATED FROM PYTHON SOURCE LINES 53-54
 
 Now we define the required parameters to render the Ball.
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-75
+.. GENERATED FROM PYTHON SOURCE LINES 54-74
 
 .. code-block:: Python
 
 
     # Ball actor
-    ball_actor = actor.sphere(
+    ball_actor = fury.actor.sphere(
         centers=np.array([[0, 0, 0]]), colors=ball_color, radii=ball_radius
     )
 
@@ -124,16 +123,16 @@ Now we define the required parameters to render the Ball.
     p.changeDynamics(ball, -1, lateralFriction=0.3, restitution=0.5)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-77
+.. GENERATED FROM PYTHON SOURCE LINES 75-76
 
 Render a base plane to support the bricks.
 
-.. GENERATED FROM PYTHON SOURCE LINES 77-96
+.. GENERATED FROM PYTHON SOURCE LINES 76-95
 
 .. code-block:: Python
 
 
-    base_actor = actor.box(
+    base_actor = fury.actor.box(
         centers=np.array([[0, 0, 0]]),
         directions=[0, 0, 0],
         scales=base_size,
@@ -152,12 +151,12 @@ Render a base plane to support the bricks.
     p.changeDynamics(base, -1, lateralFriction=0.3, restitution=0.5)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 97-99
+.. GENERATED FROM PYTHON SOURCE LINES 96-98
 
 Now we render the bricks. All the bricks are rendered by a single actor for
 better performance.
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-142
+.. GENERATED FROM PYTHON SOURCE LINES 98-141
 
 .. code-block:: Python
 
@@ -197,7 +196,7 @@ better performance.
             p.changeDynamics(bricks[i], -1, lateralFriction=0.1, restitution=0.1)
             i += 1
 
-    brick_actor = actor.box(
+    brick_actor = fury.actor.box(
         centers=brick_centers,
         directions=brick_directions,
         scales=brick_sizes,
@@ -205,23 +204,23 @@ better performance.
     )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-144
+.. GENERATED FROM PYTHON SOURCE LINES 142-143
 
 Now, we define a scene and add actors to it.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-163
+.. GENERATED FROM PYTHON SOURCE LINES 143-162
 
 .. code-block:: Python
 
 
-    scene = window.Scene()
-    scene.add(actor.axes())
+    scene = fury.window.Scene()
+    scene.add(fury.actor.axes())
     scene.add(ball_actor)
     scene.add(base_actor)
     scene.add(brick_actor)
 
     # Create show manager.
-    showm = window.ShowManager(
+    showm = fury.window.ShowManager(
         scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
 
@@ -233,11 +232,11 @@ Now, we define a scene and add actors to it.
     apply_force = True
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 163-164
 
 Now, we define methods to sync objects between fury and Pybullet.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-181
+.. GENERATED FROM PYTHON SOURCE LINES 164-180
 
 .. code-block:: Python
 
@@ -251,14 +250,14 @@ Now, we define methods to sync objects between fury and Pybullet.
     ball_actor.SetPosition(*ball_pos)
 
     # Calculate the vertices of the bricks.
-    vertices = utils.vertices_from_actor(brick_actor)
+    vertices = fury.utils.vertices_from_actor(brick_actor)
     num_vertices = vertices.shape[0]
     num_objects = brick_centers.shape[0]
     sec = int(num_vertices / num_objects)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-196
+.. GENERATED FROM PYTHON SOURCE LINES 181-195
 
 ==============
 Syncing Bricks
@@ -275,7 +274,7 @@ Here, we perform three major steps to sync bricks accurately.
 * Perform calculations to get the required position and orientation.
 * Update the position and orientation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-217
+.. GENERATED FROM PYTHON SOURCE LINES 195-216
 
 .. code-block:: Python
 
@@ -301,12 +300,12 @@ Here, we perform three major steps to sync bricks accurately.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-220
+.. GENERATED FROM PYTHON SOURCE LINES 217-219
 
 A simpler but inaccurate approach is used here to update the position and
 orientation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 220-229
+.. GENERATED FROM PYTHON SOURCE LINES 219-228
 
 .. code-block:: Python
 
@@ -320,27 +319,27 @@ orientation.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-231
+.. GENERATED FROM PYTHON SOURCE LINES 229-230
 
 Here, we define a textblock to display the Avg. FPS and simulation steps.
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-238
+.. GENERATED FROM PYTHON SOURCE LINES 230-237
 
 .. code-block:: Python
 
 
     fpss = np.array([])
-    tb = ui.TextBlock2D(
+    tb = fury.ui.TextBlock2D(
         text="Avg. FPS: \nSim Steps: ", position=(0, 680), font_size=30, color=(1, 0.5, 0)
     )
     scene.add(tb)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-240
+.. GENERATED FROM PYTHON SOURCE LINES 238-239
 
 Set the camera for better visualization.
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-248
+.. GENERATED FROM PYTHON SOURCE LINES 239-247
 
 .. code-block:: Python
 
@@ -353,12 +352,12 @@ Set the camera for better visualization.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 249-251
+.. GENERATED FROM PYTHON SOURCE LINES 248-250
 
 Timer callback is created which is responsible for calling the sync and
 simulation methods.
 
-.. GENERATED FROM PYTHON SOURCE LINES 251-304
+.. GENERATED FROM PYTHON SOURCE LINES 250-303
 
 .. code-block:: Python
 
@@ -394,7 +393,7 @@ simulation methods.
         # Updating the position and orientation of each individual brick.
         for idx, brick in enumerate(bricks):
             sync_brick(idx, brick)
-        utils.update_actor(brick_actor)
+        fury.utils.update_actor(brick_actor)
 
         # Simulate a step.
         p.stepSimulation()
@@ -414,7 +413,7 @@ simulation methods.
     if interactive:
         showm.start()
 
-    window.record(scene, out_path="viz_brick_wall.png", size=(900, 768))
+    fury.window.record(scene, out_path="viz_brick_wall.png", size=(900, 768))
 
 
 .. _sphx_glr_download_auto_examples_17_pybullet_viz_brick_wall.py:
