@@ -1,0 +1,828 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SOLID, monkey patching a python issue and network visualization through WebRTC &#8212; FURY 0.11.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=61a4c737" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=522a8817" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script src="../../_static/documentation_options.js?v=1a9b1e2b"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2021/2021-06-28-gsoc-devmessias-4';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.11.0';
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  <div class="navbar-header-items__start">
+    
+      <div class="navbar-item"><div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text">FURY</div>
+    </a>
+</div></div>
+    
+  </div>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumbs">
+  <ul class="bd-breadcrumbs" role="navigation" aria-label="Breadcrumb">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">SOLID, monkey patching  a python issue and  network visualization through WebRTC</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+<section id="solid-monkey-patching-a-python-issue-and-network-visualization-through-webrtc">
+<h1>SOLID, monkey patching  a python issue and  network visualization through WebRTC<a class="headerlink" href="#solid-monkey-patching-a-python-issue-and-network-visualization-through-webrtc" title="Link to this heading">#</a></h1>
+<p>These past two weeks I’ve spent most of my time in the <a class="reference external" href="https://github.com/fury-gl/fury/pull/437">Streaming System
+PR</a> and the <a class="reference external" href="https://github.com/fury-gl/helios/pull/1/">Network Layout
+PR</a> . In this post I’ll
+focus on the most relevant things I’ve made for those PRs.</p>
+<section id="streaming-system">
+<h2>Streaming System<a class="headerlink" href="#streaming-system" title="Link to this heading">#</a></h2>
+<p><strong>Pull
+request</strong> : <a class="reference external" href="https://github.com/fury-gl/fury/pull/437/">fury-gl/fury/pull/437</a>.</p>
+<section id="code-refactoring">
+<h3>Code Refactoring<a class="headerlink" href="#code-refactoring" title="Link to this heading">#</a></h3>
+<section id="abstract-class-and-solid">
+<h4>Abstract class and SOLID<a class="headerlink" href="#abstract-class-and-solid" title="Link to this heading">#</a></h4>
+<p>The past weeks I’ve spent some time refactoring the code to see what
+I’ve done let’ s take a look into this
+<a class="reference external" href="https://github.com/devmessias/fury/blob/b1e985bd6a0088acb4a116684577c4733395c9b3/fury/stream/client.py#L20">fury/blob/b1e985…/fury/stream/client.py#L20</a>,
+the FuryStreamClient Object before the refactoring.</p>
+<p>The code is a mess. To see why this code is not good according to SOLID
+principles let’s just list all the responsibilities of FuryStreamClient:</p>
+<ul class="simple">
+<li><p>Creates a RawArray or SharedMemory to store the n-buffers</p></li>
+<li><p>Creates a RawArray or SharedMemory to store the information about
+each buffer</p></li>
+<li><p>Cleanup the shared memory resources if the SharedMemory was used</p></li>
+<li><p>Write the vtk buffer into the shared memory resource</p></li>
+<li><p>Creates the vtk callbacks to update the vtk-buffer</p></li>
+</ul>
+<p>That’s a lot and those responsibilities are not even related to each
+other. How can we be more SOLID[1]? An obvious solution is to create a
+specific object to deal with the shared memory resources. But it’s not
+good enough because we still have a poor generalization since this new
+object still needs to deal with different memory management systems:
+rawarray or shared memory (maybe sockets in the future). Fortunately, we
+can use the python Abstract Classes[2] to organize the code.</p>
+<p>To use the ABC from python I first listed all the behaviors that should
+be mandatory in the new abstract class. If we are using SharedMemory or
+RawArrays we need first to create the memory resource in a proper way.
+Therefore, the GenericImageBufferManager must have a abstract method
+create_mem_resource. Now take a look into the ImageBufferManager inside
+of
+<a class="reference external" href="https://github.com/devmessias/fury/blob/c196cf43c0135dada4e2c5d59d68bcc009542a6c/fury/stream/server/server.py#L40">stream/server/server.py</a>,
+sometimes it is necessary to load the memory resource in a proper way.
+Because of that, the GenericImageBufferManager needs to have a
+load_mem_resource abstract method. Finally, each type of
+ImageBufferManager should have a different cleanup method. The code
+below presents the sketch of the abstract class</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<span class="n">GenericImageBufferManager</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">max_window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">use_shared_mem</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+         <span class="o">...</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">load_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+<p>Now we can look for those behaviors inside of FuryStreamClient.py and
+ImageBufferManger.py that does not depend if we are using the
+SharedMemory or RawArrays. These behaviors should be methods inside of
+the new GenericImageBufferManager.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># code at: https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L491</span>
+
+<span class="k">class</span> <span class="nc">GenericImageBufferManager</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">max_window_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">num_buffers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">use_shared_mem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_window_size</span> <span class="o">=</span> <span class="n">max_window_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_buffers</span> <span class="o">=</span> <span class="n">num_buffers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_size</span> <span class="o">=</span> <span class="n">num_buffers</span><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span> <span class="o">=</span> <span class="n">use_shared_mem</span>
+         <span class="c1"># omitted code</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">next_buffer_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_buffers</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">index</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">buffer_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info_buffer_repr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">index</span>
+    <span class="k">def</span> <span class="nf">write_into</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">np_arr</span><span class="p">):</span>
+        <span class="n">buffer_size</span> <span class="o">=</span> <span class="n">buffer_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">h</span><span class="o">*</span><span class="n">w</span><span class="p">)</span>
+        <span class="n">next_buffer_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_buffer_index</span>
+         <span class="c1"># omitted code</span>
+
+    <span class="k">def</span> <span class="nf">get_current_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span><span class="p">:</span>
+        <span class="c1"># omitted code</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_buffer_repr</span>
+
+    <span class="k">def</span> <span class="nf">get_jpeg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_current_frame</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_shared_mem</span><span class="p">:</span>
+        <span class="c1"># omitted code</span>
+        <span class="k">return</span> <span class="n">image_encoded</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">async_get_jpeg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ms</span><span class="o">=</span><span class="mi">33</span><span class="p">):</span>
+       <span class="c1"># omitted code</span>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">load_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">create_mem_resource</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Pass</span>
+</pre></div>
+</div>
+<p>With the
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L491">GenericImageBufferManager</a>
+the
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L609">RawArrayImageBufferManager</a>
+and
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L681">SharedMemImageBufferManager</a>
+is now implemented with less duplication of code (DRY principle). This
+makes the code more readable and easier to find bugs. In addition, later
+we can implement other memory management systems in the streaming system
+without modifying the behavior of FuryStreamClient or the code inside of
+server.py.</p>
+<p>I’ve also applied the same SOLID principles to improve the CircularQueue
+object. Although the CircularQueue and FuryStreamInteraction were not
+violating the S from SOLID, the head-tail buffer from the CircularQueue
+must have a way to lock the write/read if the memory resource is busy.
+Meanwhile the
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Array">multiprocessing.Arrays</a>
+already has a context which allows lock (.get_lock()) SharedMemory
+doesn’t[2]. The use of abstract class allowed me to deal with those
+peculiarities. <a class="reference external" href="https://github.com/fury-gl/fury/pull/437/commits/358402ea2f06833f66f45f3818ccc3448b2da9cd">commit
+358402e</a></p>
+</section>
+<section id="using-namedtuples-to-grant-immutability-and-to-avoid-silent-bugs">
+<h4>Using namedtuples to grant immutability and to avoid silent bugs<a class="headerlink" href="#using-namedtuples-to-grant-immutability-and-to-avoid-silent-bugs" title="Link to this heading">#</a></h4>
+<p>The circular queue and the user interaction are implemented in the
+streaming system using numbers to identify the type of event (mouse
+click, mouse weel, …) and where to store the specific values
+associated with the event , for example if the ctrl key is pressed or
+not. Therefore, those numbers appear in different files and locations:
+tests/test_stream.py, stream/client.py, steam/server/app_async.py. This
+can be problematic because a typo can create a silent bug. One
+possibility to mitigate this is to use a python dictionary to store the
+constant values, for example</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">EVENT_IDS</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s2">&quot;mouse_move&quot;</span> <span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;mouse_weel&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">#...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>But this solution has another issue, anywhere in the code we can change
+the values of EVENT_IDS and this will produce a new silent bug. To avoid
+this I chose to use
+<a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple">namedtuples</a>
+to create an immutable object which holds all the constant values
+associated with the user interactions.
+<a class="reference external" href="https://github.com/devmessias/fury/blob/b1e985bd6a0088acb4a116684577c4733395c9b3/fury/stream/constants.py#L59">stream/constants.py</a></p>
+<p>The namedtuple has several advantages when compared to dictionaries for
+this specific situation. In addition, it has a better performance. A
+good tutorial about namedtuples it’s available here
+<a class="reference external" href="https://realpython.com/python-namedtuple/">https://realpython.com/python-namedtuple/</a></p>
+</section>
+</section>
+<section id="testing">
+<h3>Testing<a class="headerlink" href="#testing" title="Link to this heading">#</a></h3>
+<p>My mentors asked me to write tests for this PR. Therefore, this past
+week I’ve implemented the most important tests for the streaming system:
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/tests/test_stream.py">/fury/tests/test_stream.py</a></p>
+</section>
+<section id="most-relevant-bugs">
+<h3>Most relevant bugs<a class="headerlink" href="#most-relevant-bugs" title="Link to this heading">#</a></h3>
+<p>As I discussed in my <a class="reference external" href="https://blogs.python-gsoc.org/en/demvessiass-blog/weekly-check-in-3-15/">third
+week</a>
+check-in there is an open issue related to SharedMemory in python.
+This”bug” happens in the streaming system through the following scenario</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="m">1</span>-Process<span class="w"> </span>A<span class="w"> </span>creates<span class="w"> </span>a<span class="w"> </span>shared<span class="w"> </span>memory<span class="w"> </span>X
+<span class="m">2</span>-Process<span class="w"> </span>A<span class="w"> </span>creates<span class="w"> </span>a<span class="w"> </span>subprocess<span class="w"> </span>B<span class="w"> </span>using<span class="w"> </span>popen<span class="w"> </span><span class="o">(</span><span class="nv">shell</span><span class="o">=</span>False<span class="o">)</span>
+<span class="m">3</span>-Process<span class="w"> </span>B<span class="w"> </span>reads<span class="w"> </span>X
+<span class="m">4</span>-Process<span class="w"> </span>B<span class="w"> </span>closes<span class="w"> </span>X
+<span class="m">5</span>-Process<span class="w"> </span>A<span class="w"> </span>kills<span class="w"> </span>B
+<span class="m">4</span>-Process<span class="w"> </span>A<span class="w"> </span>closes<span class="w">  </span>X
+<span class="m">5</span>-Process<span class="w"> </span>A<span class="w"> </span>unlink<span class="o">()</span><span class="w"> </span>the<span class="w"> </span>shared<span class="w"> </span>memory<span class="w"> </span>resource
+</pre></div>
+</div>
+<p>In python, this scenario translates to</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">shared_memory</span> <span class="k">as</span> <span class="n">sh</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="n">shm_a</span> <span class="o">=</span> <span class="n">sh</span><span class="o">.</span><span class="n">SharedMemory</span><span class="p">(</span><span class="n">create</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">command_string</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;from multiprocessing import shared_memory as sh;import time;shm_b = sh.SharedMemory(&#39;</span><span class="si">{</span><span class="n">shm_a</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;);shm_b.close();&quot;</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">command_string</span><span class="p">],</span>
+    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STDOUT&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=======</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">STDERR&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=======</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;========</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">shm_a</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">shm_a</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Fortunately, I could use a monkey-patching[3] solution to fix that;
+meanwhile we’re waiting for the python-core team to fix the
+resource_tracker (38119) issue [4].</p>
+</section>
+</section>
+<section id="network-layout-helios-fury">
+<h2>Network Layout (Helios-FURY)<a class="headerlink" href="#network-layout-helios-fury" title="Link to this heading">#</a></h2>
+<p><strong>Pull
+request</strong><a class="reference external" href="https://github.com/fury-gl/helios/pull/1/">fury-gl/helios/pull/1</a></p>
+<p>Finally, the first version of FURY network layout is working as you can
+see in the video below.</p>
+<p>In addition, this already can be used with the streaming system allowing
+user interactions across the internet with WebRTC protocol.</p>
+<p>One of the issues that I had to solve to achieve the result presented in
+the video above was to find a way to update the positions of the vtk
+objects without blocking the main thread and at the same time allowing
+the vtk events calls. My solution was to define an interval timer using
+the python threading module:
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/tools.py#L776">/fury/stream/tools.py#L776</a>,
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/client.py#L112">/fury/stream/client.py#L112</a>
+<a class="reference external" href="https://github.com/devmessias/fury/blob/440a39d427822096679ba384c7d1d9a362dab061/fury/stream/client.py#L296">/fury/stream/client.py#L296</a></p>
+</section>
+<section id="refs">
+<h2>Refs:<a class="headerlink" href="#refs" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>[1] A. Souly,”5 Principles to write SOLID Code (examples in Python),”
+Medium, Apr. 26, 2021.
+<a class="reference external" href="https://towardsdatascience.com/5-principles-to-write-solid-code-examples-in-python-9062272e6bdc">https://towardsdatascience.com/5-principles-to-write-solid-code-examples-in-python-9062272e6bdc</a>
+(accessed Jun. 28, 2021).</p></li>
+<li><p>[2]”[Python-ideas] Re: How to prevent shared memory from being
+corrupted ?”
+<a class="reference external" href="https://www.mail-archive.com/python-ideas&#64;python.org/msg22935.html">https://www.mail-archive.com/python-ideas&#64;python.org/msg22935.html</a>
+(accessed Jun. 28, 2021).</p></li>
+<li><p>[3]“Message 388287 - Python tracker.”
+<a class="reference external" href="https://bugs.python.org/msg388287">https://bugs.python.org/msg388287</a> (accessed Jun. 28, 2021).</p></li>
+<li><p>[4]“bpo-38119: Fix shmem resource tracking by vinay0410 · Pull
+Request #21516 · python/cpython,” GitHub.
+<a class="github reference external" href="https://github.com/python/cpython/pull/21516">python/cpython#21516</a> (accessed Jun. 28,
+2021).</p></li>
+</ul>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+
+
+<div class="section ablog__prev-next">
+  <span class="ablog__prev">
+    
+    
+    <a href="2021-07-05-week-5-sajag.html">
+      
+      <i class="fa fa-arrow-circle-left"></i>
+      
+      <span>Fourth week of coding!</span>
+    </a>
+    
+  </span>
+  <span class="ablog__spacer">&nbsp;</span>
+  <span class="ablog__next">
+    
+    
+    <a href="2021-07-05-week-5-antriksh.html">
+      <span>Week #5: Rebasing all PRs w.r.t the UI restructuring, Tree2D, Bug Fixes</span>
+      
+      <i class="fa fa-arrow-circle-right" ></i>
+      
+    </a>
+    
+  </span>
+</div>
+
+  
+  
+</div>
+
+                </article>
+              
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming-system">Streaming System</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#code-refactoring">Code Refactoring</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#abstract-class-and-solid">Abstract class and SOLID</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#using-namedtuples-to-grant-immutability-and-to-avoid-silent-bugs">Using namedtuples to grant immutability and to avoid silent bugs</a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#testing">Testing</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#most-relevant-bugs">Most relevant bugs</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#network-layout-helios-fury">Network Layout (Helios-FURY)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#refs">Refs:</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/posts/2021/2021-06-28-gsoc-devmessias-4.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+ 
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+    </div>
+</div></div>
+      
+    </div>
+  
+  
+</div>
+
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>

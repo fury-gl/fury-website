@@ -1,0 +1,645 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <id>https://fury.gl/</id>
+  <title>Blog - Posts by Mohamed Abouagour</title>
+  <updated>2024-07-31T19:06:36.007555+00:00</updated>
+  <link href="https://fury.gl/"/>
+  <link href="https://fury.gl/blog/author/mohamed-abouagour/atom.xml" rel="self"/>
+  <generator uri="https://ablog.readthedocs.io/" version="0.11.6">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2023/2023-01-29-final-report-mohamed.html</id>
+    <title>Google Summer of Code Final Work Product</title>
+    <updated>2023-01-29T00:00:00-05:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;center&gt;&lt;a href="https://summerofcode.withgoogle.com/programs/2022/projects/ZZQ6IrHq"&gt;&lt;img src="https://developers.google.com/open-source/gsoc/resources/downloads/GSoC-logo-horizontal.svg" alt="gsoc" height="50"/&gt;&lt;/a&gt;&lt;/center&gt;&lt;center&gt;
+&lt;a href="https://summerofcode.withgoogle.com/projects/#6653942668197888"&gt;&lt;img src="https://www.python.org/static/community_logos/python-logo.png" height="45"/&gt;&lt;/a&gt;
+&lt;a href="https://fury.gl/latest/community.html"&gt;&lt;img src="https://python-gsoc.org/logos/FURY.png" alt="FURY" height="45"/&gt;&lt;/a&gt;
+&lt;/center&gt;&lt;section id="google-summer-of-code-final-work-product"&gt;
+
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Name:&lt;/strong&gt; Mohamed Abouagour&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Organisation:&lt;/strong&gt; Python Software Foundation&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Sub-Organisation:&lt;/strong&gt; FURY&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Project:&lt;/strong&gt; &lt;a class="reference external" href="https://github.com/fury-gl/fury/wiki/Google-Summer-of-Code-2022-(GSOC2022)#project-2-keyframe-animations-in-fury"&gt;FURY - Keyframe animations API&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;section id="proposed-objectives"&gt;
+&lt;h2&gt;Proposed Objectives&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Keyframe animations API&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Basic playback functions, such as playing, pausing, and rewinding the timeline.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Adding keyframes at a specific time for transformations of FURY actors and cameras such as translation, scale, rotation, color, and opacity.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Implement quaternion-based interpolation (SLERP)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Allow the camera to be interpolated by the keyframe system.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Allow the creation and removal of actors from the scene according to the keyframes.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Visualize the motion path of positional animation.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Speed the animation using GLSL vertex and fragment shaders.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="modified-objectives"&gt;
+&lt;h2&gt;Modified Objectives&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Adding a playback panel for controlling the timeline.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Billboard actor using the geometry shader.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Hierarchical animation support.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Animating primitives of the same FURY actor separately.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Color interpolators.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="objectives-completed"&gt;
+&lt;h2&gt;Objectives Completed&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Keyframes Animation API&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt; Class&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt; class is the main part of the FURY animation module. It is responsible for keyframe animations for a single or a group of FURY actors.  The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt; is able to handle multiple attributes and properties of FURY actors such as position, color, scale, rotation, and opacity.  It is also capable of doing the following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Set animation keyframes and events.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Animate custom properties.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Support add-to-scene/remove-from-scene events.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Can animate other animations (Hierarchical animation)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Set or change the keyframes interpolation method.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Visualize the motion path of the positional animation.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; Class
+The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; is the player of FURY &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animations&lt;/span&gt;&lt;/code&gt;; it controls the playback of one or more FURY animations. It also has the option to include a very useful playback panel to help control the playback of the animation. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; can have a fixed length or get its duration from the animations added to it dynamically. It can loop, play once, change speed, play, pause, and stop.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;dl class="simple"&gt;
+&lt;dt&gt;Keyframes Interpolators&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Interpolation is also a core part of the keyframes animation. It is responsible for filling in the blanks between the keyframes so that we have transitional states between the set keyframes. Another factor is that interpolators must be super-optimized to interpolate data in a minimum amount of time as possible or else it would be the bottleneck that lags the animation.
+The following interpolators have been implemented as a part of the keyframes animation API:&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Step Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Linear Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Spherical Linear Interpolator (Slerp)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Spline Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Cubic Spline Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Cubic Bézier Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Color Interpolators:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;XYZ Color Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Lab Color Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;HSV Color Interpolator&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;img alt="https://user-images.githubusercontent.com/63170874/217738142-2dba8f6a-f8ff-4231-babd-048055074cc0.gif" class="align-center" src="https://user-images.githubusercontent.com/63170874/217738142-2dba8f6a-f8ff-4231-babd-048055074cc0.gif" style="width: 560px;" /&gt;
+&lt;img alt="https://user-images.githubusercontent.com/63170874/190892795-f47ceaf1-8dd0-4235-99be-2cf0aec323bb.gif" class="align-center" src="https://user-images.githubusercontent.com/63170874/190892795-f47ceaf1-8dd0-4235-99be-2cf0aec323bb.gif" style="width: 560px;" /&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;dl class="simple"&gt;
+&lt;dt&gt;Tutorials&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Also included 11 tutorials  demonstrating how the FURY keyframe animation API works and how to use it to make some interesting animations. These tutorial will be added soon to the FURY website.
+Subjects explained in the tutorials are:&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Introduction&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Timeline&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Interpolators&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Camera Animation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Hierarchical Animation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Using Color Interpolators&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Using Bezier Interpolator&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Using Spline Interpolator&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Using time-based functions&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Creating Custom Interpolators&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Arm Robot Animation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Keyframe animations and interpolators (Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/647"&gt;fury-gl/fury#647&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Separating the  ``Timeline`` (Ready to be Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/694"&gt;fury-gl/fury#694&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Timeline hierarchical transformation (Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/665"&gt;fury-gl/fury#665&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Add Timelines to ShowManager directly (Ready to be Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/690"&gt;fury-gl/fury#690&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Updating animation tutorials (Ready to be Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/680"&gt;fury-gl/fury#680&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Record keyframe animation as GIF and MP4 (Under Development):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/687"&gt;fury-gl/fury#687&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;PlaybackPanel UI component&lt;/p&gt;
+&lt;p&gt;At first, while in the early development stage of the FURY keyframe animation API, basic playback buttons were used to play, pause, and stop the animation. As the API kept growing, more controllers needed to be implemented, such as the time progress slider, the speed changer, and the loop toggle. And composing all of these controllers into a single UI element was inevitable.
+While the PlaybackPanel is a main part of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;,  the goal was to make it completely independent from the keyframes animation API so that it can be used for anything else, i.e. a video player actor or a continuous time simulation or any other time-dependent applications.&lt;/p&gt;
+&lt;a class="reference external image-reference" href="https://user-images.githubusercontent.com/63170874/194377387-bfeeea2c-b4ee-4d26-82c0-b76c27fa0f90.png"&gt;&lt;img alt="image" src="https://user-images.githubusercontent.com/63170874/194377387-bfeeea2c-b4ee-4d26-82c0-b76c27fa0f90.png" /&gt;&lt;/a&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;``PlaybackPanel`` initial implementation (Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/647"&gt;fury-gl/fury#647&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Set position and width of the  ``PlaybackPanel`` (Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/692"&gt;fury-gl/fury#692&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;dl class="simple"&gt;
+&lt;dt&gt;Billboard actor using the geometry shader&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;FURY already has a billboard actor implemented using two triangles to construct the billboard. But the new approach uses only one vertex and the canvas of the billboard is generated by the geometry shader. This approach is faster in initialization since only the center is needed and no additional computations to generate the primitive on the CPU side. Also, animating these new billboards using the method mentioned above in the previous objective is way much faster, and faster is one of the reasons why we use billboards.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;billboards using geometry shader (Ready to be Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/631"&gt;fury-gl/fury#631&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="objectives-in-progress"&gt;
+&lt;h2&gt;Objectives in Progress&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;dl class="simple"&gt;
+&lt;dt&gt;Animating primitives of the same FURY Actor separately&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Animating FURY actors is not a problem and can be done easily using the FURY animation module. The problem appears when trying to animate a massive amount of actors, thousands or even hundreds of thousands of actors, it’s impossible to do that using the animation module. Instead, primitives of the same actor can be animated by changing their vertices and then sending the new vertices buffer to the GPU. This also needs some discussion to find the cleanest way to implement it.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Animating primitives of the same actor (Draft):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/660"&gt;fury-gl/fury#660&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Added primitives count to the polydata (Merged):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/617"&gt;fury-gl/fury#617&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;dl class="simple"&gt;
+&lt;dt&gt;Speeding up the animation using GLSL shaders&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Using the power of the GPU to help speed up the animations since some interpolators are relatively slow, such as the spline interpolator. Besides, morphing and skeletal animation would be tremendously optimized if they were computed on the GPU side!&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Adding shader support for doing the animations (Open):&lt;/strong&gt; &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/702"&gt;fury-gl/fury#702&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="other-objectives"&gt;
+&lt;h2&gt;Other Objectives&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;dl&gt;
+&lt;dt&gt;Added more enhancements to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;vector_text&lt;/span&gt;&lt;/code&gt; actor&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Added the ability to change the direction of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;vector_text&lt;/span&gt;&lt;/code&gt; actor, as well as giving it the option to follow the camera. Also added the option to extrude the text which makes it more like 3D text.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Pull Requests:&lt;/em&gt;&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Improving  ``vector_text`` (Merged)&lt;/strong&gt; : &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/661"&gt;fury-gl/fury#661&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Other PRs&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Fixed multi_samples not being used (Merged)&lt;/strong&gt;:  &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/594"&gt;fury-gl/fury#594&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Added an accurate way to calculate FPS (Merged)&lt;/strong&gt;:   &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/597"&gt;fury-gl/fury#597&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Implemented two new hooks for UI sliders (Merged)&lt;/strong&gt;:   &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/634"&gt;fury-gl/fury#634&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Fixed some old tutorials (Merged)&lt;/strong&gt;:   &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/591"&gt;fury-gl/fury#591&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Returning the Timer id while initialization (Merged)&lt;/strong&gt;:   &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/598"&gt;fury-gl/fury#598&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;GSoC Weekly Blogs&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;My blog posts can be found on &lt;a class="reference external" href="https://fury.gl/latest/blog/author/mohamed-abouagour.html"&gt;the FURY website&lt;/a&gt; and &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/"&gt;the Python GSoC blog&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="timeline"&gt;
+&lt;h2&gt;Timeline&lt;/h2&gt;
+&lt;table class="table"&gt;
+&lt;thead&gt;
+&lt;tr class="row-odd"&gt;&lt;th class="head"&gt;&lt;p&gt;Date&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Description&lt;/p&gt;&lt;/th&gt;
+&lt;th class="head"&gt;&lt;p&gt;Blog Post Link&lt;/p&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 0 &lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(23-05-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;My journey till getting accepted into GSoC22&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-05-23-first-post-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/my-journey-till-getting-accepted-into-gsoc22/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 1&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(08-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Implementing a basic Keyframe animation API&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-06-08-week-1-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-1-implementing-a-basic-keyframe-animation-api/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 2&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(28-06-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Implementing non-linear and color interpolators&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-06-28-week-2-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-2-implementing-non-linear-and-color-interpolators/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 3&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(04-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Redesigning the API,&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt; Implementing cubic Bezier Interpolator,&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt; and making progress on the GPU side!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-07-04-week-3-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-3-redesigning-the-api-implementing-cubic-bezier-interpolator-and-making-progress-on-the-gpu-side/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 4&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(11-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Camera animation, &lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;interpolation in GLSL, and a single Timeline!&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-07-11-week-4-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-4-camera-animation-interpolation-in-glsl-and-a-single-timeline/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 5&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(19-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Slerp implementation, &lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;documenting the Timeline, and adding unit tests&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-07-19-week-5-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-5-slerp-implementation-documenting-the-timeline-and-adding-unit-tests/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 6&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(25-07-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Fixing the Timeline issues and equipping it with&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt; more features&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-07-25-week-6-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-6-fixing-the-timeline-issues-and-equipping-it-with-more-features/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 7&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(01-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Billboard spheres and implementing interpolators&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt; using closures&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-08-01-week-7-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-7-billboard-spheres-and-implementing-interpolators-using-closures/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 8&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(09-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Back to the shader-based version of the Timeline&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-08-09-week-8-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-8-back-to-the-shader-based-version-of-the-timeline/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 9&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(16-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Animating primitives of the same actor&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-08-16-week-9-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-9-animating-primitives-of-the-same-actor/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 10&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(23-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Supporting hierarchical animating&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-08-23-week-10-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-10-supporting-hierarchical-animations/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 11&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(30-08-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Improving tutorials a little&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-08-30-week-11-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-11-improving-tutorials-a-little/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-even"&gt;&lt;td&gt;&lt;p&gt;Week 12&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(7-09-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Adding new tutorials&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-09-7-week-12-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-12-adding-new-tutorials/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class="row-odd"&gt;&lt;td&gt;&lt;p&gt;Week 13&lt;span class="raw-html"&gt;&lt;br&gt;&lt;/span&gt;(20-09-2022)&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;Keyframes animation is now a bit easier in FURY&lt;/p&gt;&lt;/td&gt;
+&lt;td&gt;&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2022/2022-09-20-week-13-mohamed.html"&gt;FURY&lt;/a&gt; - &lt;a class="reference external" href="https://blogs.python-gsoc.org/en/m-agours-blog/week-13-keyframes-animation-is-now-a-bit-easier-in-fury/"&gt;Python&lt;/a&gt;&lt;/p&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2023/2023-01-29-final-report-mohamed.html"/>
+    <summary>Name: Mohamed Abouagour</summary>
+    <category term="google" label="google"/>
+    <published>2023-01-29T00:00:00-05:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-28-week-14-mohamed.html</id>
+    <title>Week 14: Keyframes animation is now a bit easier in FURY</title>
+    <updated>2022-09-28T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-14-keyframes-animation-is-now-a-bit-easier-in-fury"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Separated the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; into a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; and an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt;. So, instead of having the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; do everything. It’s now more like doing animations in Blender and other 3D editing software where the timeline handles the playback of several animations &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/694"&gt;#694&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added unit tests for the billboards based on geometry shader.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Tried to solve the issue with actors not being rendered when their positions are changed in the vertex shader. For now, I just found a way to force invoke the shader callbacks, but force rendering the actor itself still needs more investigation.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Add unit testing for the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt;, document it well, and implement more properties suggested by Shivam (&amp;#64;xtanion).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Modify &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/690"&gt;Add Timelines to ShowManager directly&lt;/a&gt; PR to allow adding &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Animation&lt;/span&gt;&lt;/code&gt; to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ShowManager&lt;/span&gt;&lt;/code&gt; as well.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Update tutorials to adapt to all the new changes in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;animation&lt;/span&gt;&lt;/code&gt; module.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;I got stuck trying to solve the issue mentioned above with actors not being rendered.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-28-week-14-mohamed.html"/>
+    <summary>Separated the Timeline into a Timeline and an Animation. So, instead of having the Timeline do everything. It’s now more like doing animations in Blender and other 3D editing software where the timeline handles the playback of several animations #694.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-28T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-20-week-13-mohamed.html</id>
+    <title>Week 13: Keyframes animation is now a bit easier in FURY</title>
+    <updated>2022-09-20T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-13-keyframes-animation-is-now-a-bit-easier-in-fury"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Added the ability to have the ShowManager stored inside the Timeline. That way the user does not have to update and render the animations because it will be done internally.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added a record method to the Timeline that records the animation and saves it as either GIF or MP4 (requires OpenCV). This record functionality has the option to show/hide the PlaybackPanel which makes it better than recording the animation using a third-party software.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;img alt="https://user-images.githubusercontent.com/63170874/190892795-f47ceaf1-8dd0-4235-99be-2cf0aec323bb.gif" class="align-center" src="https://user-images.githubusercontent.com/63170874/190892795-f47ceaf1-8dd0-4235-99be-2cf0aec323bb.gif" style="width: 600px;" /&gt;
+&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixed some issues that Serge mentioned while reviewing PR &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/665"&gt;#665&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Instead of adding the ShowManager to the Timeline, doing it the other way around is a better choice and makes the code more readable.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add tests for the Timeline’s record method.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add tests for the billboard actor to test consistency among different approaches..&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-20-week-13-mohamed.html"/>
+    <summary>Added the ability to have the ShowManager stored inside the Timeline. That way the user does not have to update and render the animations because it will be done internally.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-20T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-09-7-week-12-mohamed.html</id>
+    <title>Week 12: Adding new tutorials</title>
+    <updated>2022-09-07T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-12-adding-new-tutorials"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Restructured tutorials to be more readable and more focused on a specific topic.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Replaced the old animation introductory tutorial with a lot simpler one, and added tutorial to explain keyframes and interpolators.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Simplified setting lighting uniforms for the geometry-based-billboard actor by getting the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Scene&lt;/span&gt;&lt;/code&gt; from the actor using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;actor.GetConsumer(scene_idx)&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Allow the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; to take the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ShowManager&lt;/span&gt;&lt;/code&gt; as an argument to reduce the amount of code the user has to write every time using FURY animations.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fix some typos in the tutorials and write some info about &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Slerp&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Find a way to fix the shader-callback problem of not being executed when the actor is out of the camera’s frustum.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-09-7-week-12-mohamed.html"/>
+    <summary>Restructured tutorials to be more readable and more focused on a specific topic.</summary>
+    <category term="google" label="google"/>
+    <published>2022-09-07T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-30-week-11-mohamed.html</id>
+    <title>Week 11: Improving tutorials a little</title>
+    <updated>2022-08-30T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-11-improving-tutorials-a-little"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Fixed some issues in the hierarchical order animation support &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/665"&gt;PR&lt;/a&gt; that we discussed during last week’s meeting (mostly naming issues).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Explained the introductory tutorial a little. But it is not suitable for beginners. So, I will spend time improving tutorials this week.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added extrusion to &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/661"&gt;vector_text&lt;/a&gt; to allow the z-scaling to be functional.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixed &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lightColor0&lt;/span&gt;&lt;/code&gt; being &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/464b3dd3f5be5159f5f9617a2c7b6f7bd65c0c80/fury/actor.py#L2395"&gt;hard-set&lt;/a&gt; to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;(1,&lt;/span&gt; &lt;span class="pre"&gt;1,&lt;/span&gt; &lt;span class="pre"&gt;1)&lt;/span&gt;&lt;/code&gt;. Instead, it’s now using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Scene&lt;/span&gt;&lt;/code&gt; to set the lighting uniforms.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Improve tutorials.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Find out how to get the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Scene&lt;/span&gt;&lt;/code&gt; from the actor instead of manually assigning it.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If I have time, I will try to implement recording animation as GIF or as a video.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-30-week-11-mohamed.html"/>
+    <summary>Fixed some issues in the hierarchical order animation support PR that we discussed during last week’s meeting (mostly naming issues).</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-30T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-23-week-10-mohamed.html</id>
+    <title>Week 10: Supporting hierarchical animating</title>
+    <updated>2022-08-23T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-10-supporting-hierarchical-animating"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Implemented hierarchical order support for animations using matrices in this &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/665"&gt;PR&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Improved the API of a &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/660"&gt;PartialActor&lt;/a&gt; by adding some methods to control the scales, positions and colors.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added a new example of using the new hierarchical feature to animate an arm robot.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;iframe id="player" type="text/html"   width="440" height="390" src="https://user-images.githubusercontent.com/63170874/185803285-9184c561-a787-4ad0-ac1a-0b22854da889.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Improved &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/661"&gt;vector_text&lt;/a&gt; a little by adding options to control its direction.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Finish the hierarchical order animation support &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/665"&gt;PR&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Explain tutorials in more detail. See this &lt;a class="reference external" href="https://github.com/fury-gl/fury/issues/664"&gt;issue&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fix issues discovered by Serge in this &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/647#pullrequestreview-1061261078"&gt;review&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fix &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lightColor0&lt;/span&gt;&lt;/code&gt; being &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/464b3dd3f5be5159f5f9617a2c7b6f7bd65c0c80/fury/actor.py#L2395"&gt;hard-set&lt;/a&gt; to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;(1,&lt;/span&gt; &lt;span class="pre"&gt;1,&lt;/span&gt; &lt;span class="pre"&gt;1)&lt;/span&gt;&lt;/code&gt;. Instead, find a way to get this property the same way other polygon-based actor gets it.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Try to get PRs and issues mentioned above merged, closed or ready for a final review.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-23-week-10-mohamed.html"/>
+    <summary>Implemented hierarchical order support for animations using matrices in this PR.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-23T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-16-week-9-mohamed.html</id>
+    <title>Week 9: Animating primitives of the same actor</title>
+    <updated>2022-08-16T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-9-animating-primitives-of-the-same-actor"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Made two tutorials in this &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/660"&gt;PR&lt;/a&gt; that show two approaches on how to animate primitives of the same FURY actor using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;iframe id="player" type="text/html"   width="440" height="390" src="https://user-images.githubusercontent.com/63170874/184627836-6b022832-043b-4c28-85b3-d5911808e1a4.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Tried sending all keyframes at once as uniforms, but I faced a performance issue doing this.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Set uniforms that are not being sent by VTK for the billboard actor.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Alter the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; to use matrices instead of setting values directly to allow hierarchical transformation.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Improve the API of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;PartialActor&lt;/span&gt;&lt;/code&gt; to act almost like a normal actor.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I had some issues trying to get shader’s uniforms to hold their data, and solving this issue led to another issue, which was a performance issue.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-16-week-9-mohamed.html"/>
+    <summary>Made two tutorials in this PR that show two approaches on how to animate primitives of the same FURY actor using the Timeline.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-16T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-09-week-8-mohamed.html</id>
+    <title>Week 8: Back to the shader-based version of the Timeline</title>
+    <updated>2022-08-09T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-8-back-to-the-shader-based-version-of-the-timeline"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;First, I made some modifications to the main animation PR. Then as Filipi requested, I integrated the vertex shader that I was implementing a few weeks ago to work with the new improved version of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;As for how keyframes are sent to the GPU, the method being used is to send the needed keyframes for each draw. This is heavy because we only roll out the interpolation part, which with linear or step interpolation won’t make any difference! Instead, I tried setting all the keyframes at once as a GLSL variable using string manipulation before animation starts. This also was slow to initialize, and the shader was getting bigger and slower to bind and unbind. To solve this problem, I made a uniform that holds all the keyframes of the animation and sent data as vectors, which was faster than string manipulation, also it was faster to render since data are now stored directly in memory, and the shader program was a lot more compact. But this method had an issue; uniforms do not keep data stored as expected! If two or more actors have the same uniform name in their shader program and only one of them was set, the other actor will get this value as well. A way around this is to change the names of the uniforms so that they maintain their data.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Tested animating 160K billboard spheres animation but this time using translation as well. And they performed very well.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;iframe id="player" type="text/html"   width="440" height="390" src="https://user-images.githubusercontent.com/63170874/183534269-73bf6158-cd54-4011-9742-0483d67ca802.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Fix issues I encountered this week working with GLSL shaders.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Implement slerp in GLSL as well as figure out a way to optimize sending keyframes to the shader program.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Figure a way to animate primitives of the same actor by different timelines.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I had two issues, one mentioned above which was uniforms not being able to hold data. The second one is that VTK does not send specular-related uniforms and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lightColor0&lt;/span&gt;&lt;/code&gt; to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;point&lt;/span&gt;&lt;/code&gt; primitive, which are needed for light calculations.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-09-week-8-mohamed.html"/>
+    <summary>First, I made some modifications to the main animation PR. Then as Filipi requested, I integrated the vertex shader that I was implementing a few weeks ago to work with the new improved version of the Timeline.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-09T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-08-01-week-7-mohamed.html</id>
+    <title>Week 7: Billboard spheres and implementing interpolators using closures</title>
+    <updated>2022-08-01T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-7-billboard-spheres-and-implementing-interpolators-using-closures"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Restructured the keyframe animation interpolators using closures to be functions instead of classes &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/647"&gt;#647&lt;/a&gt;. Now it is easier to implement new interpolators with the help of the functions existing in &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/670d3a41645eb7bcd445a7d8ae9ddd7bebc376b7/fury/animation/helpers.py"&gt;fury/animation/helpers.py&lt;/a&gt;. Also, now unit tests can be added for the latter functions.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added two examples explaining how to implement a custom interpolator that can be used by the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;, one using &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/e0539269adc2a51e35282f83b8b0672bbe047a39/docs/tutorials/05_animation/viz_keyframe_custom_interpolator.py"&gt;classes&lt;/a&gt; and the other using &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/670d3a41645eb7bcd445a7d8ae9ddd7bebc376b7/docs/tutorials/05_animation/viz_keyframe_custom_interpolator.py"&gt;closures&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixed rotation issue that Shivam discovered while using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; to animate glTF models. So, rotation in VTK is done by rotating first around Z-axis, then X-axis, then finally around Y-axis, which was not the order I was using to convert from quaternions to Euler degrees.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Made changes requested by Javier and Filipi on the billboards using geometry shader &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/631"&gt;PR&lt;/a&gt;, and made an example of how to use this billboard to show an impostor sphere which looks almost like a real high poly sphere. Also benchmarked using this version of billboard vs using a quad-based billboard, and how they both affect the FPS of the animation.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;div&gt;&lt;iframe id="player" type="text/html"   width="440" height="390" src="https://user-images.githubusercontent.com/63170874/182064895-27fdd00a-6372-4caa-aff6-3a4bad64e407.mp4" frameborder="0"&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/blockquote&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Document the new closure-based interpolators. And make some slight renaming changes that we discussed in today’s meeting.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add tests to the functions inside &lt;a class="reference external" href="https://github.com/fury-gl/fury/blob/670d3a41645eb7bcd445a7d8ae9ddd7bebc376b7/fury/animation/helpers.py"&gt;fury/animation/helpers.py&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Make changes to the geometry-shader-based billboard to make it more like the quad-based billboard actor while maintaining the new features.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Integrate the already-implemented shader functionality to the new &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; in a separate draft or PR.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I got stuck trying to get and modify the vertices (centers) of the billboard actor.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-08-01-week-7-mohamed.html"/>
+    <summary>Restructured the keyframe animation interpolators using closures to be functions instead of classes #647. Now it is easier to implement new interpolators with the help of the functions existing in fury/animation/helpers.py. Also, now unit tests can be added for the latter functions.</summary>
+    <category term="google" label="google"/>
+    <published>2022-08-01T00:00:00-04:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2022/2022-07-25-week-6-mohamed.html</id>
+    <title>Week 6: Fixing the Timeline issues and equipping it with more features</title>
+    <updated>2022-07-25T00:00:00-04:00</updated>
+    <author>
+      <name>Mohamed Abouagour</name>
+    </author>
+    <content type="html">&lt;section id="week-6-fixing-the-timeline-issues-and-equipping-it-with-more-features"&gt;
+
+&lt;section id="what-did-you-do-this-week"&gt;
+&lt;h2&gt;What did you do this week?&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;Improved the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;PlaybackPanel&lt;/span&gt;&lt;/code&gt; by adding speed control and the ability to loop the animation. Also, fixed the lagging issue of play and pause buttons and composed them into a single play/pause button.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Updated the old tutorials’ syntax to match the other tutorials and added a new tutorial on position animation using spline interpolation. Added unit tests for the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;PlaybackPanel&lt;/span&gt;&lt;/code&gt; and the newly added color converters in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;colormap.py&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Added more hooks to the 2D sliders to cover two more states:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;on_value_changed&lt;/span&gt;&lt;/code&gt;, which gets called whenever the value of the slider is changed without interacting with the slider.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;on_moving_slider&lt;/span&gt;&lt;/code&gt;, which gets called when the position of the slider is changed by user interaction. &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/634"&gt;#634&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;The reason for adding these two hooks is that there was only the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;on_change&lt;/span&gt;&lt;/code&gt; hook, which always gets called when the value of the slider is changed without considering how the value is changed, hence, the functionality of the slider was limited.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Provided the ability to add static actors to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;, which might be needed in the animation part of Shivam’s glTF project &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/643"&gt;#643&lt;/a&gt;.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;If an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;actor&lt;/span&gt;&lt;/code&gt; is added to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt; as a static actor, it won’t be animated by the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;, but it will get added to the scene along with the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Implemented a custom evaluator for the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;’s properties.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;A custom evaluator uses a user-provided function that takes time as input and evaluates the property at that time. This feature is yet to be discussed more in today’s meeting.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Fixed camera rotation and the view-up issue when interacting with the scene.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Make a tutorial on how to implement a new custom Interpolator to work with the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Timeline&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add motion path visualization feature for both position and color properties.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add custom evaluation functions directly, without using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;CustomInterpolator&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Implement an already existing complex interpolator using closures instead of classes.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I didn’t get stuck this week.&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2022/2022-07-25-week-6-mohamed.html"/>
+    <summary>Improved the PlaybackPanel by adding speed control and the ability to loop the animation. Also, fixed the lagging issue of play and pause buttons and composed them into a single play/pause button.</summary>
+    <category term="google" label="google"/>
+    <published>2022-07-25T00:00:00-04:00</published>
+  </entry>
+</feed>
