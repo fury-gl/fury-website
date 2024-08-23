@@ -1,0 +1,637 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Week 9: Hosting FineTuned Models &#8212; FURY 0.12.0.dev19+gf7d8d5b5 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=522a8817" />
+    <link rel="stylesheet" type="text/css" href="../../_static/vendor/fonts.css?v=51523cda" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=3f40707b"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2024/2024-08-15_week9';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+
+
+
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item"><div id="navbar-start">
+    <a class="navbar-brand" href="../../index.html">
+        <img src="../../_static/images/logo.svg" class="logo" alt="logo" style="padding-right: 1rem;">
+        <!-- <img src="../../_static/images/text-logo.png" class="logo" alt="logo"> -->
+        <div id="navbar-logo-text">FURY</div>
+    </a>
+</div></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><ul id="navbar-main-elements" class="navbar-nav">
+    <li class="nav-item">
+        <a class="nav-link" href="../../installation.html">Installation</a>
+    </li>
+    <li class="nav-item ">
+        <a class="nav-link" href="../../introduction.html">About</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../reference/index.html">API reference</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../blog.html">Blog</a>
+    </li>
+
+    <li class="nav-item ">
+        <a class="nav-link" href="../../community.html">Community</a>
+    </li>
+    
+</ul></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">Week 9:...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+<section id="week-9-hosting-finetuned-models">
+<h1>Week 9: Hosting FineTuned Models<a class="headerlink" href="#week-9-hosting-finetuned-models" title="Link to this heading">#</a></h1>
+<p>Hi, I’m <a class="reference external" href="https://github.com/robinroy03">Robin</a> and this is my blog about week 9.</p>
+<p>This week I worked on hosting the Finetuned model as an API and started work on GitHub GraphQL.</p>
+<section id="things-i-did-in-week-9">
+<h2>Things I did in Week 9<a class="headerlink" href="#things-i-did-in-week-9" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p><strong>Hosting the fine-tuned API</strong></p></li>
+</ol>
+<p>Last week we fine-tuned the Gemini model, but it didn’t have an endpoint which we could use to connect with Discord/other frontend applications. I thought it would be a simple task until I realized it wasn’t. Some features are still in beta phase, like this one :)</p>
+<p>Fine-tuned models need more permissions to be used under an API, cause it is your data (as per Google policy). Google Gemini API provides only 1 way to achieve this right now, and that is by using a short-lived token. Short-lived tokens can’t be used on a server cause we’ll have to rotate it, and to rotate them I’ll need to sign in to my Google account every time, and I can’t program it.</p>
+<p>The way we generally solve this is by using a token with no expiry - but the Gemini API does not support that. I tried making service accounts to bypass expiry but it was all failing. The documentation does not mention anywhere how to fix this issue either.</p>
+<p>After a lot of googling, I ended up checking the <a class="reference external" href="https://github.com/google-gemini/cookbook/">Google Gemini Cookbook repo</a>, here we have a notebook which talks about this problem! I was so happy seeing <a class="reference external" href="https://github.com/google-gemini/cookbook/blob/main/quickstarts/Authentication_with_OAuth.ipynb">this Authentication_with_OAuth.ipynb file</a>. The solution is to essentially add permission to the fine-tuned model through a REST call. There is no UI/SDK way to do this. You’ll have to trigger a certain REST endpoint to update the permissions to “EVERYONE” so anyone can access the fine-tuned model. For FURY it’s fine since FURY does not contain any sensitive information.</p>
+<dl class="simple">
+<dt>So right now our workflow is as follows:</dt><dd><ul class="simple">
+<li><p>Fine-tune a model on Google AI Studio.</p></li>
+<li><p>Update model permissions using a separate script.</p></li>
+<li><p>Call through the FURY-Engine API as usual.</p></li>
+</ul>
+</dd>
+</dl>
+<ol class="arabic simple" start="2">
+<li><p><strong>GraphQL work</strong></p></li>
+</ol>
+<p>The next thing I did was start working on GitHub integration. The Discord Bot is hosted and stable, now it was time to do the same with GitHub. For GitHub, the aim is to use the LLM to give a first response to discussions posts. GitHub uses GraphQL instead of REST APIs.</p>
+<p>If you do not know GraphQL you can learn about it in detail from <a class="reference external" href="https://www.youtube.com/playlist?list=PL4cUxeGkcC9gUxtblNUahcsg0WLxmrK_y">this YouTube playlist</a> and later from the <a class="reference external" href="https://graphql.org/">official docs</a>. But I’ll give you a quick explanation anyway since I think the playlist and docs miss this part:</p>
+<p>GraphQL is essentially HTTP POST/GET calls. We’ll avoid all the jargon here and talk from first principles. REST API philosophy is to provide multiple endpoints <cite>/google</cite>, <cite>/groq</cite>, etc (these are FURY-engine endpoints). They do different things. Now these are just styles, remember that. At the end of the day you’re still sending network packets to the server, these just dictate which URL you send it to and what data it contains.</p>
+<p>GraphQL is different in the sense it does not have multiple endpoints. There’s only one endpoint (example: <a class="reference external" href="https://api.github.com/graphql">https://api.github.com/graphql</a> for GitHub). We send all our requests to this endpoint and then the server uses it to do an action and return results. So you may ask “Why” do we need to follow the GraphQL syntax, why not just modify REST API to follow our custom style? You can do that. GraphQL is just a style of doing things that smart people at Meta decided to standardize.</p>
+<p>The reason people use GraphQL is because it reduces the number of queries required. You can read the docs to see example GraphQL queries, it is compact and you can easily get a lot of information with one single call. Different people have different opinions about how to make and consume APIs. But fundamentally it’s just another layer of abstraction.</p>
+</section>
+<section id="what-is-coming-up-next-week">
+<h2>What is coming up next week?<a class="headerlink" href="#what-is-coming-up-next-week" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Work on GitHub App.</p></li>
+</ul>
+</section>
+<section id="did-you-get-stuck-anywhere">
+<h2>Did you get stuck anywhere?<a class="headerlink" href="#did-you-get-stuck-anywhere" title="Link to this heading">#</a></h2>
+<p>I was stuck with the Gemini API part but it was fixed. It was also a learning experience to not trust documentation always :)</p>
+<p>LINKS:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/google-gemini/cookbook/">Google Gemini Cookbook repo</a></p></li>
+<li><p><a class="reference external" href="https://github.com/google-gemini/cookbook/blob/main/quickstarts/Authentication_with_OAuth.ipynb">Authentication_with_OAuth.ipynb file</a></p></li>
+<li><p><a class="reference external" href="https://www.youtube.com/playlist?list=PL4cUxeGkcC9gUxtblNUahcsg0WLxmrK_y">GraphQL YouTube playlist</a></p></li>
+<li><p><a class="reference external" href="https://graphql.org/">GraphQL official docs</a></p></li>
+</ul>
+<p>Thank you for reading!</p>
+</section>
+</section>
+
+<div class="section ablog__blog_comments">
+  
+  
+
+
+<div class="section ablog__prev-next">
+  <span class="ablog__prev">
+    
+    
+    <a href="2024-08-12-week8-wachiou-bouraima.html">
+      
+      <i class="fa fa-arrow-circle-left"></i>
+      
+      <span>WEEK 8: Refining Lazy Loading Implementation and Simplifying Imports in FURY</span>
+    </a>
+    
+  </span>
+  <span class="ablog__spacer">&nbsp;</span>
+  <span class="ablog__next">
+    
+    
+    <a href="2024-08-16_week10.html">
+      <span>Week 10: Learning GraphQL</span>
+      
+      <i class="fa fa-arrow-circle-right" ></i>
+      
+    </a>
+    
+  </span>
+</div>
+
+  
+  
+</div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#things-i-did-in-week-9">Things I did in Week 9</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-coming-up-next-week">What is coming up next week?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#did-you-get-stuck-anywhere">Did you get stuck anywhere?</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/posts/2024/2024-08-15_week9.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+ 
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><div id="footer-columns" class="footer-columns">
+    <div class="footer-logo-column">
+        <img id="footer-logo" src="../../_static/images/logo.svg" alt=" logo. ">
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">About</h5>
+            </div>
+            <ul class="link-list" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" href="../../community.html"><i
+                            class="fa fa-angle-double-right"></i> Developers</a></li>
+                <li class="link-list"><a class="footer-link" href="https://discord.gg/6btFPPj"><i
+                            class="fa fa-angle-double-right"></i> Support</a></li>
+                <li class="link-list"><a class="footer-link" href="../../installation.html"><i
+                            class="fa fa-angle-double-right"></i> Download</a></li>
+                <li class="link-list"><a class="footer-link" href="../../auto_tutorials/index.html"><i
+                            class="fa fa-angle-double-right"></i> Tutorials</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Friends</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://dipy.org/"><i
+                            class="fa fa-angle-double-right"></i> DIPY</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://heliosnetwork.io/"><i
+                            class="fa fa-angle-double-right"></i> Helios</a></li>
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://furiousatoms.com/"><i
+                            class="fa fa-angle-double-right"></i> Furious Atoms</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="link-column">
+        <div class="footer-column">
+            <div class="footer-header">
+                <h5 class="footer-h5">Support</h5>
+            </div>
+            <ul class="" style="padding-left: 0px;">
+                <li class="link-list"><a class="footer-link" target="_blank" href="https://engineering.indiana.edu/"><i
+                            class="fa fa-angle-double-right"></i>
+                        The department of Intelligent Systems Engineering of Indiana University
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625"><i
+                            class="fa fa-angle-double-right"></i>
+                        NSF NCN - Engineered NanoBIO - NSF award #1720625
+                    </a></li>
+                <li class="link-list"><a class="footer-link" target="_blank"
+                        href="https://summerofcode.withgoogle.com/"><i class="fa fa-angle-double-right"></i>
+                        Google Summer of Code Program
+                    </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-actions">
+
+
+        <nav class="level is-mobile">
+            <div class="social-media-icons">
+                <a class="level-item" href="https://github.com/fury-gl/fury"
+                    aria-label="https://github.com/fury-gl/fury">
+                    <span class="icon"><i class="fab fa-github-alt"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+                <a class="level-item" href="https://twitter.com/fury_engine"
+                    aria-label="https://twitter.com/fury_engine">
+                    <span class="icon"><i class="fab fa-twitter"
+                            style="color: white; margin-right: 0.75rem;"></i></span>
+                </a>
+            </div>
+        </nav>
+        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+    </div>
+</div></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+<link rel="stylesheet" href="../../_static/css/blog.css" type="text/css">
+<link rel="stylesheet" href="../../_static/vendor/vars.css" />
+<link rel="stylesheet" href="../../_static/vendor/styles.css" />
+<link rel="stylesheet" href="../../_static/vendor/sphinx-footer.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
+  integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
+  crossorigin="anonymous" />
+<style>
+  /* Sidebar header (and topbar for mobile) */
+  .wy-side-nav-search,
+  .wy-nav-top {
+    background: #990000;
+  }
+
+  /* Sidebar */
+  .wy-nav-side {
+    background: #4A3C31;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async defer>
+  new Crate({
+    server: '695048505902891009',
+    channel: '695305679682011217',
+    shard: 'https://e.widgetbot.io',
+    // glyph: ['https://i0.wp.com/www.puclpodcast.com/wp-content/uploads/2014/03/discord-chat-link-button.jpg?w=681&ssl=1', '100%'],
+  })
+</script>
+
+  </body>
+</html>
