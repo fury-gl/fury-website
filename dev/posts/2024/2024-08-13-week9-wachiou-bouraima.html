@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Week 3: Data Data Data! &#8212; FURY 0.12.0.dev22+gdda1fdf5 documentation</title>
+    <title>WEEK 9: Fixing Sphinx Warnings and Investigating Web Footer Issues &#8212; FURY 0.12.0.dev24+g6db8e47a documentation</title>
   
   
   
@@ -44,12 +44,12 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=ab89b83f"></script>
+    <script src="../../_static/documentation_options.js?v=3ca0b3cb"></script>
     <script src="../../_static/doctools.js?v=9a2dae69"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2024/2024-06-16-week3-robin';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'posts/2024/2024-08-13-week9-wachiou-bouraima';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = '/_static/versions_switcher.json';
@@ -354,7 +354,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">Week 3:...</li>
+    <li class="breadcrumb-item active" aria-current="page">WEEK 9:...</li>
   </ul>
 </nav>
 </div>
@@ -371,62 +371,47 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-<section id="week-3-data-data-data">
-<h1>Week 3: Data Data Data!<a class="headerlink" href="#week-3-data-data-data" title="Link to this heading">#</a></h1>
-<p>Hi, I’m <a class="reference external" href="https://github.com/robinroy03">Robin</a> and this is my blog about week 3.</p>
-<p>My goal for week 3 was to collect data more efficiently and improve the citations. I also had my mid-terms during this week so I had to get things done fast.</p>
-<section id="things-i-did-in-week-3">
-<h2>Things I did in week 3<a class="headerlink" href="#things-i-did-in-week-3" title="Link to this heading">#</a></h2>
-<ol class="arabic simple">
-<li><p><strong>A better data parsing technique</strong></p></li>
-</ol>
-<p>My initial approach was naive, it was just regex and some common filtrations. Later, my mentors told me to use the <cite>inspect</cite> module. I studied that module and realized that I needed to parse data using an AST. I didn’t use the <cite>inspect</cite> module to do the parsing, since I only had to get the function/class signature and docstrings. So instead I used the <code class="docutils literal notranslate"><span class="pre">ast</span></code> module from python stdlib. My mentors gave me the general direction to go through - which was using ASTs to parse data effectively.</p>
-<p>So now we have a script which you run like <cite>python extractor.py fury</cite> and it’ll generate the appropriate JSON files.</p>
-<p><cite>{“path”: “../..”, “function/class name”: “name”, “docstring”: “..”, “class_methods”: [“method1”, “…”]}</cite></p>
-<p>I also changed the upserting chunk format. Earlier it was just strings, now it is JSON (same thing above). I do not have a scientific reason for this, but empirically it looks like it helped. Benchmarking is something I’m planning to do next week.</p>
-<p>Metadata format:</p>
-<p><cite>metadata: {“path”: “../..”, “function/class name”: “name”, “docstring”: “..”, “methods”: [(method1, docstring), (method2, docstring), …]}</cite></p>
-<ol class="arabic simple" start="2">
-<li><p><strong>Links for citation</strong></p></li>
-</ol>
-<p>Now the bot shows links for citations. Because of the new parsing, I was able to do that pretty efficiently.</p>
-<img alt="Link based references for the LLM output." src="../../_images/gsoc-robin-3-fury-discord-bot-references-url.jpg" />
-<ol class="arabic simple" start="3">
-<li><p><strong>Faster Inference</strong></p></li>
-</ol>
-<p>So this is something about the Generative AI field. There are too many things happening you might miss some stuff. <cite>Groq</cite> is a company providing free APIs for the llama and other opensource models (free for now, at least). Its inference speed is also super high. So I decided to integrate that also into our infrastructure.
-Since everything is a microservice in our architecture, it is easy to add new things.</p>
-<dl>
-<dt>Our architecture:</dt><dd><img src="https://github.com/fury-gl/fury-communication-assets/blob/main/gsoc_2024/7-6-2024-demo-architecture-gsoc-robin-week2.png?raw=true"></dd>
-</dl>
-<p>So now, along with Ollama, we have Groq inference also. I aim to make a <cite>router</cite> so that we can swap different providers as required. I’m also very interested in integrating Google Gemini 1.5 Flash and other models. Groq does not support fine-tuning, but Flash supports it and is <a class="reference external" href="https://developers.googleblog.com/en/gemini-15-pro-and-15-flash-now-available/#:~:text=To%20support%20that%2C%20we%20will%20also%20be%20rolling%20out%20tuning%20support%20for%20Gemini%201.5%20Flash%20on%20June%2017th.%20Tuning%20will%20be%20supported%20in%20both%20Google%20AI%20Studio%20and%20the%20Gemini%20API%20directly.%20Currently%2C%20tuning%20jobs%20are%20free%20of%20charge%2C%20and%20using%20a%20tuned%20model%20does%20not%20incur%20any%20additional%20per%2Dtoken%20costs.">free of cost</a> (for now). Our architecture is platform agnostic, so we can try out different things without being locked into any of them. We will also fine-tune our phi3 model since we have the data with us.</p>
-<blockquote>
-<div><iframe src="https://github.com/robinroy03/fury-discord-bot/assets/115863770/234fee85-9eb4-4fd5-a334-9e6d11e552a3" width="640" height="390" frameborder="0" allowfullscreen></iframe></div></blockquote>
-<ol class="arabic simple" start="4">
-<li><p><strong>Dockerizing Discord Bot</strong></p></li>
-</ol>
-<p>I earlier used the huggingface implementation (copied their implementation demo). It was bad. My mentors suggested to dockerize the bot so I did that.</p>
+<section id="week-9-fixing-sphinx-warnings-and-investigating-web-footer-issues">
+<h1>WEEK 9: Fixing Sphinx Warnings and Investigating Web Footer Issues<a class="headerlink" href="#week-9-fixing-sphinx-warnings-and-investigating-web-footer-issues" title="Link to this heading">#</a></h1>
+<p>Hello everyone,
+welcome to my Google Summer of Code (GSoC) 2024 journey! Week 9 was devoted to fixing Sphinx warnings caused by indentation errors in some docstrings of some examples in the <code class="docutils literal notranslate"><span class="pre">auto_examples</span></code> folder. I also started investigating why the footer of the <code class="docutils literal notranslate"><span class="pre">FURY</span></code> site distorts when you try to move the mouse over an element.</p>
+<section id="continuing-the-fight-against-sphinx-warnings">
+<h2>Continuing the Fight Against Sphinx Warnings<a class="headerlink" href="#continuing-the-fight-against-sphinx-warnings" title="Link to this heading">#</a></h2>
+<p>My main task this week has been to continue dealing with the Sphinx warnings in our documentation. I focused on the 188 warnings related to the main documentation, as well as 2 warnings in the blog posts.
+I fixed 19 warnings caused by the docstring of <code class="docutils literal notranslate"><span class="pre">viz_**.py</span></code> modules in the <code class="docutils literal notranslate"><span class="pre">source/auto_examples</span></code> folder
+by fixing the indentation errors in the docstrings of the examples.</p>
+<p>Here is an example of indentation error in the docstring of the example <code class="docutils literal notranslate"><span class="pre">auto_examples/04_demos/viz_animated_surfaces.py</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">...</span> <span class="n">Code</span> <span class="n">block</span> <span class="o">...</span>
+
+<span class="c1">###############################################################################</span>
+<span class="c1"># Variables and their usage:</span>
+<span class="c1"># :time - float: initial value of the time variable i.e. value of the time variable at</span>
+<span class="c1">#               the beginning of the program; (default = 0)</span>
+<span class="c1"># dt: float</span>
+<span class="c1">#     amount by which ``time`` variable is incremented for every iteration</span>
+<span class="c1">#     of timer_callback function (default = 0.1)</span>
+<span class="c1"># lower_xbound: float</span>
+
+<span class="o">...</span> <span class="n">Code</span> <span class="n">block</span> <span class="o">...</span>
+</pre></div>
+</div>
 </section>
-<section id="what-is-coming-up-next-week">
-<h2>What is coming up next week?<a class="headerlink" href="#what-is-coming-up-next-week" title="Link to this heading">#</a></h2>
-<ul class="simple">
-<li><p>Benchmarking. Now we have the data, but we need to properly benchmark to see whether the modifications I make every day are making the bot dumber or smarter.</p></li>
-<li><p>Study different techniques to improve model answer accuracy such as <a class="reference external" href="https://arxiv.org/abs/2212.10496">HyDE</a>.</p></li>
-<li><p>Study how to go forward with fine-tuning.</p></li>
-<li><p>Improved references.</p></li>
-<li><p>Collect more data.</p></li>
-</ul>
+<section id="investigating-web-footer-issues">
+<h2>Investigating Web Footer Issues<a class="headerlink" href="#investigating-web-footer-issues" title="Link to this heading">#</a></h2>
+<p>In parallel, I started investigating an issue with the FURY website’s footer, which deforms when hovering over an element with the mouse. This problem affects the user experience and visual consistency of the site. My work this week has focused on diagnosing the underlying cause of this issue and planning the necessary steps to fix it. This task has been both technically intriguing and a great opportunity to sharpen my web development skills.</p>
+<p>issue number: <a class="reference external" href="https://github.com/fury-gl/fury/issues/874">#874</a></p>
 </section>
-<section id="did-you-get-stuck-anywhere">
-<h2>Did you get stuck anywhere?<a class="headerlink" href="#did-you-get-stuck-anywhere" title="Link to this heading">#</a></h2>
-<p>No, everything went well this week. Exam preparation was a pain though😢.</p>
-<p>LINKS:</p>
+<section id="did-i-get-stuck-anywhere">
+<h2>Did I get stuck anywhere ?<a class="headerlink" href="#did-i-get-stuck-anywhere" title="Link to this heading">#</a></h2>
+<p>I encountered some challenges while fixing the indentation errors in the docstrings of the examples. The errors were caused by inconsistent indentation in the docstrings, which made it difficult to identify the root cause of the warnings. However, I was able to resolve these issues and make progress in addressing the Sphinx warnings.</p>
+</section>
+<section id="what-s-next">
+<h2>What’s next ?<a class="headerlink" href="#what-s-next" title="Link to this heading">#</a></h2>
+<p>For week 10, I plan to:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://developers.googleblog.com/en/gemini-15-pro-and-15-flash-now-available">Gemini Blog</a></p></li>
-<li><p><a class="reference external" href="https://arxiv.org/abs/2212.10496">HyDE</a></p></li>
-<li><p><a class="reference external" href="https://github.com/robinroy03">Robin :)</a></p></li>
+<li><p>Continue fixing the Sphinx warnings in the documentation.</p></li>
+<li><p>Start fixing the issue with the footer of the FURY website.</p></li>
 </ul>
-<p>Thank you for reading!</p>
 </section>
 </section>
 
@@ -439,11 +424,11 @@ Since everything is a microservice in our architecture, it is easy to add new th
   <span class="ablog__prev">
     
     
-    <a href="2024-06-16-week2-robin.html">
+    <a href="2024-08-12-week8-wachiou-bouraima.html">
       
       <i class="fa fa-arrow-circle-left"></i>
       
-      <span>Week 2: The first iteration!</span>
+      <span>WEEK 8: Refining Lazy Loading Implementation and Simplifying Imports in FURY</span>
     </a>
     
   </span>
@@ -451,8 +436,8 @@ Since everything is a microservice in our architecture, it is easy to add new th
   <span class="ablog__next">
     
     
-    <a href="2024-06-26-week3-wachiou-bouraima.html">
-      <span>WEEK 3: Refinements and Further Enhancements</span>
+    <a href="2024-08-15-week10-wachiou-bouraima.html">
+      <span>WEEK 10: Investigating Footer Deformation and Limited Progress on Warnings</span>
       
       <i class="fa fa-arrow-circle-right" ></i>
       
@@ -492,16 +477,17 @@ Since everything is a microservice in our architecture, it is easy to add new th
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#things-i-did-in-week-3">Things I did in week 3</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-coming-up-next-week">What is coming up next week?</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#did-you-get-stuck-anywhere">Did you get stuck anywhere?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#continuing-the-fight-against-sphinx-warnings">Continuing the Fight Against Sphinx Warnings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#investigating-web-footer-issues">Investigating Web Footer Issues</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#did-i-get-stuck-anywhere">Did I get stuck anywhere ?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-s-next">What’s next ?</a></li>
 </ul>
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
-    <a href="../../_sources/posts/2024/2024-06-16-week3-robin.rst.txt">
+    <a href="../../_sources/posts/2024/2024-08-13-week9-wachiou-bouraima.rst.txt">
       <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
   </div>
