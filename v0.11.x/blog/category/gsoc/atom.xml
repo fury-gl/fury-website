@@ -2,885 +2,569 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2024-07-31T19:06:36.209248+00:00</updated>
+  <updated>2024-08-25T20:04:14.001920+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml" rel="self"/>
-  <generator uri="https://ablog.readthedocs.io/" version="0.11.6">ABlog</generator>
+  <generator uri="https://ablog.readthedocs.io/" version="0.11.10">ABlog</generator>
   <entry>
-    <id>https://fury.gl/posts/2024/2024-07-27-week8-robin.html</id>
-    <title>Week 8: Gemini Finetuning</title>
-    <updated>2024-07-27T00:00:00-04:00</updated>
+    <id>https://fury.gl/posts/2024/2024-08-20_week_12.html</id>
+    <title>Week 12: Wrapping things up</title>
+    <updated>2024-08-20T00:00:00+00:00</updated>
     <author>
       <name>Robin Roy</name>
     </author>
-    <content type="html">&lt;section id="week-8-gemini-finetuning"&gt;
+    <content type="html">&lt;section id="week-12-wrapping-things-up"&gt;
 
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 8.&lt;/p&gt;
-&lt;p&gt;This week I worked on finalizing the Discord chat QnA data collection and using it to Fine-Tune the Gemini-1.0-Pro model.&lt;/p&gt;
-&lt;section id="things-i-did-in-week-8"&gt;
-&lt;h2&gt;Things I did in Week 8&lt;/h2&gt;
+&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 12.&lt;/p&gt;
+&lt;p&gt;As the final official week, I spent my time wrapping things up and also improving the UX of the GitHub Application.&lt;/p&gt;
+&lt;section id="things-i-did-in-week-12"&gt;
+&lt;h2&gt;Things I did in Week 12&lt;/h2&gt;
 &lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Discord Data Collection&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Improving GitHub App UX&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
-&lt;p&gt;I finished collecting data from all the channels in the Discord server, cross-verifying to check whether they still work. I also added some questions which were on the FURY bot testing server. These QnA pairs were later converted to a CSV with input/output pairs and fed to Gemini for finetuning.&lt;/p&gt;
+&lt;p&gt;Previously the bot responded to every discussion post. It was not a good approach and we tried stuff like &amp;#64;mentions. The problem is GitHub does not support bot mentions natively. Actually &lt;a class="reference external" href="https://github.com/skoudoro/"&gt;Serge&lt;/a&gt; had a better approach that is using Discussion Templates. I integrated that. Right now, you have a checkbox that you can tick to get the LLM answer as the first response.&lt;/p&gt;
+&lt;p&gt;The new UI looks like this:&lt;/p&gt;
+&lt;img alt="Present GitHub Discussions Template" src="https://fury.gl/_images/robin_gsoc_FURY_DISCUSSIONS_TEMPLATE.jpg" /&gt;
 &lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Gemini Finetuning&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Documentation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-27-week8-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-20_week_12.rst&lt;/span&gt;, line 2)&lt;/p&gt;
 &lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
 &lt;/aside&gt;
-&lt;p&gt;Finetuning is essentially training the model on the input/output. RAG is giving context and asking the model to form an answer using that. Finetuning updates the model weights as per the input/output. Gemini uses &lt;a class="reference external" href="https://huggingface.co/blog/peft"&gt;Parameter-Efficient Fine-Tuning&lt;/a&gt; in AI Studio as per some reports. It makes sense because the tuning only takes minutes and PEFT is a good strategy to prevent issues like &lt;a class="reference external" href="https://arxiv.org/abs/1312.6211"&gt;catastrophic forgetting&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Finetuning and RAG are complementary to each other. The difference between them can be summarized as follows:&lt;/p&gt;
-&lt;p&gt;RAG is like giving an LLM with no prior knowledge about FURY access to some important functions/classes as per the user prompt. It’ll use this given context and its knowledge of graphics libraries (knowledge from pretraining) to form an answer.&lt;/p&gt;
-&lt;p&gt;Finetuning is used to make the model follow a certain style or behaviour. It is a form of mimicking the input-output. This will help in increasing the model’s performance. An interesting thing is I had to train the model 1) with RAG and 2) without RAG.&lt;/p&gt;
-&lt;p&gt;For finetuning, the input must be in the format the LLM will get the answer from the user. When you ask a question to the FURY bot, the bot does not get your question directly. We are processing it to add additional information. Therefore I had to process all the collected data with RAG.&lt;/p&gt;
-&lt;p&gt;This is an interesting direction, and I have a lot of cool things to try out here. I’ll spend the next few weeks trying different ideas.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Finetuning strategies.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Hosting the model on API.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I did not get stuck anywhere.&lt;/p&gt;
-&lt;p&gt;LINKS:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-27-week8-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “parameter-efficient fine-tuning”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://huggingface.co/blog/peft"&gt;Parameter-Efficient Fine-Tuning&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-27-week8-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id2"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “catastrophic forgetting”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://arxiv.org/abs/1312.6211"&gt;catastrophic forgetting&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-27-week8-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 8.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-27T00:00:00-04:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-07-27-week7-robin.html</id>
-    <title>Week 7: Surviving final examinations</title>
-    <updated>2024-07-27T00:00:00-04:00</updated>
-    <author>
-      <name>Robin Roy</name>
-    </author>
-    <content type="html">&lt;section id="week-7-surviving-final-examinations"&gt;
-
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 7.&lt;/p&gt;
-&lt;p&gt;I majorly took this week off due to my semester final examinations :) They were fun. Major topics were x86, ARM and 8051. I had not written a lot of assembly apart from school work. I took the week to experiment with some assembly. The course was more into hardware architecture than programming. I’ve now enough knowledge to read a given piece of ASM code with a wiki to look up mnemonics (and Gemini/Claude to help). I’m not fast in writing ASM (yet), one day I’ll find a project to dive into, or maybe some reverse engineering and CTFs. GPU instruction sets are also something interesting.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Discord data collection&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;I collected some Q&amp;amp;A questions from the FURY discord server. I did it manually because the volume wasn’t high, and I wanted it to be correct. Had to cross-check with GitHub also to check whether the answer/code mentioned still stands. The format I used was [User question, Answer]. If the answer/question is spread across multiple conversations, I’ll adjust it to this format.&lt;/p&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Gemini Finetuning&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Collect more Discord data.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;Not really apart from some silly ASM bugs.&lt;/p&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-27-week7-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 7.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-27T00:00:00-04:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-07-27-week6-robin.html</id>
-    <title>Week 6: UI Improvements and RAG performance evaluation</title>
-    <updated>2024-07-27T00:00:00-04:00</updated>
-    <author>
-      <name>Robin Roy</name>
-    </author>
-    <content type="html">&lt;section id="week-6-ui-improvements-and-rag-performance-evaluation"&gt;
-
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 6.&lt;/p&gt;
-&lt;p&gt;This week, I worked on some UI improvements and studied and evaluated the RAG performance.&lt;/p&gt;
-&lt;section id="things-i-did-in-week-6"&gt;
-&lt;h2&gt;Things I did in week 6&lt;/h2&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Line number references&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Earlier, the bot used to reference the Python file directly. This made it difficult to search and find the particular function/class. We had to manually go and search. I modified the code to include a link with line numbers. Now the references section will give a link which wraps around the function/class. To do this I had to re-index the whole library again using the new parser code. The present model points to the latest stable release of FURY.&lt;/p&gt;
-&lt;p&gt;I also tried to compress it all into one Discord message, reducing one extra ping :)&lt;/p&gt;
-&lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;RAG Performance Evaluation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-27-week6-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;I added a new benchmark to measure RAG performance. It essentially checks whether certain key information was retrieved from the database. There are certain situations where the model fetches data irrelevant to the question, this could help in fixing that.&lt;/p&gt;
-&lt;p&gt;The RAG benchmark dataset consists of a prompt to the LLM and expected references to be fetched from the database. I’ll give a score based on the % of correct fetches.&lt;/p&gt;
+&lt;p&gt;Some of the API endpoints had no documentation, the documentation work is still ongoing. But I worked on adding basic info like how to test locally and stuff. It was added directly to the README.md files. I’ll also make a separate GitHub Gists where I’ll detail all the components and how they integrate with each other.&lt;/p&gt;
 &lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Fine-tuning feasibility study&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;API testing&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-27-week6-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-20_week_12.rst&lt;/span&gt;, line 2)&lt;/p&gt;
 &lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
 &lt;/aside&gt;
-&lt;p&gt;It was time to start thinking about fine-tuning. Gemini had a generous free tier and it was possible to fine-tune Gemini-1.0-pro. I looked into it and started collecting data for it. For fine-tuning Gemini, I had to format the data as an input/output pair. Most of the data were planned to be collected from Discord and GitHub.&lt;/p&gt;
-&lt;p&gt;I also checked into fine-tuning models like phi-3 and llama 7b. It is possible to do the fine-tuning on google colab/kaggle. We could use a small quantized model and fine-tune that without much performance loss.&lt;/p&gt;
+&lt;p&gt;I plan to have testing for every endpoint. Testing includes the following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Check the endpoints with valid data to see the response. Validate the JSON format.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Check the endpoints with incorrect schema and record the response.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Test by adjusting parameters like KNN.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Testing will be a separate file, it’ll be production testing. We’ll hit the live endpoints directly.&lt;/p&gt;
 &lt;/section&gt;
 &lt;section id="what-is-coming-up-next-week"&gt;
 &lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;I’ll be taking a break next week due to my semester final examinations. I’ll study model finetuning and keep brainstorming interesting trajectories for FURY.&lt;/p&gt;
+&lt;p&gt;I’m working on the final report. Also, I’m working on finishing testing, documentation and updating the LLM response. The plan is to use a Re-Ranker to rerank the KNN references and filter ones not in context.&lt;/p&gt;
 &lt;/section&gt;
 &lt;section id="did-you-get-stuck-anywhere"&gt;
 &lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I did not get stuck anywhere.&lt;/p&gt;
+&lt;p&gt;No, I did not get stuck. I was having some health issues this week so was unable to make a lot of progress. But the general plan is prepared, and now I’ll have to compile everything.&lt;/p&gt;
 &lt;p&gt;Thank you for reading!&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2024/2024-07-27-week6-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 6.</summary>
+    <link href="https://fury.gl/posts/2024/2024-08-20_week_12.html"/>
+    <summary>Hi, I’m Robin and this is my blog about week 12.</summary>
     <category term="google" label="google"/>
-    <published>2024-07-27T00:00:00-04:00</published>
+    <published>2024-08-20T00:00:00+00:00</published>
   </entry>
   <entry>
-    <id>https://fury.gl/posts/2024/2024-07-06-week5-wachiou-bouraima.html</id>
-    <title>WEEK 5: Implementing Lazy Loading in FURY with lazy_loader</title>
-    <updated>2024-07-06T00:00:00-04:00</updated>
+    <id>https://fury.gl/posts/2024/2024-08-17_week_11.html</id>
+    <title>Week 11: Getting the App Live</title>
+    <updated>2024-08-17T00:00:00+00:00</updated>
+    <author>
+      <name>Robin Roy</name>
+    </author>
+    <content type="html">&lt;section id="week-11-getting-the-app-live"&gt;
+
+&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 11.&lt;/p&gt;
+&lt;p&gt;This week I worked on Getting the GitHub App live.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Getting the App Live&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Last week I prototyped and got to know the language and the API. But I can’t use my account as an automated bot account. So it was required to make a GitHub App. The architecture for it is as follows:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Make a GitHub App to listen to Discussion posts&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Send a webhook to &lt;a class="reference external" href="https://robinroy03-github-bot.hf.space/github"&gt;https://robinroy03-github-bot.hf.space/github&lt;/a&gt; whenever any change happens.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Respond to the webhook as required.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I was told by &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge&lt;/a&gt; to try and fit the endpoint inside the Discord Bot script. I tried but it was weird so I left it. The Discord Bot is set up using threading which is a hack (although it is how every discord bot is set up in HuggingFace). Placing it inside any other repository won’t be good so I ended up making another new repository.&lt;/p&gt;
+&lt;p&gt;I faced an issue while trying to get the app live. I had another documentation rabbit hole situation. So what ended up happening was I was unable to authenticate myself with the GitHub app to send commands. To command an app you have to authenticate as a &lt;cite&gt;GitHub App Installation&lt;/cite&gt;. To authenticate as an App installation, you need 3 key things:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Installation ID&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;App ID&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Private Key of the App&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You use the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;App&lt;/span&gt; &lt;span class="pre"&gt;ID&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Private&lt;/span&gt; &lt;span class="pre"&gt;Key&lt;/span&gt;&lt;/code&gt; to make a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;JWT&lt;/span&gt;&lt;/code&gt;. You use the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;JWT&lt;/span&gt;&lt;/code&gt; with &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;ID&lt;/span&gt;&lt;/code&gt; to make an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;Access&lt;/span&gt; &lt;span class="pre"&gt;Token&lt;/span&gt;&lt;/code&gt;. You’ll now use this &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;Access&lt;/span&gt; &lt;span class="pre"&gt;Token&lt;/span&gt;&lt;/code&gt; to authorize you and then send commands to the GitHub App. The &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Access&lt;/span&gt; &lt;span class="pre"&gt;Token&lt;/span&gt;&lt;/code&gt; will expire after 1 hour, so we’ll have to regenerate it.&lt;/p&gt;
+&lt;p&gt;The problem was that the documentation didn’t mention how to generate &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;Access&lt;/span&gt; &lt;span class="pre"&gt;Token&lt;/span&gt;&lt;/code&gt; and it kept confusing everyone with &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;ID&lt;/span&gt;&lt;/code&gt;. Even the names were misleading, since it isn’t an &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Installation&lt;/span&gt; &lt;span class="pre"&gt;Token&lt;/span&gt;&lt;/code&gt; in the real sense cause it is already installed. I ended up fixing it by landing at &lt;a class="reference external" href="https://stackoverflow.com/questions/77325437/how-do-i-get-an-github-app-installation-token-to-authenticate-cloning-a-reposito"&gt;this StackOverflow Post&lt;/a&gt; which took me to this &lt;a class="reference external" href="https://github.com/orgs/community/discussions/48186"&gt;Discussions Post&lt;/a&gt;. I think the majority uses &lt;cite&gt;Octokit.js SDK&lt;/cite&gt; to generate Access Tokens and regenerate JWTs. Sadly Python has no library so we had to go all manual.&lt;/p&gt;
+&lt;p&gt;So I ended up sending a PR to GitHub Docs :)&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Issue: &lt;a class="github reference external" href="https://github.com/github/docs/issues/34258"&gt;github/docs#34258&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;PR: &lt;a class="github reference external" href="https://github.com/github/docs/pull/34259"&gt;github/docs#34259&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can test the GitHub App today! Checkout &lt;a class="github reference external" href="https://github.com/robinroy03/FURY-data-script/discussions"&gt;robinroy03/FURY-data-script#discussions&lt;/a&gt;&lt;/p&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Week 12 :) I’ll be finalizing stuff.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Make the GitHub App respond to mentions.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;Was stuck with the documentation but got it fixed.&lt;/p&gt;
+&lt;p&gt;LINKS:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://stackoverflow.com/questions/77325437/how-do-i-get-an-github-app-installation-token-to-authenticate-cloning-a-reposito"&gt;StackOverflow Post&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-17_week_11.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “discussions post”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/orgs/community/discussions/48186"&gt;Discussions Post&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="github reference external" href="https://github.com/github/docs/issues/34258"&gt;github/docs#34258&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="github reference external" href="https://github.com/github/docs/pull/34259"&gt;github/docs#34259&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2024/2024-08-17_week_11.html"/>
+    <summary>Hi, I’m Robin and this is my blog about week 11.</summary>
+    <category term="google" label="google"/>
+    <published>2024-08-17T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2024/2024-08-17-week12-wachiou.html</id>
+    <title>WEEK 12: The final straight</title>
+    <updated>2024-08-17T00:00:00+00:00</updated>
     <author>
       <name>Wachiou BOURAIMA</name>
     </author>
-    <content type="html">&lt;section id="week-5-implementing-lazy-loading-in-fury-with-lazy-loader"&gt;
+    <content type="html">&lt;section id="week-12-the-final-straight"&gt;
 
-&lt;section id="hello-everyone"&gt;
-&lt;h2&gt;Hello everyone,&lt;/h2&gt;
-&lt;p&gt;Welcome back to my Google Summer of Code (GSoC) 2024 journey! This week has been particularly exciting as I introduced a significant performance optimization feature: lazy loading. Here’s an overview of my progress and contributions.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="introduction-of-lazy-loading"&gt;
-&lt;h2&gt;&lt;strong&gt;Introduction of lazy loading&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;This week, I focused on implementing the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lazy_loader&lt;/span&gt;&lt;/code&gt; feature of &lt;a class="reference external" href="https://scientific-python.org/"&gt;Scientific Python&lt;/a&gt; to optimize module loading in FURY. Lazy loading improves performance by deferring the loading of modules until they are actually needed, thus reducing start-up times and memory footprint.&lt;/p&gt;
-&lt;p&gt;The implementation involved:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Implementation of Lazy Loading:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Application of lazy loading in several FURY modules using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lazy_loader&lt;/span&gt;&lt;/code&gt; module to improve performance&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Update &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.py&lt;/span&gt;&lt;/code&gt; files:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Modified &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.py&lt;/span&gt;&lt;/code&gt; files to support lazy loading where necessary. This ensures that modules are only loaded when they are accessed for the first time&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Added Type Stubs (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.pyi&lt;/span&gt;&lt;/code&gt;):&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Adding type stubs (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.pyi&lt;/span&gt;&lt;/code&gt;) provides type hints for lazy-loading modules, improving code readability and maintainability&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Improved module organization:&lt;/strong&gt;&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Improved module organization in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.py&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.pyi&lt;/span&gt;&lt;/code&gt; files, to effectively support lazy loading.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/section&gt;
-&lt;section id="example-implementation"&gt;
-&lt;h2&gt;&lt;strong&gt;Example Implementation&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;To give you an idea, here’s the actual implementation of how lazy loading was done using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;lazy_loader&lt;/span&gt;&lt;/code&gt; module in FURY:&lt;/p&gt;
-&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.py&lt;/span&gt;&lt;/code&gt; File:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;lazy_loader&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;lazy&lt;/span&gt;
-&lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;fury.pkg_info&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="n"&gt;__version__&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;pkg_commit_hash&lt;/span&gt;
+&lt;p&gt;Hello👋🏾
+I’m &lt;a class="reference external" href="https://github.com/WassCodeur"&gt;Wachiou BOURAIMA&lt;/a&gt;,
+All good things must come to an end, and it’s with a mixture of satisfaction and nostalgia that I end this final week of my GSoC 2024 mission.  It’s been an incredible journey, and I can’t wait to share the progress I’ve made in my final week.&lt;/p&gt;
+&lt;section id="addressing-sphinx-warnings"&gt;
+&lt;h2&gt;Addressing Sphinx Warnings&lt;/h2&gt;
+&lt;p&gt;In my final week, I focused on addressing the remaining Sphinx warnings related to the documentation. The primary challenge was understanding and resolving issues that arose from the documentation format.
+The core issue stemmed from a conflict between the documentation conventions used. Specifically, the docstrings in our modules followed the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpydoc&lt;/span&gt;&lt;/code&gt; convention, while our &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;conf.py&lt;/span&gt;&lt;/code&gt; file was set up for &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;sphinx.ext.napoleon&lt;/span&gt;&lt;/code&gt;. Since these two conventions have different structures and expectations, Sphinx struggled to compile the docstrings correctly, leading to numerous warnings.&lt;/p&gt;
+&lt;p&gt;Here’s a snippet of the configuration in our &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;conf.py&lt;/span&gt;&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;extensions&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;sphinx.ext.autodoc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;sphinx.ext.autosummary&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;sphinx.ext.githubpages&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;sphinx.ext.intersphinx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="s2"&gt;&amp;quot;sphinx.ext.napoleon&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
 
-&lt;span class="fm"&gt;__getattr__&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="fm"&gt;__dir__&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;__all__&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;lazy&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;attach_stub&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="vm"&gt;__name__&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="vm"&gt;__file__&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-
-&lt;span class="n"&gt;_all__&lt;/span&gt; &lt;span class="o"&gt;+=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
-&lt;span class="s2"&gt;&amp;quot;__version__&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="s2"&gt;&amp;quot;disable_warnings&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="s2"&gt;&amp;quot;enable_warnings&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="s2"&gt;&amp;quot;get_info&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="p"&gt;]&lt;/span&gt;
-
-&lt;span class="c1"&gt;# ... (functions)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;__init__.pyi&lt;/span&gt;&lt;/code&gt; File:&lt;/p&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="c1"&gt;# This file is a stub type for the fury package. It provides information about types&lt;/span&gt;
-&lt;span class="c1"&gt;# to help type-checking tools like mypy and improve the development experience&lt;/span&gt;
-&lt;span class="c1"&gt;# with better autocompletion and documentation in code editors.&lt;/span&gt;
-
-&lt;span class="n"&gt;__all__&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;actor&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;actors&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;animation&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="s2"&gt;&amp;quot;colormap&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-    &lt;span class="c1"&gt;# ... (other modules)&lt;/span&gt;
-    &lt;span class="p"&gt;,&lt;/span&gt;
     &lt;span class="p"&gt;]&lt;/span&gt;
-
-    &lt;span class="kn"&gt;from&lt;/span&gt; &lt;span class="nn"&gt;.&lt;/span&gt; &lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
-        &lt;span class="n"&gt;actor&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="n"&gt;actors&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="n"&gt;animation&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="n"&gt;colormap&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="c1"&gt;# ... (other modules)&lt;/span&gt;
-        &lt;span class="p"&gt;,&lt;/span&gt;
-        &lt;span class="p"&gt;)&lt;/span&gt;
-        &lt;span class="c1"&gt;# ... (other functions)&lt;/span&gt;
 &lt;/pre&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;p&gt;You can review the implementation in &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/907/"&gt;this pull request&lt;/a&gt;.&lt;/p&gt;
 &lt;/section&gt;
-&lt;section id="reading-spec1"&gt;
-&lt;h2&gt;Reading &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SPEC1&lt;/span&gt;&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;To align myself with best practice, I read the &lt;a class="reference external" href="https://scientific-python.org/specs/spec-0001/"&gt;SPEC1&lt;/a&gt; document available at Scientific Python SPEC1. This document provided valuable hints and guidelines that I took into account when implementing the lazy loading feature.&lt;/p&gt;
+&lt;section id="to-address-this"&gt;
+&lt;h2&gt;To address this:&lt;/h2&gt;
+&lt;p&gt;1- Identified the Problem:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Discovered that the mismatch between the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpydoc&lt;/span&gt;&lt;/code&gt; style and the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;napoleon&lt;/span&gt;&lt;/code&gt; extension caused Sphinx to fail in parsing and generating documentation properly.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;2- Explored Solutions:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;I reviewed the documentation styles and configurations to understand the differences between &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpydoc&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;napoleon&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Evaluated whether to convert the docstrings to match the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;napoleon&lt;/span&gt;&lt;/code&gt; style or update the configuration to align with &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpydoc&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;3- Decided on a Path Forward:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;After careful consideration, I chose to update the configuration to support the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;numpydoc&lt;/span&gt;&lt;/code&gt; style, as it was more consistent with our existing docstrings.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;By making this change, I was able to resolve the conflicts and successfully compile the documentation without warnings.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Here’s a snippet of the updated configuration in our &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;conf.py&lt;/span&gt;&lt;/code&gt; file:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;extensions&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;
+        &lt;span class="o"&gt;...&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;sphinx.ext.autodoc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;numppydoc&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;sphinx.ext.autosummary&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;sphinx.ext.githubpages&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="s2"&gt;&amp;quot;sphinx.ext.intersphinx&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+        &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/section&gt;
+&lt;section id="did-i-get-stuck"&gt;
+&lt;h2&gt;Did I get stuck?&lt;/h2&gt;
+&lt;p&gt;No, I didn’t get stuck. I was able to solve the problems by carefully analyzing them and choosing the most appropriate solution with the help of my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;. This experience further enhanced my troubleshooting skills and deepened my understanding of documentation conventions.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="acknowledgements"&gt;
+&lt;h2&gt;Acknowledgements&lt;/h2&gt;
+&lt;p&gt;I’d like to sincerely thank my mentor, &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;, my peers: &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;  and the entire &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; team and community for their support and advice throughout this adventure. Your help has been essential to the success of this project.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="looking-ahead"&gt;
+&lt;h2&gt;Looking Ahead&lt;/h2&gt;
+&lt;p&gt;As &lt;cite&gt;GSoC 2024&lt;/cite&gt; comes to an end, I’m filled with gratitude for this incredible learning experience. While my official time in &lt;cite&gt;GSoC&lt;/cite&gt; is concluding, my journey with open source and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; is far from over. I look forward to continuing to contribute and grow alongside the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; community.
+Thank you for following along with my &lt;cite&gt;GSoC&lt;/cite&gt; journey.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="links"&gt;
+&lt;h2&gt;Links&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/922"&gt;PR #922&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://www.sphinx-doc.org/"&gt;Sphinx&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/"&gt;numpydoc&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://sphinxcontrib-napoleon.readthedocs.io/en/latest/"&gt;napoleon&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/WassCodeur"&gt;Wachiou BOURAIMA&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Stay tuned for more updates as I continue to explore the world of open source software!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2024/2024-08-17-week12-wachiou.html"/>
+    <summary>Hello👋🏾
+I’m Wachiou BOURAIMA,
+All good things must come to an end, and it’s with a mixture of satisfaction and nostalgia that I end this final week of my GSoC 2024 mission.  It’s been an incredible journey, and I can’t wait to share the progress I’ve made in my final week.</summary>
+    <category term="google" label="google"/>
+    <published>2024-08-17T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2024/2024-08-16_week10.html</id>
+    <title>Week 10: Learning GraphQL</title>
+    <updated>2024-08-16T00:00:00+00:00</updated>
+    <author>
+      <name>Robin Roy</name>
+    </author>
+    <content type="html">&lt;section id="week-10-learning-graphql"&gt;
+
+&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 10.&lt;/p&gt;
+&lt;p&gt;This week I worked on the GitHub GraphQL implementation. I tested out things and was learning GraphQL properly since I have never used it before.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Learning and testing GraphQL&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I spent time learning and implementing prototypes of the GitHub app. Initially, I tested using &lt;a class="reference external" href="https://docs.github.com/en/graphql/overview/explorer"&gt;GitHub Explorer&lt;/a&gt; to control my account. I initially spent some time searching for other GitHub libraries but later gave up and made my custom scripts. There are no Python GraphQL libraries available, and the ones available do not integrate with Discussion tabs.&lt;/p&gt;
+&lt;p&gt;I used Explorer to mainly focus only on the query language, and not on implementation. The plan was to use a GitHub app to send webhooks to the HuggingFace server, which will respond to it.&lt;/p&gt;
+&lt;p&gt;We use &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;query&lt;/span&gt;&lt;/code&gt; to fetch discussions and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;mutation&lt;/span&gt;&lt;/code&gt; to send a reply. They are GraphQL operations.&lt;/p&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Working GitHub App&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, I did not get stuck anywhere. I was learning new things and experimenting with stuff.&lt;/p&gt;
+&lt;p&gt;LINKS:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-16_week10.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “github explorer”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://docs.github.com/en/graphql/overview/explorer"&gt;GitHub Explorer&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2024/2024-08-16_week10.html"/>
+    <summary>Hi, I’m Robin and this is my blog about week 10.</summary>
+    <category term="google" label="google"/>
+    <published>2024-08-16T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2024/2024-08-15_week9.html</id>
+    <title>Week 9: Hosting FineTuned Models</title>
+    <updated>2024-08-15T00:00:00+00:00</updated>
+    <author>
+      <name>Robin Roy</name>
+    </author>
+    <content type="html">&lt;section id="week-9-hosting-finetuned-models"&gt;
+
+&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 9.&lt;/p&gt;
+&lt;p&gt;This week I worked on hosting the Finetuned model as an API and started work on GitHub GraphQL.&lt;/p&gt;
+&lt;section id="things-i-did-in-week-9"&gt;
+&lt;h2&gt;Things I did in Week 9&lt;/h2&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Hosting the fine-tuned API&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Last week we fine-tuned the Gemini model, but it didn’t have an endpoint which we could use to connect with Discord/other frontend applications. I thought it would be a simple task until I realized it wasn’t. Some features are still in beta phase, like this one :)&lt;/p&gt;
+&lt;p&gt;Fine-tuned models need more permissions to be used under an API, cause it is your data (as per Google policy). Google Gemini API provides only 1 way to achieve this right now, and that is by using a short-lived token. Short-lived tokens can’t be used on a server cause we’ll have to rotate it, and to rotate them I’ll need to sign in to my Google account every time, and I can’t program it.&lt;/p&gt;
+&lt;p&gt;The way we generally solve this is by using a token with no expiry - but the Gemini API does not support that. I tried making service accounts to bypass expiry but it was all failing. The documentation does not mention anywhere how to fix this issue either.&lt;/p&gt;
+&lt;p&gt;After a lot of googling, I ended up checking the &lt;a class="reference external" href="https://github.com/google-gemini/cookbook/"&gt;Google Gemini Cookbook repo&lt;/a&gt;, here we have a notebook which talks about this problem! I was so happy seeing &lt;a class="reference external" href="https://github.com/google-gemini/cookbook/blob/main/quickstarts/Authentication_with_OAuth.ipynb"&gt;this Authentication_with_OAuth.ipynb file&lt;/a&gt;. The solution is to essentially add permission to the fine-tuned model through a REST call. There is no UI/SDK way to do this. You’ll have to trigger a certain REST endpoint to update the permissions to “EVERYONE” so anyone can access the fine-tuned model. For FURY it’s fine since FURY does not contain any sensitive information.&lt;/p&gt;
+&lt;dl class="simple"&gt;
+&lt;dt&gt;So right now our workflow is as follows:&lt;/dt&gt;&lt;dd&gt;&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Fine-tune a model on Google AI Studio.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Update model permissions using a separate script.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Call through the FURY-Engine API as usual.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;ol class="arabic simple" start="2"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;GraphQL work&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-15_week9.rst&lt;/span&gt;, line 2)&lt;/p&gt;
+&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;The next thing I did was start working on GitHub integration. The Discord Bot is hosted and stable, now it was time to do the same with GitHub. For GitHub, the aim is to use the LLM to give a first response to discussions posts. GitHub uses GraphQL instead of REST APIs.&lt;/p&gt;
+&lt;p&gt;If you do not know GraphQL you can learn about it in detail from &lt;a class="reference external" href="https://www.youtube.com/playlist?list=PL4cUxeGkcC9gUxtblNUahcsg0WLxmrK_y"&gt;this YouTube playlist&lt;/a&gt; and later from the &lt;a class="reference external" href="https://graphql.org/"&gt;official docs&lt;/a&gt;. But I’ll give you a quick explanation anyway since I think the playlist and docs miss this part:&lt;/p&gt;
+&lt;p&gt;GraphQL is essentially HTTP POST/GET calls. We’ll avoid all the jargon here and talk from first principles. REST API philosophy is to provide multiple endpoints &lt;cite&gt;/google&lt;/cite&gt;, &lt;cite&gt;/groq&lt;/cite&gt;, etc (these are FURY-engine endpoints). They do different things. Now these are just styles, remember that. At the end of the day you’re still sending network packets to the server, these just dictate which URL you send it to and what data it contains.&lt;/p&gt;
+&lt;p&gt;GraphQL is different in the sense it does not have multiple endpoints. There’s only one endpoint (example: &lt;a class="reference external" href="https://api.github.com/graphql"&gt;https://api.github.com/graphql&lt;/a&gt; for GitHub). We send all our requests to this endpoint and then the server uses it to do an action and return results. So you may ask “Why” do we need to follow the GraphQL syntax, why not just modify REST API to follow our custom style? You can do that. GraphQL is just a style of doing things that smart people at Meta decided to standardize.&lt;/p&gt;
+&lt;p&gt;The reason people use GraphQL is because it reduces the number of queries required. You can read the docs to see example GraphQL queries, it is compact and you can easily get a lot of information with one single call. Different people have different opinions about how to make and consume APIs. But fundamentally it’s just another layer of abstraction.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-is-coming-up-next-week"&gt;
+&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Work on GitHub App.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="did-you-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;I was stuck with the Gemini API part but it was fixed. It was also a learning experience to not trust documentation always :)&lt;/p&gt;
+&lt;p&gt;LINKS:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-15_week9.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Duplicate explicit target name: “google gemini cookbook repo”.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;&lt;a class="reference external" href="https://github.com/google-gemini/cookbook/"&gt;Google Gemini Cookbook repo&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/google-gemini/cookbook/blob/main/quickstarts/Authentication_with_OAuth.ipynb"&gt;Authentication_with_OAuth.ipynb file&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://www.youtube.com/playlist?list=PL4cUxeGkcC9gUxtblNUahcsg0WLxmrK_y"&gt;GraphQL YouTube playlist&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://graphql.org/"&gt;GraphQL official docs&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2024/2024-08-15_week9.html"/>
+    <summary>Hi, I’m Robin and this is my blog about week 9.</summary>
+    <category term="google" label="google"/>
+    <published>2024-08-15T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2024/2024-08-15-week11-wachiou.html</id>
+    <title>WEEK 11: Resolving the Footer Issue and Addressing Sphinx Warnings</title>
+    <updated>2024-08-15T00:00:00+00:00</updated>
+    <author>
+      <name>Wachiou BOURAIMA</name>
+    </author>
+    <content type="html">&lt;section id="week-11-resolving-the-footer-issue-and-addressing-sphinx-warnings"&gt;
+
+&lt;p&gt;Hello everyone,
+welcome to the update for Week 11 of my Google Summer of Code (GSoC) 2024 journey. This week, I focused on finalizing the footer issue on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; website and tackling some Sphinx warnings related to attribute and property naming conflicts. Here’s a detailed look at what I accomplished and the challenges faced.&lt;/p&gt;
+&lt;section id="fixing-the-footer-issue"&gt;
+&lt;h2&gt;Fixing the Footer Issue&lt;/h2&gt;
+&lt;p&gt;In the previous week, I identified the root cause of the footer deformation. The problem arose when hovering over elements, which caused their size to increase, thereby affecting the padding of their container and subsequently the entire footer layout.
+To illustrate the issue and the resolution, I have included the following videos:&lt;/p&gt;
+&lt;p&gt;Before Fixing the Footer Issue:
+Video demonstrating the footer deformation before the fix.&lt;/p&gt;
+&lt;iframe src="https://github.com/user-attachments/assets/2f5d4021-b661-4be9-944f-7a2638376f2c" width="640" height="390" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;&lt;p&gt;After Fixing the Footer Issue:
+Video showing the footer after applying the fix.&lt;/p&gt;
+&lt;iframe src="https://github.com/user-attachments/assets/b0ec74df-827b-4280-b3e4-bf968b97a654" width="640" height="390" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;&lt;p&gt;To address this, I experimented with different approaches. Initially, I tried adjusting the &lt;cite&gt;font-size&lt;/cite&gt; of the elements on hover by making them bold instead. This resolved the deformation issue but did not align with the design specifications of the homepage footer.
+After reconsidering, I added some properties to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;.class-columns&lt;/span&gt;&lt;/code&gt; in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;styles.css&lt;/span&gt;&lt;/code&gt; file to better adapt the footer style and prevent any layout issues. This approach aimed to maintain the design integrity while addressing the layout problem effectively.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="handling-sphinx-warnings"&gt;
+&lt;h2&gt;Handling Sphinx Warnings&lt;/h2&gt;
+&lt;p&gt;In addition to fixing the footer, I worked on resolving warnings caused by Sphinx due to naming conflicts between attributes and properties. To mitigate these warnings, I initially added &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;:no-index:&lt;/span&gt;&lt;/code&gt; directives in the .rst files for functions and classes to prevent indexing issues.
+However, during our weekly meeting with my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;, it became clear that this solution might hinder the indexing and referencing of functions, modules, and classes on the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; site and the web. Therefore, I need to re-evaluate the issue and find a more suitable solution that ensures proper indexing while addressing the warnings.&lt;/p&gt;
 &lt;/section&gt;
 &lt;section id="did-i-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I didn’t encounter any major blockers this week. The implementation of lazy loading went smoothly, and I was able to complete the task.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-s-next"&gt;
-&lt;h2&gt;&lt;strong&gt;What’s Next?&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;For the next week, I plan to:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Review all my Pull Requests with my mentor &lt;a class="reference external" href="https://github.com/skoudoro/"&gt;Serge Koudoro&lt;/a&gt;, to ensure everything is up to FURY’s standards.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Start working on the redesign of the FURY website, making it more user-friendly and visually appealing.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Thank you for reading. Stay tuned for more updates on my progress!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-06-week5-wachiou-bouraima.html"/>
-    <summary>Welcome back to my Google Summer of Code (GSoC) 2024 journey! This week has been particularly exciting as I introduced a significant performance optimization feature: lazy loading. Here’s an overview of my progress and contributions.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-06T00:00:00-04:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-07-01-week-5-robin.html</id>
-    <title>Week 5: LLM Benchmarking &amp; Architecture Modifications</title>
-    <updated>2024-07-01T00:00:00-04:00</updated>
-    <author>
-      <name>Robin Roy</name>
-    </author>
-    <content type="html">&lt;section id="week-5-llm-benchmarking-architecture-modifications"&gt;
-
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 5.&lt;/p&gt;
-&lt;p&gt;This week, we’ll take all the things we did in the previous weeks, and quantify them. Benchmarking an LLM is the process of grading the LLM answer. To grade properly, we need good rubrics, so that’s what I worked on this week. Also, I made some architectural changes, to make the overall development simple.&lt;/p&gt;
-&lt;section id="things-i-did-in-week-5"&gt;
-&lt;h2&gt;Things I did in Week 5&lt;/h2&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Architectural Update&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Earlier, this was our architecture:&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;div&gt;&lt;img src="https://github.com/fury-gl/fury-communication-assets/blob/main/gsoc_2024/7-6-2024-demo-architecture-gsoc-robin-week2.png?raw=true"&gt;&lt;/div&gt;&lt;/blockquote&gt;
-&lt;p&gt;This had an obvious issue, all the core logic was inside the Discord Bot. So if I want to say, use the LLM inference for making a GitHub bot, or for benchmarking etc, it wasn’t possible. So I decided to cut the LLM logic from Discord Bot and made a new &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;LLM&lt;/span&gt; &lt;span class="pre"&gt;Router&lt;/span&gt;&lt;/code&gt;. It’ll handle all the LLM logic from now on, and we do not directly call any other endpoint other than this one.
-It makes life simple, every input going into the endpoint goes like this:&lt;/p&gt;
-&lt;div class="highlight-json notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;quot;query&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Render a cube in fury&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;quot;llm&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;llama3-70b-8192&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;quot;knn&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;3&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="nt"&gt;&amp;quot;stream&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="kc"&gt;false&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;Every response coming out will be like this:&lt;/p&gt;
-&lt;div class="highlight-json notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;response&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;Yes, this is how it would be done python import fury....&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-&lt;span class="w"&gt;    &lt;/span&gt;&lt;span class="nt"&gt;&amp;quot;references&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;1, 2, 3&amp;quot;&lt;/span&gt;
-&lt;span class="p"&gt;}&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;dl class="simple"&gt;
-&lt;dt&gt;What happens on the inside is completely abstracted away. You just call this and it’ll&lt;/dt&gt;&lt;dd&gt;&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;call the embedding model&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;pass embeddings to the database&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;return them to LLM (which you can choose)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;returns LLM answer with references to you&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;p&gt;Currently, we support &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ollama&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;google&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;groq&lt;/span&gt;&lt;/code&gt; providers. That itself is 20+ LLM support, and you could swap between them using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;/api/groq&lt;/span&gt; &lt;span class="pre"&gt;or&lt;/span&gt; &lt;span class="pre"&gt;api/google&lt;/span&gt; &lt;span class="pre"&gt;or&lt;/span&gt; &lt;span class="pre"&gt;/api/ollama&lt;/span&gt; &lt;span class="pre"&gt;...&lt;/span&gt;&lt;/code&gt;. Adding another provider is simply adding another endpoint.&lt;/p&gt;
-&lt;p&gt;So if you do&lt;/p&gt;
-&lt;p&gt;&lt;cite&gt;curl -X POST https://robinroy03-fury-engine.hf.space/api/groq/generate -H “Content-Type: application/json” -d ‘{“query”: “How do I create a sphere in FURY?”, “llm”: “llama3-70b-8192”, “knn”: “3”, “stream”: false}’&lt;/cite&gt;&lt;/p&gt;
-&lt;p&gt;You’ll get a response from &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;llama3-70b-8192&lt;/span&gt;&lt;/code&gt; using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;groq&lt;/span&gt;&lt;/code&gt;. If you do &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;https://robinroy03-fury-engine.hf.space/api/google/generate&lt;/span&gt;&lt;/code&gt; you can call any google gemini modes like &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;gemini-1.5-pro&lt;/span&gt;&lt;/code&gt; or &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;gemini-1.5-flash&lt;/span&gt;&lt;/code&gt;. Same for &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ollama&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;This still could be improved, it does not currently account for vision models. I did not add that because we do not use vision models other than for benchmarking now, and that too is done locally. Benchmarking could also be streamlined, I avoided that because benchmarking is still in development so I’ll have to rewrite every day. Presently you can use this core &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;router&lt;/span&gt;&lt;/code&gt; for a working LLM generation (you’ll get the same thing you’ll get from the Discord Bot. So if you have a website, all you have to do is call the API).&lt;/p&gt;
-&lt;p&gt;This is our present architecture:&lt;/p&gt;
-&lt;img alt="Present LLM architecture." src="https://fury.gl/_images/gsoc_llm_robin_week5.jpg" /&gt;
-&lt;p&gt;It is the same thing as above, except we have two new components - &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;LLM&lt;/span&gt; &lt;span class="pre"&gt;Engine&lt;/span&gt;&lt;/code&gt; and a &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Groq&lt;/span&gt; &lt;span class="pre"&gt;&amp;amp;&lt;/span&gt; &lt;span class="pre"&gt;Gemini&lt;/span&gt;&lt;/code&gt; endpoint. When we’ll end up having a conversational model setup (right now, it is one question and one answer), this model will be upgraded to accommodate that. My plan is to extend LLM Engine and add that. Other features such as vision also could be added to this as needed.&lt;/p&gt;
-&lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Gemini Models added&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-5-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;As mentioned above, I added &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Gemini&lt;/span&gt;&lt;/code&gt; models this week. They have a decent free tier. Also, I’m studying the feasibility of fine-tuning using the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Gemini&lt;/span&gt;&lt;/code&gt; models.&lt;/p&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;LLM Benchmarking&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-5-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;LLM Benchmarking is the process of evaluating the LLM output and giving a score. With this, making the model better will be simply a function of increasing the score. This area is still under development and the things I’ve tried here are the current standard procedures. To understand more about benchmarking, you can read: &lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/rag_evaluation"&gt;RAG Evaluation&lt;/a&gt;, &lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/llm_judge"&gt;Using LLM-as-a-judge 🧑‍⚖️ for an automated and versatile evaluation&lt;/a&gt; and &lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/advanced_rag"&gt;Advanced RAG on Hugging Face documentation using LangChain&lt;/a&gt;. This &lt;a class="reference external" href="https://www.deeplearning.ai/short-courses/advanced-retrieval-for-ai/"&gt;course&lt;/a&gt; is also amazing.&lt;/p&gt;
-&lt;p&gt;I’ll anyways give a TL;DR:
-LLM benchmarking is essentially like writing an English Literature exam and getting the grades. Your evaluator may give you a 4 or a 5, and the reasoning can be varied. For the same answer, you may even get very varied results from 2 different evaluators! Two common rubrics they use are &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;groundedness&lt;/span&gt; &lt;span class="pre"&gt;(whether&lt;/span&gt; &lt;span class="pre"&gt;the&lt;/span&gt; &lt;span class="pre"&gt;answer&lt;/span&gt; &lt;span class="pre"&gt;follows&lt;/span&gt; &lt;span class="pre"&gt;from&lt;/span&gt; &lt;span class="pre"&gt;the&lt;/span&gt; &lt;span class="pre"&gt;material)&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;completion&lt;/span&gt; &lt;span class="pre"&gt;(whether&lt;/span&gt; &lt;span class="pre"&gt;the&lt;/span&gt; &lt;span class="pre"&gt;answer&lt;/span&gt; &lt;span class="pre"&gt;is&lt;/span&gt; &lt;span class="pre"&gt;complete,&lt;/span&gt; &lt;span class="pre"&gt;whether&lt;/span&gt; &lt;span class="pre"&gt;it&lt;/span&gt; &lt;span class="pre"&gt;fully&lt;/span&gt; &lt;span class="pre"&gt;answers&lt;/span&gt; &lt;span class="pre"&gt;the&lt;/span&gt; &lt;span class="pre"&gt;question&lt;/span&gt; &lt;span class="pre"&gt;with&lt;/span&gt; &lt;span class="pre"&gt;respect&lt;/span&gt; &lt;span class="pre"&gt;to&lt;/span&gt; &lt;span class="pre"&gt;the&lt;/span&gt; &lt;span class="pre"&gt;material)&lt;/span&gt;&lt;/code&gt;. These are the same rubrics we’ll use for LLM evaluation. For code, it’s different. The code should compile and do exactly what it should.&lt;/p&gt;
-&lt;p&gt;Now FURY Bot does 2 things - writing code &amp;amp; writing answers for common questions (on GitHub issues etc). Presently, I’ve only collected data for coding questions, as they are much easier to evaluate and give a clear sense of direction (also I found more coding data).&lt;/p&gt;
-&lt;dl class="simple"&gt;
-&lt;dt&gt;Evaluating FURY code can be done by:&lt;/dt&gt;&lt;dd&gt;&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Running the code.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Checking the output.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;p&gt;Now we do this using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;pytest&lt;/span&gt;&lt;/code&gt; in the FURY repo for tests. But this approach is tedious, as collecting questions and writing test cases take a lot of time, also the orientation of the 3D objects also matters (an LLM generation is not deterministic). So we are using a vision model &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;moondream2&lt;/span&gt;&lt;/code&gt; to check the LLM generated output and verify if it is what we actually wanted.
-On a high level, this is what we do (for now):&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Take a QnA pair from the collected dataset (I’ve collected ~23 questions).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Ask the LLM to generate a FURY code for that (using the references).&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Run this generated code.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Check the output using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;moondream2&lt;/span&gt;&lt;/code&gt; and verify whether it is what we wanted.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;There is also &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;fast_eval&lt;/span&gt;&lt;/code&gt; which checks whether the code compiles and skips &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;moondream2&lt;/span&gt;&lt;/code&gt; entirely. This is obviously faster and is also decently good (is actually a pretty good heuristic). If it runs, assume it works :)&lt;/p&gt;
-&lt;p&gt;This is our current stats: (from now on, we can finally talk using numbers)&lt;/p&gt;
-&lt;section id="coding-benchmark"&gt;
-&lt;h3&gt;Coding benchmark:&lt;/h3&gt;
-&lt;p&gt;On &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;fast_eval&lt;/span&gt;&lt;/code&gt; we have a success rate of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;47.83%&lt;/span&gt;&lt;/code&gt; for &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;groq&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;On &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;normal_eval&lt;/span&gt;&lt;/code&gt; we have a success rate of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;13.04%&lt;/span&gt;&lt;/code&gt; for &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;groq&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;Note that &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;moondream2&lt;/span&gt;&lt;/code&gt; also sometimes mistakes the output for something else. It is close to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;~45%&lt;/span&gt;&lt;/code&gt; when I checked manually. For now, I’m only going to focus on &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;fast_eval&lt;/span&gt;&lt;/code&gt; as fixing &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;moondream2&lt;/span&gt;&lt;/code&gt; is a distraction for the moment. (This actually gets very meta, there are projects where they have benchmarks for the evaluator and so on. &lt;a class="reference external" href="https://openai.com/index/finding-gpt4s-mistakes-with-gpt-4/"&gt;Read this&lt;/a&gt;.)&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Better benchmark scores :)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Line number highlighting &amp;#64; references.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Some &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;references&lt;/span&gt;&lt;/code&gt; improvements.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I did not get stuck anywhere.&lt;/p&gt;
-&lt;p&gt;LINKS:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-5-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “rag evaluation”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/rag_evaluation"&gt;RAG Evaluation&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/llm_judge"&gt;LLM Judge&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://huggingface.co/learn/cookbook/en/advanced_rag"&gt;Advanced RAG&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://www.deeplearning.ai/short-courses/advanced-retrieval-for-ai/"&gt;Advanced Retrieval for AI&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://huggingface.co/vikhyatk/moondream2"&gt;Moondream2&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://openai.com/index/finding-gpt4s-mistakes-with-gpt-4/"&gt;Finding GPT-4 mistakes with GPT-4&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-01-week-5-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 5.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-01T00:00:00-04:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-07-01-week-4-robin.html</id>
-    <title>Week 4: Pipeline Improvements and Taking The Bot Public!</title>
-    <updated>2024-07-01T00:00:00-04:00</updated>
-    <author>
-      <name>Robin Roy</name>
-    </author>
-    <content type="html">&lt;section id="week-4-pipeline-improvements-and-taking-the-bot-public"&gt;
-
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 4.&lt;/p&gt;
-&lt;p&gt;My goals for week 4 were to move my Google colab notes to a proper Python script, improve the existing code, and make a working pipeline to upsert data easily. Also, the bot is public now :) Anyone reading this blog could join this &lt;a class="reference external" href="https://discord.gg/NVkE6Qd2bZ"&gt;Discord Server&lt;/a&gt; and ask questions right away!&lt;/p&gt;
-&lt;section id="things-i-did-in-week-4"&gt;
-&lt;h2&gt;Things I did in Week 4&lt;/h2&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Chunking tutorials and documentation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Earlier, only files fitting the context window of the embedding model were upserted. This was because otherwise, we’d have to split the file in half and lose the overall context. This will lead to information loss and retrieval will be messy. Now, I decided I’d upsert everything by splitting information properly. By “properly”, what I mean is it won’t be a random split, and there’ll be logical reasoning behind every chunk.&lt;/p&gt;
-&lt;p&gt;This area is still actively studied, and the whole concept is to find ideal chunks which are self-sufficient and contain the most information. This &lt;a class="reference external" href="https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb"&gt;notebook&lt;/a&gt; details 6 different approaches, I read through them and some of their associated literature and decided we’ll use &lt;cite&gt;Recursive Character Text Splitting&lt;/cite&gt; and &lt;cite&gt;Document Specific Splitting&lt;/cite&gt; for now. There is no major reason for this, I just felt it’ll work well for now (a reasoning-backed approach will come in a few weeks). There is a lot of experimentation we could do here, a better chunking will result in better &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;references&lt;/span&gt;&lt;/code&gt; generation and so on.&lt;/p&gt;
-&lt;dl class="simple"&gt;
-&lt;dt&gt;So this is our current process&lt;/dt&gt;&lt;dd&gt;&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;if normal function/class definition: no splitting, chunk as it is.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;if rst files, use the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;rst&lt;/span&gt; &lt;span class="pre"&gt;parser&lt;/span&gt;&lt;/code&gt; and split them with a chunk size of ~8000 tokens (max llama could take). RST files in FURY contain documentation &amp;amp; blog posts.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;if tutorial, try chunking as it is, if not possible split at 8000 tokens.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;p&gt;Function/class definitions are generally under 8000 so I’ve not done explicit checks for now, the model will trim the remaining if longer (I found some long classes later).&lt;/p&gt;
-&lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Move colab files to a proper Python script&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-4-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;I did all the upsertion and experiments on colab. It is messy and can’t be used in production. We need a one-click approach to upsertion. Something like point to &lt;cite&gt;fury&lt;/cite&gt; directory and it should do everything. So I took the messy colab code and made a python script from it.&lt;/p&gt;
-&lt;p&gt;One of my key goals is to separate core application logic from LLMs/Database providers. We should be able to swap them as needed without much fuss. I’ll talk more about this in week 5.&lt;/p&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Taking the bot public!&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-4-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;The whole point of making the bot is to help improve the productivity of FURY developers. So I decided to take it public on &lt;a class="reference external" href="https://discord.gg/NVkE6Qd2bZ"&gt;this discord server&lt;/a&gt;. You could use it today! (actually, you could’ve used it from the 20th of last month, this blog got delayed😢)&lt;/p&gt;
-&lt;p&gt;I’ll observe what people are asking and then iterate towards making the bot better in that area. I think it’ll be better than making the bot good on what I believe is the best.&lt;/p&gt;
-&lt;ol class="arabic simple" start="4"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Minor bugfixes and stuff&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-4-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “4” (ordinal 4)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;Did some minor bug fixes on things like the Discord bot generation cutoff and error handling improvements. It was Discord message limit (&amp;lt;=2000) that caused the generation to cut off, I split the message into parts to fix that. Error handling was improved generally everywhere. I’ll need to bring logging later.&lt;/p&gt;
-&lt;section id="minor-sidequest"&gt;
-&lt;h3&gt;Minor Sidequest&lt;/h3&gt;
-&lt;p&gt;This is in no way related to FURY, but it was fun so I thought I’d add it here :)&lt;/p&gt;
-&lt;p&gt;So after midterms, I decided to go back home, to maximally use my time I searched for things to do and found a local FOSS event: (&lt;a class="reference external" href="https://x.com/FOSSUnitedKochi/status/1804763181274759645"&gt;Kochi’s FOSS&lt;/a&gt;). It was done by FOSS United Kochi and it’s one of the major FOSS events in my state (Kerala, India). Met some Pythonistas! Explained what FURY is to them. I also ended up finding some lore (&lt;a class="reference external" href="https://www.gnu.org/education/edu-system-india.html"&gt;click here to read&lt;/a&gt;) about how GNU/Linux spread in Kerala, India. Also found some old FOSS event pictures (&lt;a class="reference external" href="https://www.flickr.com/photos/pce/245170427/in/photostream/"&gt;this&lt;/a&gt; one is talking about Python, 2003 World of Python). This was my first FOSS event outside campus so it was fun :)&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Benchmarking&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Architecture Update&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I did not get stuck. This week was more of learning and experimentation so I think it’s normal what I encountered.&lt;/p&gt;
-&lt;p&gt;LINKS:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-07-01-week-4-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “discord server”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://discord.gg/NVkE6Qd2bZ"&gt;Discord Server&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/FullStackRetrieval-com/RetrievalTutorials/blob/main/tutorials/LevelsOfTextSplitting/5_Levels_Of_Text_Splitting.ipynb"&gt;A Text Splitting Guide&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://www.gnu.org/education/edu-system-india.html"&gt;GNU Case of Kerala&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://www.flickr.com/photos/pce/245170427/in/photostream/"&gt;2003 World of Python&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://x.com/FOSSUnitedKochi/status/1804763181274759645"&gt;FOSS United Kochi&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin :)&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-01-week-4-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 4.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-01T00:00:00-04:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-06-26-week4-wachiou-bouraima.html</id>
-    <title>WEEK 4: Updating Decorator, Exploring Lazy Loading, and Code Reviews</title>
-    <updated>2024-06-26T00:00:00-04:00</updated>
-    <author>
-      <name>Wachiou BOURAIMA</name>
-    </author>
-    <content type="html">&lt;section id="week-4-updating-decorator-exploring-lazy-loading-and-code-reviews"&gt;
-
-&lt;section id="hello-everyone"&gt;
-&lt;h2&gt;Hello everyone,&lt;/h2&gt;
-&lt;p&gt;Welcome again to my Google summer of code 2024 (GSoC’ 2024) journey 2024!.
-This week, I focused on updating the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator, applying it across multiple modules, exploring lazy loading, and continuing with code reviews.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="updating-the-warn-on-args-to-kwargs-decorator"&gt;
-&lt;h2&gt;Updating the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator&lt;/h2&gt;
-&lt;p&gt;Based on feedback from my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;  and peers  &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;, I refined the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator and its associated unit tests:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Improvements:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Added conditions to verify if the values of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;from_version&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;until_version&lt;/span&gt;&lt;/code&gt;, and the current version of FURY are respected. This includes handling cases where &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;from_version&lt;/span&gt;&lt;/code&gt; is greater than the current version of FURY, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;until_version&lt;/span&gt;&lt;/code&gt; is less than the current version of FURY, and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;until_version&lt;/span&gt;&lt;/code&gt; is greater than or equal to the current version of FURY.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Ensured the decorator and tests cover a broader range of edge cases.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Enhanced the warning messages for better clarity and guidance.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Doctest Updates:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Updated the doctest considering the values of &lt;cite&gt;from_version&lt;/cite&gt; and &lt;cite&gt;until_version&lt;/cite&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Moved the doctest from the &lt;cite&gt;def decorator()&lt;/cite&gt; function to the root function.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Unit Tests:&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;test_warn_on_args_to_kwargs&lt;/span&gt;&lt;span class="p"&gt;():&lt;/span&gt;
-    &lt;span class="nd"&gt;@warn_on_args_to_kwargs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;a&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;):&lt;/span&gt;
-        &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;a&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;b&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;
-
-&lt;span class="c1"&gt;# if FURY_CURRENT_VERSION is less than from_version&lt;/span&gt;
-&lt;span class="n"&gt;fury&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;__version__&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;0.0.0&amp;quot;&lt;/span&gt;
-&lt;span class="n"&gt;npt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;assert_equal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;npt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;assert_equal&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;d&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;e&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;),&lt;/span&gt; &lt;span class="mi"&gt;15&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;span class="n"&gt;npt&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;assert_raises&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="ne"&gt;TypeError&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;func&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;This ensures robust validation and helps catch potential issues early.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="applying-the-warn-on-args-to-kwargs-decorator"&gt;
-&lt;h2&gt;Applying the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; Decorator&lt;/h2&gt;
-&lt;p&gt;This week, I applied the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator to several modules, ensuring consistent usage and improved code quality. The modules updated include:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;actors&lt;/cite&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;ui&lt;/cite&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;animation&lt;/cite&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;shares&lt;/cite&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;data&lt;/cite&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;For each module, I opened a pull request to track the changes and facilitate reviews:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;actors&lt;/cite&gt;: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/898"&gt;fury-gl/fury#898&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;animation&lt;/cite&gt;: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/899"&gt;fury-gl/fury#899&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;data&lt;/cite&gt;: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/900"&gt;fury-gl/fury#900&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;shares&lt;/cite&gt;: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/901"&gt;fury-gl/fury#901&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;cite&gt;ui&lt;/cite&gt;: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/902"&gt;fury-gl/fury#902&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="exploring-lazy-loading"&gt;
-&lt;h2&gt;Exploring lazy loading&lt;/h2&gt;
-&lt;p&gt;In order to optimize performance, I’ve started exploring and implementing lazy loading. This week, the focus was on the following points:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Getting to grips with how the lazy loader works&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Implementing some small script to understand how the lazy loader works&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;I also read the SPEC1 document available at &lt;a class="reference external" href="https://scientific-python.org/specs/spec-0001/"&gt;SPEC1&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Understanding the benefits of lazy loading and how it can be applied to the FURY code base&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Planning the integration of lazy loading into the FURY code base&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Code sample: &lt;a class="reference external" href="https://gist.github.com/WassCodeur/98297d7a59b27979d27945760e3ffb10"&gt;https://gist.github.com/WassCodeur/98297d7a59b27979d27945760e3ffb10&lt;/a&gt;&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="peer-code-review"&gt;
-&lt;h2&gt;Peer Code Review&lt;/h2&gt;
-&lt;p&gt;This week, I continued to dedicate time to reviewing the code of my peers. Specifically, I reviewed Kaustav Deka’s work, providing constructive feedback and suggestions for improvement. You can view the pull request here: &lt;a class="github reference external" href="https://github.com/dipy/dipy/pull/3239"&gt;dipy/dipy#3239&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Did I Get Stuck Anywhere ?&lt;/h2&gt;
+&lt;p&gt;While addressing the Sphinx warnings, I encountered some challenges related to the naming conflicts between attributes and properties. The warnings were triggered by the use of the same name for both an attribute and a property in the codebase. This conflict led to Sphinx warnings, which I am currently working to resolve. The complexity of this issue requires a more in-depth analysis to develop an appropriate solution that aligns with the project’s requirements and Sphinx guidelines.&lt;/p&gt;
 &lt;/section&gt;
 &lt;section id="acknowledgements"&gt;
 &lt;h2&gt;Acknowledgements&lt;/h2&gt;
 &lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week4-wachiou-bouraima.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “iñigo tellaetxe elorriaga”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week4-wachiou-bouraima.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id2"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “robin roy”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week4-wachiou-bouraima.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id3"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “kaustav deka”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week4-wachiou-bouraima.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id4"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-08-15-week11-wachiou.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
 &lt;p&gt;Duplicate explicit target name: “serge koudoro”.&lt;/p&gt;
 &lt;/aside&gt;
-&lt;p&gt;I am deeply grateful to my classmates &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;  for their continuous support and insightful suggestions. Special thanks to my mentor, &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; , whose expertise and guidance have been invaluable in navigating these technical challenges.&lt;/p&gt;
+&lt;p&gt;I am deeply grateful to my peers &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;  for their continuous support and insightful suggestions. Special thanks to my mentor, &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; , whose expertise and guidance have been invaluable in navigating these technical challenges.&lt;/p&gt;
 &lt;/section&gt;
-&lt;section id="did-i-get-stuck"&gt;
-&lt;h2&gt;Did I get stuck?&lt;/h2&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week4-wachiou-bouraima.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id5"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “serge koudoro”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;Yes, I was a bit confused about understanding lazy loader, but thanks to the help of my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; , I was able to understand it better.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-s-next"&gt;
-&lt;h2&gt;What’s next?&lt;/h2&gt;
+&lt;section id="whats-next"&gt;
+&lt;h2&gt;What’s Next ?&lt;/h2&gt;
 &lt;p&gt;For the upcoming week, I plan to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Implement lazy loading in the FURY code base&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Continue refining the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator based on feedback&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Engage in more code reviews to support my peers&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Prepare to working on the FURY website to improve the documentation and user experience&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Delve deeper into the Sphinx warnings related to attribute and property naming conflicts to develop a more appropriate solution.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Continue to refine the footer styling to ensure it meets design specifications while maintaining functionality.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Start writing my &lt;cite&gt;GSOC’2024&lt;/cite&gt; final report.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;Thank you for following my progress. Your feedback is always welcome.&lt;/p&gt;
+&lt;p&gt;Thank you for following my progress. I look forward to sharing further updates and solutions in the coming weeks!&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2024/2024-06-26-week4-wachiou-bouraima.html"/>
-    <summary>Welcome again to my Google summer of code 2024 (GSoC’ 2024) journey 2024!.
-This week, I focused on updating the warn_on_args_to_kwargs decorator, applying it across multiple modules, exploring lazy loading, and continuing with code reviews.</summary>
+    <link href="https://fury.gl/posts/2024/2024-08-15-week11-wachiou.html"/>
+    <summary>Hello everyone,
+welcome to the update for Week 11 of my Google Summer of Code (GSoC) 2024 journey. This week, I focused on finalizing the footer issue on the FURY website and tackling some Sphinx warnings related to attribute and property naming conflicts. Here’s a detailed look at what I accomplished and the challenges faced.</summary>
     <category term="google" label="google"/>
-    <published>2024-06-26T00:00:00-04:00</published>
+    <published>2024-08-15T00:00:00+00:00</published>
   </entry>
   <entry>
-    <id>https://fury.gl/posts/2024/2024-06-26-week3-wachiou-bouraima.html</id>
-    <title>WEEK 3: Refinements and Further Enhancements</title>
-    <updated>2024-06-26T00:00:00-04:00</updated>
+    <id>https://fury.gl/posts/2024/2024-08-15-week10-wachiou.html</id>
+    <title>WEEK 10: Investigating Footer Deformation and Limited Progress on Warnings</title>
+    <updated>2024-08-15T00:00:00+00:00</updated>
     <author>
       <name>Wachiou BOURAIMA</name>
     </author>
-    <content type="html">&lt;section id="week-3-refinements-and-further-enhancements"&gt;
+    <content type="html">&lt;section id="week-10-investigating-footer-deformation-and-limited-progress-on-warnings"&gt;
 
-&lt;section id="hello-everyone"&gt;
-&lt;h2&gt;Hello everyone,&lt;/h2&gt;
-&lt;p&gt;Welcome to the fourth week of my Google Summer of Code (GSoC) 2024 journey!
-This week I’ve been delving into the technical aspects of my project,
-focusing on the consistent application of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator and the initial implementation of lazy loading.&lt;/p&gt;
+&lt;p&gt;Welcome to the week 10 of my Google Summer of Code (GSoC) 2024 journey. This week, I focused on resolving an issue with the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt;  website’s footer and made limited progress on fixing documentation warnings. Here’s a detailed overview of my activities and challenges.&lt;/p&gt;
+&lt;section id="investigating-footer-deformation-issue-874"&gt;
+&lt;h2&gt;Investigating Footer Deformation Issue: &lt;a class="reference external" href="https://github.com/fury-gl/fury/issues/874"&gt;#874&lt;/a&gt;&lt;/h2&gt;
+&lt;p&gt;During this week, I identified the root cause of the footer deformation on the FURY website. The problem arose when hovering over an element, which caused the element’s size to increase. This, in turn, increased the padding of its container and subsequently affected the layout of following elements.
+To address this, I initially considered avoiding changes in font size on hover and opted to make elements bold instead. While this approach resolved the deformation issue, it did not align with the design requirements for the homepage footer.
+Due to health constraints, I was unable to continue this work. I plan to explore alternative solutions to align with the design specifications in the upcoming week.&lt;/p&gt;
 &lt;/section&gt;
-&lt;section id="consistent-application-of-warn-on-args-to-kwargs"&gt;
-&lt;h2&gt;Consistent application of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;This week I continued to apply the decorator to functions.
-To ensure consistency across the code base, I audited all functions that could benefit from the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator.
-To do this, I had to:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Identify target functions:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Identify functions that could benefit from the decorator.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;continue reviewing the code base to identify functions that accept both positional and keyword arguments.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Applying the Decorator:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;For each identified function, I added the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Example:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nd"&gt;@warn_on_args_to_kwargs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;get_actor_from_primitive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-   &lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;triangles&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;normals&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;backface_culling&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;prim_count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="p"&gt;):&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;Updating Unit Tests:&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-26-week3-wachiou-bouraima.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;updated all the unit tests for the functions where the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator is applied to ensure they respect the new format.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Example:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;actr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_actor_from_primitive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;big_verts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;big_faces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;big_colors&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;You can find more details and the implementation in my pull request: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/888"&gt;fury-gl/fury#888&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
+&lt;section id="limited-progress-on-documentation-warnings"&gt;
+&lt;h2&gt;Limited Progress on Documentation Warnings&lt;/h2&gt;
+&lt;p&gt;I also aimed to make progress on fixing Sphinx warnings related to documentation typos. Unfortunately, I could not advance significantly in this area due to the time constraints imposed by the footer issue and my health.&lt;/p&gt;
 &lt;/section&gt;
-&lt;section id="what-happens-next"&gt;
-&lt;h2&gt;What Happens Next?&lt;/h2&gt;
-&lt;p&gt;For week 4, I plan to:&lt;/p&gt;
+&lt;section id="what-s-next"&gt;
+&lt;h2&gt;What’s Next ?&lt;/h2&gt;
+&lt;p&gt;For week 11, I plan to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Continue refining the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator based on feedback from my Peers &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;, my guide: &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; and the other community members.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Apply the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator to all the remaining modules and update all the unit tests of these modules too, to respect the desired format.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Dive deep into the lazy loading functionality based on my research to optimize performance.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Further engage in code reviews to support my peers and improve our project.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Explore alternative solutions to address the footer deformation issue while aligning with the design requirements.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Continue fixing Sphinx warnings in the documentation and address any remaining issues.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck"&gt;
-&lt;h2&gt;Did I get stuck?&lt;/h2&gt;
-&lt;p&gt;I didn’t get stuck.&lt;/p&gt;
-&lt;p&gt;Thank you for following my progress. Your feedback is always welcome.&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2024/2024-06-26-week3-wachiou-bouraima.html"/>
-    <summary>Welcome to the fourth week of my Google Summer of Code (GSoC) 2024 journey!
-This week I’ve been delving into the technical aspects of my project,
-focusing on the consistent application of the warn_on_args_to_kwargs decorator and the initial implementation of lazy loading.</summary>
+    <link href="https://fury.gl/posts/2024/2024-08-15-week10-wachiou.html"/>
+    <summary>Welcome to the week 10 of my Google Summer of Code (GSoC) 2024 journey. This week, I focused on resolving an issue with the FURY  website’s footer and made limited progress on fixing documentation warnings. Here’s a detailed overview of my activities and challenges.</summary>
     <category term="google" label="google"/>
-    <published>2024-06-26T00:00:00-04:00</published>
+    <published>2024-08-15T00:00:00+00:00</published>
   </entry>
   <entry>
-    <id>https://fury.gl/posts/2024/2024-06-16-week3-robin.html</id>
-    <title>Week 3: Data Data Data!</title>
-    <updated>2024-06-16T00:00:00-04:00</updated>
+    <id>https://fury.gl/posts/2024/2024-08-13-week9-wachiou.html</id>
+    <title>WEEK 9: Fixing Sphinx Warnings and Investigating Web Footer Issues</title>
+    <updated>2024-08-13T00:00:00+00:00</updated>
     <author>
-      <name>Robin Roy</name>
+      <name>Wachiou BOURAIMA</name>
     </author>
-    <content type="html">&lt;section id="week-3-data-data-data"&gt;
+    <content type="html">&lt;section id="week-9-fixing-sphinx-warnings-and-investigating-web-footer-issues"&gt;
 
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 3.&lt;/p&gt;
-&lt;p&gt;My goal for week 3 was to collect data more efficiently and improve the citations. I also had my mid-terms during this week so I had to get things done fast.&lt;/p&gt;
-&lt;section id="things-i-did-in-week-3"&gt;
-&lt;h2&gt;Things I did in week 3&lt;/h2&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;A better data parsing technique&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;My initial approach was naive, it was just regex and some common filtrations. Later, my mentors told me to use the &lt;cite&gt;inspect&lt;/cite&gt; module. I studied that module and realized that I needed to parse data using an AST. I didn’t use the &lt;cite&gt;inspect&lt;/cite&gt; module to do the parsing, since I only had to get the function/class signature and docstrings. So instead I used the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ast&lt;/span&gt;&lt;/code&gt; module from python stdlib. My mentors gave me the general direction to go through - which was using ASTs to parse data effectively.&lt;/p&gt;
-&lt;p&gt;So now we have a script which you run like &lt;cite&gt;python extractor.py fury&lt;/cite&gt; and it’ll generate the appropriate JSON files.&lt;/p&gt;
-&lt;p&gt;&lt;cite&gt;{“path”: “../..”, “function/class name”: “name”, “docstring”: “..”, “class_methods”: [“method1”, “…”]}&lt;/cite&gt;&lt;/p&gt;
-&lt;p&gt;I also changed the upserting chunk format. Earlier it was just strings, now it is JSON (same thing above). I do not have a scientific reason for this, but empirically it looks like it helped. Benchmarking is something I’m planning to do next week.&lt;/p&gt;
-&lt;p&gt;Metadata format:&lt;/p&gt;
-&lt;p&gt;&lt;cite&gt;metadata: {“path”: “../..”, “function/class name”: “name”, “docstring”: “..”, “methods”: [(method1, docstring), (method2, docstring), …]}&lt;/cite&gt;&lt;/p&gt;
-&lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Links for citation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week3-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;Now the bot shows links for citations. Because of the new parsing, I was able to do that pretty efficiently.&lt;/p&gt;
-&lt;img alt="Link based references for the LLM output." src="https://fury.gl/_images/gsoc-robin-3-fury-discord-bot-references-url.jpg" /&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Faster Inference&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week3-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;So this is something about the Generative AI field. There are too many things happening you might miss some stuff. &lt;cite&gt;Groq&lt;/cite&gt; is a company providing free APIs for the llama and other opensource models (free for now, at least). Its inference speed is also super high. So I decided to integrate that also into our infrastructure.
-Since everything is a microservice in our architecture, it is easy to add new things.&lt;/p&gt;
-&lt;dl&gt;
-&lt;dt&gt;Our architecture:&lt;/dt&gt;&lt;dd&gt;&lt;img src="https://github.com/fury-gl/fury-communication-assets/blob/main/gsoc_2024/7-6-2024-demo-architecture-gsoc-robin-week2.png?raw=true"&gt;&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;p&gt;So now, along with Ollama, we have Groq inference also. I aim to make a &lt;cite&gt;router&lt;/cite&gt; so that we can swap different providers as required. I’m also very interested in integrating Google Gemini 1.5 Flash and other models. Groq does not support fine-tuning, but Flash supports it and is &lt;a class="reference external" href="https://developers.googleblog.com/en/gemini-15-pro-and-15-flash-now-available/#:~:text=To%20support%20that%2C%20we%20will%20also%20be%20rolling%20out%20tuning%20support%20for%20Gemini%201.5%20Flash%20on%20June%2017th.%20Tuning%20will%20be%20supported%20in%20both%20Google%20AI%20Studio%20and%20the%20Gemini%20API%20directly.%20Currently%2C%20tuning%20jobs%20are%20free%20of%20charge%2C%20and%20using%20a%20tuned%20model%20does%20not%20incur%20any%20additional%20per%2Dtoken%20costs."&gt;free of cost&lt;/a&gt; (for now). Our architecture is platform agnostic, so we can try out different things without being locked into any of them. We will also fine-tune our phi3 model since we have the data with us.&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;div&gt;&lt;iframe src="https://github.com/robinroy03/fury-discord-bot/assets/115863770/234fee85-9eb4-4fd5-a334-9e6d11e552a3" width="640" height="390" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;&lt;/div&gt;&lt;/blockquote&gt;
-&lt;ol class="arabic simple" start="4"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Dockerizing Discord Bot&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week3-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “4” (ordinal 4)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;I earlier used the huggingface implementation (copied their implementation demo). It was bad. My mentors suggested to dockerize the bot so I did that.&lt;/p&gt;
+&lt;p&gt;Hello everyone,
+welcome to my Google Summer of Code (GSoC) 2024 journey! Week 9 was devoted to fixing Sphinx warnings caused by indentation errors in some docstrings of some examples in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;auto_examples&lt;/span&gt;&lt;/code&gt; folder. I also started investigating why the footer of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;FURY&lt;/span&gt;&lt;/code&gt; site distorts when you try to move the mouse over an element.&lt;/p&gt;
+&lt;section id="continuing-the-fight-against-sphinx-warnings"&gt;
+&lt;h2&gt;Continuing the Fight Against Sphinx Warnings&lt;/h2&gt;
+&lt;p&gt;My main task this week has been to continue dealing with the Sphinx warnings in our documentation. I focused on the 188 warnings related to the main documentation, as well as 2 warnings in the blog posts.
+I fixed 19 warnings caused by the docstring of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;viz_**.py&lt;/span&gt;&lt;/code&gt; modules in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;source/auto_examples&lt;/span&gt;&lt;/code&gt; folder
+by fixing the indentation errors in the docstrings of the examples.&lt;/p&gt;
+&lt;p&gt;Here is an example of indentation error in the docstring of the example &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;auto_examples/04_demos/viz_animated_surfaces.py&lt;/span&gt;&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="n"&gt;block&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;
+
+&lt;span class="c1"&gt;###############################################################################&lt;/span&gt;
+&lt;span class="c1"&gt;# Variables and their usage:&lt;/span&gt;
+&lt;span class="c1"&gt;# :time - float: initial value of the time variable i.e. value of the time variable at&lt;/span&gt;
+&lt;span class="c1"&gt;#               the beginning of the program; (default = 0)&lt;/span&gt;
+&lt;span class="c1"&gt;# dt: float&lt;/span&gt;
+&lt;span class="c1"&gt;#     amount by which ``time`` variable is incremented for every iteration&lt;/span&gt;
+&lt;span class="c1"&gt;#     of timer_callback function (default = 0.1)&lt;/span&gt;
+&lt;span class="c1"&gt;# lower_xbound: float&lt;/span&gt;
+
+&lt;span class="o"&gt;...&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="n"&gt;block&lt;/span&gt; &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/pre&gt;&lt;/div&gt;
+&lt;/div&gt;
 &lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
+&lt;section id="investigating-web-footer-issues"&gt;
+&lt;h2&gt;Investigating Web Footer Issues&lt;/h2&gt;
+&lt;p&gt;In parallel, I started investigating an issue with the FURY website’s footer, which deforms when hovering over an element with the mouse. This problem affects the user experience and visual consistency of the site. My work this week has focused on diagnosing the underlying cause of this issue and planning the necessary steps to fix it. This task has been both technically intriguing and a great opportunity to sharpen my web development skills.&lt;/p&gt;
+&lt;p&gt;issue number: &lt;a class="reference external" href="https://github.com/fury-gl/fury/issues/874"&gt;#874&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="did-i-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did I get stuck anywhere ?&lt;/h2&gt;
+&lt;p&gt;I encountered some challenges while fixing the indentation errors in the docstrings of the examples. The errors were caused by inconsistent indentation in the docstrings, which made it difficult to identify the root cause of the warnings. However, I was able to resolve these issues and make progress in addressing the Sphinx warnings.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-s-next"&gt;
+&lt;h2&gt;What’s next ?&lt;/h2&gt;
+&lt;p&gt;For week 10, I plan to:&lt;/p&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Benchmarking. Now we have the data, but we need to properly benchmark to see whether the modifications I make every day are making the bot dumber or smarter.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Study different techniques to improve model answer accuracy such as &lt;a class="reference external" href="https://arxiv.org/abs/2212.10496"&gt;HyDE&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Study how to go forward with fine-tuning.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Improved references.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Collect more data.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Continue fixing the Sphinx warnings in the documentation.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Start fixing the issue with the footer of the FURY website.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, everything went well this week. Exam preparation was a pain though😢.&lt;/p&gt;
-&lt;p&gt;LINKS:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://developers.googleblog.com/en/gemini-15-pro-and-15-flash-now-available"&gt;Gemini Blog&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week3-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “hyde”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://arxiv.org/abs/2212.10496"&gt;HyDE&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin :)&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2024/2024-06-16-week3-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 3.</summary>
+    <link href="https://fury.gl/posts/2024/2024-08-13-week9-wachiou.html"/>
+    <summary>Hello everyone,
+welcome to my Google Summer of Code (GSoC) 2024 journey! Week 9 was devoted to fixing Sphinx warnings caused by indentation errors in some docstrings of some examples in the auto_examples folder. I also started investigating why the footer of the FURY site distorts when you try to move the mouse over an element.</summary>
     <category term="google" label="google"/>
-    <published>2024-06-16T00:00:00-04:00</published>
+    <published>2024-08-13T00:00:00+00:00</published>
   </entry>
   <entry>
-    <id>https://fury.gl/posts/2024/2024-06-16-week2-robin.html</id>
-    <title>Week 2: The first iteration!</title>
-    <updated>2024-06-16T00:00:00-04:00</updated>
+    <id>https://fury.gl/posts/2024/2024-08-12-week8-wachiou-bouraima.html</id>
+    <title>WEEK 8: Refining Lazy Loading Implementation and Simplifying Imports in FURY</title>
+    <updated>2024-08-12T00:00:00+00:00</updated>
     <author>
-      <name>Robin Roy</name>
+      <name>Wachiou BOURAIMA</name>
     </author>
-    <content type="html">&lt;section id="week-2-the-first-iteration"&gt;
+    <content type="html">&lt;section id="week-8-refining-lazy-loading-implementation-and-simplifying-imports-in-fury"&gt;
 
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 2.&lt;/p&gt;
-&lt;p&gt;My goal for week 2 was to connect everything and make a prototype. So now we have a bot working 24x7 to answer all your doubts :)&lt;/p&gt;
-&lt;dl class="simple"&gt;
-&lt;dt&gt;Apart from the things mentioned in my &lt;a class="reference external" href="https://fury.gl/latest/posts/2024/2024-06-06-week-1-robin.html"&gt;week 1 blog&lt;/a&gt;, the things I did in week 2 are basically:&lt;/dt&gt;&lt;dd&gt;&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Chunking the files for embedding.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Upserting the chunks into the database.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Connecting everything together.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Making the discord bot async.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Merging a PR.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/dd&gt;
-&lt;/dl&gt;
-&lt;section id="chunking-the-files-for-embedding"&gt;
-&lt;h2&gt;1) &lt;strong&gt;Chunking the files for embedding&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;In the context of building LLM-related applications, chunking is the process of breaking down large pieces of text into smaller segments. It’s an essential technique that helps optimize the relevance of the content we get back from a vector database once we use an embedding model to embed content. For our case with FURY, our data is entirely code. So one approach I tried was to take docstrings and the function/class signature.&lt;/p&gt;
-&lt;p&gt;I used a naive parser during week 2, which used a combination of regex and common pattern matching to do this splitting. Later my mentors &lt;a class="reference external" href="https://github.com/m-agour"&gt;Mohamed&lt;/a&gt; and &lt;a class="reference external" href="https://github.com/skoudoro/"&gt;Serge&lt;/a&gt; told me to use a better approach, using the python &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;inspect&lt;/span&gt;&lt;/code&gt; module.&lt;/p&gt;
-&lt;p&gt;Another thing to consider was the chunk size. It is shown that smaller chunks outperform larger chunks. This can be intuitively thought of like this: An embedding model can compress a smaller text to 1024 vectors without much data loss compared to compressing a larger text to 1024 vectors.&lt;/p&gt;
-&lt;p&gt;This also introduces another important issue, we need a way to test it based on our model. So we need benchmarking.&lt;/p&gt;
+&lt;p&gt;Hello everyone,
+Welcome back to another update on my Google Summer of Code (GSoC) 2024 journey! This week, my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; and I focused on refining the lazy loading feature and optimizing import statements within FURY’s &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;examples&lt;/span&gt; &lt;span class="pre"&gt;modules&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;section id="reviewing-and-refining-lazy-loading"&gt;
+&lt;h2&gt;Reviewing and Refining Lazy Loading&lt;/h2&gt;
+&lt;p&gt;This week was dedicated to a thorough review of the lazy loading implementation I introduced in the previous weeks. My mentor provided invaluable feedback, and together we identified areas where the implementation could be improved.&lt;/p&gt;
 &lt;/section&gt;
-&lt;section id="upserting-chunks-into-the-database"&gt;
-&lt;h2&gt;2) &lt;strong&gt;Upserting chunks into the database&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;I upserted all the chunks into the database, along with the vectors I gave metadata which was the function signature and docstrings. Later in week 3, we’ll modify this to show links instead of the big wall of text.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="connecting-everything-together"&gt;
-&lt;h2&gt;3) &lt;strong&gt;Connecting everything together&lt;/strong&gt;&lt;/h2&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week2-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “week 1 blog”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;I took the 4 key parts - Discord Bot, LLM API, Embeddings API and the Database API and connected them together. This was explained on the &lt;a class="reference external" href="https://fury.gl/latest/posts/2024/2024-06-06-week-1-robin.html"&gt;week 1 blog&lt;/a&gt; itself.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="making-the-discord-bot-async"&gt;
-&lt;h2&gt;4) &lt;strong&gt;Making the Discord Bot async&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;One of the biggest challenges I faced this week was to get everything running properly. LLM output takes a lot of time to generate (we’ll fix this amazingly well in week 3 BTW).
-I made a big mistake, I used &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;requests&lt;/span&gt;&lt;/code&gt; library to do the REST API calls. It occurred to me later that it is synchronous and does blocking calls. This was the reason my Discord bot was dying randomly. I fixed it by migrating to &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;aiohttp&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;
-&lt;p&gt;This also made me realize I can use async in a lot of other places. A lot of these tasks are I/O bound. If I make them async we might be able to take many more concurrent requests.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="merging-a-pr"&gt;
-&lt;h2&gt;5) &lt;strong&gt;Merging a PR&lt;/strong&gt;&lt;/h2&gt;
-&lt;p&gt;I merged a &lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/893"&gt;PR&lt;/a&gt; which modifies &lt;cite&gt;.gitignore&lt;/cite&gt;. I found this while generating the Sphinx docs.&lt;/p&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h3&gt;What is coming up next week?&lt;/h3&gt;
+&lt;section id="i-addressed-several-issues-including"&gt;
+&lt;h2&gt;I addressed several issues, including&lt;/h2&gt;
 &lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;A faster LLM inference.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Better pipeline for data collection.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Links for citation.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Error Fixes&lt;/strong&gt;: During the review, we identified some edge cases that were not handled correctly by the lazy loading mechanism. I corrected these errors to ensure the feature works seamlessly across the FURY codebase.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Import Simplification&lt;/strong&gt;: One significant change was simplifying how FURY is imported in example modules. Previously, the import statements were more complex, like &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;from&lt;/span&gt; &lt;span class="pre"&gt;fury&lt;/span&gt; &lt;span class="pre"&gt;import&lt;/span&gt; &lt;span class="pre"&gt;....&lt;/span&gt;&lt;/code&gt; To align with the lazy loading principles and reduce unnecessary overhead, I updated these statements to a more straightforward &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;import&lt;/span&gt; &lt;span class="pre"&gt;fury&lt;/span&gt;&lt;/code&gt; This change ensures that only the necessary components are loaded when they are actually needed, improving performance.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h3&gt;Did you get stuck anywhere?&lt;/h3&gt;
-&lt;p&gt;Took me some time to realize I was using synchronous code inside async. Fixed it later.&lt;/p&gt;
-&lt;p&gt;LINKS:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week2-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id2"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “week 1 blog”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://fury.gl/latest/posts/2024/2024-06-06-week-1-robin.html"&gt;Week 1 Blog&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/Users/skoudoro/devel/fury/docs/source/posts/2024/2024-06-16-week2-robin.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id3"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “pr”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/893"&gt;PR&lt;/a&gt;&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/skoudoro/"&gt;Serge Koudoro&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/m-agour"&gt;Mohamed Abouagour&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin :)&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
+&lt;section id="rebasing-and-squashing"&gt;
+&lt;h2&gt;Rebasing and Squashing&lt;/h2&gt;
+&lt;p&gt;After making these adjustments, I proceeded with rebasing and squashing my commits. This process was essential to maintain a clean and organized commit history. Despite the challenges, I managed to resolve all conflicts, and my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;, approved the changes. The pull request was successfully merged, marking another milestone in the project.&lt;/p&gt;
 &lt;/section&gt;
+&lt;section id="did-i-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did I get stuck anywhere?&lt;/h2&gt;
+&lt;p&gt;No, I did not encounter any major roadblocks this week. The tasks were challenging but manageable, and I was able to address them effectively with the guidance of my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-s-next"&gt;
+&lt;h2&gt;What’s Next?&lt;/h2&gt;
+&lt;p&gt;In the upcoming week,&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;I will continue addressing Sphinx warnings related.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;start working to improve de FURY website.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Thank you for following along, and stay tuned for more updates as I continue to make progress on this project!&lt;/p&gt;
 &lt;/section&gt;
 &lt;/section&gt;
 </content>
-    <link href="https://fury.gl/posts/2024/2024-06-16-week2-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 2.</summary>
+    <link href="https://fury.gl/posts/2024/2024-08-12-week8-wachiou-bouraima.html"/>
+    <summary>Hello everyone,
+Welcome back to another update on my Google Summer of Code (GSoC) 2024 journey! This week, my mentor Serge Koudoro and I focused on refining the lazy loading feature and optimizing import statements within FURY’s examples modules.</summary>
     <category term="google" label="google"/>
-    <published>2024-06-16T00:00:00-04:00</published>
+    <published>2024-08-12T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2024/2024-08-06-week7-wachiou-bouraima.html</id>
+    <title>WEEK 7: Fixing Sphinx Warnings in Blog Posts</title>
+    <updated>2024-08-06T00:00:00+00:00</updated>
+    <author>
+      <name>Wachiou BOURAIMA</name>
+    </author>
+    <content type="html">&lt;section id="week-7-fixing-sphinx-warnings-in-blog-posts"&gt;
+
+&lt;p&gt;Hello everyone,
+Welcome back to another update on my GSoC 2024 journey. This week, my focus was primarily on addressing Sphinx warnings caused by typos in blog posts.&lt;/p&gt;
+&lt;section id="addressing-sphinx-warnings"&gt;
+&lt;h2&gt;Addressing Sphinx Warnings&lt;/h2&gt;
+&lt;p&gt;This week, I dedicated my time to resolving Sphinx warnings that were popping up due to typos in various blog posts. Out of the 100 warnings that were initially present, I was able to fix 98 of them. This process involved carefully reviewing the documentation, identifying the sources of the warnings, and making the necessary corrections.&lt;/p&gt;
+&lt;p&gt;Here’s a snapshot of some of the warnings I addressed:&lt;/p&gt;
+&lt;img alt="a snapshot of some of the warnings" src="https://fury.gl/_images/gsdoc-some-sphinx-warnings-addressed_Wachiou.jpg" /&gt;
+&lt;/section&gt;
+&lt;section id="did-i-get-stuck-anywhere"&gt;
+&lt;h2&gt;Did I get stuck anywhere ?&lt;/h2&gt;
+&lt;p&gt;While most of the warnings were straightforward to fix, a few required a bit more time and attention to detail. In particular, some typos were present in code snippets, which required careful examination to ensure that the corrections did not introduce any errors.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-s-next"&gt;
+&lt;h2&gt;What’s Next ?&lt;/h2&gt;
+&lt;p&gt;In the upcoming week,&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;I will begin addressing Sphinx warnings related to typos in the documentation for certain modules.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I will also focus on improving the overall readability and clarity of the documentation to enhance the user experience.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Refining Lazy Loading Implementation according to the feedback received from my mentor &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2024/2024-08-06-week7-wachiou-bouraima.html"/>
+    <summary>Hello everyone,
+Welcome back to another update on my GSoC 2024 journey. This week, my focus was primarily on addressing Sphinx warnings caused by typos in blog posts.</summary>
+    <category term="google" label="google"/>
+    <published>2024-08-06T00:00:00+00:00</published>
   </entry>
 </feed>
