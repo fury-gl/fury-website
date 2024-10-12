@@ -36,7 +36,7 @@ Tutorial on making a robot arm animation in FURY.
     scene = fury.window.Scene()
 
     showm = fury.window.ShowManager(
-        scene, size=(900, 768), reset_camera=False, order_transparent=True
+        scene=scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
     showm.initialize()
 
@@ -81,8 +81,8 @@ Setting the center of both shafts to the beginning.
 
 .. code-block:: Python
 
-    fury.utils.set_actor_origin(main_arm, np.array([-6, 0, 0]))
-    fury.utils.set_actor_origin(sub_arm, np.array([-4, 0, 0]))
+    fury.utils.set_actor_origin(main_arm, center=np.array([-6, 0, 0]))
+    fury.utils.set_actor_origin(sub_arm, center=np.array([-4, 0, 0]))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 51-52
@@ -100,21 +100,23 @@ Creating a timeline
 
 Creating animations
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-61
+.. GENERATED FROM PYTHON SOURCE LINES 56-63
 
 .. code-block:: Python
 
-    main_arm_animation = fury.animation.Animation([main_arm, joint_1], length=2 * np.pi)
-    child_arm_animation = fury.animation.Animation([sub_arm, joint_2])
-    drill_animation = fury.animation.Animation(end)
+    main_arm_animation = fury.animation.Animation(
+        actors=[main_arm, joint_1], length=2 * np.pi
+    )
+    child_arm_animation = fury.animation.Animation(actors=[sub_arm, joint_2])
+    drill_animation = fury.animation.Animation(actors=end)
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-63
+.. GENERATED FROM PYTHON SOURCE LINES 64-65
 
 Adding other Animations in hierarchical order
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-67
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 .. code-block:: Python
 
@@ -123,11 +125,11 @@ Adding other Animations in hierarchical order
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 68-69
+.. GENERATED FROM PYTHON SOURCE LINES 70-71
 
 Creating Arm joints time dependent animation functions.
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-83
+.. GENERATED FROM PYTHON SOURCE LINES 71-85
 
 .. code-block:: Python
 
@@ -146,46 +148,46 @@ Creating Arm joints time dependent animation functions.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 86-88
 
 Setting timelines (joints) relative position
 1- Placing the main arm on the cube static base.
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 88-90
 
 .. code-block:: Python
 
     main_arm_animation.set_position(0, np.array([0, 1.3, 0]))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-91
+.. GENERATED FROM PYTHON SOURCE LINES 91-93
 
 2- Translating the timeline containing the sub arm to the end of the first
 arm.
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-93
+.. GENERATED FROM PYTHON SOURCE LINES 93-95
 
 .. code-block:: Python
 
     child_arm_animation.set_position(0, np.array([12, 0, 0]))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-95
+.. GENERATED FROM PYTHON SOURCE LINES 96-97
 
 3- Translating the timeline containing the drill to the end of the sub arm.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-97
+.. GENERATED FROM PYTHON SOURCE LINES 97-99
 
 .. code-block:: Python
 
     drill_animation.set_position(0, np.array([8, 0, 0]))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-99
+.. GENERATED FROM PYTHON SOURCE LINES 100-101
 
 Setting rotation time-based evaluators
 
-.. GENERATED FROM PYTHON SOURCE LINES 99-103
+.. GENERATED FROM PYTHON SOURCE LINES 101-105
 
 .. code-block:: Python
 
@@ -194,44 +196,44 @@ Setting rotation time-based evaluators
     drill_animation.set_rotation_interpolator(rot_drill, is_evaluator=True)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 104-105
+.. GENERATED FROM PYTHON SOURCE LINES 106-107
 
 Setting camera position to observe the robot arm.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-107
+.. GENERATED FROM PYTHON SOURCE LINES 107-109
 
 .. code-block:: Python
 
     scene.camera().SetPosition(0, 0, 90)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-109
+.. GENERATED FROM PYTHON SOURCE LINES 110-111
 
 Adding the base actor to the scene
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-111
+.. GENERATED FROM PYTHON SOURCE LINES 111-113
 
 .. code-block:: Python
 
     scene.add(base)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 112-113
+.. GENERATED FROM PYTHON SOURCE LINES 114-115
 
 Adding the main parent animation to the Timeline.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-115
+.. GENERATED FROM PYTHON SOURCE LINES 115-117
 
 .. code-block:: Python
 
     timeline.add_animation(main_arm_animation)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-117
+.. GENERATED FROM PYTHON SOURCE LINES 118-119
 
 Now we add the timeline to the ShowManager
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-125
+.. GENERATED FROM PYTHON SOURCE LINES 119-127
 
 .. code-block:: Python
 
@@ -242,7 +244,7 @@ Now we add the timeline to the ShowManager
     if interactive:
         showm.start()
 
-    fury.window.record(scene, out_path="viz_robot_arm.png", size=(900, 768))
+    fury.window.record(scene=scene, out_path="viz_robot_arm.png", size=(900, 768))
 
 
 .. _sphx_glr_download_auto_examples_10_animation_viz_robot_arm_animation.py:

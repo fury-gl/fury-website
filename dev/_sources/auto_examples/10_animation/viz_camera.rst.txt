@@ -52,7 +52,7 @@ show `FURY` text that appears at the end!
     scene = fury.window.Scene()
 
     showm = fury.window.ShowManager(
-        scene, size=(900, 768), reset_camera=False, order_transparent=True
+        scene=scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
 
 
@@ -112,7 +112,7 @@ Creating "FURY" text
 
 .. code-block:: Python
 
-    fury_text = fury.actor.vector_text("FURY", pos=(-4.3, 15, 0), scale=(2, 2, 2))
+    fury_text = fury.actor.vector_text(text="FURY", pos=(-4.3, 15, 0), scale=(2, 2, 2))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 66-67
@@ -123,7 +123,7 @@ Creating an ``Animation`` to animate the opacity of ``fury_text``
 
 .. code-block:: Python
 
-    text_anim = Animation(fury_text, loop=False)
+    text_anim = Animation(actors=fury_text, loop=False)
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 70-72
@@ -156,7 +156,7 @@ Creating and animating 50 Spheres
 =================================
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-116
+.. GENERATED FROM PYTHON SOURCE LINES 83-118
 
 .. code-block:: Python
 
@@ -167,14 +167,16 @@ Creating and animating 50 Spheres
         # and radius.
         actors = [
             fury.actor.sphere(
-                np.array([[0, 0, 0]]), np.random.random([1, 3]), np.random.random([1, 3])
+                np.array([[0, 0, 0]]),
+                np.random.random([1, 3]),
+                radii=np.random.random([1, 3]),
             )
         ]
 
         ###########################################################################
         # create a timeline to animate this actor (single actor or list of actors)
         # Actors can be added later using `Timeline.add_actor(actor)`
-        animation = Animation(actors)
+        animation = Animation(actors=actors)
 
         # We generate random position and scale values from time=0 to time=49 each
         # two seconds.
@@ -194,7 +196,7 @@ Creating and animating 50 Spheres
         timeline.add_animation(animation)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-124
+.. GENERATED FROM PYTHON SOURCE LINES 119-126
 
 Animating the camera
 ====================
@@ -204,7 +206,7 @@ a separate ``Animation``.
 Three properties can control the camera's animation:
 Position, focal position (referred to by `focal`), and up-view.
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-128
+.. GENERATED FROM PYTHON SOURCE LINES 126-130
 
 .. code-block:: Python
 
@@ -213,12 +215,12 @@ Position, focal position (referred to by `focal`), and up-view.
     timeline.add_animation(camera_anim)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 129-131
+.. GENERATED FROM PYTHON SOURCE LINES 131-133
 
 Multiple keyframes can be set at once as follows.
 camera focal positions
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-152
+.. GENERATED FROM PYTHON SOURCE LINES 133-154
 
 .. code-block:: Python
 
@@ -244,12 +246,12 @@ camera focal positions
     }
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 153-155
+.. GENERATED FROM PYTHON SOURCE LINES 155-157
 
 ``set_camera_focal`` can only set one keyframe, but
 ``set_camera_focal_keyframes`` can set a dictionary of keyframes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 155-158
+.. GENERATED FROM PYTHON SOURCE LINES 157-160
 
 .. code-block:: Python
 
@@ -257,11 +259,11 @@ camera focal positions
     camera_anim.set_position_keyframes(camera_positions)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 159-160
+.. GENERATED FROM PYTHON SOURCE LINES 161-162
 
 Change camera position and focal interpolators
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-163
+.. GENERATED FROM PYTHON SOURCE LINES 162-165
 
 .. code-block:: Python
 
@@ -269,33 +271,33 @@ Change camera position and focal interpolators
     camera_anim.set_focal_interpolator(cubic_spline_interpolator)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 166-167
 
 Adding non-animatable actors to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-167
+.. GENERATED FROM PYTHON SOURCE LINES 167-169
 
 .. code-block:: Python
 
     scene.add(arrow, plan)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-169
+.. GENERATED FROM PYTHON SOURCE LINES 170-171
 
 Adding the timeline to the ShowManager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 169-171
+.. GENERATED FROM PYTHON SOURCE LINES 171-173
 
 .. code-block:: Python
 
     showm.add_animation(timeline)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 172-173
+.. GENERATED FROM PYTHON SOURCE LINES 174-175
 
 The ShowManager must go on!
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-180
+.. GENERATED FROM PYTHON SOURCE LINES 175-184
 
 .. code-block:: Python
 
@@ -305,7 +307,9 @@ The ShowManager must go on!
     if interactive:
         showm.start()
 
-    fury.window.record(scene, out_path="viz_keyframe_animation_camera.png", size=(900, 768))
+    fury.window.record(
+        scene=scene, out_path="viz_keyframe_animation_camera.png", size=(900, 768)
+    )
 
 
 .. _sphx_glr_download_auto_examples_10_animation_viz_camera.py:

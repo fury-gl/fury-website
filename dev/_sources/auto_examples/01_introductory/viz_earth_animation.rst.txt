@@ -120,7 +120,7 @@ correctly align the texture.
 
     moon_actor.SetPosition(1, 0.1, 0.5)
     moon_actor.SetScale(0.25, 0.25, 0.25)
-    fury.utils.rotate(earth_actor, (-90, 1, 0, 0))
+    fury.utils.rotate(earth_actor, rotation=(-90, 1, 0, 0))
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 61-63
@@ -134,7 +134,7 @@ interactor.
 
 
     showm = fury.window.ShowManager(
-        scene, size=(900, 768), reset_camera=False, order_transparent=True
+        scene=scene, size=(900, 768), reset_camera=False, order_transparent=True
     )
 
 
@@ -181,29 +181,32 @@ on the Earth's surface on Bloomington, IN, home of FURY's headquarters!
 
     center = np.array([[-0.39, 0.3175, 0.025]])
     radius = 0.002
-    sphere_actor = fury.actor.sphere(center, fury.window.colors.blue_medium, radius)
+    sphere_actor = fury.actor.sphere(center, fury.window.colors.blue_medium, radii=radius)
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 94-95
 
 Also creating a text actor to add below the sphere.
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-101
+.. GENERATED FROM PYTHON SOURCE LINES 95-104
 
 .. code-block:: Python
 
 
     text_actor = fury.actor.text_3d(
-        "Bloomington, Indiana", (-0.42, 0.31, 0.03), fury.window.colors.white, 0.004
+        "Bloomington, Indiana",
+        position=(-0.42, 0.31, 0.03),
+        color=fury.window.colors.white,
+        font_size=0.004,
     )
-    fury.utils.rotate(text_actor, (-90, 0, 1, 0))
+    fury.utils.rotate(text_actor, rotation=(-90, 0, 1, 0))
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 102-103
+.. GENERATED FROM PYTHON SOURCE LINES 105-106
 
 Let's also import a model of a satellite to visualize circling the moon.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-113
+.. GENERATED FROM PYTHON SOURCE LINES 106-116
 
 .. code-block:: Python
 
@@ -218,14 +221,14 @@ Let's also import a model of a satellite to visualize circling the moon.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-118
+.. GENERATED FROM PYTHON SOURCE LINES 117-121
 
 In the ``timer_callback`` function, use if statements to specify when
 certain events will happen in the animation, based on the position that
 the counter is at. So, for example, the earth actor will continue to
 rotate while the count is less than 450.
 
-.. GENERATED FROM PYTHON SOURCE LINES 118-163
+.. GENERATED FROM PYTHON SOURCE LINES 121-166
 
 .. code-block:: Python
 
@@ -235,7 +238,7 @@ rotate while the count is less than 450.
         cnt = next(counter)
         showm.render()
         if cnt < 450:
-            fury.utils.rotate(earth_actor, (1, 0, 1, 0))
+            fury.utils.rotate(earth_actor, rotation=(1, 0, 1, 0))
         if cnt % 5 == 0 and cnt < 450:
             showm.scene.azimuth(-1)
         if cnt == 300:
@@ -260,26 +263,26 @@ rotate while the count is less than 450.
             )
             scene.zoom(0.03)
             scene.add(satellite_actor)
-            fury.utils.rotate(satellite_actor, (180, 0, 1, 0))
+            fury.utils.rotate(satellite_actor, rotation=(180, 0, 1, 0))
             scene.rm(earth_actor)
         if cnt > 575 and cnt < 750:
             showm.scene.azimuth(-2)
-            fury.utils.rotate(moon_actor, (-2, 0, 1, 0))
+            fury.utils.rotate(moon_actor, rotation=(-2, 0, 1, 0))
             satellite_actor.SetPosition(-0.8, 0.1 - cnt / 10000, 0.4)
         if cnt >= 750 and cnt < 1100:
             showm.scene.azimuth(-2)
-            fury.utils.rotate(moon_actor, (-2, 0, 1, 0))
+            fury.utils.rotate(moon_actor, rotation=(-2, 0, 1, 0))
             satellite_actor.SetPosition(-0.8, -0.07 + cnt / 10000, 0.4)
         if cnt == 1100:
             showm.exit()
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-165
+.. GENERATED FROM PYTHON SOURCE LINES 167-168
 
 Watch your new animation take place!
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-170
+.. GENERATED FROM PYTHON SOURCE LINES 168-175
 
 .. code-block:: Python
 
@@ -287,7 +290,9 @@ Watch your new animation take place!
 
     showm.add_timer_callback(True, 35, timer_callback)
     showm.start()
-    fury.window.record(showm.scene, size=(900, 768), out_path="viz_earth_animation.png")
+    fury.window.record(
+        scene=showm.scene, size=(900, 768), out_path="viz_earth_animation.png"
+    )
 
 
 .. _sphx_glr_download_auto_examples_01_introductory_viz_earth_animation.py:

@@ -121,7 +121,7 @@ for the new centers, provided that the tetrahedron is centered at the origin
         vertices, triangles, colors, _ = fury.primitive.repeat_primitive(
             centers=centers, colors=colors, vertices=vertices, faces=faces
         )
-        return fury.utils.get_actor_from_primitive(vertices, triangles, colors)
+        return fury.utils.get_actor_from_primitive(vertices, triangles, colors=colors)
 
 
 
@@ -196,7 +196,7 @@ level.
         vertices, triangles, colors, _ = fury.primitive.repeat_primitive(
             centers=centers, colors=colors, vertices=vertices, faces=faces
         )
-        return fury.utils.get_actor_from_primitive(vertices, triangles, colors)
+        return fury.utils.get_actor_from_primitive(vertices, triangles, colors=colors)
 
 
 
@@ -258,7 +258,7 @@ possible to see the Koch snowflake if you position the camera just right.
         vertices, triangles, colors, _ = fury.primitive.repeat_primitive(
             centers=centers, colors=colors, vertices=vertices, faces=faces
         )
-        return fury.utils.get_actor_from_primitive(vertices, triangles, colors)
+        return fury.utils.get_actor_from_primitive(vertices, triangles, colors=colors)
 
 
 
@@ -267,21 +267,23 @@ possible to see the Koch snowflake if you position the camera just right.
 Now that we have the functions to generate fractals, we can start setting up
 the Scene and ShowManager.
 
-.. GENERATED FROM PYTHON SOURCE LINES 222-226
+.. GENERATED FROM PYTHON SOURCE LINES 222-228
 
 .. code-block:: Python
 
 
     scene = fury.window.Scene()
-    showmgr = fury.window.ShowManager(scene, "Fractals", (800, 800), reset_camera=True)
+    showmgr = fury.window.ShowManager(
+        scene=scene, title="Fractals", size=(800, 800), reset_camera=True
+    )
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-229
+.. GENERATED FROM PYTHON SOURCE LINES 229-231
 
 These values are what work nicely on my machine without lagging. If you have
 a powerful machine, you could bump these up by around 2-3.
 
-.. GENERATED FROM PYTHON SOURCE LINES 229-232
+.. GENERATED FROM PYTHON SOURCE LINES 231-234
 
 .. code-block:: Python
 
@@ -289,13 +291,13 @@ a powerful machine, you could bump these up by around 2-3.
     fractals = [tetrix(6), sponge(3), snowflake(3)]
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 233-236
+.. GENERATED FROM PYTHON SOURCE LINES 235-238
 
 We want to be able to switch between the three fractals. To achieve this
 we'll create a RadioButton and register a callback which will remove existing
 fractals and add the selected one. This also resets the camera.
 
-.. GENERATED FROM PYTHON SOURCE LINES 236-264
+.. GENERATED FROM PYTHON SOURCE LINES 238-266
 
 .. code-block:: Python
 
@@ -328,14 +330,14 @@ fractals and add the selected one. This also resets the camera.
     showmgr.scene.add(shape_chooser)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-269
+.. GENERATED FROM PYTHON SOURCE LINES 267-271
 
 Let's add some basic camera movement to make it look a little interesting.
 We can use a callback here to update a counter and calculate the camera
 positions using the counter. ``sin`` and ``cos`` are used here to make smooth
 looping movements.
 
-.. GENERATED FROM PYTHON SOURCE LINES 269-283
+.. GENERATED FROM PYTHON SOURCE LINES 271-285
 
 .. code-block:: Python
 
@@ -354,13 +356,13 @@ looping movements.
     showmgr.add_timer_callback(True, 20, timer_callback)
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 284-287
+.. GENERATED FROM PYTHON SOURCE LINES 286-289
 
 Finally, show the window if running in interactive mode or render to an image
 otherwise. This is needed for generating the documentation that you are
 reading.
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-293
+.. GENERATED FROM PYTHON SOURCE LINES 289-295
 
 .. code-block:: Python
 
@@ -369,7 +371,7 @@ reading.
     if interactive:
         showmgr.start()
     else:
-        fury.window.record(showmgr.scene, out_path="fractals.png", size=(800, 800))
+        fury.window.record(scene=showmgr.scene, out_path="fractals.png", size=(800, 800))
 
 
 .. _sphx_glr_download_auto_examples_04_demos_viz_fractals.py:
