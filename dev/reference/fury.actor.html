@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>actor &#8212; FURY 0.12.0.dev53+ga09d2ce2 documentation</title>
+    <title>actor &#8212; FURY 0.12.0.dev54+g1d5e7dc6 documentation</title>
   
   
   
@@ -44,7 +44,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=06f35967"></script>
+    <script src="../_static/documentation_options.js?v=6b25e154"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -327,6 +327,7 @@ document.write(`
 <li class="toctree-l2"><a class="reference internal" href="fury.primitive.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">primitive</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fury.shaders.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">shaders</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fury.stream.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">stream</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fury.texture.html">Module: <code class="xref py py-mod docutils literal notranslate"><span class="pre">texture.utils</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fury.transform.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">transform</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fury.ui.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ui</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fury.utils.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">utils</span></code></a></li>
@@ -533,6 +534,9 @@ document.write(`
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#fury.actor.uncertainty_cone" title="fury.actor.uncertainty_cone"><code class="xref py py-obj docutils literal notranslate"><span class="pre">uncertainty_cone</span></code></a>(evals, evecs, signal, ...)</p></td>
 <td><p>VTK actor for visualizing the cone of uncertainty representing the variance of the main direction of diffusion.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#fury.actor.odf" title="fury.actor.odf"><code class="xref py py-obj docutils literal notranslate"><span class="pre">odf</span></code></a>(centers, coeffs[, sh_basis, scales, opacity])</p></td>
+<td><p>FURY actor for visualizing Orientation Distribution Functions (ODFs) given an array of Spherical Harmonics (SH) coefficients.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2423,6 +2427,40 @@ variance of the main direction of diffusion.</p>
 </dd></dl>
 
 </section>
+<section id="odf">
+<h2>odf<a class="headerlink" href="#odf" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fury.actor.odf">
+<span class="sig-prename descclassname"><span class="pre">fury.actor.</span></span><span class="sig-name descname"><span class="pre">odf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coeffs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sh_basis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'descoteaux'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scales</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/actor.html#odf"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fury.actor.odf" title="Link to this definition">#</a></dt>
+<dd><p>FURY actor for visualizing Orientation Distribution Functions (ODFs) given
+an array of Spherical Harmonics (SH) coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>centers</strong><span class="classifier">ndarray(N, 3)</span></dt><dd><p>ODFs positions.</p>
+</dd>
+<dt><strong>coeffs</strong><span class="classifier">(N, M) or (N, 6) or (N, 15) or (N, 28) or (N, 45) or (N, 66) or</span></dt><dd><p>(N, 91) ndarray.
+Corresponding SH coefficients for the ODFs.</p>
+</dd>
+<dt><strong>sh_basis: str, optional</strong></dt><dd><p>Type of basis (descoteaux, tournier)
+‘descoteaux’ for the default <code class="docutils literal notranslate"><span class="pre">descoteaux07</span></code> DIPY basis.
+‘tournier’ for the default <code class="docutils literal notranslate"><span class="pre">tournier07</span></code> DIPY basis.</p>
+</dd>
+<dt><strong>scales</strong><span class="classifier">float or ndarray (N, ), optional</span></dt><dd><p>ODFs size.</p>
+</dd>
+<dt><strong>opacity</strong><span class="classifier">float, optional</span></dt><dd><p>Takes values from 0 (fully transparent) to 1 (opaque).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>odf: Actor</dt><dd></dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
 </section>
 
 <div class="section ablog__blog_comments">
@@ -2663,6 +2701,10 @@ variance of the main direction of diffusion.</p>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#uncertainty-cone">uncertainty_cone</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fury.actor.uncertainty_cone"><code class="docutils literal notranslate"><span class="pre">uncertainty_cone()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#odf">odf</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#fury.actor.odf"><code class="docutils literal notranslate"><span class="pre">odf()</span></code></a></li>
 </ul>
 </li>
 </ul>
