@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.gltf &#8212; FURY 0.13.0.dev2+g337f4b3b documentation</title>
+    <title>fury.gltf &#8212; FURY 0.13.0.dev10+gd46ce905 documentation</title>
   
   
   
@@ -27,7 +27,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=c0b2bda8"></script>
+    <script src="../../_static/documentation_options.js?v=9d298b3c"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -369,26 +369,26 @@ document.write(`
                 <article class="bd-article">
                    <h1>Source code for fury.gltf</h1><div class="highlight"><pre>
 <span></span><span class="c1"># TODO: Materials, Lights</span>
-<span class="kn">import</span> <span class="nn">base64</span>
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>  <span class="c1"># noqa</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span>  <span class="c1"># noqa</span>
 
-<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pygltflib</span> <span class="k">as</span> <span class="nn">gltflib</span>
-<span class="kn">from</span> <span class="nn">pygltflib.utils</span> <span class="kn">import</span> <span class="n">glb2gltf</span><span class="p">,</span> <span class="n">gltf2glb</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pygltflib</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gltflib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pygltflib.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">glb2gltf</span><span class="p">,</span> <span class="n">gltf2glb</span>
 
-<span class="kn">from</span> <span class="nn">fury</span> <span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">fury.animation</span> <span class="kn">import</span> <span class="n">Animation</span>
-<span class="kn">from</span> <span class="nn">fury.animation.interpolator</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury</span><span class="w"> </span><span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">io</span><span class="p">,</span> <span class="n">transform</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">linear_interpolator</span><span class="p">,</span>
     <span class="n">slerp</span><span class="p">,</span>
     <span class="n">step_interpolator</span><span class="p">,</span>
     <span class="n">tan_cubic_spline_interpolator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">fury.decorators</span> <span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
-<span class="kn">from</span> <span class="nn">fury.lib</span> <span class="kn">import</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">Matrix4x4</span><span class="p">,</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">Transform</span><span class="p">,</span> <span class="n">numpy_support</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">Matrix4x4</span><span class="p">,</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">Transform</span><span class="p">,</span> <span class="n">numpy_support</span>
 
 <span class="n">comp_type</span> <span class="o">=</span> <span class="p">{</span>
     <span class="mi">5120</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">byte</span><span class="p">},</span>
@@ -404,9 +404,9 @@ document.write(`
 
 <div class="viewcode-block" id="glTF">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF">[docs]</a>
-<span class="k">class</span> <span class="nc">glTF</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">glTF</span><span class="p">:</span>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">apply_normals</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">apply_normals</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and generate actors from glTF files.</span>
 
 <span class="sd">        Parameters</span>
@@ -467,7 +467,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.actors">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.actors">[docs]</a>
-    <span class="k">def</span> <span class="nf">actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate actors from glTF file.</span>
 
 <span class="sd">        Returns</span>
@@ -501,7 +501,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.inspect_scene">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.inspect_scene">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">inspect_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scene_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">inspect_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">scene_id</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop over nodes in a scene.</span>
 
 <span class="sd">        Parameters</span>
@@ -522,7 +522,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.transverse_node">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.transverse_node">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">transverse_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nextnode_id</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_joint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transverse_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nextnode_id</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">is_joint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load mesh and generates transformation matrix.</span>
 
 <span class="sd">        Parameters</span>
@@ -608,7 +608,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.load_mesh">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.load_mesh">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_id</span><span class="p">,</span> <span class="n">transform_mat</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_mesh</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mesh_id</span><span class="p">,</span> <span class="n">transform_mat</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the mesh data from accessor and applies the transformation.</span>
 
 <span class="sd">        Parameters</span>
@@ -673,7 +673,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_acc_data">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_acc_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_acc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_acc_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">acc_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the correct data from buffer using accessors and bufferviews.</span>
 
 <span class="sd">        Parameters</span>
@@ -714,7 +714,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_buff_array">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_buff_array">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_buff_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buff_id</span><span class="p">,</span> <span class="n">d_type</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="n">byte_offset</span><span class="p">,</span> <span class="n">byte_stride</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_buff_array</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buff_id</span><span class="p">,</span> <span class="n">d_type</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="n">byte_offset</span><span class="p">,</span> <span class="n">byte_stride</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract the mesh data from buffer.</span>
 
 <span class="sd">        Parameters</span>
@@ -771,7 +771,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_materials">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_materials">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_materials</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mat_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the material data.</span>
 
 <span class="sd">        Parameters</span>
@@ -799,7 +799,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_texture">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_texture">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_texture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tex_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_texture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tex_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read and convert image into vtk texture.</span>
 
 <span class="sd">        Parameters</span>
@@ -859,7 +859,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.load_camera">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.load_camera">[docs]</a>
-    <span class="k">def</span> <span class="nf">load_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera_id</span><span class="p">,</span> <span class="n">transform_mat</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera_id</span><span class="p">,</span> <span class="n">transform_mat</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the camera data of a node.</span>
 
 <span class="sd">        Parameters</span>
@@ -900,7 +900,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.transverse_channels">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.transverse_channels">[docs]</a>
-    <span class="k">def</span> <span class="nf">transverse_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">:</span> <span class="n">gltflib</span><span class="o">.</span><span class="n">Animation</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transverse_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">:</span> <span class="n">gltflib</span><span class="o">.</span><span class="n">Animation</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop over animation channels and sets animation data.</span>
 
 <span class="sd">        Parameters</span>
@@ -931,7 +931,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_sampler_data">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_sampler_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_sampler_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">gltflib</span><span class="o">.</span><span class="n">Sampler</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">transform_type</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sampler_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">gltflib</span><span class="o">.</span><span class="n">Sampler</span><span class="p">,</span> <span class="n">node_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">transform_type</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the animation and transformation data from sampler.</span>
 
 <span class="sd">        Parameters</span>
@@ -965,7 +965,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_matrix_from_sampler">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_matrix_from_sampler">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_matrix_from_sampler</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_matrix_from_sampler</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">anim_channel</span><span class="p">,</span> <span class="n">sampler</span><span class="p">:</span> <span class="n">gltflib</span><span class="o">.</span><span class="n">Sampler</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return transformation matrix for a given timestamp from Sampler</span>
@@ -1010,7 +1010,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_morph_data">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_morph_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_morph_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">mesh_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_morph_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">mesh_id</span><span class="p">):</span>
         <span class="n">weights_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gltf</span><span class="o">.</span><span class="n">meshes</span><span class="p">[</span><span class="n">mesh_id</span><span class="p">]</span><span class="o">.</span><span class="n">weights</span>
         <span class="k">if</span> <span class="n">target</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POSITION&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">morphed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_acc_data</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;POSITION&quot;</span><span class="p">))</span>
@@ -1020,7 +1020,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_skin_data">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_skin_data">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_skin_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skin_id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_skin_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skin_id</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the inverse bind matrix for each bone in the skin.</span>
 
 <span class="sd">        Parameters</span>
@@ -1045,7 +1045,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.generate_tmatrix">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.generate_tmatrix">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_tmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transf</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_tmatrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transf</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create transformation matrix from TRS array.</span>
 
 <span class="sd">        Parameters</span>
@@ -1076,7 +1076,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.transverse_animations">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.transverse_animations">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">transverse_animations</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transverse_animations</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">animation</span><span class="p">,</span>
         <span class="n">bone_id</span><span class="p">,</span>
@@ -1138,7 +1138,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.update_skin">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.update_skin">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_skin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_skin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the animation and actors with skinning data.</span>
 
 <span class="sd">        Parameters</span>
@@ -1182,7 +1182,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.initialize_skin">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.initialize_skin">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">initialize_skin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">bones</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_skin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">bones</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.2</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create bones and add to the animation and initialise `update_skin`</span>
 
 <span class="sd">        Parameters</span>
@@ -1207,7 +1207,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.apply_skin_matrix">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.apply_skin_matrix">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">apply_skin_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">joint_matrices</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_skin_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">joint_matrices</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor_index</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply the skinnig matrix, that transform the vertices.</span>
 
 <span class="sd">        Parameters</span>
@@ -1247,7 +1247,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.transverse_bones">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.transverse_bones">[docs]</a>
-    <span class="k">def</span> <span class="nf">transverse_bones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bone_id</span><span class="p">,</span> <span class="n">channel_name</span><span class="p">,</span> <span class="n">parent_animation</span><span class="p">:</span> <span class="n">Animation</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transverse_bones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bone_id</span><span class="p">,</span> <span class="n">channel_name</span><span class="p">,</span> <span class="n">parent_animation</span><span class="p">:</span> <span class="n">Animation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop over the bones and add child bone animation to their parent</span>
 <span class="sd">        animation.</span>
 
@@ -1285,7 +1285,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.skin_animation">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.skin_animation">[docs]</a>
-    <span class="k">def</span> <span class="nf">skin_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">skin_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;One animation for each bone, contains parent transforms.</span>
 
 <span class="sd">        Returns</span>
@@ -1310,7 +1310,7 @@ document.write(`
 <div class="viewcode-block" id="glTF.get_joint_actors">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_joint_actors">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-    <span class="k">def</span> <span class="nf">get_joint_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">with_transforms</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_joint_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">with_transforms</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create an arrow actor for each bone in a skinned model.</span>
 
 <span class="sd">        Parameters</span>
@@ -1340,7 +1340,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.update_morph">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.update_morph">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_morph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_morph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the animation and actors with morphing.</span>
 
 <span class="sd">        Parameters</span>
@@ -1361,7 +1361,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.apply_morph_vertices">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.apply_morph_vertices">[docs]</a>
-    <span class="k">def</span> <span class="nf">apply_morph_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">cnt</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply_morph_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">cnt</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate weighted vertex from the morph data.</span>
 
 <span class="sd">        Parameters</span>
@@ -1387,7 +1387,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.morph_animation">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.morph_animation">[docs]</a>
-    <span class="k">def</span> <span class="nf">morph_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">morph_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create animation for each channel in animations.</span>
 
 <span class="sd">        Returns</span>
@@ -1422,7 +1422,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.get_animations">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.get_animations">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_animations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_animations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return list of animations.</span>
 
 <span class="sd">        Returns</span>
@@ -1502,7 +1502,7 @@ document.write(`
 
 <div class="viewcode-block" id="glTF.main_animation">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.glTF.main_animation">[docs]</a>
-    <span class="k">def</span> <span class="nf">main_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">main_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return main animation with all glTF animations.</span>
 
 <span class="sd">        Returns</span>
@@ -1524,7 +1524,7 @@ document.write(`
 <div class="viewcode-block" id="export_scene">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.export_scene">[docs]</a>
 <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">export_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;default.gltf&quot;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">export_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;default.gltf&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate gltf from FURY scene.</span>
 
 <span class="sd">    Parameters</span>
@@ -1571,7 +1571,7 @@ document.write(`
 
 
 
-<span class="k">def</span> <span class="nf">_connect_primitives</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">buff_file</span><span class="p">,</span> <span class="n">byteoffset</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_connect_primitives</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">buff_file</span><span class="p">,</span> <span class="n">byteoffset</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create Accessor, BufferViews and writes primitive data to a binary file</span>
 
 <span class="sd">    Parameters</span>
@@ -1743,7 +1743,7 @@ document.write(`
 
 <div class="viewcode-block" id="write_scene">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_scene">[docs]</a>
-<span class="k">def</span> <span class="nf">write_scene</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_scene</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create scene</span>
 
 <span class="sd">    Parameters</span>
@@ -1763,7 +1763,7 @@ document.write(`
 <div class="viewcode-block" id="write_node">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_node">[docs]</a>
 <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">write_node</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mesh_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_node</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mesh_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">camera_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create node</span>
 
 <span class="sd">    Parameters</span>
@@ -1787,7 +1787,7 @@ document.write(`
 
 <div class="viewcode-block" id="write_mesh">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_mesh">[docs]</a>
-<span class="k">def</span> <span class="nf">write_mesh</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">primitives</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_mesh</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">primitives</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create mesh and add primitive.</span>
 
 <span class="sd">    Parameters</span>
@@ -1808,7 +1808,7 @@ document.write(`
 
 <div class="viewcode-block" id="write_camera">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_camera">[docs]</a>
-<span class="k">def</span> <span class="nf">write_camera</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">camera</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_camera</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">camera</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create and add camera.</span>
 
 <span class="sd">    Parameters</span>
@@ -1841,7 +1841,7 @@ document.write(`
 <div class="viewcode-block" id="get_prim">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.get_prim">[docs]</a>
 <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">get_prim</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">tcoord</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_prim</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="n">tcoord</span><span class="p">,</span> <span class="n">normal</span><span class="p">,</span> <span class="n">material</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a Primitive object.</span>
 
 <span class="sd">    Parameters</span>
@@ -1885,7 +1885,7 @@ document.write(`
 
 <div class="viewcode-block" id="write_material">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_material">[docs]</a>
-<span class="k">def</span> <span class="nf">write_material</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">basecolortexture</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_material</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">basecolortexture</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write Material, Images and Textures</span>
 
 <span class="sd">    Parameters</span>
@@ -1918,7 +1918,7 @@ document.write(`
 <div class="viewcode-block" id="write_accessor">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_accessor">[docs]</a>
 <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">write_accessor</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_accessor</span><span class="p">(</span>
     <span class="n">gltf</span><span class="p">,</span> <span class="n">bufferview</span><span class="p">,</span> <span class="n">byte_offset</span><span class="p">,</span> <span class="n">comp_type</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">accssor_type</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write accessor in the gltf.</span>
@@ -1960,7 +1960,7 @@ document.write(`
 <div class="viewcode-block" id="write_bufferview">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_bufferview">[docs]</a>
 <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">write_bufferview</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">byte_offset</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">byte_stride</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_bufferview</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">byte_offset</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">byte_stride</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write bufferview in the gltf.</span>
 
 <span class="sd">    Parameters</span>
@@ -1989,7 +1989,7 @@ document.write(`
 
 <div class="viewcode-block" id="write_buffer">
 <a class="viewcode-back" href="../../reference/fury.gltf.html#fury.gltf.write_buffer">[docs]</a>
-<span class="k">def</span> <span class="nf">write_buffer</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_buffer</span><span class="p">(</span><span class="n">gltf</span><span class="p">,</span> <span class="n">byte_length</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Write buffer int the gltf</span>
 
 <span class="sd">    Parameters</span>
@@ -2124,7 +2124,7 @@ document.write(`
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
     </div>
 </div></div>
       
