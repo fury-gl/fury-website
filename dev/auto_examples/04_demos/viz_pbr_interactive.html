@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Interactive PBR demo &#8212; FURY 0.13.0.dev2+g337f4b3b documentation</title>
+    <title>Interactive PBR demo &#8212; FURY 0.13.0.dev10+gd46ce905 documentation</title>
   
   
   
@@ -28,7 +28,7 @@
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
 <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
@@ -44,7 +44,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=c0b2bda8"></script>
+    <script src="../../_static/documentation_options.js?v=9d298b3c"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -391,74 +391,74 @@ to download the full example code.</p>
 <p>This is a demonstration of how Physically-Based Rendering (PBR) can be used to
 simulate different materials.</p>
 <p>Let’s start by importing the necessary modules:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">fury</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">fury</span>
 </pre></div>
 </div>
 <p>The following functions will help us to manage the sliders events.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">change_slice_metallic</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">change_slice_metallic</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">metallic</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">roughness</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_anisotropy</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_anisotropy</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_x</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_anisotropy_direction_x</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">doa</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">sphere</span>
     <span class="n">doa</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
     <span class="n">tangents</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_from_direction_of_anisotropy</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">doa</span><span class="p">)</span>
     <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_to_actor</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_y</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_anisotropy_direction_y</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">doa</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">sphere</span>
     <span class="n">doa</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
     <span class="n">tangents</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_from_direction_of_anisotropy</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">doa</span><span class="p">)</span>
     <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_to_actor</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_anisotropy_direction_z</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_anisotropy_direction_z</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">doa</span><span class="p">,</span> <span class="n">normals</span><span class="p">,</span> <span class="n">sphere</span>
     <span class="n">doa</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
     <span class="n">tangents</span> <span class="o">=</span> <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_from_direction_of_anisotropy</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">doa</span><span class="p">)</span>
     <span class="n">fury</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">tangents_to_actor</span><span class="p">(</span><span class="n">sphere</span><span class="p">,</span> <span class="n">tangents</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_anisotropy_rotation</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_anisotropy_rotation</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">anisotropy_rotation</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_coat_strength</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_coat_strength</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_strength</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_coat_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_coat_roughness</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_roughness</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_base_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_base_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">base_ior</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 
 
-<span class="k">def</span> <span class="nf">change_slice_coat_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">change_slice_coat_ior</span><span class="p">(</span><span class="n">slider</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">pbr_params</span>
     <span class="n">pbr_params</span><span class="o">.</span><span class="n">coat_ior</span> <span class="o">=</span> <span class="n">slider</span><span class="o">.</span><span class="n">value</span>
 </pre></div>
 </div>
 <p>Last, but not least, we define the following function to help us to
 reposition the UI elements every time we resize the window.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">win_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">win_callback</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
     <span class="k">global</span> <span class="n">control_panel</span><span class="p">,</span> <span class="n">size</span>
     <span class="k">if</span> <span class="n">size</span> <span class="o">!=</span> <span class="n">obj</span><span class="o">.</span><span class="n">GetSize</span><span class="p">():</span>
         <span class="n">size_old</span> <span class="o">=</span> <span class="n">size</span>
@@ -854,7 +854,7 @@ let’s capture the current size and add our helper function as a
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2024, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
     </div>
 </div></div>
       
