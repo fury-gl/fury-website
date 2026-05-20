@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.material &#8212; FURY 0.13.0.dev16+g792f89c8f documentation</title>
+    <title>fury.material &#8212; FURY 2.1.0.dev40+g9c69c7757 documentation</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -43,11 +43,12 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=7d417c42"></script>
+    <script src="../../_static/documentation_options.js?v=34ffda04"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/fury/material';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
@@ -368,700 +369,1242 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <h1>Source code for fury.material</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span></span><span class="sd">&quot;&quot;&quot;Module for creating various materials used in 3D rendering.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">VTK_OBJECT</span><span class="p">,</span> <span class="n">calldata_type</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.shaders</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-    <span class="n">add_shader_callback</span><span class="p">,</span>
-    <span class="n">compose_shader</span><span class="p">,</span>
-    <span class="n">import_fury_shader</span><span class="p">,</span>
-    <span class="n">shader_to_actor</span><span class="p">,</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ImageBasicMaterial</span><span class="p">,</span>
+    <span class="n">LineArrowMaterial</span><span class="p">,</span>
+    <span class="n">LineMaterial</span><span class="p">,</span>
+    <span class="n">LineSegmentMaterial</span><span class="p">,</span>
+    <span class="n">LineThinMaterial</span><span class="p">,</span>
+    <span class="n">LineThinSegmentMaterial</span><span class="p">,</span>
+    <span class="n">MeshBasicMaterial</span><span class="p">,</span>
+    <span class="n">MeshPhongMaterial</span><span class="p">,</span>
+    <span class="n">PointsGaussianBlobMaterial</span><span class="p">,</span>
+    <span class="n">PointsMarkerMaterial</span><span class="p">,</span>
+    <span class="n">PointsMaterial</span><span class="p">,</span>
+    <span class="n">TextMaterial</span><span class="p">,</span>
 <span class="p">)</span>
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">__PBRParams</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper class to manage PBR parameters.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    actor_properties : vtkProperty</span>
-<span class="sd">        The actor properties.</span>
+<div class="viewcode-block" id="validate_opacity">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.validate_opacity">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure opacity is between 0 and 1.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    metallic : float</span>
-<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
-<span class="sd">        must be between 0.0 and 1.0.</span>
-<span class="sd">    roughness : float</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
-<span class="sd">    anisotropy : float</span>
-<span class="sd">        Isotropic or anisotropic material parameter. Values must be between</span>
-<span class="sd">        0.0 and 1.0.</span>
-<span class="sd">    anisotropy_rotation : float</span>
-<span class="sd">        Rotation of the anisotropy around the normal in a counter-clockwise</span>
-<span class="sd">        fashion. Values must be between 0.0 and 1.0. A value of 1.0 means a</span>
-<span class="sd">        rotation of 2 * pi.</span>
-<span class="sd">    coat_strength : float</span>
-<span class="sd">        Strength of the coat layer. Values must be between 0.0 and 1.0 (0.0</span>
-<span class="sd">        means no clear coat will be modeled).</span>
-<span class="sd">    coat_roughness : float</span>
-<span class="sd">        Roughness of the coat layer. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    base_ior : float</span>
-<span class="sd">        Index of refraction of the base material. Default is 1.5. Values must</span>
-<span class="sd">        be between 1.0 and 2.3.</span>
-<span class="sd">    coat_ior : float</span>
-<span class="sd">        Index of refraction of the coat material. Default is 1.5. Values must</span>
-<span class="sd">        be between 1.0 and 2.3.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">actor_properties</span><span class="p">,</span>
-        <span class="n">metallic</span><span class="p">,</span>
-        <span class="n">roughness</span><span class="p">,</span>
-        <span class="n">anisotropy</span><span class="p">,</span>
-        <span class="n">anisotropy_rotation</span><span class="p">,</span>
-        <span class="n">coat_strength</span><span class="p">,</span>
-        <span class="n">coat_roughness</span><span class="p">,</span>
-        <span class="n">base_ior</span><span class="p">,</span>
-        <span class="n">coat_ior</span><span class="p">,</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span> <span class="o">=</span> <span class="n">actor_properties</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetMetallic</span><span class="p">(</span><span class="n">metallic</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetRoughness</span><span class="p">(</span><span class="n">roughness</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropy</span><span class="p">(</span><span class="n">anisotropy</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropyRotation</span><span class="p">(</span><span class="n">anisotropy_rotation</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatStrength</span><span class="p">(</span><span class="n">coat_strength</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatRoughness</span><span class="p">(</span><span class="n">coat_roughness</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetBaseIOR</span><span class="p">(</span><span class="n">base_ior</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatIOR</span><span class="p">(</span><span class="n">coat_ior</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">metallic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetMetallic</span><span class="p">()</span>
-
-    <span class="nd">@metallic</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">metallic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metallic</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetMetallic</span><span class="p">(</span><span class="n">metallic</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetRoughness</span><span class="p">()</span>
-
-    <span class="nd">@roughness</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">roughness</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetRoughness</span><span class="p">(</span><span class="n">roughness</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">anisotropy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetAnisotropy</span><span class="p">()</span>
-
-    <span class="nd">@anisotropy</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">anisotropy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anisotropy</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropy</span><span class="p">(</span><span class="n">anisotropy</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">anisotropy_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetAnisotropyRotation</span><span class="p">()</span>
-
-    <span class="nd">@anisotropy_rotation</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">anisotropy_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">anisotropy_rotation</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetAnisotropyRotation</span><span class="p">(</span><span class="n">anisotropy_rotation</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatStrength</span><span class="p">()</span>
-
-    <span class="nd">@coat_strength</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_strength</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatStrength</span><span class="p">(</span><span class="n">coat_strength</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatRoughness</span><span class="p">()</span>
-
-    <span class="nd">@coat_roughness</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_roughness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_roughness</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatRoughness</span><span class="p">(</span><span class="n">coat_roughness</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">base_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetBaseIOR</span><span class="p">()</span>
-
-    <span class="nd">@base_ior</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">base_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_ior</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetBaseIOR</span><span class="p">(</span><span class="n">base_ior</span><span class="p">)</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">GetCoatIOR</span><span class="p">()</span>
-
-    <span class="nd">@coat_ior</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">coat_ior</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">coat_ior</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__actor_properties</span><span class="o">.</span><span class="n">SetCoatIOR</span><span class="p">(</span><span class="n">coat_ior</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="manifest_pbr">
-<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_pbr">[docs]</a>
-<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">manifest_pbr</span><span class="p">(</span>
-    <span class="n">actor</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">metallic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">roughness</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
-    <span class="n">anisotropy</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">anisotropy_rotation</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">coat_strength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">coat_roughness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">base_ior</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
-    <span class="n">coat_ior</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply VTK&#39;s Physically Based Rendering properties to the selected actor.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    actor : actor</span>
-<span class="sd">    metallic : float, optional</span>
-<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
-<span class="sd">        must be between 0.0 and 1.0.</span>
-<span class="sd">    roughness : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
-<span class="sd">    anisotropy : float, optional</span>
-<span class="sd">        Isotropic or anisotropic material parameter. Values must be between</span>
-<span class="sd">        0.0 and 1.0.</span>
-<span class="sd">    anisotropy_rotation : float, optional</span>
-<span class="sd">        Rotation of the anisotropy around the normal in a counter-clockwise</span>
-<span class="sd">        fashion. Values must be between 0.0 and 1.0. A value of 1.0 means a</span>
-<span class="sd">        rotation of 2 * pi.</span>
-<span class="sd">    coat_strength : float, optional</span>
-<span class="sd">        Strength of the coat layer. Values must be between 0.0 and 1.0 (0.0</span>
-<span class="sd">        means no clear coat will be modeled).</span>
-<span class="sd">    coat_roughness : float, optional</span>
-<span class="sd">        Roughness of the coat layer. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    base_ior : float, optional</span>
-<span class="sd">        Index of refraction of the base material. Default is 1.5. Values must</span>
-<span class="sd">        be between 1.0 and 2.3.</span>
-<span class="sd">    coat_ior : float, optional</span>
-<span class="sd">        Index of refraction of the coat material. Default is 1.5. Values must</span>
-<span class="sd">        be between 1.0 and 2.3.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPBR</span><span class="p">()</span>
-            <span class="n">pbr_params</span> <span class="o">=</span> <span class="n">__PBRParams</span><span class="p">(</span>
-                <span class="n">prop</span><span class="p">,</span>
-                <span class="n">metallic</span><span class="p">,</span>
-                <span class="n">roughness</span><span class="p">,</span>
-                <span class="n">anisotropy</span><span class="p">,</span>
-                <span class="n">anisotropy_rotation</span><span class="p">,</span>
-                <span class="n">coat_strength</span><span class="p">,</span>
-                <span class="n">coat_roughness</span><span class="p">,</span>
-                <span class="n">base_ior</span><span class="p">,</span>
-                <span class="n">coat_ior</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">pbr_params</span>
-        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;PBR interpolation cannot be applied to this actor. The &quot;</span>
-                <span class="s2">&quot;material will not be applied.&quot;</span><span class="p">,</span>
-                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Actor does not have the attribute property. This &quot;</span>
-            <span class="s2">&quot;material will not be applied.&quot;</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
-
-
-
-<div class="viewcode-block" id="manifest_principled">
-<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_principled">[docs]</a>
-<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">manifest_principled</span><span class="p">(</span>
-    <span class="n">actor</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">subsurface</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">metallic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">specular</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">specular_tint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">roughness</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">anisotropic</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">anisotropic_direction</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">sheen</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">sheen_tint</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">clearcoat</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">clearcoat_gloss</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply the Principled Shading properties to the selected actor.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    actor : actor</span>
-<span class="sd">    subsurface : float, optional</span>
-<span class="sd">        Subsurface scattering computation value. Values must be between 0.0 and</span>
-<span class="sd">        1.0.</span>
-<span class="sd">    metallic : float, optional</span>
-<span class="sd">        Metallic or non-metallic (dielectric) shading computation value. Values</span>
-<span class="sd">        must be between 0.0 and 1.0.</span>
-<span class="sd">    specular : float, optional</span>
-<span class="sd">        Specular lighting coefficient. Value must be between 0.0 and 1.0.</span>
-<span class="sd">    specular_tint : float, optional</span>
-<span class="sd">        Specular tint coefficient value. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    roughness : float, optional</span>
-<span class="sd">        Parameter used to specify how glossy the actor should be. Values must</span>
-<span class="sd">        be between 0.0 and 1.0.</span>
-<span class="sd">    anisotropic : float, optional</span>
-<span class="sd">        Anisotropy coefficient. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    anisotropic_direction : list, optional</span>
-<span class="sd">        Anisotropy direction where X, Y and Z should be in the range [-1, 1].</span>
-<span class="sd">    sheen : float, optional</span>
-<span class="sd">        Sheen coefficient. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    sheen_tint : float, optional</span>
-<span class="sd">        Sheen tint coefficient value. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    clearcoat : float, optional</span>
-<span class="sd">        Clearcoat coefficient. Values must be between 0.0 and 1.0.</span>
-<span class="sd">    clearcoat_gloss : float, optional</span>
-<span class="sd">        Clearcoat gloss coefficient value. Values must be between 0.0 and 1.0.</span>
+<span class="sd">    opacity : float</span>
+<span class="sd">        Opacity value to validate.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    principled_params : dict</span>
-<span class="sd">        Dictionary containing the Principled Shading parameters.</span>
+<span class="sd">    float</span>
+<span class="sd">        Validated opacity value.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If opacity is not between 0 and 1.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">anisotropic_direction</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">anisotropic_direction</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
-
-        <span class="n">principled_params</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;subsurface&quot;</span><span class="p">:</span> <span class="n">subsurface</span><span class="p">,</span>
-            <span class="s2">&quot;metallic&quot;</span><span class="p">:</span> <span class="n">metallic</span><span class="p">,</span>
-            <span class="s2">&quot;specular&quot;</span><span class="p">:</span> <span class="n">specular</span><span class="p">,</span>
-            <span class="s2">&quot;specular_tint&quot;</span><span class="p">:</span> <span class="n">specular_tint</span><span class="p">,</span>
-            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="n">roughness</span><span class="p">,</span>
-            <span class="s2">&quot;anisotropic&quot;</span><span class="p">:</span> <span class="n">anisotropic</span><span class="p">,</span>
-            <span class="s2">&quot;anisotropic_direction&quot;</span><span class="p">:</span> <span class="n">anisotropic_direction</span><span class="p">,</span>
-            <span class="s2">&quot;sheen&quot;</span><span class="p">:</span> <span class="n">sheen</span><span class="p">,</span>
-            <span class="s2">&quot;sheen_tint&quot;</span><span class="p">:</span> <span class="n">sheen_tint</span><span class="p">,</span>
-            <span class="s2">&quot;clearcoat&quot;</span><span class="p">:</span> <span class="n">clearcoat</span><span class="p">,</span>
-            <span class="s2">&quot;clearcoat_gloss&quot;</span><span class="p">:</span> <span class="n">clearcoat_gloss</span><span class="p">,</span>
-        <span class="p">}</span>
-
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecular</span><span class="p">(</span><span class="n">specular</span><span class="p">)</span>
-
-        <span class="nd">@calldata_type</span><span class="p">(</span><span class="n">VTK_OBJECT</span><span class="p">)</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">uniforms_callback</span><span class="p">(</span><span class="n">_caller</span><span class="p">,</span> <span class="n">_event</span><span class="p">,</span> <span class="n">calldata</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">calldata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;subsurface&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;subsurface&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span><span class="s2">&quot;metallic&quot;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;metallic&quot;</span><span class="p">])</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;specularTint&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;specular_tint&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;roughness&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;roughness&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;anisotropic&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;anisotropic&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span><span class="s2">&quot;sheen&quot;</span><span class="p">,</span> <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;sheen&quot;</span><span class="p">])</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;sheenTint&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;sheen_tint&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;clearcoat&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;clearcoat&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniformf</span><span class="p">(</span>
-                    <span class="s2">&quot;clearcoatGloss&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;clearcoat_gloss&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-
-                <span class="n">calldata</span><span class="o">.</span><span class="n">SetUniform3f</span><span class="p">(</span>
-                    <span class="s2">&quot;anisotropicDirection&quot;</span><span class="p">,</span>
-                    <span class="n">principled_params</span><span class="p">[</span><span class="s2">&quot;anisotropic_direction&quot;</span><span class="p">],</span>
-                <span class="p">)</span>
-
-        <span class="n">add_shader_callback</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">uniforms_callback</span><span class="p">)</span>
-
-        <span class="c1"># Start of shader implementation</span>
-
-        <span class="c1"># Adding required constants</span>
-        <span class="n">pi</span> <span class="o">=</span> <span class="s2">&quot;#define PI 3.14159265359&quot;</span>
-
-        <span class="c1"># Adding uniforms</span>
-        <span class="n">uniforms</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        uniform float subsurface;</span>
-<span class="s2">        uniform float metallic;</span>
-<span class="s2">        uniform float specularTint;</span>
-<span class="s2">        uniform float roughness;</span>
-<span class="s2">        uniform float anisotropic;</span>
-<span class="s2">        uniform float sheen;</span>
-<span class="s2">        uniform float sheenTint;</span>
-<span class="s2">        uniform float clearcoat;</span>
-<span class="s2">        uniform float clearcoatGloss;</span>
-
-<span class="s2">        uniform vec3 anisotropicDirection;</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Importing functions in order</span>
-
-        <span class="c1"># Importing utility functions</span>
-        <span class="n">square</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;utils&quot;</span><span class="p">,</span> <span class="s2">&quot;square.glsl&quot;</span><span class="p">))</span>
-        <span class="n">pow5</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;utils&quot;</span><span class="p">,</span> <span class="s2">&quot;pow5.glsl&quot;</span><span class="p">))</span>
-
-        <span class="c1"># Importing utility function to update the tangent and bitangent</span>
-        <span class="c1"># vectors given a direction of anisotropy</span>
-        <span class="n">update_tan_bitan</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;utils&quot;</span><span class="p">,</span> <span class="s2">&quot;update_tan_bitan.glsl&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing color conversion gamma to linear space function</span>
-        <span class="n">gamma_to_linear</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;gamma_to_linear.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing color conversion linear to gamma space function</span>
-        <span class="n">linear_to_gamma</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;linear_to_gamma.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing linear-space CIE luminance tint approximation function</span>
-        <span class="n">cie_color_tint</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;cie_color_tint.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing Schlick&#39;s weight approximation of the Fresnel equation</span>
-        <span class="n">schlick_weight</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;schlick_weight.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing Normal Distribution Function (NDF): Generalized</span>
-        <span class="c1"># Trowbridge-Reitz with param gamma=1 (D_{GTR_1}) needed for the Clear</span>
-        <span class="c1"># Coat lobe</span>
-        <span class="n">gtr1</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;ndf&quot;</span><span class="p">,</span> <span class="s2">&quot;gtr1.frag&quot;</span><span class="p">))</span>
-
-        <span class="c1"># Importing Normal Distribution Function (NDF): Generalized</span>
-        <span class="c1"># Trowbridge-Reitz with param gamma=2 (D_{GTR_2}) needed for the</span>
-        <span class="c1"># Isotropic Specular lobe</span>
-        <span class="n">gtr2</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;ndf&quot;</span><span class="p">,</span> <span class="s2">&quot;gtr2.frag&quot;</span><span class="p">))</span>
-
-        <span class="c1"># Importing Normal Distribution Function (NDF): Anisotropic form of the</span>
-        <span class="c1"># Generalized Trowbridge-Reitz with param gamma=2</span>
-        <span class="c1"># (D_{GTR_2anisotropic}) needed for the respective Specular lobe</span>
-        <span class="n">gtr2_anisotropic</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;ndf&quot;</span><span class="p">,</span> <span class="s2">&quot;gtr2_anisotropic.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing Geometry Shadowing and Masking Function (GF): Smith Ground</span>
-        <span class="c1"># Glass Unknown (G_{GGX}) needed for the Isotropic Specular and Clear</span>
-        <span class="c1"># Coat lobes</span>
-        <span class="n">smith_ggx</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">&quot;lighting&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;gf&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;smith_ggx.frag&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing Geometry Shadowing and Masking Function (GF): Anisotropic</span>
-        <span class="c1"># form of the Smith Ground Glass Unknown (G_{GGXanisotropic}) needed</span>
-        <span class="c1"># for the respective Specular lobe</span>
-        <span class="n">smith_ggx_anisotropic</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;gf&quot;</span><span class="p">,</span> <span class="s2">&quot;smith_ggx_anisotropic.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Importing Principled components functions</span>
-        <span class="n">diffuse</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;principled&quot;</span><span class="p">,</span> <span class="s2">&quot;diffuse.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">subsurface</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;principled&quot;</span><span class="p">,</span> <span class="s2">&quot;subsurface.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">sheen</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="s2">&quot;lighting&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;principled&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;sheen.frag&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">specular_isotropic</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;principled&quot;</span><span class="p">,</span> <span class="s2">&quot;specular_isotropic.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">specular_anisotropic</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;principled&quot;</span><span class="p">,</span> <span class="s2">&quot;specular_anisotropic.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">clearcoat</span> <span class="o">=</span> <span class="n">import_fury_shader</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;lighting&quot;</span><span class="p">,</span> <span class="s2">&quot;principled&quot;</span><span class="p">,</span> <span class="s2">&quot;clearcoat.frag&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Putting all the functions together before passing them to the actor</span>
-        <span class="n">fs_dec</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">pi</span><span class="p">,</span>
-                <span class="n">uniforms</span><span class="p">,</span>
-                <span class="n">square</span><span class="p">,</span>
-                <span class="n">pow5</span><span class="p">,</span>
-                <span class="n">update_tan_bitan</span><span class="p">,</span>
-                <span class="n">gamma_to_linear</span><span class="p">,</span>
-                <span class="n">linear_to_gamma</span><span class="p">,</span>
-                <span class="n">cie_color_tint</span><span class="p">,</span>
-                <span class="n">schlick_weight</span><span class="p">,</span>
-                <span class="n">gtr1</span><span class="p">,</span>
-                <span class="n">gtr2</span><span class="p">,</span>
-                <span class="n">gtr2_anisotropic</span><span class="p">,</span>
-                <span class="n">smith_ggx</span><span class="p">,</span>
-                <span class="n">smith_ggx_anisotropic</span><span class="p">,</span>
-                <span class="n">diffuse</span><span class="p">,</span>
-                <span class="n">subsurface</span><span class="p">,</span>
-                <span class="n">sheen</span><span class="p">,</span>
-                <span class="n">specular_isotropic</span><span class="p">,</span>
-                <span class="n">specular_anisotropic</span><span class="p">,</span>
-                <span class="n">clearcoat</span><span class="p">,</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Adding shader functions to actor</span>
-        <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">decl_code</span><span class="o">=</span><span class="n">fs_dec</span><span class="p">)</span>
-
-        <span class="c1"># Start of the implementation code</span>
-        <span class="n">start_comment</span> <span class="o">=</span> <span class="s2">&quot;//Disney&#39;s Principled BRDF&quot;</span>
-
-        <span class="c1"># Preparing vectors and values</span>
-        <span class="n">normal</span> <span class="o">=</span> <span class="s2">&quot;vec3 normal = normalVCVSOutput;&quot;</span>
-        <span class="c1"># VTK&#39;s default system is retroreflective, which means view = light</span>
-        <span class="n">view</span> <span class="o">=</span> <span class="s2">&quot;vec3 view = normalize(-vertexVC.xyz);&quot;</span>
-        <span class="c1"># Since VTK&#39;s default setup is retroreflective we only need to</span>
-        <span class="c1"># calculate one single dot product</span>
-        <span class="n">dot_n_v</span> <span class="o">=</span> <span class="s2">&quot;float dotNV = clamp(dot(normal, view), 1e-5, 1);&quot;</span>
-
-        <span class="n">dot_n_v_validation</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        if(dotNV &lt; 0)</span>
-<span class="s2">            fragOutput0 = vec4(vec3(0), opacity);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># To work with anisotropic distributions is necessary to have a tangent</span>
-        <span class="c1"># and bitangent vector per point on the surface</span>
-        <span class="n">tangent</span> <span class="o">=</span> <span class="s2">&quot;vec3 tangent = vec3(.0);&quot;</span>
-        <span class="n">bitangent</span> <span class="o">=</span> <span class="s2">&quot;vec3 bitangent = vec3(.0);&quot;</span>
-        <span class="c1"># The shader function updateTanBitan aligns tangents and bitangents</span>
-        <span class="c1"># according to a direction of anisotropy</span>
-        <span class="n">update_aniso_vecs</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        updateTanBitan(normal, anisotropicDirection, tangent, bitangent);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Calculating dot products with tangent and bitangent</span>
-        <span class="n">dot_t_v</span> <span class="o">=</span> <span class="s2">&quot;float dotTV = dot(tangent, view);&quot;</span>
-        <span class="n">dot_b_v</span> <span class="o">=</span> <span class="s2">&quot;float dotBV = dot(bitangent, view);&quot;</span>
-
-        <span class="c1"># Converting color to linear space</span>
-        <span class="n">linear_color</span> <span class="o">=</span> <span class="s2">&quot;vec3 linColor = gamma2Linear(diffuseColor);&quot;</span>
-
-        <span class="c1"># Calculating linear-space CIE luminance tint approximation</span>
-        <span class="n">tint</span> <span class="o">=</span> <span class="s2">&quot;vec3 tint = calculateTint(linColor);&quot;</span>
-
-        <span class="c1"># Since VTK&#39;s default setup is retroreflective we only need to</span>
-        <span class="c1"># calculate one single Schlick&#39;s weight</span>
-        <span class="n">fsw</span> <span class="o">=</span> <span class="s2">&quot;float fsw = schlickWeight(dotNV);&quot;</span>
-
-        <span class="c1"># Calculating the diffuse coefficient</span>
-        <span class="n">diff_coeff</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        float diffCoeff = evaluateDiffuse(roughness, fsw, fsw, dotNV);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Calculating the subsurface coefficient</span>
-        <span class="n">subsurf_coeff</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        float subsurfCoeff = evaluateSubsurface(roughness, fsw, fsw, dotNV,</span>
-<span class="s2">            dotNV, dotNV);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Calculating the sheen irradiance</span>
-        <span class="n">sheen_rad</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        vec3 sheenRad = evaluateSheen(sheen, sheenTint, tint, fsw);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Calculating the specular irradiance</span>
-        <span class="n">spec_rad</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        vec3 specRad = evaluateSpecularAnisotropic(specularIntensity,</span>
-<span class="s2">            specularTint, metallic, anisotropic, roughness, tint, linColor,</span>
-<span class="s2">            fsw, dotNV, dotTV, dotBV, dotNV, dotTV, dotBV, dotNV, dotTV,</span>
-<span class="s2">            dotBV);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Calculating the clear coat coefficient</span>
-        <span class="n">clear_coat_coef</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        float coatCoeff = evaluateClearcoat(clearcoat, clearcoatGloss, fsw,</span>
-<span class="s2">            dotNV, dotNV, dotNV);</span>
-<span class="s2">        &quot;&quot;&quot;</span>
-
-        <span class="c1"># Starting to put all together</span>
-        <span class="c1"># Initializing the radiance vector</span>
-        <span class="n">radiance</span> <span class="o">=</span> <span class="s2">&quot;vec3 rad = (1 / PI) * linColor;&quot;</span>
-        <span class="c1"># Adding mix between the diffuse and the subsurface coefficients</span>
-        <span class="c1"># controlled by the subsurface parameter</span>
-        <span class="n">diff_subsurf_mix</span> <span class="o">=</span> <span class="s2">&quot;rad *= mix(diffCoeff, subsurfCoeff, subsurface);&quot;</span>
-        <span class="c1"># Adding sheen radiance</span>
-        <span class="n">sheen_add</span> <span class="o">=</span> <span class="s2">&quot;rad += sheenRad;&quot;</span>
-        <span class="c1"># Balancing energy using metallic</span>
-        <span class="n">metallic_balance</span> <span class="o">=</span> <span class="s2">&quot;rad *= (1 - metallic);&quot;</span>
-        <span class="c1"># Adding specular radiance</span>
-        <span class="n">specular_add</span> <span class="o">=</span> <span class="s2">&quot;rad += specRad;&quot;</span>
-        <span class="c1"># Adding clear coat coefficient</span>
-        <span class="n">clearcoat_add</span> <span class="o">=</span> <span class="s2">&quot;rad += coatCoeff;&quot;</span>
-
-        <span class="c1"># Initializing the color vector using the final radiance and VTK&#39;s</span>
-        <span class="c1"># additional information</span>
-        <span class="n">color</span> <span class="o">=</span> <span class="s2">&quot;vec3 color = rad * lightColor0;&quot;</span>
-        <span class="c1"># Converting color back to gamma space</span>
-        <span class="n">gamma_color</span> <span class="o">=</span> <span class="s2">&quot;color = linear2Gamma(color);&quot;</span>
-        <span class="c1"># Clamping color values</span>
-        <span class="n">color_clamp</span> <span class="o">=</span> <span class="s2">&quot;color = clamp(color, vec3(0), vec3(1));&quot;</span>
-
-        <span class="c1"># Fragment shader output</span>
-        <span class="n">frag_output</span> <span class="o">=</span> <span class="s2">&quot;fragOutput0 = vec4(color, opacity);&quot;</span>
-
-        <span class="c1"># Putting all the implementation together before passing it to the</span>
-        <span class="c1"># actor</span>
-        <span class="n">fs_impl</span> <span class="o">=</span> <span class="n">compose_shader</span><span class="p">(</span>
-            <span class="p">[</span>
-                <span class="n">start_comment</span><span class="p">,</span>
-                <span class="n">normal</span><span class="p">,</span>
-                <span class="n">view</span><span class="p">,</span>
-                <span class="n">dot_n_v</span><span class="p">,</span>
-                <span class="n">dot_n_v_validation</span><span class="p">,</span>
-                <span class="n">tangent</span><span class="p">,</span>
-                <span class="n">bitangent</span><span class="p">,</span>
-                <span class="n">update_aniso_vecs</span><span class="p">,</span>
-                <span class="n">dot_t_v</span><span class="p">,</span>
-                <span class="n">dot_b_v</span><span class="p">,</span>
-                <span class="n">linear_color</span><span class="p">,</span>
-                <span class="n">tint</span><span class="p">,</span>
-                <span class="n">fsw</span><span class="p">,</span>
-                <span class="n">diff_coeff</span><span class="p">,</span>
-                <span class="n">subsurf_coeff</span><span class="p">,</span>
-                <span class="n">sheen_rad</span><span class="p">,</span>
-                <span class="n">spec_rad</span><span class="p">,</span>
-                <span class="n">clear_coat_coef</span><span class="p">,</span>
-                <span class="n">radiance</span><span class="p">,</span>
-                <span class="n">diff_subsurf_mix</span><span class="p">,</span>
-                <span class="n">sheen_add</span><span class="p">,</span>
-                <span class="n">metallic_balance</span><span class="p">,</span>
-                <span class="n">specular_add</span><span class="p">,</span>
-                <span class="n">clearcoat_add</span><span class="p">,</span>
-                <span class="n">color</span><span class="p">,</span>
-                <span class="n">gamma_color</span><span class="p">,</span>
-                <span class="n">color_clamp</span><span class="p">,</span>
-                <span class="n">frag_output</span><span class="p">,</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
-
-        <span class="c1"># Adding shader implementation to actor</span>
-        <span class="n">shader_to_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;fragment&quot;</span><span class="p">,</span> <span class="n">impl_code</span><span class="o">=</span><span class="n">fs_impl</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="s2">&quot;light&quot;</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">principled_params</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Actor does not have the attribute property. This &quot;</span>
-            <span class="s2">&quot;material will not be applied.&quot;</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">if</span> <span class="n">opacity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">1.0</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">opacity</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Opacity must be between 0 and 1.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">opacity</span></div>
 
 
 
-<div class="viewcode-block" id="manifest_standard">
-<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.manifest_standard">[docs]</a>
-<span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">manifest_standard</span><span class="p">(</span>
-    <span class="n">actor</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">ambient_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">ambient_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="n">diffuse_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">diffuse_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="n">specular_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">specular_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="n">specular_power</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;gouraud&quot;</span><span class="p">,</span>
-<span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply the standard material to the selected actor.</span>
+<div class="viewcode-block" id="validate_color">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.validate_color">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validate and modify color based on opacity and mode.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    actor : actor</span>
-<span class="sd">    ambient_level : float, optional</span>
-<span class="sd">        Ambient lighting coefficient. Value must be between 0.0 and 1.0.</span>
-<span class="sd">    ambient_color : tuple (3,), optional</span>
-<span class="sd">        Ambient RGB color where R, G and B should be in the range [0, 1].</span>
-<span class="sd">    diffuse_level : float, optional</span>
-<span class="sd">        Diffuse lighting coefficient. Value must be between 0.0 and 1.0.</span>
-<span class="sd">    diffuse_color : tuple (3,), optional</span>
-<span class="sd">        Diffuse RGB color where R, G and B should be in the range [0, 1].</span>
-<span class="sd">    specular_level : float, optional</span>
-<span class="sd">        Specular lighting coefficient. Value must be between 0.0 and 1.0.</span>
-<span class="sd">    specular_color : tuple (3,), optional</span>
-<span class="sd">        Specular RGB color where R, G and B should be in the range [0, 1].</span>
-<span class="sd">    specular_power : float, optional</span>
-<span class="sd">        Parameter used to specify the intensity of the specular reflection.</span>
-<span class="sd">        Value must be between 0.0 and 128.0.</span>
-<span class="sd">    interpolation : string, optional</span>
-<span class="sd">        If &#39;flat&#39;, the actor will be shaded using flat interpolation. If</span>
-<span class="sd">        &#39;gouraud&#39; (default), then the shading will be calculated at the</span>
-<span class="sd">        vertex level. If &#39;phong&#39;, then the shading will be calculated at the</span>
-<span class="sd">        fragment level.</span>
+<span class="sd">    color : tuple or None</span>
+<span class="sd">        RGB or RGBA color tuple.</span>
+<span class="sd">    opacity : float</span>
+<span class="sd">        Opacity value between 0 and 1.</span>
+<span class="sd">    mode : str</span>
+<span class="sd">        Color mode, either &#39;auto&#39; or &#39;vertex&#39;.</span>
 
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple or None</span>
+<span class="sd">        Modified color tuple with opacity applied.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If color is None when mode is &#39;auto&#39; or if color has invalid length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">prop</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
 
-        <span class="n">interpolation</span> <span class="o">=</span> <span class="n">interpolation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;vertex&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span>
-            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToFlat</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;gouraud&quot;</span><span class="p">:</span>
-            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToGouraud</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">interpolation</span> <span class="o">==</span> <span class="s2">&quot;phong&quot;</span><span class="p">:</span>
-            <span class="n">prop</span><span class="o">.</span><span class="n">SetInterpolationToPhong</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">color</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">opacity</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s1">&#39;Unknown interpolation. Ignoring &quot;</span><span class="si">{}</span><span class="s1">&quot; interpolation &#39;</span>
-                <span class="s1">&#39;option and using the default (&quot;</span><span class="si">{}</span><span class="s1">&quot;) option.&#39;</span>
-            <span class="p">)</span>
-            <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">interpolation</span><span class="p">,</span> <span class="s2">&quot;gouraud&quot;</span><span class="p">)</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Color must be a tuple of length 3 or 4.&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">color</span></div>
 
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetAmbient</span><span class="p">(</span><span class="n">ambient_level</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetAmbientColor</span><span class="p">(</span><span class="n">ambient_color</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetDiffuse</span><span class="p">(</span><span class="n">diffuse_level</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetDiffuseColor</span><span class="p">(</span><span class="n">diffuse_color</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecular</span><span class="p">(</span><span class="n">specular_level</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecularColor</span><span class="p">(</span><span class="n">specular_color</span><span class="p">)</span>
-        <span class="n">prop</span><span class="o">.</span><span class="n">SetSpecularPower</span><span class="p">(</span><span class="n">specular_power</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;Actor does not have the attribute property. This &quot;</span>
-            <span class="s2">&quot;material will not be applied.&quot;</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_mesh_material</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">&quot;phong&quot;</span><span class="p">,</span>
+    <span class="n">enable_picking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;vertex&quot;</span><span class="p">,</span>
+    <span class="n">flat_shading</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">texture</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">wireframe</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">wireframe_thickness</span><span class="o">=-</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a mesh material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    material : str, optional</span>
+<span class="sd">        The type of material to create. Options are &#39;phong&#39; (default) and</span>
+<span class="sd">        &#39;basic&#39;.</span>
+<span class="sd">    enable_picking : bool, optional</span>
+<span class="sd">        Whether the material should be pickable in a scene.</span>
+<span class="sd">    color : tuple or None, optional</span>
+<span class="sd">        The color of the material, represented as an RGB or RGBA tuple. If None,</span>
+<span class="sd">        the default color is used.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        The opacity of the material, from 0 (transparent) to 1 (opaque).</span>
+<span class="sd">        If RGBA is provided, the final alpha will be:</span>
+<span class="sd">        final_alpha = alpha_in_RGBA * opacity.</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        The color mode of the material. Options are &#39;auto&#39; and &#39;vertex&#39;.</span>
+<span class="sd">    flat_shading : bool, optional</span>
+<span class="sd">        Whether to use flat shading (True) or smooth shading (False).</span>
+<span class="sd">    texture : Texture or TextureMap, optional</span>
+<span class="sd">        The texture map specifying the color for each texture coordinate.</span>
+<span class="sd">    wireframe : bool, optional</span>
+<span class="sd">        Whether to render the mesh as a wireframe.</span>
+<span class="sd">    wireframe_thickness : float, optional</span>
+<span class="sd">        The thickness of the wireframe lines.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    MeshMaterial</span>
+<span class="sd">        A mesh material object of the specified type with the given properties.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If an unsupported material type is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">validate_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pick_write&quot;</span><span class="p">:</span> <span class="n">enable_picking</span><span class="p">,</span>
+        <span class="s2">&quot;color_mode&quot;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+        <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="n">opacity</span><span class="p">,</span>
+        <span class="s2">&quot;flat_shading&quot;</span><span class="p">:</span> <span class="n">flat_shading</span><span class="p">,</span>
+        <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="n">texture</span><span class="p">,</span>
+        <span class="s2">&quot;wireframe&quot;</span><span class="p">:</span> <span class="n">wireframe</span><span class="p">,</span>
+        <span class="s2">&quot;wireframe_thickness&quot;</span><span class="p">:</span> <span class="n">wireframe_thickness</span><span class="p">,</span>
+        <span class="s2">&quot;alpha_mode&quot;</span><span class="p">:</span> <span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="s2">&quot;depth_write&quot;</span><span class="p">:</span> <span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;phong&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MeshPhongMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MeshBasicMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported material type: </span><span class="si">{</span><span class="n">material</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_line_material</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span>
+    <span class="n">enable_picking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+    <span class="n">thickness</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">thickness_space</span><span class="o">=</span><span class="s2">&quot;screen&quot;</span><span class="p">,</span>
+    <span class="n">dash_pattern</span><span class="o">=</span><span class="p">(),</span>
+    <span class="n">dash_offset</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a line material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    material : str, optional</span>
+<span class="sd">        The type of line material to create. Options are &#39;line&#39; (default),</span>
+<span class="sd">        &#39;segment&#39;, &#39;arrow&#39;, &#39;thin&#39;, and &#39;thin_segment&#39;.</span>
+<span class="sd">    enable_picking : bool, optional</span>
+<span class="sd">        Whether the material should be pickable in a scene.</span>
+<span class="sd">    color : tuple or None, optional</span>
+<span class="sd">        The color of the material, represented as an RGBA tuple. If None, the</span>
+<span class="sd">        default color is used.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        The opacity of the material, from 0 (transparent) to 1 (opaque).</span>
+<span class="sd">        If RGBA is provided, the final alpha will be:</span>
+<span class="sd">        final_alpha = alpha_in_RGBA * opacity.</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        The color mode of the material. Options are &#39;auto&#39; and &#39;vertex&#39;.</span>
+<span class="sd">    thickness : float, optional</span>
+<span class="sd">        The line thickness expressed in logical pixels.</span>
+<span class="sd">    thickness_space : str, optional</span>
+<span class="sd">        The coordinate space in which the thickness is</span>
+<span class="sd">        expressed (&#39;screen&#39;, &#39;world&#39;, &#39;model&#39;).</span>
+<span class="sd">    dash_pattern : tuple, optional</span>
+<span class="sd">        The pattern of the dash, e.g., [2, 3].</span>
+<span class="sd">        meaning no dashing.</span>
+<span class="sd">    dash_offset : float, optional</span>
+<span class="sd">        The offset into the dash cycle to start drawing at.</span>
+<span class="sd">    anti_aliasing : bool, optional</span>
+<span class="sd">        Whether or not the line is anti-aliased in the shader.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    LineMaterial</span>
+<span class="sd">        A line material object of the specified type with the given properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">validate_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pick_write&quot;</span><span class="p">:</span> <span class="n">enable_picking</span><span class="p">,</span>
+        <span class="s2">&quot;color_mode&quot;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+        <span class="s2">&quot;thickness&quot;</span><span class="p">:</span> <span class="n">thickness</span><span class="p">,</span>
+        <span class="s2">&quot;thickness_space&quot;</span><span class="p">:</span> <span class="n">thickness_space</span><span class="p">,</span>
+        <span class="s2">&quot;dash_pattern&quot;</span><span class="p">:</span> <span class="n">dash_pattern</span><span class="p">,</span>
+        <span class="s2">&quot;dash_offset&quot;</span><span class="p">:</span> <span class="n">dash_offset</span><span class="p">,</span>
+        <span class="s2">&quot;aa&quot;</span><span class="p">:</span> <span class="n">anti_aliasing</span><span class="p">,</span>
+        <span class="s2">&quot;alpha_mode&quot;</span><span class="p">:</span> <span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="s2">&quot;depth_write&quot;</span><span class="p">:</span> <span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LineMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;segment&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LineSegmentMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;arrow&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LineArrowMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;thin&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LineThinMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;thin_segment&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">LineThinSegmentMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported material type: </span><span class="si">{</span><span class="n">material</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_vector_field_material</span><span class="p">(</span>
+    <span class="n">cross_section</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">visibility</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">&quot;thin_line&quot;</span><span class="p">,</span>
+    <span class="n">enable_picking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">thickness</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">thickness_space</span><span class="o">=</span><span class="s2">&quot;screen&quot;</span><span class="p">,</span>
+    <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a line material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cross_section : list or tuple, shape (3,), optional</span>
+<span class="sd">        A list or tuple representing the cross section dimensions.</span>
+<span class="sd">        If None, the cross section will be ignored and complete field will be shown.</span>
+<span class="sd">    visibility : list or tuple, shape (3,), optional</span>
+<span class="sd">        A list or tuple representing the visibility in the x, y, and z dimensions.</span>
+<span class="sd">        If None, the visibility will be set to (-1, -1, -1) to show the complete field.</span>
+<span class="sd">    material : str, optional</span>
+<span class="sd">        The type of vector field material to create. Options are &#39;thin_line&#39; (default),</span>
+<span class="sd">        &#39;line&#39;, &#39;arrow&#39;.</span>
+<span class="sd">    enable_picking : bool, optional</span>
+<span class="sd">        Whether the material should be pickable in a scene.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        The opacity of the material, from 0 (transparent) to 1 (opaque).</span>
+<span class="sd">        If RGBA is provided, the final alpha will be:</span>
+<span class="sd">        final_alpha = alpha_in_RGBA * opacity.</span>
+<span class="sd">    thickness : float, optional</span>
+<span class="sd">        The line thickness expressed in logical pixels.</span>
+<span class="sd">    thickness_space : str, optional</span>
+<span class="sd">        The coordinate space in which the thickness is</span>
+<span class="sd">        expressed (&#39;screen&#39;, &#39;world&#39;, &#39;model&#39;).</span>
+<span class="sd">    anti_aliasing : bool, optional</span>
+<span class="sd">        Whether or not the line is anti-aliased in the shader.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    LineMaterial</span>
+<span class="sd">        A line material object of the specified type with the given properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;pick_write&quot;</span><span class="p">:</span> <span class="n">enable_picking</span><span class="p">,</span>
+        <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="n">opacity</span><span class="p">,</span>
+        <span class="s2">&quot;thickness&quot;</span><span class="p">:</span> <span class="n">thickness</span><span class="p">,</span>
+        <span class="s2">&quot;thickness_space&quot;</span><span class="p">:</span> <span class="n">thickness_space</span><span class="p">,</span>
+        <span class="s2">&quot;aa&quot;</span><span class="p">:</span> <span class="n">anti_aliasing</span><span class="p">,</span>
+        <span class="s2">&quot;alpha_mode&quot;</span><span class="p">:</span> <span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="s2">&quot;depth_write&quot;</span><span class="p">:</span> <span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;thin_line&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">VectorFieldThinLineMaterial</span><span class="p">(</span><span class="n">cross_section</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="n">visibility</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;line&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">VectorFieldLineMaterial</span><span class="p">(</span><span class="n">cross_section</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="n">visibility</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;arrow&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">VectorFieldArrowMaterial</span><span class="p">(</span><span class="n">cross_section</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="n">visibility</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported material type: </span><span class="si">{</span><span class="n">material</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_points_material</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">&quot;basic&quot;</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="n">size</span><span class="o">=</span><span class="mf">4.0</span><span class="p">,</span>
+    <span class="nb">map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">aa</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;circle&quot;</span><span class="p">,</span>
+    <span class="n">edge_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+    <span class="n">edge_width</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;vertex&quot;</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">enable_picking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a points material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    material : str, optional</span>
+<span class="sd">        The type of material to create. Options are &#39;basic&#39; (default),</span>
+<span class="sd">        &#39;gaussian&#39;, and &#39;marker&#39;.</span>
+<span class="sd">    color : tuple, optional</span>
+<span class="sd">        RGB or RGBA values in the range [0, 1].</span>
+<span class="sd">    size : float, optional</span>
+<span class="sd">        The size (diameter) of the points in logical pixels.</span>
+<span class="sd">    map : TextureMap or Texture, optional</span>
+<span class="sd">        The texture map specifying the color for each texture coordinate.</span>
+<span class="sd">    aa : bool, optional</span>
+<span class="sd">        Whether or not the points are anti-aliased in the shader.</span>
+<span class="sd">    marker : str or MarkerShape, optional</span>
+<span class="sd">        The shape of the marker.</span>
+<span class="sd">        Options are &quot;●&quot;: &quot;circle&quot;, &quot;+&quot;: &quot;plus&quot;, &quot;x&quot;: &quot;cross&quot;, &quot;♥&quot;: &quot;heart&quot;,</span>
+<span class="sd">        &quot;✳&quot;: &quot;asterix&quot;.</span>
+<span class="sd">    edge_color : str or tuple or Color, optional</span>
+<span class="sd">        The color of line marking the edge of the markers.</span>
+<span class="sd">    edge_width : float, optional</span>
+<span class="sd">        The width of the edge of the markers.</span>
+<span class="sd">    mode : str, optional</span>
+<span class="sd">        The color mode of the material. Options are &#39;auto&#39; and &#39;vertex&#39;.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        The opacity of the material, from 0 (transparent) to 1 (opaque).</span>
+<span class="sd">        If RGBA is provided, the final alpha will be:</span>
+<span class="sd">        final_alpha = alpha_in_RGBA * opacity.</span>
+<span class="sd">    enable_picking : bool, optional</span>
+<span class="sd">        Whether the material should be pickable in a scene.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    PointsMaterial</span>
+<span class="sd">        A point material object of the specified type with the given properties.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If an unsupported material type is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">validate_color</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+
+    <span class="n">args</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+        <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="n">size</span><span class="p">,</span>
+        <span class="s2">&quot;color_mode&quot;</span><span class="p">:</span> <span class="n">mode</span><span class="p">,</span>
+        <span class="s2">&quot;map&quot;</span><span class="p">:</span> <span class="nb">map</span><span class="p">,</span>
+        <span class="s2">&quot;aa&quot;</span><span class="p">:</span> <span class="n">aa</span><span class="p">,</span>
+        <span class="s2">&quot;pick_write&quot;</span><span class="p">:</span> <span class="n">enable_picking</span><span class="p">,</span>
+        <span class="s2">&quot;opacity&quot;</span><span class="p">:</span> <span class="n">opacity</span><span class="p">,</span>
+        <span class="s2">&quot;alpha_mode&quot;</span><span class="p">:</span> <span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="s2">&quot;depth_write&quot;</span><span class="p">:</span> <span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;basic&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PointsMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PointsGaussianBlobMaterial</span><span class="p">(</span><span class="o">**</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">material</span> <span class="o">==</span> <span class="s2">&quot;marker&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">PointsMarkerMaterial</span><span class="p">(</span>
+            <span class="n">marker</span><span class="o">=</span><span class="n">marker</span><span class="p">,</span> <span class="n">edge_color</span><span class="o">=</span><span class="n">edge_color</span><span class="p">,</span> <span class="n">edge_width</span><span class="o">=</span><span class="n">edge_width</span><span class="p">,</span> <span class="o">**</span><span class="n">args</span>
         <span class="p">)</span>
-        <span class="k">return</span></div>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported material type: </span><span class="si">{</span><span class="n">material</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_text_material</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">outline_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="n">outline_thickness</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">weight_offset</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a text material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    color : tuple, optional</span>
+<span class="sd">        The color of the text as RGB or RGBA tuple.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        The opacity of the material, from 0 (transparent) to 1 (opaque).</span>
+<span class="sd">        If RGBA is provided, the final alpha will be:</span>
+<span class="sd">        final_alpha = alpha_in_RGBA * opacity.</span>
+<span class="sd">    outline_color : tuple, optional</span>
+<span class="sd">        The color of the outline of the text as RGB or RGBA tuple.</span>
+<span class="sd">    outline_thickness : float, optional</span>
+<span class="sd">        A value indicating the relative width of the outline. Valid values are</span>
+<span class="sd">        between 0.0 and 0.5.</span>
+<span class="sd">    weight_offset : float, optional</span>
+<span class="sd">        A value representing an offset to the font weight. Font weights are in</span>
+<span class="sd">        the range 100-900, so this value should be in the same order of</span>
+<span class="sd">        magnitude. Can be negative to make text thinner.</span>
+<span class="sd">    aliasing : bool, optional</span>
+<span class="sd">        If True, use anti-aliasing while rendering glyphs. Aliasing gives</span>
+<span class="sd">        prettier results, but may affect performance for very large texts.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    TextMaterial</span>
+<span class="sd">        A text material object with the specified properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">,</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">color</span><span class="p">[:</span><span class="mi">3</span><span class="p">],</span> <span class="n">color</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="n">opacity</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Color must be a tuple of length 3 or 4.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">TextMaterial</span><span class="p">(</span>
+        <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+        <span class="n">outline_color</span><span class="o">=</span><span class="n">outline_color</span><span class="p">,</span>
+        <span class="n">outline_thickness</span><span class="o">=</span><span class="n">outline_thickness</span><span class="p">,</span>
+        <span class="n">weight_offset</span><span class="o">=</span><span class="n">weight_offset</span><span class="p">,</span>
+        <span class="n">aa</span><span class="o">=</span><span class="n">aliasing</span><span class="p">,</span>
+        <span class="n">alpha_mode</span><span class="o">=</span><span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="n">depth_write</span><span class="o">=</span><span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_create_image_material</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">clim</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="nb">map</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">interpolation</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">,</span>
+    <span class="n">alpha_mode</span><span class="o">=</span><span class="s2">&quot;blend&quot;</span><span class="p">,</span>
+    <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rasterized image material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    clim : tuple, optional</span>
+<span class="sd">        The contrast limits to scale the data values with.</span>
+<span class="sd">    map : Texture or TextureMap, optional</span>
+<span class="sd">        The texture map to turn the image values into its final color.</span>
+<span class="sd">    gamma : float, optional</span>
+<span class="sd">        The gamma correction to apply to the image data.</span>
+<span class="sd">        Must be greater than 0.0.</span>
+<span class="sd">    interpolation : str, optional</span>
+<span class="sd">        The method to interpolate the image data.</span>
+<span class="sd">        Either &#39;nearest&#39; or &#39;linear&#39;.</span>
+<span class="sd">    alpha_mode : str, optional</span>
+<span class="sd">        The alpha mode for the material. Please see the below link for details:</span>
+<span class="sd">        https://docs.pygfx.org/stable/_autosummary/materials/pygfx.materials.Material.html#pygfx.materials.Material.alpha_mode.</span>
+<span class="sd">    depth_write : bool, optional</span>
+<span class="sd">        Whether to write depth information for the material.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ImageMaterial</span>
+<span class="sd">        A rasterized image material object with the specified properties.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">ImageBasicMaterial</span><span class="p">(</span>
+        <span class="n">clim</span><span class="o">=</span><span class="n">clim</span><span class="p">,</span>
+        <span class="nb">map</span><span class="o">=</span><span class="nb">map</span><span class="p">,</span>
+        <span class="n">gamma</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span>
+        <span class="n">interpolation</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span>
+        <span class="n">alpha_mode</span><span class="o">=</span><span class="n">alpha_mode</span><span class="p">,</span>
+        <span class="n">depth_write</span><span class="o">=</span><span class="n">depth_write</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="VectorFieldThinLineMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.VectorFieldThinLineMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VectorFieldThinLineMaterial</span><span class="p">(</span><span class="n">LineMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Material for VectorFieldActor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cross_section : {list, tuple, ndarray}</span>
+<span class="sd">        A list or tuple  or ndarray representing the cross section dimensions.</span>
+<span class="sd">    visibility : {list, tuple, ndarray}, optional</span>
+<span class="sd">        A list or tuple  or ndarray representing the visibility in the 3D.</span>
+<span class="sd">        If None, the visibility will be set to (-1, -1, -1) to show the complete field.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uniform_type</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">LineThinSegmentMaterial</span><span class="o">.</span><span class="n">uniform_type</span><span class="p">,</span>
+        <span class="n">cross_section</span><span class="o">=</span><span class="s2">&quot;4xf4&quot;</span><span class="p">,</span>  <span class="c1"># vec4&lt;i32&gt;</span>
+        <span class="n">visibility</span><span class="o">=</span><span class="s2">&quot;4xi4&quot;</span><span class="p">,</span>  <span class="c1"># vec4&lt;i32&gt;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="VectorFieldThinLineMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.VectorFieldThinLineMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cross_section</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">visibility</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the VectorFieldMaterial.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cross_section : {list, tuple, ndarray}</span>
+<span class="sd">            A list or tuple  or ndarray representing the cross section dimensions.</span>
+<span class="sd">        visibility : {list, tuple, ndarray}, optional</span>
+<span class="sd">            A list or tuple  or ndarray representing the visibility in the 3D.</span>
+<span class="sd">            If None, the visibility will be set to (-1, -1, -1) to show the complete</span>
+<span class="sd">            field.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">color_mode</span><span class="o">=</span><span class="s2">&quot;vertex&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cross_section</span> <span class="o">=</span> <span class="n">cross_section</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visibility</span> <span class="o">=</span> <span class="n">visibility</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the visibility of the vector field in each dimension.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list representing the visibility in the x, y, and z dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;visibility&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">vis</span> <span class="o">==</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">bool</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">vis</span><span class="p">]</span>
+
+    <span class="nd">@visibility</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visibility</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the visibility of the vector field in each dimension.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        visibility : list or tuple</span>
+<span class="sd">            A list or tuple representing the visibility in the x, y, and z dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">visibility</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;visibility&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">visibility</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;visibility must have exactly 3 dimensions.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;item&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span> <span class="nb">bool</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">visibility</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;visibility must contain only booleans.&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;visibility&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+                <span class="p">[</span><span class="o">*</span><span class="n">visibility</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cross_section</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the cross section of the vector field.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list representing the cross section dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cross_section&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="nd">@cross_section</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cross_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cross_section</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the cross section of the vector field.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        cross_section : list or tuple</span>
+<span class="sd">            A list or tuple representing the cross section dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cross_section</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;cross_section must have exactly 3 dimensions.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;cross_section&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">cross_section</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="VectorFieldLineMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.VectorFieldLineMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VectorFieldLineMaterial</span><span class="p">(</span><span class="n">VectorFieldThinLineMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Material for VectorFieldActor.</span>
+
+<span class="sd">    This class provides a way to distinguish the usage of right shader for</span>
+<span class="sd">    creating a vector field.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="VectorFieldArrowMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.VectorFieldArrowMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">VectorFieldArrowMaterial</span><span class="p">(</span><span class="n">VectorFieldThinLineMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Material for VectorFieldActor.</span>
+
+<span class="sd">    This class provides a way to distinguish the usage of right shader for</span>
+<span class="sd">    creating a vector field.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SphGlyphMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.SphGlyphMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SphGlyphMaterial</span><span class="p">(</span><span class="n">MeshPhongMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Spherical Glyph Material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_coeffs : int, optional</span>
+<span class="sd">        The maximum spherical harmonic degree.</span>
+<span class="sd">    scale : int, optional</span>
+<span class="sd">        The scale factor.</span>
+<span class="sd">    shininess : int, optional</span>
+<span class="sd">        The shininess factor.</span>
+<span class="sd">    emissive : str, optional</span>
+<span class="sd">        The emissive color.</span>
+<span class="sd">    specular : str, optional</span>
+<span class="sd">        The specular color.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uniform_type</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">MeshPhongMaterial</span><span class="o">.</span><span class="n">uniform_type</span><span class="p">,</span>
+        <span class="n">n_coeffs</span><span class="o">=</span><span class="s2">&quot;i4&quot;</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;f4&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="SphGlyphMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.SphGlyphMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">n_coeffs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">shininess</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+        <span class="n">emissive</span><span class="o">=</span><span class="s2">&quot;#000&quot;</span><span class="p">,</span>
+        <span class="n">specular</span><span class="o">=</span><span class="s2">&quot;#494949&quot;</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Spherical Glyph Material.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n_coeffs : int, optional</span>
+<span class="sd">            The maximum spherical harmonic degree. This value will limit the number of</span>
+<span class="sd">            spherical harmonic coefficients that can be used from the data.</span>
+<span class="sd">            If -1, no limit is applied.</span>
+<span class="sd">        scale : int, optional</span>
+<span class="sd">            The scale factor.</span>
+<span class="sd">        shininess : int, optional</span>
+<span class="sd">            The shininess factor.</span>
+<span class="sd">        emissive : str, optional</span>
+<span class="sd">            The emissive color.</span>
+<span class="sd">        specular : str, optional</span>
+<span class="sd">            The specular color.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">shininess</span><span class="p">,</span> <span class="n">emissive</span><span class="p">,</span> <span class="n">specular</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_coeffs</span> <span class="o">=</span> <span class="n">n_coeffs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the maximum number of spherical harmonic coefficients.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            The maximum number of spherical harmonic coefficients.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_coeffs&quot;</span><span class="p">]</span>
+
+    <span class="nd">@n_coeffs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">n_coeffs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the maximum number of spherical harmonic coefficients.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : int</span>
+<span class="sd">            The maximum number of spherical harmonic coefficients.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;n_coeffs must be an integer.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_coeffs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the scale factor.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The scale factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span>
+
+    <span class="nd">@scale</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the scale factor.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            The scale factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;scale must be a number.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="StreamlinesMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.StreamlinesMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StreamlinesMaterial</span><span class="p">(</span><span class="n">LineMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the Streamlines Material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    outline_thickness : float, optional</span>
+<span class="sd">        The thickness of the outline.</span>
+<span class="sd">    outline_color : tuple, optional</span>
+<span class="sd">        The color of the outline as an RGBA tuple.</span>
+<span class="sd">    roi_enabled : bool, optional</span>
+<span class="sd">        Whether ROI culling is active. This is typically driven by the presence</span>
+<span class="sd">        of an ROI mask on the actor.</span>
+<span class="sd">    roi_dim : tuple, optional</span>
+<span class="sd">        3D integer dimensions (nx, ny, nz) of a mask grid when a volumetric</span>
+<span class="sd">        ROI is used in the shader.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Additional keyword arguments for the material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uniform_type</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">LineMaterial</span><span class="o">.</span><span class="n">uniform_type</span><span class="p">,</span>
+        <span class="n">outline_thickness</span><span class="o">=</span><span class="s2">&quot;f4&quot;</span><span class="p">,</span>
+        <span class="n">outline_color</span><span class="o">=</span><span class="s2">&quot;4xf4&quot;</span><span class="p">,</span>
+        <span class="n">roi_enabled</span><span class="o">=</span><span class="s2">&quot;i4&quot;</span><span class="p">,</span>
+        <span class="n">roi_dim</span><span class="o">=</span><span class="s2">&quot;4xi4&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="StreamlinesMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.StreamlinesMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">outline_thickness</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">outline_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">roi_enabled</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">roi_dim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Streamline Material.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        outline_thickness : float, optional</span>
+<span class="sd">            The thickness of the outline.</span>
+<span class="sd">        outline_color : tuple, optional</span>
+<span class="sd">            The color of the outline as an RGBA tuple.</span>
+<span class="sd">        roi_enabled : bool, optional</span>
+<span class="sd">            Whether ROI culling is active. If None, ROI culling defaults to</span>
+<span class="sd">            False until an ROI mask is attached by the actor.</span>
+<span class="sd">        roi_dim : tuple, optional</span>
+<span class="sd">            3D integer dimensions (nx, ny, nz) of a mask grid when a volumetric</span>
+<span class="sd">            ROI is used in the shader.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline_thickness</span> <span class="o">=</span> <span class="n">outline_thickness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">outline_color</span> <span class="o">=</span> <span class="n">outline_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_dim</span> <span class="o">=</span> <span class="n">roi_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_enabled</span> <span class="o">=</span> <span class="n">roi_enabled</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outline_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the outline thickness.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The thickness of the outline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;outline_thickness&quot;</span><span class="p">])</span>
+
+    <span class="nd">@outline_thickness</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outline_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the outline thickness.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            The thickness of the outline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;outline_thickness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outline_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the outline color.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            The color of the outline as an RGBA tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;outline_color&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+
+    <span class="nd">@outline_color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">outline_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the outline color.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : tuple</span>
+<span class="sd">            The color of the outline as an RGB or RGBA tuple.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;outline_color&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">roi_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True when ROI-based culling is active.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if ROI-based culling is enabled, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;roi_enabled&quot;</span><span class="p">])</span>
+
+    <span class="nd">@roi_enabled</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">roi_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable/disable ROI-based culling.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : bool</span>
+<span class="sd">            True to enable ROI-based culling, False to disable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;roi_enabled&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">roi_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;ROI grid dimensions as (nx, ny, nz).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            A tuple of three integers representing the ROI grid dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;roi_dim&quot;</span><span class="p">][:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="nd">@roi_dim</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">roi_dim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the ROI grid dimensions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : tuple</span>
+<span class="sd">            A tuple of three integers representing the ROI grid dimensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;roi_dim must contain exactly three integers.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;roi_dim&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_StreamlineBakedMaterial</span><span class="p">(</span><span class="n">StreamlinesMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the internal baked streamline material.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    auto_detach : bool, optional</span>
+<span class="sd">        If True, automatically switch to render-only material after baking.</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Additional keyword arguments for the material.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">auto_detach</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the internal baked streamline material.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        auto_detach : bool, optional</span>
+<span class="sd">            If True, automatically switch to render-only material after baking.</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments for the material.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_detach</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">auto_detach</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BillboardMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.BillboardMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BillboardMaterial</span><span class="p">(</span><span class="n">MeshBasicMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Billboard material for creating quads that always face the camera.</span>
+
+<span class="sd">    This material is designed to work with the BillboardShader to create</span>
+<span class="sd">    rectangles that automatically rotate to face the camera while maintaining</span>
+<span class="sd">    their 3D position.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    **kwargs : dict</span>
+<span class="sd">        Additional keyword arguments forwarded to</span>
+<span class="sd">        :class:`~fury.material.MeshBasicMaterial`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BillboardMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.BillboardMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the material and forward arguments to the base class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional keyword arguments forwarded to ``MeshBasicMaterial``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StreamtubeMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.StreamtubeMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StreamtubeMaterial</span><span class="p">(</span><span class="n">MeshPhongMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Material for GPU-generated streamtubes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Arguments forwarded to :class:`MeshPhongMaterial`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="StreamtubeMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.StreamtubeMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise the material with MeshPhongMaterial keyword arguments.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Arguments forwarded to :class:`MeshPhongMaterial`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_StreamtubeBakedMaterial</span><span class="p">(</span><span class="n">MeshPhongMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Internal material for compute-shader-based streamtubes with auto-baking.</span>
+
+<span class="sd">    This material is used internally by the streamtube actor when GPU compute</span>
+<span class="sd">    shaders are available. Users should not instantiate this directly; instead</span>
+<span class="sd">    use the ``streamtube()`` function which will automatically select the</span>
+<span class="sd">    appropriate implementation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    radius : float, optional</span>
+<span class="sd">        Tube radius used by the compute shader.</span>
+<span class="sd">    segments : int, optional</span>
+<span class="sd">        Number of radial segments forming the tube.</span>
+<span class="sd">    end_caps : bool, optional</span>
+<span class="sd">        Whether flat caps are generated for each tube.</span>
+<span class="sd">    auto_detach : bool, optional</span>
+<span class="sd">        If True, automatically switch to render-only material after baking.</span>
+<span class="sd">    **kwargs : dict, optional</span>
+<span class="sd">        Additional arguments forwarded to :class:`MeshPhongMaterial`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This is an internal class marked with a leading underscore. It should not</span>
+<span class="sd">    be used directly by end users.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">uniform_type</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">MeshPhongMaterial</span><span class="o">.</span><span class="n">uniform_type</span><span class="p">,</span>
+        <span class="n">tube_radius</span><span class="o">=</span><span class="s2">&quot;f4&quot;</span><span class="p">,</span>
+        <span class="n">tube_segments</span><span class="o">=</span><span class="s2">&quot;u4&quot;</span><span class="p">,</span>
+        <span class="n">tube_end_caps</span><span class="o">=</span><span class="s2">&quot;i4&quot;</span><span class="p">,</span>
+        <span class="n">line_count</span><span class="o">=</span><span class="s2">&quot;u4&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">radius</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+        <span class="n">segments</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">end_caps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">auto_detach</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialise uniforms controlling the compute-driven streamtube.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        radius : float, optional</span>
+<span class="sd">            Tube radius used by the compute shader.</span>
+<span class="sd">        segments : int, optional</span>
+<span class="sd">            Number of radial segments forming the tube.</span>
+<span class="sd">        end_caps : bool, optional</span>
+<span class="sd">            Whether flat caps are generated for each tube.</span>
+<span class="sd">        auto_detach : bool, optional</span>
+<span class="sd">            If True, automatically switch to render-only material after baking.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional arguments forwarded to :class:`MeshPhongMaterial`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="n">radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segments</span> <span class="o">=</span> <span class="n">segments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_caps</span> <span class="o">=</span> <span class="n">end_caps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auto_detach</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">auto_detach</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the tube radius used by the compute shader.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Current tube radius.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_radius&quot;</span><span class="p">])</span>
+
+    <span class="nd">@radius</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">radius</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the tube radius used in the compute shader.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            New tube radius value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_radius&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of radial segments per tube.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of radial segments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_segments&quot;</span><span class="p">])</span>
+
+    <span class="nd">@segments</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the number of radial segments per tube.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : int</span>
+<span class="sd">            New segment count.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_segments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_caps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check whether end caps are rendered.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            ``True`` when end caps are enabled.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_end_caps&quot;</span><span class="p">])</span>
+
+    <span class="nd">@end_caps</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_caps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enable or disable end caps on the tubes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : bool</span>
+<span class="sd">            Flag indicating whether to render end caps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;tube_end_caps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">line_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the number of lines processed by the compute shader.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of lines passed to the GPU compute stage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;line_count&quot;</span><span class="p">])</span>
+
+    <span class="nd">@line_count</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">line_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the number of lines handled by the compute shader.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : int</span>
+<span class="sd">            Number of lines to process.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;line_count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uniform_buffer</span><span class="o">.</span><span class="n">update_full</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_compute_shader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_count</span><span class="p">,</span> <span class="n">max_line_length</span><span class="p">,</span> <span class="n">tube_segments</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record metadata used by the GPU compute pass.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        line_count : int</span>
+<span class="sd">            Total number of lines to process.</span>
+<span class="sd">        max_line_length : int</span>
+<span class="sd">            Maximum length of any line in the batch.</span>
+<span class="sd">        tube_segments : int</span>
+<span class="sd">            Number of radial tube segments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_count</span> <span class="o">=</span> <span class="n">line_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">segments</span> <span class="o">=</span> <span class="n">tube_segments</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_line_length</span> <span class="o">=</span> <span class="n">max_line_length</span>
+
+
+<div class="viewcode-block" id="BillboardSphereMaterial">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.BillboardSphereMaterial">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BillboardSphereMaterial</span><span class="p">(</span><span class="n">MeshPhongMaterial</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Phong-lit material for billboard-based impostor spheres.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    **material_kwargs : dict</span>
+<span class="sd">        Keyword arguments propagated to</span>
+<span class="sd">        :class:`~fury.material.MeshPhongMaterial`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="BillboardSphereMaterial.__init__">
+<a class="viewcode-back" href="../../reference/fury.material.html#fury.material.BillboardSphereMaterial.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">material_kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the sphere impostor material.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **material_kwargs : dict</span>
+<span class="sd">            Keyword arguments propagated to</span>
+<span class="sd">            :class:`~fury.material.MeshPhongMaterial`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">material_kwargs</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;flat_shading&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">material_kwargs</span><span class="p">)</span></div>
+</div>
 
 </pre></div>
 <div class="section ablog__blog_comments">
@@ -1180,7 +1723,7 @@ document.write(`
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2026, FURY. All rights reserved.</div>
     </div>
 </div></div>
       

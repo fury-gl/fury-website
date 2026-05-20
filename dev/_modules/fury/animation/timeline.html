@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.timeline &#8212; FURY 0.13.0.dev16+g792f89c8f documentation</title>
+    <title>fury.animation.timeline &#8212; FURY 2.1.0.dev40+g9c69c7757 documentation</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom_github.css?v=b0433979" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -43,11 +43,12 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=7d417c42"></script>
+    <script src="../../../_static/documentation_options.js?v=34ffda04"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/fury/animation/timeline';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
@@ -368,7 +369,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <h1>Source code for fury.animation.timeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span></span><span class="sd">&quot;&quot;&quot;Timeline class for keyframe animation.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">perf_counter</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
@@ -377,8 +380,12 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury</span><span class="w"> </span><span class="kn">import</span> <span class="n">window</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">RenderWindow</span><span class="p">,</span> <span class="n">WindowToImageFilter</span><span class="p">,</span> <span class="n">numpy_support</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.elements</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlaybackPanel</span>
+
+<span class="c1"># from fury.lib import RenderWindow, WindowToImageFilter, numpy_support</span>
+<span class="c1"># from fury.ui.elements import PlaybackPanel</span>
+
+<span class="n">RenderWindow</span><span class="p">,</span> <span class="n">WindowToImageFilter</span><span class="p">,</span> <span class="n">numpy_support</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+<span class="n">PlaybackPanel</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="Timeline">
@@ -387,29 +394,71 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Keyframe animation Timeline.</span>
 
 <span class="sd">    Timeline is responsible for handling the playback of keyframes animations.</span>
-<span class="sd">    It has multiple playback options which makes it easy</span>
-<span class="sd">    to control the playback, speed, state of the animation with/without a GUI</span>
-<span class="sd">    playback panel.</span>
+<span class="sd">    It has multiple playback options which makes it easy to control the playback,</span>
+<span class="sd">    speed, state of the animation with/without a GUI playback panel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    animations : Animation or list[Animation], optional</span>
+<span class="sd">        Actor/s to be animated directly by the Timeline (main Animation).</span>
+<span class="sd">        Default is None.</span>
+<span class="sd">    playback_panel : bool, optional</span>
+<span class="sd">        If True, the timeline will have a playback panel set, which can be used</span>
+<span class="sd">        to control the playback of the timeline. Default is False.</span>
+<span class="sd">    loop : bool, optional</span>
+<span class="sd">        Whether to loop playing the timeline or play once. Default is True.</span>
+<span class="sd">    length : float or int, optional</span>
+<span class="sd">        The fixed length of the timeline. If set to None, the timeline will get</span>
+<span class="sd">        its length from the animations that it controls automatically.</span>
+<span class="sd">        Default is None.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    animations : Animation or list[Animation], optional, default: None</span>
-<span class="sd">        Actor/s to be animated directly by the Timeline (main Animation).</span>
-<span class="sd">    playback_panel : bool, optional</span>
-<span class="sd">        If True, the timeline will have a playback panel set, which can be used</span>
-<span class="sd">        to control the playback of the timeline.</span>
-<span class="sd">    length : float or int, default: None, optional</span>
-<span class="sd">        the fixed length of the timeline. If set to None, the timeline will get</span>
-<span class="sd">         its length from the animations that it controls automatically.</span>
-<span class="sd">    loop : bool, optional</span>
-<span class="sd">        Whether loop playing the timeline or play once.</span>
-
+<span class="sd">    playback_panel : PlaybackPanel or None</span>
+<span class="sd">        The panel used to control the playback of the timeline.</span>
+<span class="sd">    duration : float</span>
+<span class="sd">        The duration of the timeline in seconds.</span>
+<span class="sd">    current_timestamp : float</span>
+<span class="sd">        The current time position in the timeline.</span>
+<span class="sd">    speed : float</span>
+<span class="sd">        The playback speed multiplier.</span>
+<span class="sd">    playing : bool</span>
+<span class="sd">        Whether the timeline is currently playing.</span>
+<span class="sd">    stopped : bool</span>
+<span class="sd">        Whether the timeline is currently stopped.</span>
+<span class="sd">    paused : bool</span>
+<span class="sd">        Whether the timeline is currently paused.</span>
+<span class="sd">    loop : bool</span>
+<span class="sd">        Whether the timeline is set to loop or play once.</span>
+<span class="sd">    animations : list</span>
+<span class="sd">        List of animations controlled by the timeline.</span>
+<span class="sd">    has_playback_panel : bool</span>
+<span class="sd">        Whether the timeline has a playback panel.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="Timeline.__init__">
+<a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.__init__">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">animations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">playback_panel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span>
     <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Timeline.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        animations : Animation or list[Animation], optional</span>
+<span class="sd">            Actor/s to be animated directly by the Timeline (main Animation).</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        playback_panel : bool, optional</span>
+<span class="sd">            If True, the timeline will have a playback panel set, which can be used</span>
+<span class="sd">            to control the playback of the timeline. Default is False.</span>
+<span class="sd">        loop : bool, optional</span>
+<span class="sd">            Whether to loop playing the timeline or play once. Default is True.</span>
+<span class="sd">        length : float or int, optional</span>
+<span class="sd">            The fixed length of the timeline. If set to None, the timeline will get</span>
+<span class="sd">            its length from the animations that it controls automatically.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
@@ -438,18 +487,21 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">on_speed_changed</span> <span class="o">=</span> <span class="n">set_speed</span>
 
         <span class="k">if</span> <span class="n">animations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">animations</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">animations</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="Timeline.update_duration">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.update_duration">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update and return the duration of the Timeline.</span>
 
+<span class="sd">        Calculate the duration based on either a fixed length or the maximum</span>
+<span class="sd">        duration of all animations controlled by this Timeline.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
-<span class="sd">            The duration of the Timeline.</span>
-
+<span class="sd">            The duration of the Timeline in seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
@@ -469,15 +521,18 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
-<span class="sd">            The duration of the Timeline.</span>
-
+<span class="sd">            The duration of the Timeline in seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span>
 
 <div class="viewcode-block" id="Timeline.play">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.play">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Play the animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Play the animation.</span>
+
+<span class="sd">        Start playing the timeline from the current timestamp. If the current timestamp</span>
+<span class="sd">        is at the end of the timeline, it will reset to the beginning.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_timestamp</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
@@ -490,7 +545,10 @@ document.write(`
 <div class="viewcode-block" id="Timeline.pause">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.pause">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">pause</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pause the animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pause the animation.</span>
+
+<span class="sd">        Freeze the animation at its current timestamp.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_timestamp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_playing</span> <span class="o">=</span> <span class="kc">False</span></div>
 
@@ -498,7 +556,10 @@ document.write(`
 <div class="viewcode-block" id="Timeline.stop">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the animation.</span>
+
+<span class="sd">        Reset the timeline to the beginning and stop playback.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_playing</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -507,7 +568,10 @@ document.write(`
 <div class="viewcode-block" id="Timeline.restart">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.restart">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restart the animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restart the animation.</span>
+
+<span class="sd">        Reset the timeline to the beginning and start playing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_playing</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">force</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
@@ -520,8 +584,7 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
-<span class="sd">            The current time of the Timeline.</span>
-
+<span class="sd">            The current position in seconds of the Timeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="p">(</span>
@@ -535,9 +598,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            The time to set as current time of the Timeline.</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The time to set as current position of the Timeline in seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
 
@@ -548,9 +610,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            The time to seek.</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The time in seconds to seek to. Will be clamped between 0 and the</span>
+<span class="sd">            timeline duration.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># assuring timestamp value is in the timeline range</span>
         <span class="k">if</span> <span class="n">timestamp</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -567,13 +629,12 @@ document.write(`
 <div class="viewcode-block" id="Timeline.seek_percent">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.seek_percent">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">seek_percent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">percent</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek a percentage of the Timeline&#39;s final timestamp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Seek to a percentage of the Timeline&#39;s duration.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        percent: float</span>
-<span class="sd">            Value from 1 to 100.</span>
-
+<span class="sd">        percent : float</span>
+<span class="sd">            Percentage value from 0 to 100 of the timeline duration to seek to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">t</span> <span class="o">=</span> <span class="n">percent</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">/</span> <span class="mi">100</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
@@ -586,8 +647,7 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
-<span class="sd">            True if the Timeline is playing.</span>
-
+<span class="sd">            True if the Timeline is currently playing, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_playing</span>
 
@@ -598,8 +658,8 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
-<span class="sd">            True if Timeline is stopped.</span>
-
+<span class="sd">            True if the Timeline is stopped (not playing and at timestamp 0),</span>
+<span class="sd">            False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span>
 
@@ -610,8 +670,8 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
-<span class="sd">            True if the Timeline is paused.</span>
-
+<span class="sd">            True if the Timeline is paused (not playing but at a non-zero timestamp),</span>
+<span class="sd">            False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -622,8 +682,7 @@ document.write(`
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
-<span class="sd">            The speed of the timeline&#39;s playback.</span>
-
+<span class="sd">            The playback speed multiplier.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_speed</span>
 
@@ -633,9 +692,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        speed: float</span>
-<span class="sd">            The speed of the timeline&#39;s playback.</span>
-
+<span class="sd">        speed : float</span>
+<span class="sd">            The playback speed multiplier. Values greater than 1 speed up playback,</span>
+<span class="sd">            values between 0 and 1 slow it down. Values of 0 or less are ignored.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_timestamp</span>
         <span class="k">if</span> <span class="n">speed</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -646,14 +705,12 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get loop condition of the timeline.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the loop setting of the timeline.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
-<span class="sd">            Whether the playback is in loop mode (True) or play one mode</span>
-<span class="sd">            (False).</span>
-
+<span class="sd">            True if the timeline is set to loop playback, False if set to play once.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span>
 
@@ -663,21 +720,20 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        loop: bool</span>
-<span class="sd">            The loop condition to be set. (True) to loop the playback, and</span>
-<span class="sd">            (False) to play only once.</span>
-
+<span class="sd">        loop : bool</span>
+<span class="sd">            When True, playback will loop continuously.</span>
+<span class="sd">            When False, playback will stop at the end of the timeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">loop</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">has_playback_panel</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the `Timeline` has a playback panel.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return whether the Timeline has a playback panel.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        bool: &#39;True&#39; if the `Timeline` has a playback panel. otherwise, &#39;False&#39;</span>
-
+<span class="sd">        bool</span>
+<span class="sd">            True if the Timeline has a playback panel, False otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
@@ -696,41 +752,41 @@ document.write(`
         <span class="n">max_peels</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="n">show_panel</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the animation</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record the animation to a file or return frames.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fname : str, optional</span>
-<span class="sd">            The file name. Save a GIF file if name ends with &#39;.gif&#39;, or mp4</span>
-<span class="sd">            video if name ends with&#39;.mp4&#39;.</span>
-<span class="sd">            If None, this method will only return an array of frames.</span>
+<span class="sd">            The output filename. Creates a GIF if name ends with &#39;.gif&#39;, or an MP4</span>
+<span class="sd">            video if name ends with &#39;.mp4&#39;. If None, only returns the frames array.</span>
+<span class="sd">            Default is None.</span>
 <span class="sd">        fps : int, optional</span>
-<span class="sd">            The number of frames per second of the record.</span>
-<span class="sd">        size : (int, int)</span>
-<span class="sd">            ``(width, height)`` of the window. Default is (900, 768).</span>
-<span class="sd">        speed : float, optional, default 1.0</span>
-<span class="sd">            The speed of the animation.</span>
+<span class="sd">            The number of frames per second to record. Default is 30.</span>
+<span class="sd">        speed : float, optional</span>
+<span class="sd">            The playback speed multiplier for the recording. Default is 1.0.</span>
+<span class="sd">        size : tuple of int, optional</span>
+<span class="sd">            The dimensions of the recording as (width, height). Default is (900, 768).</span>
 <span class="sd">        order_transparent : bool, optional</span>
-<span class="sd">            Default False. Use depth peeling to sort transparent objects.</span>
-<span class="sd">            If True also enables anti-aliasing.</span>
+<span class="sd">            Whether to use depth peeling to sort transparent objects. If True,</span>
+<span class="sd">            also enables anti-aliasing. Default is True.</span>
 <span class="sd">        multi_samples : int, optional</span>
-<span class="sd">            Number of samples for anti-aliasing (Default 8).</span>
-<span class="sd">            For no anti-aliasing use 0.</span>
+<span class="sd">            Number of samples for anti-aliasing. Use 0 for no anti-aliasing.</span>
+<span class="sd">            Default is 8.</span>
 <span class="sd">        max_peels : int, optional</span>
-<span class="sd">            Maximum number of peels for depth peeling (Default 4).</span>
-<span class="sd">        show_panel : bool, optional, default False</span>
-<span class="sd">            Controls whether to show the playback (if True) panel of hide it</span>
-<span class="sd">            (if False)</span>
+<span class="sd">            Maximum number of peels for depth peeling. Default is 4.</span>
+<span class="sd">        show_panel : bool, optional</span>
+<span class="sd">            Controls whether to show the playback panel (if True) or hide it</span>
+<span class="sd">            (if False) in the recording. Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray:</span>
-<span class="sd">            The recorded frames.</span>
+<span class="sd">        list</span>
+<span class="sd">            List of frames as PIL Image objects.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        It&#39;s recommended to use 50 or 30 FPS while recording to a GIF file.</span>
-
+<span class="sd">        It&#39;s recommended to use 30 or 50 FPS when recording to a GIF file.</span>
+<span class="sd">        To save as MP4, OpenCV must be installed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
@@ -741,7 +797,7 @@ document.write(`
                 <span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
             <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-                    <span class="s2">&quot;OpenCV must be installed in order to &quot;</span> <span class="s2">&quot;save as MP4 video.&quot;</span>
+                    <span class="s2">&quot;OpenCV must be installed in order to save as MP4 video.&quot;</span>
                 <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">err</span>
             <span class="n">fourcc</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="o">.</span><span class="n">fourcc</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;mp4v&quot;</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">fourcc</span><span class="p">,</span> <span class="n">fps</span><span class="p">,</span> <span class="n">size</span><span class="p">)</span>
@@ -825,13 +881,18 @@ document.write(`
 <div class="viewcode-block" id="Timeline.add_animation">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.add_animation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Animation or list of Animations.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Animation or list of Animations to the Timeline.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        animation: Animation or list[Animation] or tuple[Animation]</span>
-<span class="sd">            Animation/s to be added.</span>
+<span class="sd">        animation : Animation or list[Animation] or tuple[Animation]</span>
+<span class="sd">            Animation object(s) to be added to this Timeline.</span>
 
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        TypeError</span>
+<span class="sd">            If the provided animation is not an Animation object or a collection</span>
+<span class="sd">            of Animation objects.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
             <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">anim</span><span class="p">)</span> <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="n">animation</span><span class="p">]</span>
@@ -845,13 +906,12 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">animations</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;list[Animation]&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a list of Animations.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all animations controlled by this Timeline.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list:</span>
-<span class="sd">            List of Animations controlled by the timeline.</span>
-
+<span class="sd">        list</span>
+<span class="sd">            List of Animation objects controlled by the timeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span>
 
@@ -859,17 +919,16 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.update">[docs]</a>
     <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the timeline.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the timeline and all controlled animations.</span>
 
-<span class="sd">        Update the Timeline and all the animations that it controls. As well as</span>
-<span class="sd">        the playback of the Timeline (if exists).</span>
+<span class="sd">        Updates the Timeline and all animations it controls. Also updates the</span>
+<span class="sd">        playback panel if one exists.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        force: bool, optional, default: False</span>
-<span class="sd">            If True, the timeline will update even when the timeline is paused</span>
-<span class="sd">            or stopped and hence, more resources will be used.</span>
-
+<span class="sd">        force : bool, optional</span>
+<span class="sd">            If True, the timeline will update even when paused or stopped,</span>
+<span class="sd">            which may use more resources. Default is False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_timestamp</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span><span class="p">:</span>
@@ -891,7 +950,13 @@ document.write(`
 <div class="viewcode-block" id="Timeline.add_to_scene">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.add_to_scene">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Timeline and all of its Animations to the scene&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add Timeline and all of its Animations to the scene.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scene : Scene</span>
+<span class="sd">            The scene to add the Timeline and its Animations to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="n">scene</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
@@ -901,7 +966,13 @@ document.write(`
 <div class="viewcode-block" id="Timeline.remove_from_scene">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.timeline.Timeline.remove_from_scene">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove Timeline and all of its Animations to the scene&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove Timeline and all of its Animations from the scene.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scene : Scene</span>
+<span class="sd">            The scene from which to remove the Timeline and its Animations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_playback_panel</span><span class="p">:</span>
             <span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="o">*</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">playback_panel</span><span class="o">.</span><span class="n">actors</span><span class="p">))</span>
@@ -1025,7 +1096,7 @@ document.write(`
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2026, FURY. All rights reserved.</div>
     </div>
 </div></div>
       

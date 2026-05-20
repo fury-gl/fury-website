@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.animation &#8212; FURY 0.13.0.dev16+g792f89c8f documentation</title>
+    <title>fury.animation.animation &#8212; FURY 2.1.0.dev40+g9c69c7757 documentation</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../../_static/css/custom_github.css?v=b0433979" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -43,11 +43,12 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=7d417c42"></script>
+    <script src="../../../_static/documentation_options.js?v=34ffda04"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/fury/animation/animation';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
@@ -368,7 +369,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <h1>Source code for fury.animation.animation</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span></span><span class="sd">&quot;&quot;&quot;Animation module.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">time</span><span class="w"> </span><span class="kn">import</span> <span class="n">perf_counter</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
@@ -376,47 +379,80 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">line</span>
+
+<span class="c1"># from fury.actor import line</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa F401</span>
     <span class="n">linear_interpolator</span><span class="p">,</span>
     <span class="n">slerp</span><span class="p">,</span>
     <span class="n">spline_interpolator</span><span class="p">,</span>
     <span class="n">step_interpolator</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Actor</span><span class="p">,</span> <span class="n">Camera</span><span class="p">,</span> <span class="n">Transform</span>
+
+<span class="c1"># from fury.lib import Actor, Camera, Transform</span>
 
 
 <div class="viewcode-block" id="Animation">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Animation</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keyframe animation class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create and manage keyframe animations for Fury actors.</span>
 
-<span class="sd">    Animation is responsible for keyframe animations for a single or a</span>
-<span class="sd">    group of actors.</span>
-<span class="sd">    It&#39;s used to handle multiple attributes and properties of Fury actors such</span>
-<span class="sd">    as transformations, color, and scale.</span>
-<span class="sd">    It also accepts custom data and interpolates them, such as temperature.</span>
-<span class="sd">    Linear interpolation is used by default to interpolate data between the</span>
-<span class="sd">    main keyframes.</span>
+<span class="sd">    Animation is responsible for handling keyframe animations for a single actor</span>
+<span class="sd">    or a group of actors. It provides control over multiple attributes and</span>
+<span class="sd">    properties of Fury actors including position, rotation, scale, color, and</span>
+<span class="sd">    opacity. The class also supports custom data interpolation. By default,</span>
+<span class="sd">    linear interpolation is used to interpolate data between keyframes.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    actors : Actor or list of Actor, optional</span>
+<span class="sd">        Actor(s) to be animated.</span>
+<span class="sd">    length : float or int, optional</span>
+<span class="sd">        The fixed length/duration of the animation in seconds. If None,</span>
+<span class="sd">        the animation will derive its duration from the keyframes.</span>
+<span class="sd">    loop : bool, optional</span>
+<span class="sd">        Whether to loop the animation (True) or play once (False).</span>
+<span class="sd">    motion_path_res : int, optional</span>
+<span class="sd">        The number of line segments used to visualize the animation&#39;s motion</span>
+<span class="sd">        path (position visualization). Higher values create smoother paths.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    actors : Actor or list[Actor], optional, default: None</span>
-<span class="sd">        Actor/s to be animated.</span>
-<span class="sd">    length : float or int, default: None, optional</span>
-<span class="sd">        the fixed length of the animation. If set to None, the animation will</span>
-<span class="sd">        get its duration from the keyframes being set.</span>
-<span class="sd">    loop : bool, optional, default: True</span>
-<span class="sd">        Whether to loop the animation (True) of play once (False).</span>
-<span class="sd">    motion_path_res : int, default: None</span>
-<span class="sd">        the number of line segments used to visualizer the animation&#39;s motion</span>
-<span class="sd">        path (visualizing position).</span>
-
+<span class="sd">    actors : list</span>
+<span class="sd">        List of actors controlled by the Animation.</span>
+<span class="sd">    child_animations : list</span>
+<span class="sd">        List of child Animations of this Animation.</span>
+<span class="sd">    duration : float</span>
+<span class="sd">        The duration of the animation in seconds.</span>
+<span class="sd">    current_timestamp : float</span>
+<span class="sd">        The current time of the animation in seconds.</span>
+<span class="sd">    loop : bool</span>
+<span class="sd">        Whether the animation is in loop mode (True) or play once mode (False).</span>
+<span class="sd">    parent_animation : Animation</span>
+<span class="sd">        The hierarchical parent Animation for the current Animation.</span>
+<span class="sd">    static_actors : list</span>
+<span class="sd">        List of static actors that are not animated but added to the scene.</span>
+<span class="sd">    timeline : Timeline</span>
+<span class="sd">        The Timeline instance handling the current animation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<div class="viewcode-block" id="Animation.__init__">
+<a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Animation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        actors : Actor or list of Actor, optional</span>
+<span class="sd">            Actor(s) to be animated.</span>
+<span class="sd">        length : float or int, optional</span>
+<span class="sd">            The fixed length/duration of the animation in seconds. If None,</span>
+<span class="sd">            the animation will derive its duration from the keyframes.</span>
+<span class="sd">        loop : bool, optional</span>
+<span class="sd">            Whether to loop the animation (True) or play once (False).</span>
+<span class="sd">        motion_path_res : int, optional</span>
+<span class="sd">            The number of line segments used to visualize the animation&#39;s motion</span>
+<span class="sd">            path (position visualization). Higher values create smoother paths.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span> <span class="o">=</span> <span class="p">[]</span>
@@ -434,22 +470,25 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_res</span> <span class="o">=</span> <span class="n">motion_path_res</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span> <span class="o">=</span> <span class="n">Transform</span><span class="p">()</span>
+        <span class="c1"># self._transform = Transform()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_general_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># Adding actors to the animation</span>
         <span class="k">if</span> <span class="n">actors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">actors</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="Animation.update_duration">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.update_duration">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update and return the duration of the Animation.</span>
 
+<span class="sd">        Update the animation duration based on the length parameter or the maximum</span>
+<span class="sd">        timestamp of all keyframes and child animations.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
-<span class="sd">            The duration of the animation.</span>
-
+<span class="sd">            The duration of the animation in seconds.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_length</span>
@@ -470,7 +509,6 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
 <span class="sd">            The duration of the animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span>
 
@@ -482,7 +520,6 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        float</span>
 <span class="sd">            The current time of the animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span><span class="o">.</span><span class="n">current_timestamp</span>
@@ -493,7 +530,11 @@ document.write(`
 <div class="viewcode-block" id="Animation.update_motion_path">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.update_motion_path">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_motion_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update motion path visualization actor&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update motion path visualization actor.</span>
+
+<span class="sd">        Creates or updates the motion path visualization actor that represents the</span>
+<span class="sd">        animation path. The resolution of the path is determined by motion_path_res.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_res</span>
         <span class="n">tl</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">while</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tl</span><span class="o">.</span><span class="n">_parent_animation</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
@@ -516,30 +557,29 @@ document.write(`
                     <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">lines</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lines</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">colors</span><span class="p">])</span>
 
-            <span class="n">mpa</span> <span class="o">=</span> <span class="n">line</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">:</span>
-                <span class="c1"># remove old motion path actor</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mpa</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span> <span class="o">=</span> <span class="n">mpa</span></div>
+        <span class="c1"># if len(lines) &gt; 0:</span>
+        <span class="c1">#     lines = np.array([lines])</span>
+        <span class="c1">#     if isinstance(colors, list):</span>
+        <span class="c1">#         colors = np.array([colors])</span>
 
+        <span class="c1">#     mpa = line(lines, colors=colors, opacity=0.6)</span>
+        <span class="c1">#     if self._scene:</span>
+        <span class="c1">#         # remove old motion path actor</span>
+        <span class="c1">#         if self._motion_path_actor is not None:</span>
+        <span class="c1">#             self._scene.rm(self._motion_path_actor)</span>
+        <span class="c1">#         self._scene.add(mpa)</span>
+        <span class="c1">#     self._motion_path_actor = mpa</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Get animation data.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict:</span>
+<span class="sd">        dict</span>
 <span class="sd">            The animation data containing keyframes and interpolators.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
 
@@ -548,14 +588,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The attribute name to get data for.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict:</span>
+<span class="sd">        dict</span>
 <span class="sd">            The animation data for a specific attribute.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
 
@@ -573,16 +612,19 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.get_keyframes">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.get_keyframes">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">attrib</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a keyframe for a specific or all attributes.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get keyframes for a specific or all attributes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str, optional, default: None</span>
+<span class="sd">        attrib : str, optional</span>
 <span class="sd">            The name of the attribute.</span>
 <span class="sd">            If None, all keyframes for all set attributes will be returned.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary of keyframes for the specified attribute(s).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">attrib</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -595,7 +637,6 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.set_keyframe">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_keyframe">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_keyframe</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">update_interpolator</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">):</span>
@@ -603,26 +644,19 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The name of the attribute.</span>
-<span class="sd">        timestamp: float</span>
+<span class="sd">        timestamp : float</span>
 <span class="sd">            Timestamp of the keyframe.</span>
-<span class="sd">        value: ndarray or float or bool</span>
+<span class="sd">        value : ndarray or float or bool</span>
 <span class="sd">            Value of the keyframe at the given timestamp.</span>
-<span class="sd">        update_interpolator: bool, optional</span>
-<span class="sd">            Interpolator will be reinitialized if True</span>
-
-<span class="sd">        Other Parameters</span>
-<span class="sd">        ----------------</span>
-<span class="sd">        in_cp: ndarray, shape (1, M), optional</span>
-<span class="sd">            The in control point in case of using cubic Bézier interpolator.</span>
-<span class="sd">        out_cp: ndarray, shape (1, M), optional</span>
-<span class="sd">            The out control point in case of using cubic Bézier interpolator.</span>
-<span class="sd">        in_tangent: ndarray, shape (1, M), optional</span>
-<span class="sd">            The in tangent at that position for the cubic spline curve.</span>
-<span class="sd">        out_tangent: ndarray, shape (1, M), optional</span>
-<span class="sd">            The out tangent at that position for the cubic spline curve.</span>
-
+<span class="sd">        update_interpolator : bool, optional</span>
+<span class="sd">            Interpolator will be reinitialized if True.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe. This can include:</span>
+<span class="sd">            - `in_cp` and `out_cp` for cubic Bézier interpolation (float).</span>
+<span class="sd">            - `in_tangent` and `out_tangent` for cubic spline interpolation,</span>
+<span class="sd">                ndarray, shape (1, M).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">attrib_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attribute_data</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
         <span class="n">keyframes</span> <span class="o">=</span> <span class="n">attrib_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keyframes&quot;</span><span class="p">)</span>
@@ -661,9 +695,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The name of the attribute.</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict object containing keyframes to be set.</span>
 
 <span class="sd">        Notes</span>
@@ -675,7 +709,6 @@ document.write(`
 <span class="sd">        ...                      2: {&#39;value&#39;: [3, 4, 5], &#39;in_cp&#39;: [1, 2, 3]}}</span>
 <span class="sd">        &gt;&gt;&gt; pos_keyframes = {1: np.array([1, 2, 3]), 3: np.array([5, 5, 5])}</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_keyframes(&#39;position&#39;, pos_keyframes) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">keyframe</span> <span class="ow">in</span> <span class="n">keyframes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">keyframe</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -687,8 +720,12 @@ document.write(`
 <div class="viewcode-block" id="Animation.is_inside_scene_at">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.is_inside_scene_at">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">is_inside_scene_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the Animation is set to be inside the scene at a specific</span>
-<span class="sd">        timestamp.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if the Animation is set to be inside the scene at a specific timestamp.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The timestamp to check scene presence at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -700,7 +737,6 @@ document.write(`
 <span class="sd">        -----</span>
 <span class="sd">        If the parent Animation is set to be out of the scene at that time, all</span>
 <span class="sd">        of their child animations will be out of the scene as well.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span>
         <span class="n">parent_in_scene</span> <span class="o">=</span> <span class="kc">True</span>
@@ -721,9 +757,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the event.</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the event when the animation should be added to the scene.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;in_scene&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;in_scene&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -735,13 +770,12 @@ document.write(`
 <div class="viewcode-block" id="Animation.remove_from_scene_at">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.remove_from_scene_at">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_from_scene_at</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set timestamp for removing Animation to scene event.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set timestamp for removing Animation from scene event.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the event.</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the event when the animation should be removed from the scene.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;in_scene&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;in_scene&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -751,6 +785,13 @@ document.write(`
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_handle_scene_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle adding/removing actors from scene at a specific timestamp.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The timestamp to handle the scene event at.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">should_be_in_scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_inside_scene_at</span><span class="p">(</span><span class="n">timestamp</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">should_be_in_scene</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span><span class="p">:</span>
@@ -762,28 +803,26 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.set_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attrib</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set keyframes interpolator for a certain property</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set keyframes interpolator for a certain property.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The name of the property.</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator to be used to</span>
 <span class="sd">            interpolate/evaluate keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes such as:</span>
 
 <span class="sd">            def get_position(t):</span>
 <span class="sd">                return np.array([np.sin(t), np.cos(t) * 5, 5])</span>
-
-<span class="sd">        Other Parameters</span>
-<span class="sd">        ----------------</span>
-<span class="sd">        spline_degree: int, optional</span>
-<span class="sd">            The degree of the spline in case of setting a spline interpolator.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the interpolator. This can include:</span>
+<span class="sd">            - spline_degree : int - The degree of the spline in case of setting a</span>
+<span class="sd">              spline interpolator.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -798,7 +837,6 @@ document.write(`
 <span class="sd">        &gt;&gt;&gt; Animation.set_interpolator(&#39;position&#39;, linear_interpolator) # doctest: +SKIP</span>
 <span class="sd">        &gt;&gt;&gt; pos_fun = lambda t: np.array([np.sin(t), np.cos(t), 0]) # doctest: +SKIP</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_interpolator(&#39;position&#39;, pos_fun) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">attrib_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_attribute_data</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
         <span class="n">keyframes</span> <span class="o">=</span> <span class="n">attrib_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;keyframes&quot;</span><span class="p">,</span> <span class="p">{})</span>
@@ -827,7 +865,7 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The name of the property.</span>
 
 <span class="sd">        Returns</span>
@@ -839,7 +877,6 @@ document.write(`
 <span class="sd">        -----</span>
 <span class="sd">        True means that it&#39;s safe to use `Interpolator.interpolate(t)` for the</span>
 <span class="sd">        specified property. And False means the opposite.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;interpolator&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;func&quot;</span><span class="p">))</span></div>
@@ -847,30 +884,22 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.set_position_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_position_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_position_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the position interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle the</span>
-<span class="sd">             position keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">            position keyframes.</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
-
-<span class="sd">        Other Parameters</span>
-<span class="sd">        ----------------</span>
-<span class="sd">        degree: int</span>
-<span class="sd">            The degree of the spline interpolation in case of setting</span>
-<span class="sd">            the `spline_interpolator`.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; Animation.set_position_interpolator(spline_interpolator, degree=5) # doctest: +SKIP</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the interpolator. This can include:</span>
+<span class="sd">            - degree : int - The degree of the spline interpolation in case of setting</span>
+<span class="sd">              the `spline_interpolator`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span>
             <span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span></div>
@@ -878,92 +907,84 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.set_scale_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_scale_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_scale_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the scale interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle</span>
 <span class="sd">            the scale keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_scale_interpolator(step_interpolator) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Animation.set_rotation_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_rotation_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_rotation_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the rotation interpolator .</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the rotation interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle the</span>
 <span class="sd">            rotation (orientation) keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_rotation_interpolator(slerp) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Animation.set_color_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_color_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_color_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the color interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle</span>
 <span class="sd">            the color keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_color_interpolator(lab_color_interpolator) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Animation.set_opacity_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_opacity_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_opacity_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the opacity interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle</span>
 <span class="sd">            the opacity keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_opacity_interpolator(step_interpolator) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
@@ -975,11 +996,15 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The attribute name.</span>
-<span class="sd">        timestamp: float</span>
+<span class="sd">        timestamp : float</span>
 <span class="sd">            The timestamp to interpolate at.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or float or bool</span>
+<span class="sd">            The interpolated value of the attribute at the given timestamp.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">value</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;interpolator&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;func&quot;</span><span class="p">)(</span><span class="n">timestamp</span><span class="p">)</span>
@@ -994,9 +1019,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        attrib: str</span>
+<span class="sd">        attrib : str</span>
 <span class="sd">            The attribute name.</span>
 
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or float or bool</span>
+<span class="sd">            The interpolated value of the attribute at the current timestamp.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">)</span>
@@ -1012,29 +1041,20 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        position: ndarray, shape (1, 3)</span>
-<span class="sd">            Position value</span>
-
-<span class="sd">        Other Parameters</span>
-<span class="sd">        ----------------</span>
-<span class="sd">        in_cp: float</span>
-<span class="sd">            The control point in case of using `cubic Bézier interpolator` when</span>
-<span class="sd">            time exceeds this timestamp.</span>
-<span class="sd">        out_cp: float</span>
-<span class="sd">            The control point in case of using `cubic Bézier interpolator` when</span>
-<span class="sd">            time precedes this timestamp.</span>
-<span class="sd">        in_tangent: ndarray, shape (1, M), optional</span>
-<span class="sd">            The in tangent at that position for the cubic spline curve.</span>
-<span class="sd">        out_tangent: ndarray, shape (1, M), optional</span>
-<span class="sd">            The out tangent at that position for the cubic spline curve.</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        position : ndarray, shape (1, 3)</span>
+<span class="sd">            Position value.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe. This can include:</span>
+<span class="sd">            - `in_cp` and `out_cp` for cubic Bézier interpolation (float).</span>
+<span class="sd">            - `in_tangent` and `out_tangent` for cubic spline interpolation,</span>
+<span class="sd">              ndarray, shape (1, M).</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        `in_cp` and `out_cp` only needed when using the cubic bezier</span>
 <span class="sd">        interpolation method.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1043,19 +1063,18 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_position_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_position_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a dict of position keyframes at once.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: position_1, timestamp_2: position_2}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and positions as values.</span>
+<span class="sd">            Should be in the following form:</span>
+<span class="sd">            {timestamp_1: position_1, timestamp_2: position_2}.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; pos_keyframes = {1, (0, 0, 0), 3, (50, 6, 6)}</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_position_keyframes(pos_keyframes) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1067,17 +1086,18 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        rotation: ndarray, shape(1, 3) or shape(1, 4)</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        rotation : ndarray, shape(1, 3) or shape(1, 4)</span>
 <span class="sd">            Rotation data in euler degrees with shape(1, 3) or in quaternions</span>
 <span class="sd">            with shape(1, 4).</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        Euler rotations are executed by rotating first around Z then around X,</span>
 <span class="sd">        and finally around Y.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">no_components</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rotation</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">no_components</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
@@ -1105,11 +1125,12 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        vector: ndarray, shape(1, 3)</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        vector : ndarray, shape(1, 3)</span>
 <span class="sd">            Directional vector that describes the rotation.</span>
-
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">quat</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_rotvec</span><span class="p">(</span><span class="n">vector</span><span class="p">)</span><span class="o">.</span><span class="n">as_quat</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">quat</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
@@ -1122,11 +1143,12 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        scalar: ndarray, shape(1, 3)</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        scalar : ndarray, shape(1, 3)</span>
 <span class="sd">            Scale keyframe value associated with the timestamp.</span>
-
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">scalar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1135,19 +1157,18 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_scale_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_scale_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a dict of scale keyframes at once.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: scale_1, timestamp_2: scale_2}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and scales as values.</span>
+<span class="sd">            Should be in the following form:</span>
+<span class="sd">            {timestamp_1: scale_1, timestamp_2: scale_2}.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; scale_keyframes = {1, (1, 1, 1), 3, (2, 2, 3)}</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_scale_keyframes(scale_keyframes) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1159,11 +1180,12 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        color: ndarray, shape(1, 3)</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        color : ndarray, shape(1, 3)</span>
 <span class="sd">            Color keyframe value associated with the timestamp.</span>
-
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional parameters for the keyframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1172,20 +1194,19 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_color_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_color_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a dict of color keyframes at once.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: color_1, timestamp_2: color_2}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and color as values.</span>
+<span class="sd">            Should be in the following form:</span>
+<span class="sd">            {timestamp_1: color_1, timestamp_2: color_2}.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; color_keyframes = {1, (1, 0, 1), 3, (0, 0, 1)}</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_color_keyframes(color_keyframes) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1197,11 +1218,12 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            Timestamp of the keyframe</span>
-<span class="sd">        opacity: ndarray, shape(1, 3)</span>
+<span class="sd">        timestamp : float</span>
+<span class="sd">            Timestamp of the keyframe.</span>
+<span class="sd">        opacity : ndarray, shape(1, 3)</span>
 <span class="sd">            Opacity keyframe value associated with the timestamp.</span>
-
+<span class="sd">        **kwargs : dict</span>
+<span class="sd">            Additional parameters for the keyframe.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">opacity</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1210,13 +1232,13 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.set_opacity_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_opacity_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a dict of opacity keyframes at once.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: opacity_1, timestamp_2: opacity_2}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict(float: ndarray, shape(1, 1) or float or int)</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and opacities as values.</span>
+<span class="sd">            Should be in the following form:</span>
+<span class="sd">            {timestamp_1: opacity_1, timestamp_2: opacity_2}.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1226,7 +1248,6 @@ document.write(`
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; opacity = {1, (1, 1, 1), 3, (2, 2, 3)}</span>
 <span class="sd">        &gt;&gt;&gt; Animation.set_scale_keyframes(opacity) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1238,14 +1259,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate position at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
+<span class="sd">        ndarray, shape (1, 3)</span>
 <span class="sd">            The interpolated position.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -1257,16 +1277,16 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
-<span class="sd">            the time to interpolate rotation at.</span>
-<span class="sd">        as_quat: bool</span>
+<span class="sd">        t : float</span>
+<span class="sd">            The time to interpolate rotation at.</span>
+<span class="sd">        as_quat : bool</span>
 <span class="sd">            Returned rotation will be as quaternion if True.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
-<span class="sd">            The interpolated rotation as Euler degrees by default.</span>
-
+<span class="sd">        ndarray, shape (1, 3) or shape (1, 4)</span>
+<span class="sd">            The interpolated rotation as Euler degrees by default or as quaternion if</span>
+<span class="sd">            as_quat is True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
@@ -1289,14 +1309,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate scale at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
+<span class="sd">        ndarray, shape (1, 3)</span>
 <span class="sd">            The interpolated scale.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -1308,14 +1327,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate color value at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
+<span class="sd">        ndarray, shape (1, 3)</span>
 <span class="sd">            The interpolated color.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -1327,14 +1345,13 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate opacity at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 1):</span>
+<span class="sd">        ndarray or float</span>
 <span class="sd">            The interpolated opacity.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -1343,21 +1360,21 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.add">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an item to the Animation.</span>
+
 <span class="sd">        This item can be an Actor, Animation, list of Actors, or a list of</span>
 <span class="sd">        Animations.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        item: Animation, vtkActor, list[Animation], or list[vtkActor]</span>
+<span class="sd">        item : Animation, vtkActor, list[Animation], or list[vtkActor]</span>
 <span class="sd">            Actor/s to be animated by the Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Actor</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="c1"># elif isinstance(item, Actor):</span>
+        <span class="c1">#     self.add_actor(item)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_child_animation</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1371,9 +1388,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        animation: Animation or list[Animation]</span>
+<span class="sd">        animation : Animation or list[Animation]</span>
 <span class="sd">            Animation/s to be added.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">animation</span><span class="p">:</span>
@@ -1387,19 +1403,17 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.add_actor">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.add_actor">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an actor or list of actors to the Animation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        actor: vtkActor or list(vtkActor)</span>
+<span class="sd">        actor : vtkActor or list(vtkActor)</span>
 <span class="sd">            Actor/s to be animated by the Animation.</span>
-<span class="sd">        static: bool</span>
+<span class="sd">        static : bool</span>
 <span class="sd">            Indicated whether the actor should be animated and controlled by</span>
 <span class="sd">            the animation or just a static actor that gets added to the scene</span>
 <span class="sd">            along with the Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actor</span><span class="p">:</span>
@@ -1419,10 +1433,9 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Timeline:</span>
+<span class="sd">        Timeline</span>
 <span class="sd">            The Timeline handling the current animation, None, if there is no</span>
 <span class="sd">            associated Timeline.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span>
 
@@ -1432,10 +1445,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timeline: Timeline</span>
+<span class="sd">        timeline : Timeline</span>
 <span class="sd">            The Timeline handling the current animation, None, if there is no</span>
 <span class="sd">            associated Timeline.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span> <span class="o">=</span> <span class="n">timeline</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">:</span>
@@ -1448,9 +1460,8 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        Animation:</span>
+<span class="sd">        Animation</span>
 <span class="sd">            The parent Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span>
 
@@ -1460,9 +1471,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        parent_animation: Animation</span>
+<span class="sd">        parent_animation : Animation</span>
 <span class="sd">            The parent Animation instance.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span> <span class="o">=</span> <span class="n">parent_animation</span>
 
@@ -1472,9 +1482,8 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list:</span>
+<span class="sd">        list</span>
 <span class="sd">            List of actors controlled by the Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span>
 
@@ -1484,24 +1493,23 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list:</span>
+<span class="sd">        list</span>
 <span class="sd">            List of child Animations of this Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span>
 
 <div class="viewcode-block" id="Animation.add_static_actor">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.add_static_actor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_static_actor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an actor or list of actors as static actor/s which will not be</span>
-<span class="sd">        controlled nor animated by the Animation. All static actors will be</span>
-<span class="sd">        added to the scene when the Animation is added to the scene.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add static actor(s) which will not be controlled/animated by the Animation.</span>
+
+<span class="sd">        All static actors will be added to the scene when the Animation is added to the</span>
+<span class="sd">        scene.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        actor: vtkActor or list(vtkActor)</span>
+<span class="sd">        actor : vtkActor or list(vtkActor)</span>
 <span class="sd">            Static actor/s.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="n">static</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
@@ -1512,16 +1520,15 @@ document.write(`
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list:</span>
+<span class="sd">        list</span>
 <span class="sd">            List of static actors.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span>
 
 <div class="viewcode-block" id="Animation.remove_animations">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.remove_animations">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_animations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all child Animations from the Animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all child Animations from the Animation.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 
@@ -1532,9 +1539,8 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        actor: vtkActor</span>
+<span class="sd">        actor : vtkActor</span>
 <span class="sd">            Actor to be removed from the Animation.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span></div>
 
@@ -1542,7 +1548,7 @@ document.write(`
 <div class="viewcode-block" id="Animation.remove_actors">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.remove_actors">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all actors from the Animation&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove all actors from the Animation.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
 
 
@@ -1554,7 +1560,6 @@ document.write(`
 <span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            Whether the animation in loop mode (True) or play one mode (False).</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span>
 
@@ -1564,33 +1569,32 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        loop: bool</span>
+<span class="sd">        loop : bool</span>
 <span class="sd">            The loop condition to be set. (True) to loop the animation, and</span>
 <span class="sd">            (False) to play only once.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">loop</span>
 
 <div class="viewcode-block" id="Animation.add_update_callback">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.add_update_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_update_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a function to be called each time animation is updated</span>
-<span class="sd">        This function must accept only one argument which is the current value</span>
-<span class="sd">        of the named property.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a function to be called each time animation is updated.</span>
 
+<span class="sd">        Add a callback function that will be invoked whenever the animation is updated.</span>
+<span class="sd">        The function must accept only one argument which is the current value</span>
+<span class="sd">        of the named property.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        callback: callable</span>
+<span class="sd">        callback : callable</span>
 <span class="sd">            The function to be called whenever the animation is updated.</span>
-<span class="sd">        prop: str, optional, default: None</span>
+<span class="sd">        prop : str, optional</span>
 <span class="sd">            The name of the property.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        If no attribute name was provided, current time of the animation will</span>
 <span class="sd">        be provided instead of current value for the callback.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">prop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_general_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
@@ -1601,7 +1605,6 @@ document.write(`
 
 <div class="viewcode-block" id="Animation.update_animation">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.update_animation">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the animation.</span>
 
@@ -1610,10 +1613,9 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time: float or int, optional, default: None</span>
+<span class="sd">        time : float or int, optional</span>
 <span class="sd">            The time to update animation at. If None, the animation will play</span>
 <span class="sd">            without adding it to a Timeline.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">has_handler</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1685,7 +1687,13 @@ document.write(`
 <div class="viewcode-block" id="Animation.add_to_scene">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.add_to_scene">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_to_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add this Animation, its actors and sub Animations to the scene&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add this Animation, its actors and sub Animations to the scene.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scene : Scene</span>
+<span class="sd">            The scene to add the animation, actors, and sub-animations to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">]</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">static_act</span><span class="p">)</span> <span class="k">for</span> <span class="n">static_act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="p">]</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span>
@@ -1701,7 +1709,13 @@ document.write(`
 <div class="viewcode-block" id="Animation.remove_from_scene">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.Animation.remove_from_scene">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">remove_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove Animation, its actors and sub Animations from the scene&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove Animation, its actors and sub Animations from the scene.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        scene : Scene</span>
+<span class="sd">            The scene from which to remove the animation, actors, and sub-animations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">act</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">static_act</span><span class="p">)</span> <span class="k">for</span> <span class="n">static_act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_animations</span><span class="p">:</span>
@@ -1720,51 +1734,52 @@ document.write(`
 
 <span class="sd">    This is used for animating a single camera using a set of keyframes.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    camera : Camera, optional</span>
+<span class="sd">        Camera to be animated. If None, active camera will be animated.</span>
+<span class="sd">    length : float or int, optional</span>
+<span class="sd">        The fixed length/duration of the animation in seconds. If None,</span>
+<span class="sd">        the animation will derive its duration from the keyframes.</span>
+<span class="sd">    loop : bool, optional</span>
+<span class="sd">        Whether to loop the animation (True) or play once (False).</span>
+<span class="sd">    motion_path_res : int, optional</span>
+<span class="sd">        The number of line segments used to visualize the animation&#39;s motion</span>
+<span class="sd">        path (position visualization). Higher values create smoother paths.</span>
+
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    camera : Camera, optional, default: None</span>
-<span class="sd">        Camera to be animated. If None, active camera will be animated.</span>
-<span class="sd">    length : float or int, default: None, optional</span>
-<span class="sd">        the fixed length of the animation. If set to None, the animation will</span>
-<span class="sd">        get its duration from the keyframes being set.</span>
-<span class="sd">    loop : bool, optional, default: True</span>
-<span class="sd">        Whether to loop the animation (True) of play once (False).</span>
-<span class="sd">    motion_path_res : int, default: None</span>
-<span class="sd">        the number of line segments used to visualizer the animation&#39;s motion</span>
-<span class="sd">        path (visualizing position).</span>
-
+<span class="sd">    camera : Camera</span>
+<span class="sd">        Camera being animated by the CameraAnimation.</span>
+<span class="sd">    duration : float</span>
+<span class="sd">        The duration of the animation in seconds.</span>
+<span class="sd">    loop : bool</span>
+<span class="sd">        Whether the animation is in loop mode (True) or play one mode (False).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
+<div class="viewcode-block" id="CameraAnimation.__init__">
+<a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">camera</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">CameraAnimation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="n">motion_path_res</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">camera</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Camera</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the camera assigned to this animation.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Camera:</span>
-<span class="sd">            The camera that is being animated by this CameraAnimation.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span>
-
-    <span class="nd">@camera</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera</span><span class="p">:</span> <span class="n">Camera</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a camera to be animated.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize CameraAnimation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        camera: Camera</span>
-<span class="sd">            The camera to be animated</span>
-
+<span class="sd">        camera : Camera, optional</span>
+<span class="sd">            Camera to be animated. If None, active camera will be animated.</span>
+<span class="sd">        length : float or int, optional</span>
+<span class="sd">            The fixed length/duration of the animation in seconds. If None,</span>
+<span class="sd">            the animation will derive its duration from the keyframes.</span>
+<span class="sd">        loop : bool, optional</span>
+<span class="sd">            Whether to loop the animation (True) or play once (False).</span>
+<span class="sd">        motion_path_res : int, optional</span>
+<span class="sd">            The number of line segments used to visualize the animation&#39;s motion</span>
+<span class="sd">            path (position visualization). Higher values create smoother paths.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">CameraAnimation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">length</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="n">loop</span><span class="p">,</span> <span class="n">motion_path_res</span><span class="o">=</span><span class="n">motion_path_res</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span></div>
+
 
 <div class="viewcode-block" id="CameraAnimation.set_focal">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.set_focal">[docs]</a>
@@ -1773,11 +1788,19 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            The time to interpolate opacity at.</span>
-<span class="sd">        position: ndarray, shape(1, 3)</span>
-<span class="sd">            The camera position</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The time to set the keyframe at.</span>
+<span class="sd">        position : ndarray, shape (1, 3)</span>
+<span class="sd">            The camera focal position.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the keyframe. The following</span>
+<span class="sd">            parameters are supported:</span>
+<span class="sd">            - in_cp: ndarray - The in control point for cubic Bézier interpolation.</span>
+<span class="sd">            - out_cp: ndarray - The out control point for cubic Bézier interpolation.</span>
+<span class="sd">            - in_tangent: ndarray - The in tangent at that position for cubic spline</span>
+<span class="sd">              curve.</span>
+<span class="sd">            - out_tangent: ndarray - The out tangent at that position for cubic spline</span>
+<span class="sd">              curve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1789,11 +1812,19 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        timestamp: float</span>
-<span class="sd">            The time to interpolate at.</span>
-<span class="sd">        direction: ndarray, shape(1, 3)</span>
-<span class="sd">            The camera view-up direction</span>
-
+<span class="sd">        timestamp : float</span>
+<span class="sd">            The time to set the keyframe at.</span>
+<span class="sd">        direction : ndarray, shape (1, 3)</span>
+<span class="sd">            The camera view-up direction vector.</span>
+<span class="sd">        **kwargs : dict, optional</span>
+<span class="sd">            Additional keyword arguments for the keyframe. The following</span>
+<span class="sd">            parameters are supported:</span>
+<span class="sd">            - in_cp: ndarray - The in control point for cubic Bézier interpolation.</span>
+<span class="sd">            - out_cp: ndarray - The out control point for cubic Bézier interpolation.</span>
+<span class="sd">            - in_tangent: ndarray - The in tangent at that position for cubic spline</span>
+<span class="sd">              curve.</span>
+<span class="sd">            - out_tangent: ndarray - The out tangent at that position for cubic spline</span>
+<span class="sd">              curve.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframe</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
@@ -1802,20 +1833,18 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.set_focal_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_focal_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set multiple camera focal position keyframes at once.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: focal_1, timestamp_2: focal_1, ...}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and camera focal positions as</span>
-<span class="sd">            values.</span>
+<span class="sd">            values. Should be in the following form:</span>
+<span class="sd">            {timestamp_1: focal_1, timestamp_2: focal_1, ...}.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        &gt;&gt;&gt; focal_pos = {0, (1, 1, 1), 3, (20, 0, 0)}</span>
 <span class="sd">        &gt;&gt;&gt; CameraAnimation.set_focal_keyframes(focal_pos) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1824,20 +1853,18 @@ document.write(`
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.set_view_up_keyframes">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_view_up_keyframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set multiple camera view up direction keyframes.</span>
-<span class="sd">        Should be in the following form:</span>
-<span class="sd">        {timestamp_1: view_up_1, timestamp_2: view_up_2, ...}</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        keyframes: dict</span>
+<span class="sd">        keyframes : dict</span>
 <span class="sd">            A dict with timestamps as keys and camera view up vectors as</span>
-<span class="sd">            values.</span>
+<span class="sd">            values. Should be in the following form:</span>
+<span class="sd">            {timestamp_1: view_up_1, timestamp_2: view_up_2, ...}.</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; view_ups = {0, np.array([1, 0, 0]), 3, np.array([0, 1, 0])} # doctest: +SKIP</span>
+<span class="sd">        &gt;&gt;&gt; view_ups = {0: np.array([1, 0, 0]), 3: np.array([0, 1, 0])}</span>
 <span class="sd">        &gt;&gt;&gt; CameraAnimation.set_view_up_keyframes(view_ups) # doctest: +SKIP</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_keyframes</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">,</span> <span class="n">keyframes</span><span class="p">)</span></div>
 
@@ -1849,19 +1876,18 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
+<span class="sd">        ndarray, shape (1, 3)</span>
 <span class="sd">            The interpolated camera&#39;s focal position.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The returned focal position does not necessarily reflect the current</span>
 <span class="sd">        camera&#39;s focal position, but the expected one.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
@@ -1873,73 +1899,66 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        t: float</span>
+<span class="sd">        t : float</span>
 <span class="sd">            The time to interpolate at.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        ndarray(1, 3):</span>
+<span class="sd">        ndarray, shape (1, 3)</span>
 <span class="sd">            The interpolated camera view-up directional vector.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        The returned focal position does not necessarily reflect the actual</span>
 <span class="sd">        camera view up directional vector, but the expected one.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CameraAnimation.set_focal_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.set_focal_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_focal_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the camera focal position interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle the</span>
 <span class="sd">            interpolation of the camera focal position keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CameraAnimation.set_view_up_interpolator">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.set_view_up_interpolator">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_view_up_interpolator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the camera up-view vector animation interpolator.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        interpolator: callable</span>
+<span class="sd">        interpolator : callable</span>
 <span class="sd">            The generator function of the interpolator that would handle the</span>
 <span class="sd">            interpolation of the camera view-up keyframes.</span>
-<span class="sd">        is_evaluator: bool, optional</span>
+<span class="sd">        is_evaluator : bool, optional</span>
 <span class="sd">            Specifies whether the `interpolator` is time-only based evaluation</span>
 <span class="sd">            function that does not depend on keyframes.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_interpolator</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">,</span> <span class="n">interpolator</span><span class="p">,</span> <span class="n">is_evaluator</span><span class="o">=</span><span class="n">is_evaluator</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CameraAnimation.update_animation">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.animation.CameraAnimation.update_animation">[docs]</a>
-    <span class="nd">@warn_on_args_to_kwargs</span><span class="p">()</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">update_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the camera animation.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        time: float or int, optional, default: None</span>
+<span class="sd">        time : float or int, optional</span>
 <span class="sd">            The time to update the camera animation at. If None, the animation</span>
 <span class="sd">            will play.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">:</span>
@@ -2093,7 +2112,7 @@ document.write(`
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2026, FURY. All rights reserved.</div>
     </div>
 </div></div>
       

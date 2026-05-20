@@ -207,7 +207,7 @@ Building the documentation
 
     pip install -U -r requirements/default.txt
     pip install -U -r requirements/optional.txt
-    pip install -U -r requirements/docs.txt
+    pip install -U -r requirements/doc.txt
 
 **Step 2.** Go to the ``docs`` folder and run the following command to generate it (Linux and macOS)
 

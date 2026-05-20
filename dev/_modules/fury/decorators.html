@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.decorators &#8212; FURY 0.13.0.dev16+g792f89c8f documentation</title>
+    <title>fury.decorators &#8212; FURY 2.1.0.dev40+g9c69c7757 documentation</title>
   
   
   
@@ -31,7 +31,7 @@
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css?v=b0433979" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -43,11 +43,12 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=7d417c42"></script>
+    <script src="../../_static/documentation_options.js?v=34ffda04"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/fury/decorators';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
@@ -368,7 +369,11 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <h1>Source code for fury.decorators</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Decorators for FURY tests.&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;Decorators for FURY tests and functions.</span>
+
+<span class="sd">This module provides decorators to handle doctests, parameter validation, and</span>
+<span class="sd">keyword-only arguments enforcement.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
@@ -391,8 +396,20 @@ document.write(`
 <div class="viewcode-block" id="doctest_skip_parser">
 <a class="viewcode-back" href="../../reference/fury.decorators.html#fury.decorators.doctest_skip_parser">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">doctest_skip_parser</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator replaces custom skip test markup in doctests.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace custom skip test markup in doctests.</span>
 
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    func : callable</span>
+<span class="sd">        Function whose docstring will be modified.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    callable</span>
+<span class="sd">        Function with modified docstring.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    Say a function has a docstring::</span>
 
 <span class="sd">        something # skip if not HAVE_AMODULE</span>
@@ -410,7 +427,6 @@ document.write(`
 <span class="sd">        something # doctest: +SKIP</span>
 <span class="sd">        something + else</span>
 <span class="sd">        something</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">lines</span> <span class="o">=</span> <span class="n">func</span><span class="o">.</span><span class="vm">__doc__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">new_lines</span> <span class="o">=</span> <span class="p">[]</span>
@@ -434,22 +450,18 @@ document.write(`
     <span class="n">from_version</span><span class="o">=</span><span class="s2">&quot;0.11.0&quot;</span><span class="p">,</span>
     <span class="n">until_version</span><span class="o">=</span><span class="s2">&quot;0.14.0&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Decorator to enforce keyword-only arguments.</span>
-
-<span class="sd">    This decorator enforces that all arguments after the first one are</span>
-<span class="sd">    keyword-only arguments. It also checks that all keyword arguments are</span>
-<span class="sd">    expected by the function.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enforce keyword-only arguments.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    from_version: str, optional</span>
-<span class="sd">        The version of fury from which the function was supported.</span>
-<span class="sd">    until_version: str, optional</span>
-<span class="sd">        The version of fury until which the function was supported.</span>
+<span class="sd">    from_version : str, optional</span>
+<span class="sd">        The version of FURY from which the function was supported.</span>
+<span class="sd">    until_version : str, optional</span>
+<span class="sd">        The version of FURY until which the function was supported.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    decorator: Callable</span>
+<span class="sd">    callable</span>
 <span class="sd">        Decorator function.</span>
 
 <span class="sd">    Examples</span>
@@ -476,23 +488,41 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">decorator</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decorator function. This function enforces that all arguments after</span>
-<span class="sd">        the first one are keyword-only arguments. It also checks that all</span>
-<span class="sd">        keyword arguments are expected by the function.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enforce keyword-only arguments in a function.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        func: function</span>
+<span class="sd">        func : callable</span>
 <span class="sd">            Function to be decorated.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        wrapper: Callable</span>
+<span class="sd">        callable</span>
 <span class="sd">            Decorated function.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Handle function arguments and enforce keyword-only arguments.</span>
+
+<span class="sd">            Parameters</span>
+<span class="sd">            ----------</span>
+<span class="sd">            *args : tuple</span>
+<span class="sd">                Positional arguments to be passed to the function.</span>
+<span class="sd">            **kwargs : dict</span>
+<span class="sd">                Keyword arguments to be passed to the function.</span>
+
+<span class="sd">            Returns</span>
+<span class="sd">            -------</span>
+<span class="sd">            any</span>
+<span class="sd">                Result of the function call.</span>
+
+<span class="sd">            Raises</span>
+<span class="sd">            ------</span>
+<span class="sd">            TypeError</span>
+<span class="sd">                If required keyword-only arguments are missing and FURY version</span>
+<span class="sd">                is greater than until_version.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
             <span class="n">sig</span> <span class="o">=</span> <span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">parameters</span>
             <span class="c1">#</span>
@@ -547,7 +577,7 @@ document.write(`
                     <span class="n">positional_args_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">POSITIONAL_ARGS</span><span class="p">)</span>
                     <span class="n">args_k</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">positional_args_len</span><span class="p">:])</span>
                     <span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[:</span><span class="n">positional_args_len</span><span class="p">])</span>
-                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">missing_kwargs</span><span class="p">,</span> <span class="n">args_k</span><span class="p">)))</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">missing_kwargs</span><span class="p">,</span> <span class="n">args_k</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)))</span>
                     <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
                     <span class="c1"># if from_version is less or equal to fury.__version__ and,</span>
@@ -694,7 +724,7 @@ document.write(`
                 </a>
             </div>
         </nav>
-        <div class="copyright">&copy; 2018-2025, FURY. All rights reserved.</div>
+        <div class="copyright">&copy; 2018-2026, FURY. All rights reserved.</div>
     </div>
 </div></div>
       
