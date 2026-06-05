@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.containers &#8212; FURY 2.1.0.dev74+g62c687353 documentation</title>
+    <title>fury.ui.containers &#8212; FURY 2.1.0.dev95+g16b97b3ac documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=2695aa57"></script>
+    <script src="../../../_static/documentation_options.js?v=d44923a9"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -423,7 +423,9 @@ document.write(`
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">UI</span><span class="p">,</span> <span class="n">Anchor</span><span class="p">,</span> <span class="n">Rectangle2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">UI</span><span class="p">,</span> <span class="n">Anchor</span><span class="p">,</span> <span class="n">Rectangle2D</span><span class="p">,</span> <span class="n">TextBlock2D</span>
 
 
 <div class="viewcode-block" id="Panel2D">
@@ -941,6 +943,884 @@ document.write(`
 
 
 
+<div class="viewcode-block" id="TabPanel2D">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TabPanel2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 2D tab header with an associated content panel.</span>
+
+<span class="sd">    This component represents a single tab inside :class:`TabUI`. It owns the</span>
+<span class="sd">    clickable tab header and delegates user-added UI elements to its</span>
+<span class="sd">    ``content_panel``. The content panel visibility is controlled by</span>
+<span class="sd">    :class:`TabUI`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates `(x, y)` of the upper-left corner of the tab</span>
+<span class="sd">        header.</span>
+<span class="sd">    size : (int, int), optional</span>
+<span class="sd">        Width and height in pixels of the tab header.</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Initial text displayed in the tab header.</span>
+<span class="sd">    color : (float, float, float), optional</span>
+<span class="sd">        RGB color of the tab header background. Values must be in [0, 1].</span>
+<span class="sd">    content_size : (int, int), optional</span>
+<span class="sd">        Width and height in pixels of the content panel. If None, ``size`` is</span>
+<span class="sd">        used.</span>
+<span class="sd">    content_visible : bool, optional</span>
+<span class="sd">        Initial visibility of the content panel.</span>
+<span class="sd">    content_panel : :class:`Panel2D`, optional</span>
+<span class="sd">        Panel used to store content for this tab. If None, a new panel with</span>
+<span class="sd">        ``content_size`` is created.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    panel : :class:`Panel2D`</span>
+<span class="sd">        Header panel used as the clickable tab background.</span>
+<span class="sd">    content_panel : :class:`Panel2D`</span>
+<span class="sd">        Panel that stores the UI elements displayed when this tab is active.</span>
+<span class="sd">    text_block : :class:`TextBlock2D`</span>
+<span class="sd">        Text component used to render the tab title.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TabPanel2D.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;New Tab&quot;</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">content_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">content_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">content_panel</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tab panel.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span> <span class="o">=</span> <span class="n">content_panel</span> <span class="ow">or</span> <span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">content_size</span> <span class="ow">or</span> <span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">content_visible</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_text_size</span> <span class="o">=</span> <span class="n">size</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">TabPanel2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> <span class="n">title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the tab header panel and title text.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_text_size</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">bg_color</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">justification</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get actors composing this component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Empty list because child UI elements own the actors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tab header size.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (int, int)</span>
+<span class="sd">            Width and height of the tab header in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the tab header position.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">())</span>
+
+<div class="viewcode-block" id="TabPanel2D.resize">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.resize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resize the tab header.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : (int, int)</span>
+<span class="sd">            New width and height in pixels of the tab header.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_text_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="p">,</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tab header background color.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (float, float, float)</span>
+<span class="sd">            RGB color of the tab header background.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">color</span>
+
+    <span class="nd">@color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the tab header background color.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        color : (float, float, float)</span>
+<span class="sd">            New RGB color of the tab header background. Values must be in</span>
+<span class="sd">            [0, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tab title.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Text displayed in the tab header.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span>
+
+    <span class="nd">@title</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the tab title.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text : str</span>
+<span class="sd">            New text displayed in the tab header.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_bold</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get whether the tab title is bold.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True when the tab title is rendered in bold.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">bold</span>
+
+    <span class="nd">@title_bold</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_bold</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bold</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set whether the tab title is bold.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bold : bool</span>
+<span class="sd">            If True, render the tab title in bold.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="n">bold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tab title color.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (float, float, float)</span>
+<span class="sd">            RGB color of the tab title.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">color</span>
+
+    <span class="nd">@title_color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the tab title color.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        color : (float, float, float)</span>
+<span class="sd">            New RGB color of the tab title. Values must be in [0, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_font_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the tab title font size.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Font size of the tab title.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">font_size</span>
+
+    <span class="nd">@title_font_size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_font_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">font_size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the tab title font size.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        font_size : int</span>
+<span class="sd">            New font size of the tab title.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_italic</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get whether the tab title is italic.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True when the tab title is rendered in italic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">italic</span>
+
+    <span class="nd">@title_italic</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title_italic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">italic</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set whether the tab title is italic.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        italic : bool</span>
+<span class="sd">            If True, render the tab title in italic.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">italic</span> <span class="o">=</span> <span class="n">italic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">message</span>
+
+<div class="viewcode-block" id="TabPanel2D.add_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.add_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an element to this tab&#39;s content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component to add to the tab content area.</span>
+<span class="sd">        coords : (float, float) or (int, int)</span>
+<span class="sd">            Coordinates relative to the content panel. If floats are supplied,</span>
+<span class="sd">            normalized coordinates in [0, 1] are assumed. If integers are</span>
+<span class="sd">            supplied, pixel coordinates are assumed.</span>
+<span class="sd">        anchor : str, optional</span>
+<span class="sd">            Anchor used to position ``element``. Supported values are the same</span>
+<span class="sd">            as :meth:`Panel2D.add_element`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">element</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabPanel2D.remove_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.remove_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove an element from this tab&#39;s content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component to remove from the tab content area.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">remove_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabPanel2D.update_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabPanel2D.update_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an element in this tab&#39;s content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component already present in the tab content area.</span>
+<span class="sd">        coords : (float, float) or (int, int)</span>
+<span class="sd">            New coordinates relative to the content panel.</span>
+<span class="sd">        anchor : str, optional</span>
+<span class="sd">            Anchor used to position ``element``. Supported values are the same</span>
+<span class="sd">            as :meth:`Panel2D.add_element`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TabUI">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TabUI</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 2D container that switches between multiple content panels.</span>
+
+<span class="sd">    ``TabUI`` creates tab headers and one content panel per tab. The tab bar can</span>
+<span class="sd">    be placed horizontally at the top or bottom, or vertically on the left or</span>
+<span class="sd">    right. It can also use an accordion layout where each tab title spans the</span>
+<span class="sd">    width of the widget and the selected tab expands below its title. A left</span>
+<span class="sd">    click on a tab header selects that tab and hides the other tab content</span>
+<span class="sd">    panels. A second left click on the active tab hides its content while</span>
+<span class="sd">    keeping the tab selected. A right click collapses the tab UI and clears the</span>
+<span class="sd">    active tab.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates `(x, y)` of the upper-left corner of the tab UI.</span>
+<span class="sd">    size : (int, int), optional</span>
+<span class="sd">        Width and height in pixels of the full tab UI.</span>
+<span class="sd">    tab_titles : list of str, optional</span>
+<span class="sd">        Titles used to create tabs during initialization. If None, one tab with</span>
+<span class="sd">        the default title is created.</span>
+<span class="sd">    active_color : (float, float, float), optional</span>
+<span class="sd">        RGB color of the active tab header. Values must be in [0, 1].</span>
+<span class="sd">    inactive_color : (float, float, float), optional</span>
+<span class="sd">        RGB color of inactive tab headers. Values must be in [0, 1].</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Font size used by tab titles.</span>
+<span class="sd">    draggable : bool, optional</span>
+<span class="sd">        If True, the tab UI can be dragged from tab headers or content panel</span>
+<span class="sd">        backgrounds.</span>
+<span class="sd">    startup_tab_id : int, optional</span>
+<span class="sd">        Index of the tab to show initially. If None, all content panels are</span>
+<span class="sd">        hidden on startup.</span>
+<span class="sd">    tab_bar_pos : {&#39;top&#39;, &#39;bottom&#39;, &#39;left&#39;, &#39;right&#39;, &#39;accordion&#39;}, optional</span>
+<span class="sd">        Position of the tab bar relative to the content panel. ``&quot;accordion&quot;``</span>
+<span class="sd">        creates an accordion-style layout.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    tabs : list of :class:`TabPanel2D`</span>
+<span class="sd">        Tab panels managed by this widget.</span>
+<span class="sd">    parent_panel : :class:`Panel2D`</span>
+<span class="sd">        Transparent panel that anchors tab headers and content panels.</span>
+<span class="sd">    active_tab_idx : int or None</span>
+<span class="sd">        Index of the currently selected tab. None when the tab UI is collapsed.</span>
+<span class="sd">    collapsed : bool</span>
+<span class="sd">        True when no tab content panel is visible due to right-click collapse.</span>
+<span class="sd">    on_change : callable</span>
+<span class="sd">        Callback invoked after a tab is selected. The callback receives this</span>
+<span class="sd">        ``TabUI`` instance.</span>
+<span class="sd">    on_collapse : callable</span>
+<span class="sd">        Callback invoked after the tab UI is collapsed. The callback receives</span>
+<span class="sd">        this ``TabUI`` instance.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``tab_titles`` is empty or is not a list of strings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_VALID_TAB_BAR_POSITIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;top&quot;</span><span class="p">,</span> <span class="s2">&quot;bottom&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="s2">&quot;accordion&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TabUI.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+        <span class="n">tab_titles</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">active_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+        <span class="n">draggable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">startup_tab_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tab_bar_pos</span><span class="o">=</span><span class="s2">&quot;top&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the tab UI.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tab_titles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tab_titles</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span>
+                <span class="nb">isinstance</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">tab_titles</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;tab_titles must be a list of strings.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tab_titles</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;TabUI requires at least one tab title.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tab_titles</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;New Tab&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_titles</span> <span class="o">=</span> <span class="n">tab_titles</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span> <span class="o">=</span> <span class="n">draggable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span> <span class="o">=</span> <span class="n">active_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span> <span class="o">=</span> <span class="n">inactive_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="n">startup_tab_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="n">startup_tab_id</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">=</span> <span class="n">tab_bar_pos</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_bar_pos</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_start_position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_moved</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_threshold</span> <span class="o">=</span> <span class="mi">3</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">TabUI</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up the parent panel and tab panels.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ui</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_collapse</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ui</span><span class="p">:</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_sizes</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_titles</span><span class="p">:</span>
+            <span class="n">tab_panel</span> <span class="o">=</span> <span class="n">TabPanel2D</span><span class="p">(</span>
+                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span><span class="p">,</span>
+                <span class="n">content_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">,</span>
+                <span class="n">content_visible</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">title_font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_idx</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_show_tab</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get actors composing this component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Empty list because child UI elements own the actors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the full tab UI size.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (int, int)</span>
+<span class="sd">            Width and height of the tab UI in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update internal component positions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">())</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;tabs&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_tab_bar_pos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fallback to the default layout when tab bar position is invalid.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_VALID_TAB_BAR_POSITIONS</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;tab_bar_pos can only have value top/bottom/left/right/accordion&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">=</span> <span class="s2">&quot;top&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update cached tab header and content panel sizes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">==</span> <span class="s2">&quot;accordion&quot;</span><span class="p">:</span>
+            <span class="n">tab_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">content_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">tab_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">content_height</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tab_height</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;left&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">]:</span>
+            <span class="n">tab_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_size</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">tab_width</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">tab_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tab_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">content_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">tab_height</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span><span class="p">,</span> <span class="n">tab_height</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TabUI.resize">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.resize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resize the full tab UI.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : (int, int)</span>
+<span class="sd">            New width and height in pixels of the full tab UI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_sizes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TabUI.update_tabs">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.update_tabs">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_tabs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update tab layout and callbacks.</span>
+
+<span class="sd">        This recomputes each tab header position, content panel position, tab</span>
+<span class="sd">        size, and event callbacks. If ``tab_bar_pos`` is invalid, it falls back</span>
+<span class="sd">        to ``&quot;top&quot;`` and emits a warning.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">previous_tab_bar_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_bar_pos</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">!=</span> <span class="n">previous_tab_bar_pos</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_sizes</span><span class="p">()</span>
+
+        <span class="n">vertical_offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">):</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">)</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">==</span> <span class="s2">&quot;top&quot;</span><span class="p">:</span>
+                <span class="n">tab_x</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tab_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">tab_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">content_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">==</span> <span class="s2">&quot;bottom&quot;</span><span class="p">:</span>
+                <span class="n">tab_x</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tab_pos</span> <span class="o">=</span> <span class="p">(</span><span class="n">tab_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">content_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">==</span> <span class="s2">&quot;left&quot;</span><span class="p">:</span>
+                <span class="n">tab_y</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tab_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tab_y</span><span class="p">)</span>
+                <span class="n">content_pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_bar_pos</span> <span class="o">==</span> <span class="s2">&quot;right&quot;</span><span class="p">:</span>
+                <span class="n">tab_y</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tab_pos</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tab_y</span><span class="p">)</span>
+                <span class="n">content_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tab_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vertical_offset</span><span class="p">)</span>
+                <span class="n">vertical_offset</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tab_panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">content_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vertical_offset</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">==</span> <span class="n">idx</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_content_visible</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">):</span>
+                    <span class="n">vertical_offset</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">content_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">tab_panel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">_elements</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">,</span> <span class="n">tab_pos</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">,</span> <span class="n">tab_pos</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">_elements</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="p">,</span> <span class="n">content_pos</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">parent_panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="p">,</span> <span class="n">content_pos</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_tab_callbacks</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_tab_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attach event callbacks to a tab header and content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        idx : int</span>
+<span class="sd">            Index of ``tab_panel`` in :attr:`tabs`.</span>
+<span class="sd">        tab_panel : :class:`TabPanel2D`</span>
+<span class="sd">            Tab panel receiving selection, collapse, and optional drag</span>
+<span class="sd">            callbacks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collapse_tab_ui</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_right_mouse_button_clicked</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">collapse_tab_ui</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="p">,</span> <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="p">]:</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">,</span> <span class="n">tab_idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_released</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">[</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">background</span><span class="p">]:</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="n">element</span><span class="o">.</span><span class="n">on_left_mouse_button_released</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">text_block</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">event</span><span class="p">,</span> <span class="n">tab_idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_tab</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">event</span><span class="p">,</span> <span class="n">tab_idx</span><span class="o">=</span><span class="n">idx</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_tab</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_tab_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate a tab index.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab to validate.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If ``tab_idx`` is outside the range of available tabs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">tab_idx</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_tabs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Tab with index </span><span class="si">{</span><span class="n">tab_idx</span><span class="si">}</span><span class="s2"> does not exist&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_content_visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_panel</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return whether a tab content panel is visible.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_panel : :class:`TabPanel2D`</span>
+<span class="sd">            Tab panel whose content visibility is queried.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True when the tab content panel background actor is visible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">actors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">visible</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_show_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Show one tab and hide all others.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab to activate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">):</span>
+            <span class="n">is_active</span> <span class="o">=</span> <span class="n">idx</span> <span class="o">==</span> <span class="n">tab_idx</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span> <span class="k">if</span> <span class="n">is_active</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">is_active</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="n">tab_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TabUI.select_tab">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.select_tab">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_tab</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select a tab.</span>
+
+<span class="sd">        Selecting a tab hides all other content panels. If the selected tab is</span>
+<span class="sd">        already visible, its content panel is hidden and the tab remains the</span>
+<span class="sd">        active tab. The :attr:`on_change` callback is invoked after selection.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab to select.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If ``tab_idx`` is outside the range of available tabs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_idx</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tab_panel</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">idx</span> <span class="o">!=</span> <span class="n">tab_idx</span><span class="p">:</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
+                <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">visible</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_content_visible</span><span class="p">(</span><span class="n">tab_panel</span><span class="p">)</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span> <span class="k">if</span> <span class="n">visible</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_color</span>
+            <span class="n">tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="ow">not</span> <span class="n">visible</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="n">tab_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabUI.collapse_tab_ui">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.collapse_tab_ui">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">collapse_tab_ui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Collapse the active tab content.</span>
+
+<span class="sd">        Hides the active tab content panel, resets :attr:`active_tab_idx` to</span>
+<span class="sd">        None, marks the tab UI as collapsed, and invokes :attr:`on_collapse`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">active_tab_panel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span><span class="p">]</span>
+            <span class="n">active_tab_panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inactive_color</span>
+            <span class="n">active_tab_panel</span><span class="o">.</span><span class="n">content_panel</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_tabs</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_collapse</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabUI.add_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.add_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an element to a tab content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab receiving the element.</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component to add to the tab content panel.</span>
+<span class="sd">        coords : (float, float) or (int, int)</span>
+<span class="sd">            Coordinates relative to the tab content panel. If floats are</span>
+<span class="sd">            supplied, normalized coordinates in [0, 1] are assumed. If integers</span>
+<span class="sd">            are supplied, pixel coordinates are assumed.</span>
+<span class="sd">        anchor : str, optional</span>
+<span class="sd">            Anchor used to position ``element``. Supported values are the same</span>
+<span class="sd">            as :meth:`Panel2D.add_element`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If ``tab_idx`` is outside the range of available tabs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_idx</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tab_idx</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_tab_idx</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">collapsed</span><span class="p">:</span>
+            <span class="n">element</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabUI.remove_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.remove_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove an element from a tab content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab containing the element.</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component to remove from the tab content panel.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If ``tab_idx`` is outside the range of available tabs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_idx</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">remove_element</span><span class="p">(</span><span class="n">element</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabUI.update_element">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.update_element">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_element</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tab_idx</span><span class="p">,</span> <span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an element in a tab content panel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tab_idx : int</span>
+<span class="sd">            Index of the tab containing the element.</span>
+<span class="sd">        element : UI</span>
+<span class="sd">            UI component already present in the tab content panel.</span>
+<span class="sd">        coords : (float, float) or (int, int)</span>
+<span class="sd">            New coordinates relative to the tab content panel.</span>
+<span class="sd">        anchor : str, optional</span>
+<span class="sd">            Anchor used to position ``element``. Supported values are the same</span>
+<span class="sd">            as :meth:`Panel2D.add_element`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        IndexError</span>
+<span class="sd">            If ``tab_idx`` is outside the range of available tabs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_tab_idx</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tabs</span><span class="p">[</span><span class="n">tab_idx</span><span class="p">]</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="n">coords</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="n">anchor</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TabUI.left_button_pressed">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.left_button_pressed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">tab_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start dragging the tab UI.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            PyGfx pointer event containing the current pointer coordinates.</span>
+<span class="sd">        tab_idx : int, optional</span>
+<span class="sd">            Index of the tab to select before starting the drag operation. If</span>
+<span class="sd">            None, only dragging is initialized.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">tab_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">select_tab</span><span class="p">(</span><span class="n">tab_idx</span><span class="p">)</span>
+
+        <span class="n">click_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_start_position</span> <span class="o">=</span> <span class="n">click_pos</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="n">click_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_moved</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TabUI.left_button_dragged">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TabUI.left_button_dragged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_dragged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drag the tab UI.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            PyGfx pointer event containing the current pointer coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">click_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_start_position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_drag_moved</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">click_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_start_position</span><span class="p">)</span>
+                <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_threshold</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">click_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">nb_tabs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the number of tabs in this tab UI.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Number of tabs in this tab UI.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tab_titles</span><span class="p">)</span></div>
+
+
+
 <span class="c1"># class TabPanel2D(UI):</span>
 <span class="c1">#     &quot;&quot;&quot;Render content within a Tab.</span>
 
@@ -1451,159 +2331,105 @@ document.write(`
 <span class="c1">#         i_ren.force_render()</span>
 
 
-<span class="c1"># # class ImageContainer2D(UI):</span>
-<span class="c1"># #     &quot;&quot;&quot;A 2D container to hold an image.</span>
+<div class="viewcode-block" id="ImageContainer2D">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ImageContainer2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageContainer2D</span><span class="p">(</span><span class="n">Rectangle2D</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 2D container to hold an image.</span>
 
-<span class="c1"># #     Currently Supports:</span>
-<span class="c1"># #     - png and jpg/jpeg images</span>
+<span class="sd">    Currently Supports:</span>
+<span class="sd">    - png and jpg/jpeg images</span>
 
-<span class="c1"># #     Attributes</span>
-<span class="c1"># #     ----------</span>
-<span class="c1"># #     size: (float, float)</span>
-<span class="c1"># #         Image size (width, height) in pixels.</span>
-<span class="c1"># #     img : ImageData</span>
-<span class="c1"># #         The image loaded from the specified path.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    img_path : str</span>
+<span class="sd">        URL or local path of the image.</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of the image.</span>
+<span class="sd">    size : (int, int), optional</span>
+<span class="sd">        Width and height in pixels of the image.</span>
 
-<span class="c1"># #     &quot;&quot;&quot;</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    size : (float, float)</span>
+<span class="sd">        Image size (width, height) in pixels.</span>
+<span class="sd">    img : ndarray</span>
+<span class="sd">        The image loaded from the specified path as a NumPy array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1"># #     @warn_on_args_to_kwargs()</span>
-<span class="c1"># #     def __init__(self, img_path, *, position=(0, 0), size=(100, 100)):</span>
-<span class="c1"># #         &quot;&quot;&quot;Init class instance.</span>
+<div class="viewcode-block" id="ImageContainer2D.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ImageContainer2D.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init class instance.</span>
 
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         img_path : string</span>
-<span class="c1"># #             URL or local path of the image</span>
-<span class="c1"># #         position : (float, float), optional</span>
-<span class="c1"># #             Absolute coordinates (x, y) of the lower-left corner of the image.</span>
-<span class="c1"># #         size : (int, int), optional</span>
-<span class="c1"># #             Width and height in pixels of the image.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        img_path : str or ndarray</span>
+<span class="sd">            URL, local path of the image, or a NumPy array containing image data.</span>
+<span class="sd">        position : (float, float), optional</span>
+<span class="sd">            Absolute coordinates (x, y) of the lower-left corner of the image.</span>
+<span class="sd">        size : (int, int), optional</span>
+<span class="sd">            Width and height in pixels of the image.</span>
 
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         super(ImageContainer2D, self).__init__(position=position)</span>
-<span class="c1"># #         self.img = load_image(img_path, as_vtktype=True)</span>
-<span class="c1"># #         self.set_img(self.img)</span>
-<span class="c1"># #         self.resize(size)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_img_path</span> <span class="o">=</span> <span class="n">img_path</span>
 
-<span class="c1"># #     def _get_size(self):</span>
-<span class="c1"># #         lower_left_corner = self.texture_points.GetPoint(0)</span>
-<span class="c1"># #         upper_right_corner = self.texture_points.GetPoint(2)</span>
-<span class="c1"># #         size = np.array(upper_right_corner) - np.array(lower_left_corner)</span>
-<span class="c1"># #         return abs(size[:2])</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ImageContainer2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">)</span>
 
-<span class="c1"># #     def _setup(self):</span>
-<span class="c1"># #         &quot;&quot;&quot;Setup this UI Component.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img_path</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
 
-<span class="c1"># #         Return an image as a 2D actor with a specific position.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_img</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span></div>
 
-<span class="c1"># #         Returns</span>
-<span class="c1"># #         -------</span>
-<span class="c1"># #         :class:`vtkTexturedActor2D`</span>
 
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         self.texture_polydata = PolyData()</span>
-<span class="c1"># #         self.texture_points = Points()</span>
-<span class="c1"># #         self.texture_points.SetNumberOfPoints(4)</span>
+<div class="viewcode-block" id="ImageContainer2D.scale">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ImageContainer2D.scale">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">factor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Scale the image.</span>
 
-<span class="c1"># #         polys = CellArray()</span>
-<span class="c1"># #         polys.InsertNextCell(4)</span>
-<span class="c1"># #         polys.InsertCellPoint(0)</span>
-<span class="c1"># #         polys.InsertCellPoint(1)</span>
-<span class="c1"># #         polys.InsertCellPoint(2)</span>
-<span class="c1"># #         polys.InsertCellPoint(3)</span>
-<span class="c1"># #         self.texture_polydata.SetPolys(polys)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        factor : (float, float)</span>
+<span class="sd">            Scaling factor (width, height) in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">factor</span><span class="p">)</span></div>
 
-<span class="c1"># #         tc = FloatArray()</span>
-<span class="c1"># #         tc.SetNumberOfComponents(2)</span>
-<span class="c1"># #         tc.SetNumberOfTuples(4)</span>
-<span class="c1"># #         tc.InsertComponent(0, 0, 0.0)</span>
-<span class="c1"># #         tc.InsertComponent(0, 1, 0.0)</span>
-<span class="c1"># #         tc.InsertComponent(1, 0, 1.0)</span>
-<span class="c1"># #         tc.InsertComponent(1, 1, 0.0)</span>
-<span class="c1"># #         tc.InsertComponent(2, 0, 1.0)</span>
-<span class="c1"># #         tc.InsertComponent(2, 1, 1.0)</span>
-<span class="c1"># #         tc.InsertComponent(3, 0, 0.0)</span>
-<span class="c1"># #         tc.InsertComponent(3, 1, 1.0)</span>
-<span class="c1"># #         self.texture_polydata.GetPointData().SetTCoords(tc)</span>
 
-<span class="c1"># #         texture_mapper = PolyDataMapper2D()</span>
-<span class="c1"># #         texture_mapper = set_input(texture_mapper, self.texture_polydata)</span>
+<div class="viewcode-block" id="ImageContainer2D.set_img">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ImageContainer2D.set_img">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_img</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Modify the image displayed by this container.</span>
 
-<span class="c1"># #         image = TexturedActor2D()</span>
-<span class="c1"># #         image.SetMapper(texture_mapper)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        img : ndarray</span>
+<span class="sd">            Image data as a NumPy array. Supports grayscale (H, W),</span>
+<span class="sd">            RGB (H, W, 3), and RGBA (H, W, 4) formats.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="n">img</span>
 
-<span class="c1"># #         self.texture = Texture()</span>
-<span class="c1"># #         image.SetTexture(self.texture)</span>
+        <span class="n">img_float</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
-<span class="c1"># #         image_property = Property2D()</span>
-<span class="c1"># #         image_property.SetOpacity(1.0)</span>
-<span class="c1"># #         image.SetProperty(image_property)</span>
-<span class="c1"># #         self.actor = image</span>
+        <span class="k">if</span> <span class="n">img_float</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">img_float</span> <span class="o">=</span> <span class="n">img_float</span> <span class="o">/</span> <span class="mf">255.0</span>
 
-<span class="c1"># #         # Add default events listener to the VTK actor.</span>
-<span class="c1"># #         self.handle_events(self.actor)</span>
+        <span class="k">if</span> <span class="n">img_float</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">img_float</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">img_float</span> <span class="o">=</span> <span class="n">img_float</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">img_float</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">img_float</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="o">*</span><span class="n">img_float</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">img_float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">img_float</span><span class="p">,</span> <span class="n">alpha</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-<span class="c1"># #     def _get_actors(self):</span>
-<span class="c1"># #         &quot;&quot;&quot;Return the actors that compose this UI component.&quot;&quot;&quot;</span>
-<span class="c1"># #         return [self.actor]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">map</span> <span class="o">=</span> <span class="n">Texture</span><span class="p">(</span><span class="n">img_float</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">needs_update</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="c1"># #     def _add_to_scene(self, scene):</span>
-<span class="c1"># #         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span></div>
+</div>
 
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         scene : scene</span>
-
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         scene.add(self.actor)</span>
-
-<span class="c1"># #     def resize(self, size):</span>
-<span class="c1"># #         &quot;&quot;&quot;Resize the image.</span>
-
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         size : (float, float)</span>
-<span class="c1"># #             image size (width, height) in pixels.</span>
-
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         # Update actor.</span>
-<span class="c1"># #         self.texture_points.SetPoint(0, 0, 0, 0.0)</span>
-<span class="c1"># #         self.texture_points.SetPoint(1, size[0], 0, 0.0)</span>
-<span class="c1"># #         self.texture_points.SetPoint(2, size[0], size[1], 0.0)</span>
-<span class="c1"># #         self.texture_points.SetPoint(3, 0, size[1], 0.0)</span>
-<span class="c1"># #         self.texture_polydata.SetPoints(self.texture_points)</span>
-
-<span class="c1"># #     def _set_position(self, coords):</span>
-<span class="c1"># #         &quot;&quot;&quot;Set the lower-left corner position of this UI component.</span>
-
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         coords: (float, float)</span>
-<span class="c1"># #             Absolute pixel coordinates (x, y).</span>
-
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         self.actor.SetPosition(*coords)</span>
-
-<span class="c1"># #     def scale(self, factor):</span>
-<span class="c1"># #         &quot;&quot;&quot;Scale the image.</span>
-
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         factor : (float, float)</span>
-<span class="c1"># #             Scaling factor (width, height) in pixels.</span>
-
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         self.resize(self.size * factor)</span>
-
-<span class="c1"># #     def set_img(self, img):</span>
-<span class="c1"># #         &quot;&quot;&quot;Modify the image used by the vtkTexturedActor2D.</span>
-
-<span class="c1"># #         Parameters</span>
-<span class="c1"># #         ----------</span>
-<span class="c1"># #         img : imageData</span>
-
-<span class="c1"># #         &quot;&quot;&quot;</span>
-<span class="c1"># #         self.texture = set_input(self.texture, img)</span>
 
 
 <span class="c1"># # class GridUI(UI):</span>
