@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.animation &#8212; FURY 2.1.0.dev95+g16b97b3ac documentation</title>
+    <title>fury.animation.animation &#8212; FURY 2.1.0.dev97+g4f0536f60 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=d44923a9"></script>
+    <script src="../../../_static/documentation_options.js?v=0ac433d2"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -426,17 +426,12 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial</span><span class="w"> </span><span class="kn">import</span> <span class="n">transform</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury</span><span class="w"> </span><span class="kn">import</span> <span class="n">utils</span>
-
-<span class="c1"># from fury.actor import line</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>  <span class="c1"># noqa F401</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">compose_transform_matrix</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">linear_interpolator</span><span class="p">,</span>
     <span class="n">slerp</span><span class="p">,</span>
-    <span class="n">spline_interpolator</span><span class="p">,</span>
     <span class="n">step_interpolator</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="c1"># from fury.lib import Actor, Camera, Transform</span>
 
 
 <div class="viewcode-block" id="Animation">
@@ -573,10 +568,6 @@ document.write(`
             <span class="p">[</span><span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ts</span><span class="p">]</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">):</span>
                 <span class="p">[</span><span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_color</span><span class="p">(</span><span class="n">t</span><span class="p">))</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">ts</span><span class="p">]</span>
-            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">colors</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">vcolors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">255</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span>
-                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
 
@@ -829,7 +820,7 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">should_be_in_scene</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">False</span>
 
 <div class="viewcode-block" id="Animation.set_interpolator">
@@ -1426,17 +1417,17 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        item : Animation, vtkActor, list[Animation], or list[vtkActor]</span>
+<span class="sd">        item : Animation, Actor, list[Animation], or list[Actor]</span>
 <span class="sd">            Actor/s to be animated by the Animation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">item</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="k">return</span>
-        <span class="c1"># elif isinstance(item, Actor):</span>
-        <span class="c1">#     self.add_actor(item)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_child_animation</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s2">&quot;local&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="si">}</span><span class="s2"> can&#39;t be animated&quot;</span><span class="p">)</span></div>
 
@@ -1470,7 +1461,7 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        actor : vtkActor or list(vtkActor)</span>
+<span class="sd">        actor : Actor or list(Actor)</span>
 <span class="sd">            Actor/s to be animated by the Animation.</span>
 <span class="sd">        static : bool</span>
 <span class="sd">            Indicated whether the actor should be animated and controlled by</span>
@@ -1485,7 +1476,6 @@ document.write(`
                 <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">actor</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">:</span>
-                <span class="n">actor</span><span class="o">.</span><span class="n">vcolors</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">colors_from_actor</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span></div>
 
 
@@ -1610,7 +1600,7 @@ document.write(`
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        actor : vtkActor</span>
+<span class="sd">        actor : Actor</span>
 <span class="sd">            Actor to be removed from the Animation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span></div>
@@ -1692,10 +1682,8 @@ document.write(`
 <span class="sd">            The time to update animation at. If None, the animation will play</span>
 <span class="sd">            without adding it to a Timeline.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">has_handler</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">time</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span>
-            <span class="n">has_handler</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># handling in/out of scene events</span>
         <span class="n">in_scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_inside_scene_at</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
@@ -1706,42 +1694,61 @@ document.write(`
                 <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
             <span class="k">elif</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
                 <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">DeepCopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_transform</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="n">parent_matrix</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="p">,</span> <span class="n">Animation</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_actors</span>
+        <span class="p">):</span>
+            <span class="n">parent_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_actors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="n">time</span>
 
         <span class="c1"># actors properties</span>
         <span class="k">if</span> <span class="n">in_scene</span><span class="p">:</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">rotation_quat</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">scale_factors</span> <span class="o">=</span> <span class="kc">None</span>
+
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
                 <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">Translate</span><span class="p">(</span><span class="o">*</span><span class="n">position</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">):</span>
+                <span class="n">rotation_quat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">as_quat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">):</span>
+                <span class="n">scale_factors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scale</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">rotation_quat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">scale_factors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="p">):</span>
+                <span class="n">transform_matrix</span> <span class="o">=</span> <span class="n">compose_transform_matrix</span><span class="p">(</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                    <span class="n">rotation_quat</span><span class="o">=</span><span class="n">rotation_quat</span><span class="p">,</span>
+                    <span class="n">scale_factors</span><span class="o">=</span><span class="n">scale_factors</span><span class="p">,</span>
+                    <span class="n">parent_matrix</span><span class="o">=</span><span class="n">parent_matrix</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
+                    <span class="n">actor</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">transform_matrix</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">):</span>
                 <span class="n">opacity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opacity</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="p">[</span><span class="n">act</span><span class="o">.</span><span class="n">GetProperty</span><span class="p">()</span><span class="o">.</span><span class="n">SetOpacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">):</span>
-                <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="c1"># Rotate in the same order as VTK defaults.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">RotateZ</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">RotateX</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">RotateY</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;scale&quot;</span><span class="p">):</span>
-                <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_scale</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="o">.</span><span class="n">Scale</span><span class="p">(</span><span class="o">*</span><span class="n">scale</span><span class="p">)</span>
+                <span class="n">opacity_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;material&quot;</span><span class="p">):</span>
+                        <span class="n">actor</span><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="n">opacity_val</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;color&quot;</span><span class="p">):</span>
                 <span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_color</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
-                    <span class="n">act</span><span class="o">.</span><span class="n">vcolors</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">color</span> <span class="o">*</span> <span class="mi">255</span>
-                    <span class="n">utils</span><span class="o">.</span><span class="n">update_actor</span><span class="p">(</span><span class="n">act</span><span class="p">)</span>
-
-            <span class="c1"># update actors&#39; transformation matrix</span>
-            <span class="p">[</span><span class="n">act</span><span class="o">.</span><span class="n">SetUserTransform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_transform</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
+                <span class="n">color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">color</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[:</span><span class="mi">3</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">actor</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="s2">&quot;colors&quot;</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">actor</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">colors_data</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">data</span>
+                            <span class="k">if</span> <span class="n">colors_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+                                <span class="n">colors_data</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+                                <span class="n">actor</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">update_range</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">attrib</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
             <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;callbacks&quot;</span><span class="p">,</span> <span class="p">[])</span>
@@ -1753,10 +1760,7 @@ document.write(`
         <span class="p">[</span><span class="n">callback</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_general_callbacks</span><span class="p">]</span>
 
         <span class="c1"># Also update all child Animations.</span>
-        <span class="p">[</span><span class="n">animation</span><span class="o">.</span><span class="n">update_animation</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_handler</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">reset_clipping_range</span><span class="p">()</span></div>
+        <span class="p">[</span><span class="n">animation</span><span class="o">.</span><span class="n">update_animation</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span></div>
 
 
 <div class="viewcode-block" id="Animation.add_to_scene">
@@ -1772,7 +1776,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">actor</span><span class="p">)</span> <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actors</span><span class="p">]</span>
         <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">static_act</span><span class="p">)</span> <span class="k">for</span> <span class="n">static_act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="p">]</span>
-        <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">animation</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span> <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">:</span>
             <span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">)</span>
@@ -1793,12 +1797,12 @@ document.write(`
 <span class="sd">        scene : fury.window.Scene</span>
 <span class="sd">            The scene from which to remove the animation, actors, and sub-animations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">act</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
-        <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="n">static_act</span><span class="p">)</span> <span class="k">for</span> <span class="n">static_act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">act</span><span class="p">)</span> <span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">static_act</span><span class="p">)</span> <span class="k">for</span> <span class="n">static_act</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_static_actors</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">child_animations</span><span class="p">:</span>
             <span class="n">anim</span><span class="o">.</span><span class="n">remove_from_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">:</span>
-            <span class="n">scene</span><span class="o">.</span><span class="n">rm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">)</span>
+            <span class="n">scene</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_actor</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">False</span></div>
 </div>
 
