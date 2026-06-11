@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.animation &#8212; FURY 2.1.0.dev99+g18f61bed0 documentation</title>
+    <title>fury.animation.animation &#8212; FURY 2.1.0.dev102+g279b4cfdf documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=afaaa948"></script>
+    <script src="../../../_static/documentation_options.js?v=ea416b39"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -432,6 +432,7 @@ document.write(`
     <span class="n">slerp</span><span class="p">,</span>
     <span class="n">step_interpolator</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldObject</span>
 
 
 <div class="viewcode-block" id="Animation">
@@ -472,11 +473,12 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="n">length</span> <span class="k">if</span> <span class="n">length</span> <span class="k">else</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">loop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_transform</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_max_timestamp</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_added_to_scene</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_motion_path_res</span> <span class="o">=</span> <span class="n">motion_path_res</span>
@@ -1426,7 +1428,7 @@ document.write(`
             <span class="k">return</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_child_animation</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="s2">&quot;local&quot;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">WorldObject</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_actor</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Object of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="si">}</span><span class="s2"> can&#39;t be animated&quot;</span><span class="p">)</span></div>
@@ -1695,11 +1697,8 @@ document.write(`
             <span class="k">elif</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
                 <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
         <span class="n">parent_matrix</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="p">,</span> <span class="n">Animation</span><span class="p">)</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_actors</span>
-        <span class="p">):</span>
-            <span class="n">parent_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_actors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="p">,</span> <span class="n">Animation</span><span class="p">):</span>
+            <span class="n">parent_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parent_animation</span><span class="o">.</span><span class="n">_current_transform</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="n">time</span>
 
@@ -1722,6 +1721,7 @@ document.write(`
                 <span class="n">position</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="ow">or</span> <span class="n">rotation_quat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
                 <span class="ow">or</span> <span class="n">scale_factors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">or</span> <span class="n">parent_matrix</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="p">):</span>
                 <span class="n">transform_matrix</span> <span class="o">=</span> <span class="n">compose_transform_matrix</span><span class="p">(</span>
                     <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
@@ -1729,12 +1729,20 @@ document.write(`
                     <span class="n">scale_factors</span><span class="o">=</span><span class="n">scale_factors</span><span class="p">,</span>
                     <span class="n">parent_matrix</span><span class="o">=</span><span class="n">parent_matrix</span><span class="p">,</span>
                 <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_current_transform</span> <span class="o">=</span> <span class="n">transform_matrix</span>
                 <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
                     <span class="n">actor</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">transform_matrix</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;opacity&quot;</span><span class="p">):</span>
                 <span class="n">opacity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_opacity</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="n">opacity_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">opacity_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">opacity_arr</span><span class="o">.</span><span class="n">size</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;Opacity animation expects a scalar value; using the &quot;</span>
+                        <span class="s2">&quot;first value from the interpolated opacity array.&quot;</span><span class="p">,</span>
+                        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">opacity_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">opacity_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
                 <span class="k">for</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
                     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;material&quot;</span><span class="p">):</span>
                         <span class="n">actor</span><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="n">opacity_val</span>
@@ -1831,8 +1839,6 @@ document.write(`
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    camera : Camera</span>
-<span class="sd">        Camera being animated by the CameraAnimation.</span>
 <span class="sd">    duration : float</span>
 <span class="sd">        The duration of the animation in seconds.</span>
 <span class="sd">    loop : bool</span>
@@ -1848,6 +1854,30 @@ document.write(`
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span></div>
 
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">camera</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the camera being animated.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Camera</span>
+<span class="sd">            The camera being animated by the CameraAnimation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span>
+
+    <span class="nd">@camera</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">camera</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">camera</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the camera being animated.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        camera : Camera</span>
+<span class="sd">            The camera to be animated by the CameraAnimation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="n">camera</span>
 
 <div class="viewcode-block" id="CameraAnimation.set_focal">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.CameraAnimation.set_focal">[docs]</a>
@@ -2039,39 +2069,41 @@ document.write(`
 <span class="sd">            The time to update the camera animation at. If None, the animation</span>
 <span class="sd">            will play.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_time</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="ow">and</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="n">time</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+            <span class="k">elif</span> <span class="n">time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+                <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_timestamp</span> <span class="o">=</span> <span class="n">time</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">camera</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">update_animation</span><span class="p">(</span><span class="n">tile</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
-                <span class="k">return</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">):</span>
-                <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">GetPosition</span><span class="p">()</span>
-                <span class="n">translation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
-                <span class="n">translation</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos</span>
-                <span class="c1"># camera axis is reverted</span>
-                <span class="n">rot</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">as_quat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="n">rot</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
-                <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">*</span><span class="n">rot</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
-                <span class="n">rot</span> <span class="o">=</span> <span class="n">translation</span> <span class="o">@</span> <span class="n">rot</span> <span class="o">@</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">translation</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetModelTransformMatrix</span><span class="p">(</span><span class="n">rot</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+            <span class="k">return</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
+            <span class="n">cam_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cam_pos</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">):</span>
+            <span class="n">cam_up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_up</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">reference_up</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">cam_up</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">):</span>
+            <span class="n">cam_foc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_focal</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">look_at</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">cam_foc</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">):</span>
+            <span class="n">rot_quat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_rotation</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">as_quat</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">rot_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">rot_mat</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">transform</span><span class="o">.</span><span class="n">Rotation</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">rot_quat</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;position&quot;</span><span class="p">):</span>
-                <span class="n">cam_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetPosition</span><span class="p">(</span><span class="n">cam_pos</span><span class="p">)</span>
+                <span class="n">rot_mat</span><span class="p">[:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">rot_mat</span>
 
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;focal&quot;</span><span class="p">):</span>
-                <span class="n">cam_foc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_focal</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetFocalPoint</span><span class="p">(</span><span class="n">cam_foc</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">):</span>
-                <span class="n">cam_up</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_up</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetViewUp</span><span class="p">(</span><span class="n">cam_up</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_interpolatable</span><span class="p">(</span><span class="s2">&quot;view_up&quot;</span><span class="p">):</span>
-                <span class="c1"># to preserve up-view as default after user interaction</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_camera</span><span class="o">.</span><span class="n">SetViewUp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_scene</span><span class="o">.</span><span class="n">reset_clipping_range</span><span class="p">()</span></div>
+        <span class="p">[</span><span class="n">callback</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_general_callbacks</span><span class="p">]</span></div>
 </div>
 
 </pre></div>
