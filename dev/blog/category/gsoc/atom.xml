@@ -2,10 +2,78 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts in gsoc</title>
-  <updated>2026-06-11T14:57:42.264579+00:00</updated>
+  <updated>2026-06-12T15:43:35.011170+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/category/gsoc/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.13">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2026/2026-05-25-week-2-medha.html</id>
+    <title>Week 2: Fixing Doc Build Warnings and Improving Documentation Pipeline</title>
+    <updated>2026-06-08T00:00:00+00:00</updated>
+    <author>
+      <name>Medha Bhardwaj</name>
+    </author>
+    <content type="html">&lt;section id="week-2-fixing-doc-build-warnings-and-improving-documentation-pipeline"&gt;
+
+&lt;p&gt;The second week of the coding period was a highly productive start, and I was able to accomplish a lot of work that I am honestly proud of. This week, my primary focus was on improving the FURY documentation pipeline and fixing various build warnings.&lt;/p&gt;
+&lt;section id="overview"&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This week, I worked on the following pull requests:&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="documentation-improvements-and-build-fixes"&gt;
+&lt;h2&gt;Documentation Improvements and Build Fixes&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Integrate Version Switcher, Add Local Docs Server, and Fix Version Redirection&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1233"&gt;#1233&lt;/a&gt;)
+This pull request focused on integrating a Version Switcher, adding a Local Docs Server, and fixing Version Redirection to improve the overall documentation navigation. Specifically, if a user is on a page and selects a different documentation version, they will now be properly redirected to that exact same page in the selected version. If the page does not exist in the older version, they are smoothly redirected to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;index.html&lt;/span&gt;&lt;/code&gt; page instead.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Fix GL01 and address SS06 warnings&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1237"&gt;#1237&lt;/a&gt;)
+Here, I addressed and fixed the NumPy warnings that were previously suppressed as exceptions in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;pyproject.toml&lt;/span&gt;&lt;/code&gt; file. I tackled these changes across several commits, utilizing automated tools to speed up the process:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Removing TOML Exceptions:&lt;/em&gt; First, I removed the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SA04&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt;, and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL02&lt;/span&gt;&lt;/code&gt; exceptions from &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;pyproject.toml&lt;/span&gt;&lt;/code&gt; so that these rules are actually checked going forward.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Automated GL01 Fixes:&lt;/em&gt; I was able to fix most of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; warnings automatically by running &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ruff&lt;/span&gt; &lt;span class="pre"&gt;check&lt;/span&gt; &lt;span class="pre"&gt;--select&lt;/span&gt; &lt;span class="pre"&gt;D213&lt;/span&gt; &lt;span class="pre"&gt;--fix&lt;/span&gt; &lt;span class="pre"&gt;.&lt;/span&gt;&lt;/code&gt;, because &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;D213&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; check for the exact same docstring rules.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Docformatter Edge Cases:&lt;/em&gt; There were some edge cases that the automated tools couldn’t catch, like single-line summaries and missing line breaks at the end of docstrings, so I went in and fixed those manually.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;SS06 Warnings:&lt;/em&gt; I also cleaned up the few lingering &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SS06&lt;/span&gt;&lt;/code&gt; warnings across the codebase.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Reinforcing Rules with Ruff:&lt;/em&gt; To make sure these issues don’t come back, I set up Ruff to handle the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL02&lt;/span&gt;&lt;/code&gt; validations. This means the rules are now enforced automatically, and contributors won’t have to worry about resolving them manually since Ruff takes care of it during the pre-commit hooks.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Enable strict documentation builds with warnings treated as errors&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1244"&gt;#1244&lt;/a&gt;)
+I configured the build system to treat warnings as errors. This ensures that any new warnings will automatically fail the CI/CD documentation build upon creating or updating a Pull Request.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Update Gallery Examples and Handling&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1238"&gt;#1238&lt;/a&gt;)
+I will likely close this PR. Although the current approach to building the gallery is complex, it provides the ability to avoid duplicate examples by mentioning them in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;.toml&lt;/span&gt;&lt;/code&gt; file.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="understanding-the-build-pipeline"&gt;
+&lt;h2&gt;Understanding the Build Pipeline&lt;/h2&gt;
+&lt;p&gt;In addition to the code changes, I spent time understanding the entire FURY documentation build pipeline, including how it works and how it can be optimized in the future. I also proposed and discussed a few ideas for improvement with my mentor.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-i-learned"&gt;
+&lt;h2&gt;What I Learned&lt;/h2&gt;
+&lt;p&gt;Beyond the code itself, this week helped me better understand some of the development practices followed within FURY.&lt;/p&gt;
+&lt;p&gt;One thing that stood out was the importance of maintaining a clean repository history. Through reviews and discussions, I learned how presenting work in a smaller number of meaningful commits makes changes easier to review, understand, and track in the future. It is a simple practice, but one that has a significant impact on project maintenance in the long term.&lt;/p&gt;
+&lt;p&gt;Overall, it was encouraging to start the coding period by gaining a deeper understanding of both the codebase and the contribution workflow.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="next-week"&gt;
+&lt;h2&gt;Next Week&lt;/h2&gt;
+&lt;p&gt;Next week, I plan to work on the following tasks:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Port Textbox2d to v2 architecture&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Introduce Rangeslider and LineDoubleSlider2D&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add GIFs to animation examples&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="connect-with-me"&gt;
+&lt;h2&gt;Connect with Me&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2026/2026-05-25-week-2-medha.html"/>
+    <summary>The second week of the coding period was a highly productive start, and I was able to accomplish a lot of work that I am honestly proud of. This week, my primary focus was on improving the FURY documentation pipeline and fixing various build warnings.</summary>
+    <category term="google" label="google"/>
+    <published>2026-06-08T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2026/2026-06-01-week-1-medha.html</id>
     <title>Week 1: Fixing Doc Build Warnings and Introducing RingSlider</title>
@@ -732,94 +800,6 @@ This week, I focused on updating the &lt;code class="docutils literal notranslat
     <link href="https://fury.gl/posts/2024/2024-06-26-week4-wachiou-bouraima.html"/>
     <summary>Welcome again to my Google summer of code 2024 (GSoC’ 2024) journey 2024!.
 This week, I focused on updating the warn_on_args_to_kwargs decorator, applying it across multiple modules, exploring lazy loading, and continuing with code reviews.</summary>
-    <category term="google" label="google"/>
-    <published>2024-06-26T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-06-26-week3-wachiou-bouraima.html</id>
-    <title>WEEK 3: Refinements and Further Enhancements</title>
-    <updated>2024-06-26T00:00:00+00:00</updated>
-    <author>
-      <name>Wachiou BOURAIMA</name>
-    </author>
-    <content type="html">&lt;section id="week-3-refinements-and-further-enhancements"&gt;
-
-&lt;section id="hello-everyone"&gt;
-&lt;h2&gt;Hello everyone,&lt;/h2&gt;
-&lt;p&gt;Welcome to the fourth week of my Google Summer of Code (GSoC) 2024 journey!
-This week I’ve been delving into the technical aspects of my project,
-focusing on the consistent application of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator and the initial implementation of lazy loading.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="consistent-application-of-warn-on-args-to-kwargs"&gt;
-&lt;h2&gt;Consistent application of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt;&lt;/h2&gt;
-&lt;p&gt;This week I continued to apply the decorator to functions.
-To ensure consistency across the code base, I audited all functions that could benefit from the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator.
-To do this, I had to:&lt;/p&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;Identify target functions:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Identify functions that could benefit from the decorator.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;continue reviewing the code base to identify functions that accept both positional and keyword arguments.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Applying the Decorator:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;For each identified function, I added the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Example:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="nd"&gt;@warn_on_args_to_kwargs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
-&lt;span class="k"&gt;def&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nf"&gt;get_actor_from_primitive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
-   &lt;span class="n"&gt;vertices&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;triangles&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;normals&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;None&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;backface_culling&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="kc"&gt;True&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="n"&gt;prim_count&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
-   &lt;span class="p"&gt;):&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;Updating Unit Tests:&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-06-26-week3-wachiou-bouraima.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;updated all the unit tests for the functions where the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator is applied to ensure they respect the new format.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Example:&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class="highlight-python notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;actr&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;get_actor_from_primitive&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;big_verts&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;big_faces&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="n"&gt;colors&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="n"&gt;big_colors&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;You can find more details and the implementation in my pull request: &lt;a class="github reference external" href="https://github.com/fury-gl/fury/pull/888"&gt;fury-gl/fury#888&lt;/a&gt;.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="what-happens-next"&gt;
-&lt;h2&gt;What Happens Next?&lt;/h2&gt;
-&lt;p&gt;For week 4, I plan to:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Continue refining the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator based on feedback from my Peers &lt;a class="reference external" href="https://github.com/itellaetxe"&gt;Iñigo Tellaetxe Elorriaga&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin Roy&lt;/a&gt;, &lt;a class="reference external" href="https://github.com/deka27"&gt;Kaustav Deka&lt;/a&gt;, my guide: &lt;a class="reference external" href="https://github.com/skoudoro"&gt;Serge Koudoro&lt;/a&gt; and the other community members.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Apply the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;warn_on_args_to_kwargs&lt;/span&gt;&lt;/code&gt; decorator to all the remaining modules and update all the unit tests of these modules too, to respect the desired format.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Dive deep into the lazy loading functionality based on my research to optimize performance.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Further engage in code reviews to support my peers and improve our project.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="did-i-get-stuck"&gt;
-&lt;h2&gt;Did I get stuck?&lt;/h2&gt;
-&lt;p&gt;I didn’t get stuck.&lt;/p&gt;
-&lt;p&gt;Thank you for following my progress. Your feedback is always welcome.&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-06-26-week3-wachiou-bouraima.html"/>
-    <summary>Welcome to the fourth week of my Google Summer of Code (GSoC) 2024 journey!
-This week I’ve been delving into the technical aspects of my project,
-focusing on the consistent application of the warn_on_args_to_kwargs decorator and the initial implementation of lazy loading.</summary>
     <category term="google" label="google"/>
     <published>2024-06-26T00:00:00+00:00</published>
   </entry>

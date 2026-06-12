@@ -2,10 +2,78 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posted in 2026</title>
-  <updated>2026-06-11T14:57:42.358772+00:00</updated>
+  <updated>2026-06-12T15:43:35.104080+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/2026/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.13">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2026/2026-05-25-week-2-medha.html</id>
+    <title>Week 2: Fixing Doc Build Warnings and Improving Documentation Pipeline</title>
+    <updated>2026-06-08T00:00:00+00:00</updated>
+    <author>
+      <name>Medha Bhardwaj</name>
+    </author>
+    <content type="html">&lt;section id="week-2-fixing-doc-build-warnings-and-improving-documentation-pipeline"&gt;
+
+&lt;p&gt;The second week of the coding period was a highly productive start, and I was able to accomplish a lot of work that I am honestly proud of. This week, my primary focus was on improving the FURY documentation pipeline and fixing various build warnings.&lt;/p&gt;
+&lt;section id="overview"&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This week, I worked on the following pull requests:&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="documentation-improvements-and-build-fixes"&gt;
+&lt;h2&gt;Documentation Improvements and Build Fixes&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Integrate Version Switcher, Add Local Docs Server, and Fix Version Redirection&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1233"&gt;#1233&lt;/a&gt;)
+This pull request focused on integrating a Version Switcher, adding a Local Docs Server, and fixing Version Redirection to improve the overall documentation navigation. Specifically, if a user is on a page and selects a different documentation version, they will now be properly redirected to that exact same page in the selected version. If the page does not exist in the older version, they are smoothly redirected to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;index.html&lt;/span&gt;&lt;/code&gt; page instead.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Fix GL01 and address SS06 warnings&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1237"&gt;#1237&lt;/a&gt;)
+Here, I addressed and fixed the NumPy warnings that were previously suppressed as exceptions in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;pyproject.toml&lt;/span&gt;&lt;/code&gt; file. I tackled these changes across several commits, utilizing automated tools to speed up the process:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Removing TOML Exceptions:&lt;/em&gt; First, I removed the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SA04&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt;, and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL02&lt;/span&gt;&lt;/code&gt; exceptions from &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;pyproject.toml&lt;/span&gt;&lt;/code&gt; so that these rules are actually checked going forward.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Automated GL01 Fixes:&lt;/em&gt; I was able to fix most of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; warnings automatically by running &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ruff&lt;/span&gt; &lt;span class="pre"&gt;check&lt;/span&gt; &lt;span class="pre"&gt;--select&lt;/span&gt; &lt;span class="pre"&gt;D213&lt;/span&gt; &lt;span class="pre"&gt;--fix&lt;/span&gt; &lt;span class="pre"&gt;.&lt;/span&gt;&lt;/code&gt;, because &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;D213&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; check for the exact same docstring rules.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Docformatter Edge Cases:&lt;/em&gt; There were some edge cases that the automated tools couldn’t catch, like single-line summaries and missing line breaks at the end of docstrings, so I went in and fixed those manually.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;SS06 Warnings:&lt;/em&gt; I also cleaned up the few lingering &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;SS06&lt;/span&gt;&lt;/code&gt; warnings across the codebase.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Reinforcing Rules with Ruff:&lt;/em&gt; To make sure these issues don’t come back, I set up Ruff to handle the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL01&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;GL02&lt;/span&gt;&lt;/code&gt; validations. This means the rules are now enforced automatically, and contributors won’t have to worry about resolving them manually since Ruff takes care of it during the pre-commit hooks.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Enable strict documentation builds with warnings treated as errors&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1244"&gt;#1244&lt;/a&gt;)
+I configured the build system to treat warnings as errors. This ensures that any new warnings will automatically fail the CI/CD documentation build upon creating or updating a Pull Request.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Update Gallery Examples and Handling&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1238"&gt;#1238&lt;/a&gt;)
+I will likely close this PR. Although the current approach to building the gallery is complex, it provides the ability to avoid duplicate examples by mentioning them in the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;.toml&lt;/span&gt;&lt;/code&gt; file.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="understanding-the-build-pipeline"&gt;
+&lt;h2&gt;Understanding the Build Pipeline&lt;/h2&gt;
+&lt;p&gt;In addition to the code changes, I spent time understanding the entire FURY documentation build pipeline, including how it works and how it can be optimized in the future. I also proposed and discussed a few ideas for improvement with my mentor.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-i-learned"&gt;
+&lt;h2&gt;What I Learned&lt;/h2&gt;
+&lt;p&gt;Beyond the code itself, this week helped me better understand some of the development practices followed within FURY.&lt;/p&gt;
+&lt;p&gt;One thing that stood out was the importance of maintaining a clean repository history. Through reviews and discussions, I learned how presenting work in a smaller number of meaningful commits makes changes easier to review, understand, and track in the future. It is a simple practice, but one that has a significant impact on project maintenance in the long term.&lt;/p&gt;
+&lt;p&gt;Overall, it was encouraging to start the coding period by gaining a deeper understanding of both the codebase and the contribution workflow.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="next-week"&gt;
+&lt;h2&gt;Next Week&lt;/h2&gt;
+&lt;p&gt;Next week, I plan to work on the following tasks:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Port Textbox2d to v2 architecture&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Introduce Rangeslider and LineDoubleSlider2D&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add GIFs to animation examples&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="connect-with-me"&gt;
+&lt;h2&gt;Connect with Me&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2026/2026-05-25-week-2-medha.html"/>
+    <summary>The second week of the coding period was a highly productive start, and I was able to accomplish a lot of work that I am honestly proud of. This week, my primary focus was on improving the FURY documentation pipeline and fixing various build warnings.</summary>
+    <category term="google" label="google"/>
+    <published>2026-06-08T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2026/2026-06-01-week-1-medha.html</id>
     <title>Week 1: Fixing Doc Build Warnings and Introducing RingSlider</title>
