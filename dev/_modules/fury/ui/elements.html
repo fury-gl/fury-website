@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.elements &#8212; FURY 2.1.0.dev107+g58dff47f8 documentation</title>
+    <title>fury.ui.elements &#8212; FURY 2.1.0.dev112+gcb0149492 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=f950713a"></script>
+    <script src="../../../_static/documentation_options.js?v=df7784f8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -438,15 +438,17 @@ document.write(`
     <span class="c1">#     &quot;DrawShape&quot;,</span>
     <span class="c1">#     &quot;DrawPanel&quot;,</span>
     <span class="s2">&quot;PlaybackPanel&quot;</span><span class="p">,</span>
-    <span class="c1">#     &quot;Card2D&quot;,</span>
+    <span class="s2">&quot;Card2D&quot;</span><span class="p">,</span>
     <span class="c1">#     &quot;SpinBox&quot;,</span>
 <span class="p">]</span>
 
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnidentifiedImageError</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_viz_icons</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_extension</span><span class="p">,</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">load_image_texture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageContainer2D</span><span class="p">,</span> <span class="n">Panel2D</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UI</span><span class="p">,</span>
@@ -4654,286 +4656,425 @@ document.write(`
 <span class="c1">#         i_ren.force_render()</span>
 
 
-<span class="c1"># class Card2D(UI):</span>
-<span class="c1">#     &quot;&quot;&quot;Card element to show image and related text</span>
+<div class="viewcode-block" id="Card2D">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Card2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 2D card UI component that displays an image with title and body text.</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     image: :class: &#39;ImageContainer2D&#39;</span>
-<span class="c1">#         Renders the image on the card.</span>
-<span class="c1">#     title_box: :class: &#39;TextBlock2D&#39;</span>
-<span class="c1">#         Displays the title on card.</span>
-<span class="c1">#     body_box: :class: &#39;TextBLock2D&#39;</span>
-<span class="c1">#         Displays the body text.</span>
+<span class="sd">    The card layout places the image at the top, followed by the title and</span>
+<span class="sd">    body text below. It can optionally be dragged around the scene.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image_path : str</span>
+<span class="sd">        Path to the image file. Supports png and jpg/jpeg images.</span>
+<span class="sd">    body_text : str, optional</span>
+<span class="sd">        Card body text.</span>
+<span class="sd">    draggable : bool, optional</span>
+<span class="sd">        If True, the card can be dragged with the mouse.</span>
+<span class="sd">    title_text : str, optional</span>
+<span class="sd">        Card title text.</span>
+<span class="sd">    padding : int, optional</span>
+<span class="sd">        Padding between image, title, and body in pixels.</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates (x, y) for placement.</span>
+<span class="sd">    size : (int, int), optional</span>
+<span class="sd">        Width and height in pixels of the card.</span>
+<span class="sd">    image_scale : float, optional</span>
+<span class="sd">        Fraction of the card height taken by the image (between 0 and 1).</span>
+<span class="sd">    bg_color : (float, float, float) or str, optional</span>
+<span class="sd">        Background color of the card. Can be RGB/RGBA array, or hex string.</span>
+<span class="sd">    bg_opacity : float, optional</span>
+<span class="sd">        Background opacity. Must be in [0, 1].</span>
+<span class="sd">    title_color : (float, float, float) or str, optional</span>
+<span class="sd">        Title text color. Can be RGB/RGBA array, or hex string.</span>
+<span class="sd">    body_color : (float, float, float) or str, optional</span>
+<span class="sd">        Body text color. Can be RGB/RGBA array, or hex string.</span>
+<span class="sd">    border_color : (float, float, float) or str, optional</span>
+<span class="sd">        Border color. Can be RGB/RGBA array, or hex string.</span>
+<span class="sd">    border_width : int, optional</span>
+<span class="sd">        Width of the border in pixels.</span>
+<span class="sd">    maintain_aspect : bool, optional</span>
+<span class="sd">        If True, the image is scaled to maintain its aspect ratio.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        The stacking priority of the card.</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(</span>
-<span class="c1">#         self,</span>
-<span class="c1">#         image_path,</span>
-<span class="c1">#         *,</span>
-<span class="c1">#         body_text=&quot;&quot;,</span>
-<span class="c1">#         draggable=True,</span>
-<span class="c1">#         title_text=&quot;&quot;,</span>
-<span class="c1">#         padding=10,</span>
-<span class="c1">#         position=(0, 0),</span>
-<span class="c1">#         size=(400, 400),</span>
-<span class="c1">#         image_scale=0.5,</span>
-<span class="c1">#         bg_color=(0.5, 0.5, 0.5),</span>
-<span class="c1">#         bg_opacity=1,</span>
-<span class="c1">#         title_color=(0.0, 0.0, 0.0),</span>
-<span class="c1">#         body_color=(0.0, 0.0, 0.0),</span>
-<span class="c1">#         border_color=(1.0, 1.0, 1.0),</span>
-<span class="c1">#         border_width=0,</span>
-<span class="c1">#         maintain_aspect=False,</span>
-<span class="c1">#     ):</span>
-<span class="c1">#         &quot;&quot;&quot;Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         image_path: str</span>
-<span class="c1">#             Path of the image, supports png and jpg/jpeg images</span>
-<span class="c1">#         body_text: str, optional</span>
-<span class="c1">#             Card body text</span>
-<span class="c1">#         draggable: Bool, optional</span>
-<span class="c1">#             If the card should be draggable</span>
-<span class="c1">#         title_text: str, optional</span>
-<span class="c1">#             Card title text</span>
-<span class="c1">#         padding: int, optional</span>
-<span class="c1">#             Padding between image, title, body</span>
-<span class="c1">#         position : (float, float), optional</span>
-<span class="c1">#             Absolute coordinates (x, y) of the lower-left corner of the</span>
-<span class="c1">#             UI component</span>
-<span class="c1">#         size : (int, int), optional</span>
-<span class="c1">#             Width and height of the pixels of this UI component.</span>
-<span class="c1">#         image_scale: float, optional</span>
-<span class="c1">#             fraction of size taken by the image (between 0 , 1)</span>
-<span class="c1">#         bg_color: (float, float, float), optional</span>
-<span class="c1">#             Background color of card</span>
-<span class="c1">#         bg_opacity: float, optional</span>
-<span class="c1">#             Background opacity</span>
-<span class="c1">#         title_color: (float, float, float), optional</span>
-<span class="c1">#             Title text color</span>
-<span class="c1">#         body_color: (float, float, float), optional</span>
-<span class="c1">#             Body text color</span>
-<span class="c1">#         border_color: (float, float, float), optional</span>
-<span class="c1">#             Border color</span>
-<span class="c1">#         border_width: int, optional</span>
-<span class="c1">#             Width of the border</span>
-<span class="c1">#         maintain_aspect: bool, optional</span>
-<span class="c1">#             If the image should be scaled to maintain aspect ratio</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    image : :class:`ImageContainer2D`</span>
+<span class="sd">        Renders the image on the card.</span>
+<span class="sd">    title_box : :class:`TextBlock2D`</span>
+<span class="sd">        Displays the title on the card.</span>
+<span class="sd">    body_box : :class:`TextBlock2D`</span>
+<span class="sd">        Displays the body text on the card.</span>
+<span class="sd">    panel : :class:`Panel2D`</span>
+<span class="sd">        The background panel that holds all card elements.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.image_path = image_path</span>
-<span class="c1">#         self._basename = os.path.basename(self.image_path)</span>
-<span class="c1">#         self._extension = self._basename.split(&quot;.&quot;)[-1]</span>
-<span class="c1">#         if self._extension not in [&quot;jpg&quot;, &quot;jpeg&quot;, &quot;png&quot;]:</span>
-<span class="c1">#             raise UnidentifiedImageError(</span>
-<span class="c1">#                 f&quot;Image extension {self._extension} not supported&quot;</span>
-<span class="c1">#             )</span>
+<div class="viewcode-block" id="Card2D.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">image_path</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">body_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">draggable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">title_text</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">400</span><span class="p">),</span>
+        <span class="n">image_scale</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">bg_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">bg_opacity</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">title_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">body_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">border_color</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+        <span class="n">border_width</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="n">maintain_aspect</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Card2D instance.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">=</span> <span class="n">image_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_extension</span> <span class="o">=</span> <span class="n">get_extension</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extension</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">UnidentifiedImageError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Image extension </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_extension</span><span class="si">}</span><span class="s2"> not supported&quot;</span>
+            <span class="p">)</span>
 
-<span class="c1">#         self.body_text = body_text</span>
-<span class="c1">#         self.title_text = title_text</span>
-<span class="c1">#         self.draggable = draggable</span>
-<span class="c1">#         self.card_size = size</span>
-<span class="c1">#         self.padding = padding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body_text</span> <span class="o">=</span> <span class="n">body_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_text</span> <span class="o">=</span> <span class="n">title_text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span> <span class="o">=</span> <span class="n">draggable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">card_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
 
-<span class="c1">#         self.title_color = [np.clip(value, 0, 1) for value in title_color]</span>
-<span class="c1">#         self.body_color = [np.clip(value, 0, 1) for value in body_color]</span>
-<span class="c1">#         self.bg_color = [np.clip(value, 0, 1) for value in bg_color]</span>
-<span class="c1">#         self.border_color = [np.clip(value, 0, 1) for value in border_color]</span>
-<span class="c1">#         self.bg_opacity = bg_opacity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_title_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">title_color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_body_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">body_color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">bg_color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_border_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">border_color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bg_opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">bg_opacity</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="c1">#         self.text_scale = np.clip(1 - image_scale, 0, 1)</span>
-<span class="c1">#         self.image_scale = np.clip(image_scale, 0, 1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">image_scale</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">image_scale</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="c1">#         self.maintain_aspect = maintain_aspect</span>
-<span class="c1">#         if self.maintain_aspect:</span>
-<span class="c1">#             self._true_image_size = Image.open(urlopen(self.image_path)).size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_data</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_path</span><span class="p">)</span>
 
-<span class="c1">#         self._image_size = (self.card_size[0], self.card_size[1] * self.image_scale)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maintain_aspect</span> <span class="o">=</span> <span class="n">maintain_aspect</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintain_aspect</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_true_image_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="c1">#         self.border_width = border_width</span>
-<span class="c1">#         self.has_border = bool(border_width)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">border_width</span> <span class="o">=</span> <span class="n">border_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_border</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">border_width</span><span class="p">)</span>
 
-<span class="c1">#         super(Card2D, self).__init__()</span>
-<span class="c1">#         self.position = position</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Card2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">)</span>
 
-<span class="c1">#         if self.maintain_aspect:</span>
-<span class="c1">#             self._new_size = (</span>
-<span class="c1">#                 self._true_image_size[0],</span>
-<span class="c1">#                 self._true_image_size[1] // self.image_scale,</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.resize(self._new_size)</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.resize(size)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintain_aspect</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_new_size</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_true_image_size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_true_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_scale</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_new_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span></div>
 
-<span class="c1">#     def _setup(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Setup this UI component</span>
-<span class="c1">#         Create the image.</span>
-<span class="c1">#         Create the title and body.</span>
-<span class="c1">#         Create a Panel2D widget to hold image, title, body.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.image = ImageContainer2D(img_path=self.image_path, size=self._image_size)</span>
 
-<span class="c1">#         self.body_box = TextBlock2D(text=self.body_text, color=self.body_color)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up this UI component.</span>
 
-<span class="c1">#         self.title_box = TextBlock2D(</span>
-<span class="c1">#             text=self.title_text, bold=True, color=self.title_color</span>
-<span class="c1">#         )</span>
+<span class="sd">        Creates the image, title, body text, and a Panel2D to hold them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">,</span> <span class="n">_title_box_size</span><span class="p">,</span> <span class="n">_body_box_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_sizes</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">card_size</span>
+        <span class="p">)</span>
 
-<span class="c1">#         self.panel = Panel2D(</span>
-<span class="c1">#             self.card_size,</span>
-<span class="c1">#             color=self.bg_color,</span>
-<span class="c1">#             opacity=self.bg_opacity,</span>
-<span class="c1">#             border_color=self.border_color,</span>
-<span class="c1">#             border_width=self.border_width,</span>
-<span class="c1">#             has_border=self.has_border,</span>
-<span class="c1">#         )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="n">ImageContainer2D</span><span class="p">(</span><span class="n">img_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">)</span>
 
-<span class="c1">#         self.panel.add_element(self.image, (0.0, 0.0))</span>
-<span class="c1">#         self.panel.add_element(self.title_box, (0.0, 0.0))</span>
-<span class="c1">#         self.panel.add_element(self.body_box, (0.0, 0.0))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">body_text</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_body_color</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">_body_box_size</span>
+        <span class="p">)</span>
 
-<span class="c1">#         if self.draggable:</span>
-<span class="c1">#             self.panel.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 self.left_button_dragged</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.panel.background.on_left_mouse_button_pressed = (</span>
-<span class="c1">#                 self.left_button_pressed</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.image.on_left_mouse_button_dragged = self.left_button_dragged</span>
-<span class="c1">#             self.image.on_left_mouse_button_pressed = self.left_button_pressed</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.panel.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 lambda i_ren, _obj, _comp: i_ren.force_render</span>
-<span class="c1">#             )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">,</span>
+            <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_title_color</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">_title_box_size</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#     def _get_actors(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.panel.actors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">card_size</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bg_color</span><span class="p">,</span>
+            <span class="n">opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_bg_opacity</span><span class="p">,</span>
+            <span class="n">border_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_border_color</span><span class="p">,</span>
+            <span class="n">border_width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">border_width</span><span class="p">,</span>
+            <span class="n">has_border</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">has_border</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#     def _add_to_scene(self, _scene):</span>
-<span class="c1">#         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         scene : scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_drag_events</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="p">)</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.add_to_scene(_scene)</span>
-<span class="c1">#         if self.size[0] &lt;= 200:</span>
-<span class="c1">#             clip_overflow(self.body_box, self.size[0] - 2 * self.padding)</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             wrap_overflow(self.body_box, self.size[0] - 2 * self.padding)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_drag_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attach drag event handlers to all interactive card surfaces.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span><span class="p">:</span>
+            <span class="n">drag_targets</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_border</span><span class="p">:</span>
+                <span class="n">drag_targets</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">borders</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-<span class="c1">#         wrap_overflow(self.title_box, self.size[0] - 2 * self.padding)</span>
+            <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">drag_targets</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="kc">None</span>
 
-<span class="c1">#     def _get_size(self):</span>
-<span class="c1">#         return self.panel.size</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the actors composing this UI component.</span>
 
-<span class="c1">#     def resize(self, size):</span>
-<span class="c1">#         &quot;&quot;&quot;Resize Card2D.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Empty list as this UI uses other UI elements as children</span>
+<span class="sd">            instead of direct actors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         size : (int, int)</span>
-<span class="c1">#             Card2D size(width, height) in pixels.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the total size of the card.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         _width, _height = size</span>
-<span class="c1">#         self.panel.resize(size)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (int, int)</span>
+<span class="sd">            Width and height in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">size</span>
 
-<span class="c1">#         self._image_size = (</span>
-<span class="c1">#             size[0] - int(self.border_width),</span>
-<span class="c1">#             int(self.image_scale * size[1]),</span>
-<span class="c1">#         )</span>
+<div class="viewcode-block" id="Card2D.resize">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D.resize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resize the Card2D and reposition internal elements.</span>
 
-<span class="c1">#         _title_box_size = (</span>
-<span class="c1">#             _width - 2 * self.padding,</span>
-<span class="c1">#             _height * 0.34 * self.text_scale / 2,</span>
-<span class="c1">#         )</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : (int, int)</span>
+<span class="sd">            Card size (width, height) in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">card_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-<span class="c1">#         _body_box_size = (_width - 2 * self.padding, _height * self.text_scale / 2)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">,</span> <span class="n">_title_box_size</span><span class="p">,</span> <span class="n">_body_box_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_sizes</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-<span class="c1">#         _img_coords = (int(self.border_width), int(size[1] - self._image_size[1]))</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">border_width</span><span class="p">)</span>
+        <span class="n">img_h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">title_h</span> <span class="o">=</span> <span class="n">_title_box_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
-<span class="c1">#         _title_coords = (</span>
-<span class="c1">#             self.padding,</span>
-<span class="c1">#             int(_img_coords[1] - _title_box_size[1] - \</span>
-<span class="c1">#  self.padding + self.border_width),</span>
-<span class="c1">#         )</span>
+        <span class="n">_img_coords</span> <span class="o">=</span> <span class="p">(</span><span class="n">bw</span><span class="p">,</span> <span class="n">bw</span><span class="p">)</span>
+        <span class="n">_title_coords</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="n">img_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">+</span> <span class="n">bw</span><span class="p">)</span>
+        <span class="n">_body_coords</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">img_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">+</span> <span class="n">title_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">+</span> <span class="n">bw</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#         _text_coords = (</span>
-<span class="c1">#             self.padding,</span>
-<span class="c1">#             int(</span>
-<span class="c1">#                 _title_coords[1] - _body_box_size[1] - \</span>
-<span class="c1"># self.padding + self.border_width</span>
-<span class="c1">#             ),</span>
-<span class="c1">#         )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span> <span class="n">_img_coords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="p">,</span> <span class="n">_title_coords</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="p">,</span> <span class="n">_body_coords</span><span class="p">)</span>
 
-<span class="c1">#         self.panel.update_element(self.image, _img_coords)</span>
-<span class="c1">#         self.panel.update_element(self.body_box, _text_coords)</span>
-<span class="c1">#         self.panel.update_element(self.title_box, _title_coords)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_image_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">_title_box_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">_body_box_size</span><span class="p">)</span></div>
 
-<span class="c1">#         self.image.resize(self._image_size)</span>
-<span class="c1">#         self.title_box.resize(_title_box_size)</span>
 
-<span class="c1">#     def _set_position(self, _coords):</span>
-<span class="c1">#         &quot;&quot;&quot;Position the lower-left corner of this UI component.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the internal position of the UI element.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">())</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         coords: (float, float)</span>
-<span class="c1">#             Absolute pixel coordinates (x, y).</span>
+<div class="viewcode-block" id="Card2D.update_layout">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D.update_layout">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Propagate layout updates to child text elements.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.position = _coords</span>
+<span class="sd">        The render loop calls this method on top-level UI elements so</span>
+<span class="sd">        that :class:`TextBlock2D` children can re-align their text</span>
+<span class="sd">        actors once the actual bounding box is known after the first</span>
+<span class="sd">        render pass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="o">.</span><span class="n">update_layout</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="o">.</span><span class="n">update_layout</span><span class="p">()</span></div>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def color(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Returns the background color of card.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.panel.color</span>
 
-<span class="c1">#     @color.setter</span>
-<span class="c1">#     def color(self, color):</span>
-<span class="c1">#         &quot;&quot;&quot;Sets background color of card.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the background color of the card.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         color : list of 3 floats.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (float, float, float)</span>
+<span class="sd">            RGB color of the card background.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">color</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.color = color</span>
+    <span class="nd">@color</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">color</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">color</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the background color of the card.</span>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def body(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Returns the body text of the card.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.body_box.message</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        color : (float, float, float) or str</span>
+<span class="sd">            RGB color. Values can be in [0, 1], [0, 255], or hex strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
-<span class="c1">#     @body.setter</span>
-<span class="c1">#     def body(self, text):</span>
-<span class="c1">#         self.body_box.message = text</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the body text of the card.</span>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def title(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Returns the title text of the card&quot;&quot;&quot;</span>
-<span class="c1">#         return self.title_box.message</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The body text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="o">.</span><span class="n">message</span>
 
-<span class="c1">#     @title.setter</span>
-<span class="c1">#     def title(self, text):</span>
-<span class="c1">#         self.title_box.message = text</span>
+    <span class="nd">@body</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">body</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the body text of the card.</span>
 
-<span class="c1">#     def left_button_pressed(self, i_ren, _obj, _sub_component):</span>
-<span class="c1">#         click_pos = np.array(i_ren.event.position)</span>
-<span class="c1">#         self._click_position = click_pos</span>
-<span class="c1">#         i_ren.event.abort()</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text : str</span>
+<span class="sd">            The new body text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">body_box</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
 
-<span class="c1">#     def left_button_dragged(self, i_ren, _obj, _sub_component):</span>
-<span class="c1">#         click_position = np.array(i_ren.event.position)</span>
-<span class="c1">#         change = click_position - self._click_position</span>
-<span class="c1">#         self.panel.position += change</span>
-<span class="c1">#         self._click_position = click_position</span>
-<span class="c1">#         i_ren.force_render()</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the title text of the card.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The title text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="o">.</span><span class="n">message</span>
+
+    <span class="nd">@title</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the title text of the card.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text : str</span>
+<span class="sd">            The new title text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_box</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">text</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the opacity of the card.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            The opacity of the card.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">opacity</span>
+
+    <span class="nd">@opacity</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">opacity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the opacity of the card.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        value : float</span>
+<span class="sd">            The new opacity of the card.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Card2D.left_button_pressed">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D.left_button_pressed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle left mouse button press event for card dragging.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The PyGfx pointer event object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">click_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="n">click_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Card2D.left_button_dragged">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Card2D.left_button_dragged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_dragged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle left mouse button drag event for card movement.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The PyGfx pointer event object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">click_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+            <span class="n">new_position</span> <span class="o">=</span> <span class="n">click_position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">new_position</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_sizes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate internal layout sizes based on the given card size.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : (int, int)</span>
+<span class="sd">            Card size (width, height) in pixels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Tuple of (image_size, title_box_size, body_box_size) where each</span>
+<span class="sd">            is a tuple of (width, height) in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_width</span><span class="p">,</span> <span class="n">_height</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="n">bw</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">border_width</span><span class="p">)</span>
+
+        <span class="n">img_w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_width</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">bw</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">img_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_scale</span> <span class="o">*</span> <span class="n">_height</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">image_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">img_w</span><span class="p">,</span> <span class="n">img_h</span><span class="p">)</span>
+
+        <span class="n">text_area_w</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_width</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">remaining_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_height</span> <span class="o">-</span> <span class="n">img_h</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">title_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">remaining_h</span> <span class="o">*</span> <span class="mf">0.25</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">body_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">remaining_h</span> <span class="o">-</span> <span class="n">title_h</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">title_box_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">text_area_w</span><span class="p">,</span> <span class="n">title_h</span><span class="p">)</span>
+        <span class="n">body_box_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">text_area_w</span><span class="p">,</span> <span class="n">body_h</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">image_size</span><span class="p">,</span> <span class="n">title_box_size</span><span class="p">,</span> <span class="n">body_box_size</span></div>
+
 
 
 <span class="c1"># class SpinBox(UI):</span>
