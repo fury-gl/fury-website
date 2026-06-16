@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.window &#8212; FURY 2.1.0.dev131+g19f5d93b6 documentation</title>
+    <title>fury.window &#8212; FURY 2.1.0.dev138+gc823434f0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=011ea2a9"></script>
+    <script src="../../_static/documentation_options.js?v=c9253b7c"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -425,7 +425,6 @@ document.write(`
 <span class="sd">scenes, cameras, controllers, and rendering multiple screens.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
@@ -1181,13 +1180,15 @@ document.write(`
             <span class="n">EventType</span><span class="o">.</span><span class="n">RESIZE</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_set_key_long_press_event</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_UP</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_register_drag</span><span class="p">,</span>
             <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_DOWN</span><span class="p">,</span>
             <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_UP</span><span class="p">,</span>
             <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_MOVE</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_handle_key_event</span><span class="p">,</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">,</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_UP</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_total_screens</span> <span class="o">=</span> <span class="mi">0</span>
@@ -1205,7 +1206,6 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">enable_imgui</span><span class="p">(</span><span class="n">imgui_draw_function</span><span class="o">=</span><span class="n">imgui_draw_function</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_events</span> <span class="o">=</span> <span class="n">enable_events</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_resize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_size</span><span class="p">:</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_size</span><span class="p">)</span></div>
 
@@ -1240,7 +1240,7 @@ document.write(`
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_register_drag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Register drag events for pointer interactions.</span>
+<span class="sd">        Handle global pointer events (drag) at the renderer level.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1258,6 +1258,50 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_toggle_screen_controllers</span><span class="p">(</span><span class="n">disable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_MOVE</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_dragging</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_handle_drag</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_key_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle global keyboard events at the renderer level.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : KeyboardEvent</span>
+<span class="sd">            The PyGfx keyboard event object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">:</span>
+            <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span><span class="o">.</span><span class="n">on_key_press</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_key_event</span> <span class="o">=</span> <span class="n">event</span>
+            <span class="n">call_later</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_key_repeat</span><span class="p">,</span> <span class="n">event</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_UP</span><span class="p">:</span>
+            <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span><span class="o">.</span><span class="n">on_key_release</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="n">repeat_event</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_repeat_key_event&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">repeat_event</span> <span class="ow">and</span> <span class="n">repeat_event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_key_event</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_do_key_repeat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Timer callback to repeatedly dispatch a held key.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        target_event : Event</span>
+<span class="sd">            The specific key down event that triggered this repeating timer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_repeat_key_event&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">target_event</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_repeat_key_event</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span><span class="o">.</span><span class="n">on_key_press</span><span class="p">(</span><span class="n">target_event</span><span class="p">)</span>
+
+        <span class="n">call_later</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_key_repeat</span><span class="p">,</span> <span class="n">target_event</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_screen_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">camera</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">camera_light</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1391,36 +1435,6 @@ document.write(`
         <span class="p">)</span>
         <span class="n">reposition_ui</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
-
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_key_long_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Handle long press events for key inputs.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        event : KeyEvent</span>
-<span class="sd">            The PyGfx key event object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.05</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">dispatch_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_set_key_long_press_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Handle long press events for key inputs.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        event : KeyEvent</span>
-<span class="sd">            The PyGfx key event object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_handle_key_long_press</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_key_long_press</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_on_repeat_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

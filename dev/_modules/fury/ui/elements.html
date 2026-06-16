@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.elements &#8212; FURY 2.1.0.dev131+g19f5d93b6 documentation</title>
+    <title>fury.ui.elements &#8212; FURY 2.1.0.dev138+gc823434f0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=011ea2a9"></script>
+    <script src="../../../_static/documentation_options.js?v=c9253b7c"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -423,7 +423,7 @@ document.write(`
     <span class="s2">&quot;TexturedButton2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TextButton2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;LineSlider2D&quot;</span><span class="p">,</span>
-    <span class="c1">#     &quot;TextBox2D&quot;,</span>
+    <span class="s2">&quot;TextBox2D&quot;</span><span class="p">,</span>
     <span class="c1">#     &quot;LineSlider2D&quot;,</span>
     <span class="c1">#     &quot;LineDoubleSlider2D&quot;,</span>
     <span class="s2">&quot;RingSlider2D&quot;</span><span class="p">,</span>
@@ -443,6 +443,9 @@ document.write(`
 <span class="p">]</span>
 
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="kn">import</span> <span class="n">printable</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnidentifiedImageError</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -450,6 +453,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_viz_icons</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_extension</span><span class="p">,</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">load_image_texture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageContainer2D</span><span class="p">,</span> <span class="n">Panel2D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">UIContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">UI</span><span class="p">,</span>
     <span class="n">Anchor</span><span class="p">,</span>
@@ -462,6 +466,10 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">clip_overflow</span>
 
 <span class="n">TWO_PI</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+
+<span class="n">LOWERS</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;`1234567890-=[]\;&#39;,./&quot;</span>
+<span class="n">UPPERS</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;~!@#$%^&amp;*()_+</span><span class="si">{}</span><span class="s1">|:&quot;&lt;&gt;?&#39;</span>
+<span class="n">SHIFT_TRANS</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">LOWERS</span><span class="p">,</span> <span class="n">UPPERS</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="TexturedButton2D">
@@ -1271,360 +1279,678 @@ document.write(`
 
 
 
-<span class="c1"># class TextBox2D(UI):</span>
-<span class="c1">#     &quot;&quot;&quot;An editable 2D text box that behaves as a UI component.</span>
+<div class="viewcode-block" id="TextBox2D">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextBox2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An editable 2D text box that behaves as a UI component.</span>
 
-<span class="c1">#     Currently supports:</span>
-<span class="c1">#     - Basic text editing.</span>
-<span class="c1">#     - Cursor movements.</span>
-<span class="c1">#     - Single and multi-line text boxes.</span>
-<span class="c1">#     - Pre text formatting (text needs to be formatted beforehand).</span>
+<span class="sd">    Currently supports:</span>
+<span class="sd">    - Basic text editing.</span>
+<span class="sd">    - Cursor movements.</span>
+<span class="sd">    - Single and multi-line text boxes.</span>
+<span class="sd">    - Pre text formatting (text needs to be formatted beforehand).</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     text : str</span>
-<span class="c1">#         The current text state.</span>
-<span class="c1">#     actor : :class:`vtkActor2d`</span>
-<span class="c1">#         The text actor.</span>
-<span class="c1">#     width : int</span>
-<span class="c1">#         The number of characters in a single line of text.</span>
-<span class="c1">#     height : int</span>
-<span class="c1">#         The number of lines in the textbox.</span>
-<span class="c1">#     window_left : int</span>
-<span class="c1">#         Left limit of visible text in the textbox.</span>
-<span class="c1">#     window_right : int</span>
-<span class="c1">#         Right limit of visible text in the textbox.</span>
-<span class="c1">#     caret_pos : int</span>
-<span class="c1">#         Position of the caret in the text.</span>
-<span class="c1">#     init : bool</span>
-<span class="c1">#         Flag which says whether the textbox has just been initialized.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    width : int</span>
+<span class="sd">        The number of characters in a single line of text.</span>
+<span class="sd">    height : int</span>
+<span class="sd">        The number of lines in the textbox.</span>
+<span class="sd">    text : str, optional</span>
+<span class="sd">        The initial text while building the actor.</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        (x, y) in pixels.</span>
+<span class="sd">    color : (float, float, float), optional</span>
+<span class="sd">        RGB values between 0 and 1.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Size of the text font.</span>
+<span class="sd">    font_family : str, optional</span>
+<span class="sd">        Currently only supports Arial.</span>
+<span class="sd">    justification : str, optional</span>
+<span class="sd">        Left, right, or center.</span>
+<span class="sd">    bold : bool, optional</span>
+<span class="sd">        Makes text bold.</span>
+<span class="sd">    italic : bool, optional</span>
+<span class="sd">        Makes text italic.</span>
+<span class="sd">    shadow : bool, optional</span>
+<span class="sd">        Adds text shadow.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        Rendering order of the widget.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    text : :class:`TextBlock2D`</span>
+<span class="sd">        The internal text UI component.</span>
+<span class="sd">    width : int</span>
+<span class="sd">        The number of characters in a single line of text.</span>
+<span class="sd">    height : int</span>
+<span class="sd">        The number of lines in the textbox.</span>
+<span class="sd">    window_left : int</span>
+<span class="sd">        Left limit of visible text in the textbox.</span>
+<span class="sd">    window_right : int</span>
+<span class="sd">        Right limit of visible text in the textbox.</span>
+<span class="sd">    caret_pos : int</span>
+<span class="sd">        Position of the caret in the text.</span>
+<span class="sd">    init : bool</span>
+<span class="sd">        Flag which says whether the textbox has just been initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(</span>
-<span class="c1">#         self,</span>
-<span class="c1">#         width,</span>
-<span class="c1">#         height,</span>
-<span class="c1">#         *,</span>
-<span class="c1">#         text=&quot;Enter Text&quot;,</span>
-<span class="c1">#         position=(100, 10),</span>
-<span class="c1">#         color=(0, 0, 0),</span>
-<span class="c1">#         font_size=18,</span>
-<span class="c1">#         font_family=&quot;Arial&quot;,</span>
-<span class="c1">#         justification=&quot;left&quot;,</span>
-<span class="c1">#         bold=False,</span>
-<span class="c1">#         italic=False,</span>
-<span class="c1">#         shadow=False,</span>
-<span class="c1">#     ):</span>
-<span class="c1">#         &quot;&quot;&quot;Init this UI element.</span>
+<div class="viewcode-block" id="TextBox2D.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">width</span><span class="p">,</span>
+        <span class="n">height</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Enter Text&quot;</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+        <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+        <span class="n">font_family</span><span class="o">=</span><span class="s2">&quot;Arial&quot;</span><span class="p">,</span>
+        <span class="n">justification</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">,</span>
+        <span class="n">bold</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">italic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">shadow</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Init this UI element.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         width : int</span>
-<span class="c1">#             The number of characters in a single line of text.</span>
-<span class="c1">#         height : int</span>
-<span class="c1">#             The number of lines in the textbox.</span>
-<span class="c1">#         text : str</span>
-<span class="c1">#             The initial text while building the actor.</span>
-<span class="c1">#         position : (float, float)</span>
-<span class="c1">#             (x, y) in pixels.</span>
-<span class="c1">#         color : (float, float, float)</span>
-<span class="c1">#             RGB: Values must be between 0-1.</span>
-<span class="c1">#         font_size : int</span>
-<span class="c1">#             Size of the text font.</span>
-<span class="c1">#         font_family : str</span>
-<span class="c1">#             Currently only supports Arial.</span>
-<span class="c1">#         justification : str</span>
-<span class="c1">#             left, right or center.</span>
-<span class="c1">#         bold : bool</span>
-<span class="c1">#             Makes text bold.</span>
-<span class="c1">#         italic : bool</span>
-<span class="c1">#             Makes text italicised.</span>
-<span class="c1">#         shadow : bool</span>
-<span class="c1">#             Adds text shadow.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        width : int</span>
+<span class="sd">            The number of characters in a single line of text.</span>
+<span class="sd">        height : int</span>
+<span class="sd">            The number of lines in the textbox.</span>
+<span class="sd">        text : str, optional</span>
+<span class="sd">            The initial text while building the actor.</span>
+<span class="sd">        position : (float, float), optional</span>
+<span class="sd">            (x, y) in pixels.</span>
+<span class="sd">        color : (float, float, float), optional</span>
+<span class="sd">            RGB values between 0 and 1.</span>
+<span class="sd">        font_size : int, optional</span>
+<span class="sd">            Size of the text font.</span>
+<span class="sd">        font_family : str, optional</span>
+<span class="sd">            Currently only supports Arial.</span>
+<span class="sd">        justification : str, optional</span>
+<span class="sd">            Left, right, or center.</span>
+<span class="sd">        bold : bool, optional</span>
+<span class="sd">            Makes text bold.</span>
+<span class="sd">        italic : bool, optional</span>
+<span class="sd">            Makes text italic.</span>
+<span class="sd">        shadow : bool, optional</span>
+<span class="sd">            Adds text shadow.</span>
+<span class="sd">        z_order : int, optional</span>
+<span class="sd">            Rendering order of the widget.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">=</span> <span class="n">width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_height</span> <span class="o">=</span> <span class="n">height</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_color</span> <span class="o">=</span> <span class="n">color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_font_family</span> <span class="o">=</span> <span class="n">font_family</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_justification</span> <span class="o">=</span> <span class="n">justification</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span> <span class="o">=</span> <span class="n">bold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span> <span class="o">=</span> <span class="n">italic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shadow</span> <span class="o">=</span> <span class="n">shadow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_z_order</span> <span class="o">=</span> <span class="n">z_order</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         super(TextBox2D, self).__init__(position=position)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="c1">#         self.message = text</span>
-<span class="c1">#         self.text.message = text</span>
-<span class="c1">#         self.text.font_size = font_size</span>
-<span class="c1">#         self.text.font_family = font_family</span>
-<span class="c1">#         self.text.justification = justification</span>
-<span class="c1">#         self.text.bold = bold</span>
-<span class="c1">#         self.text.italic = italic</span>
-<span class="c1">#         self.text.shadow = shadow</span>
-<span class="c1">#         self.text.color = color</span>
-<span class="c1">#         self.text.background_color = (1, 1, 1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shift_pressed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_caps_lock_on</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="c1">#         self.width = width</span>
-<span class="c1">#         self.height = height</span>
-<span class="c1">#         self.window_left = 0</span>
-<span class="c1">#         self.window_right = 0</span>
-<span class="c1">#         self.caret_pos = 0</span>
-<span class="c1">#         self.init = True</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TextBox2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span>
+            <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">,</span>
+            <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
-<span class="c1">#         self.off_focus = lambda ui: None</span>
 
-<span class="c1">#     def _setup(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Setup this UI component.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup this UI component.</span>
 
-<span class="c1">#         Create the TextBlock2D component used for the textbox.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.text = TextBlock2D(dynamic_bbox=True)</span>
+<span class="sd">        Create the TextBlock2D component used for the textbox.</span>
+<span class="sd">        Uses dynamic_bbox so the bounding box adapts as the user types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bold_factor</span> <span class="o">=</span> <span class="mf">1.25</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span> <span class="k">else</span> <span class="mf">1.0</span>
+        <span class="n">italic_factor</span> <span class="o">=</span> <span class="mf">1.1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span> <span class="k">else</span> <span class="mf">1.0</span>
 
-<span class="c1">#         # Add default events listener for this UI component.</span>
-<span class="c1">#         self.text.on_left_mouse_button_pressed = self.left_button_press</span>
-<span class="c1">#         self.text.on_key_press = self.key_press</span>
+        <span class="n">bg_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">bold_factor</span> <span class="o">*</span> <span class="n">italic_factor</span>
+        <span class="p">)</span>
+        <span class="n">bg_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">+</span> <span class="mi">10</span>
 
-<span class="c1">#     def _get_actors(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.text.actors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+            <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span><span class="p">,</span>
+            <span class="n">font_family</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_font_family</span><span class="p">,</span>
+            <span class="n">justification</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_justification</span><span class="p">,</span>
+            <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+            <span class="n">dynamic_bbox</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">bg_width</span><span class="p">,</span> <span class="n">bg_height</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">bold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">italic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_italic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">shadow</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shadow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">background_color</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-<span class="c1">#     def _add_to_scene(self, scene):</span>
-<span class="c1">#         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         scene : scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="k">else</span> <span class="mi">0</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.text.add_to_scene(scene)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_press</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">on_blur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blur_textbox</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">on_key_press</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_press</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">on_key_release</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_release</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">on_wheel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wheel_scroll</span>
 
-<span class="c1">#     def _set_position(self, coords):</span>
-<span class="c1">#         &quot;&quot;&quot;Set the lower-left corner position of this UI component.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the window boundaries of the textbox.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         coords: (float, float)</span>
-<span class="c1">#             Absolute pixel coordinates (x, y).</span>
+<span class="sd">        In static mode, the background height remains constant.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="mi">1</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.text.position = coords</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the actors composing this UI component.</span>
 
-<span class="c1">#     def _get_size(self):</span>
-<span class="c1">#         return self.text.size</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of actors from all child UI components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">actors</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="p">:</span>
+            <span class="n">actors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">actors</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">actors</span>
 
-<span class="c1">#     def set_message(self, message):</span>
-<span class="c1">#         &quot;&quot;&quot;Set custom text to textbox.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the size of the textbox.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         message: str</span>
-<span class="c1">#             The custom message to be set.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Width and height of the text bounding box.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">size</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.message = message</span>
-<span class="c1">#         self.text.message = message</span>
-<span class="c1">#         self.init = False</span>
-<span class="c1">#         self.window_right = len(self.message)</span>
-<span class="c1">#         self.window_left = 0</span>
-<span class="c1">#         self.caret_pos = self.window_right</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the position of the text actor (anchor-aware).&quot;&quot;&quot;</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">)</span>
 
-<span class="c1">#     def width_set_text(self, text):</span>
-<span class="c1">#         &quot;&quot;&quot;Add newlines to text where necessary.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">)</span>
 
-<span class="c1">#         This is needed for multi-line text boxes.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">(</span><span class="n">show_caret</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         text : str</span>
-<span class="c1">#             The final text to be formatted.</span>
+<div class="viewcode-block" id="TextBox2D.set_message">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.set_message">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set custom text to textbox.</span>
 
-<span class="c1">#         Returns</span>
-<span class="c1">#         -------</span>
-<span class="c1">#         str</span>
-<span class="c1">#             A multi line formatted text.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        message : str</span>
+<span class="sd">            The custom message to be set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="n">message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">(</span><span class="n">show_caret</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         multi_line_text = &quot;&quot;</span>
-<span class="c1">#         for i, t in enumerate(text):</span>
-<span class="c1">#             multi_line_text += t</span>
-<span class="c1">#             if (i + 1) % self.width == 0:</span>
-<span class="c1">#                 multi_line_text += &quot;\n&quot;</span>
-<span class="c1">#         return multi_line_text.rstrip(&quot;\n&quot;)</span>
 
-<span class="c1">#     def handle_character(self, key, key_char):</span>
-<span class="c1">#         &quot;&quot;&quot;Handle button events.</span>
+<div class="viewcode-block" id="TextBox2D.width_set_text">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.width_set_text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">width_set_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add newlines to text where necessary, needed for multi-line text boxes.</span>
 
-<span class="c1">#         # TODO: Need to handle all kinds of characters like !, +, etc.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text : str</span>
+<span class="sd">            The final text to be formatted.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         character : str</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            A multi-line formatted text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">formatted_lines</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="n">formatted_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">wrapped</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span>
+                <span class="n">line</span><span class="p">,</span>
+                <span class="n">width</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">,</span>
+                <span class="n">drop_whitespace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">replace_whitespace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">break_long_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">wrapped</span><span class="p">:</span>
+                <span class="n">formatted_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">formatted_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">wrapped</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">formatted_lines</span><span class="p">)</span></div>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if key.lower() == &quot;return&quot;:</span>
-<span class="c1">#             self.render_text(show_caret=False)</span>
-<span class="c1">#             self.off_focus(self)</span>
-<span class="c1">#             return True</span>
-<span class="c1">#         elif key_char != &quot;&quot; and key_char in printable:</span>
-<span class="c1">#             self.add_character(key_char)</span>
-<span class="c1">#         if key.lower() == &quot;backspace&quot;:</span>
-<span class="c1">#             self.remove_character()</span>
-<span class="c1">#         elif key.lower() == &quot;left&quot;:</span>
-<span class="c1">#             self.move_left()</span>
-<span class="c1">#         elif key.lower() == &quot;right&quot;:</span>
-<span class="c1">#             self.move_right()</span>
 
-<span class="c1">#         self.render_text()</span>
-<span class="c1">#         return False</span>
+<div class="viewcode-block" id="TextBox2D.handle_character">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.handle_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">key_char</span><span class="p">,</span> <span class="n">modifiers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle button events.</span>
 
-<span class="c1">#     def move_caret_right(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move the caret towards right.&quot;&quot;&quot;</span>
-<span class="c1">#         self.caret_pos = min(self.caret_pos + 1, len(self.message))</span>
+<span class="sd">        # TODO: Need to handle all kinds of characters like !, +, etc.</span>
 
-<span class="c1">#     def move_caret_left(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move the caret towards left.&quot;&quot;&quot;</span>
-<span class="c1">#         self.caret_pos = max(self.caret_pos - 1, 0)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            The key identifier.</span>
+<span class="sd">        key_char : str</span>
+<span class="sd">            The character representation of the key.</span>
+<span class="sd">        modifiers : tuple, optional</span>
+<span class="sd">            The active keyboard modifiers.</span>
 
-<span class="c1">#     def right_move_right(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move right boundary of the text window right-wards.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.window_right &lt;= len(self.message):</span>
-<span class="c1">#             self.window_right += 1</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if editing is finished, otherwise False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">modifiers</span> <span class="o">=</span> <span class="n">modifiers</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
 
-<span class="c1">#     def right_move_left(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move right boundary of the text window left-wards.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.window_right &gt; 0:</span>
-<span class="c1">#             self.window_right -= 1</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;enter&quot;</span><span class="p">,</span> <span class="s2">&quot;return&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;Shift&quot;</span> <span class="ow">in</span> <span class="n">modifiers</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_character</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">(</span><span class="n">show_caret</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">on_blur</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
 
-<span class="c1">#     def left_move_right(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move left boundary of the text window right-wards.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.window_left &lt;= len(self.message):</span>
-<span class="c1">#             self.window_left += 1</span>
+        <span class="k">if</span> <span class="n">key_char</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">is_shift</span> <span class="o">=</span> <span class="s2">&quot;Shift&quot;</span> <span class="ow">in</span> <span class="n">modifiers</span>
+            <span class="n">is_caps</span> <span class="o">=</span> <span class="s2">&quot;CapsLock&quot;</span> <span class="ow">in</span> <span class="n">modifiers</span>
 
-<span class="c1">#     def left_move_left(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Move left boundary of the text window left-wards.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.window_left &gt; 0:</span>
-<span class="c1">#             self.window_left -= 1</span>
+            <span class="k">if</span> <span class="n">is_shift</span><span class="p">:</span>
+                <span class="n">key_char</span> <span class="o">=</span> <span class="n">key_char</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">SHIFT_TRANS</span><span class="p">)</span>
 
-<span class="c1">#     def add_character(self, character):</span>
-<span class="c1">#         &quot;&quot;&quot;Insert a character into the text and moves window and caret.</span>
+            <span class="k">if</span> <span class="n">key_char</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">key_char</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">is_shift</span> <span class="o">!=</span> <span class="n">is_caps</span><span class="p">:</span>
+                    <span class="n">key_char</span> <span class="o">=</span> <span class="n">key_char</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">is_shift</span> <span class="ow">and</span> <span class="n">is_caps</span><span class="p">:</span>
+                    <span class="n">key_char</span> <span class="o">=</span> <span class="n">key_char</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         character : str</span>
+            <span class="k">if</span> <span class="n">key_char</span> <span class="ow">in</span> <span class="n">printable</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_character</span><span class="p">(</span><span class="n">key_char</span><span class="p">)</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if len(character) &gt; 1 and character.lower() != &quot;space&quot;:</span>
-<span class="c1">#             return</span>
-<span class="c1">#         if character.lower() == &quot;space&quot;:</span>
-<span class="c1">#             character = &quot; &quot;</span>
-<span class="c1">#         self.message = (</span>
-<span class="c1">#</span>
-<span class="c1">#           self.message[: self.caret_pos] + character + self.message[self.caret_pos :]</span>
-<span class="c1">#         )</span>
-<span class="c1">#         self.move_caret_right()</span>
-<span class="c1">#         if self.window_right - self.window_left == self.height * self.width - 1:</span>
-<span class="c1">#             self.left_move_right()</span>
-<span class="c1">#         self.right_move_right()</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s2">&quot;backspace&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_character</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arrowleft&quot;</span><span class="p">,</span> <span class="s2">&quot;left&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_left</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arrowright&quot;</span><span class="p">,</span> <span class="s2">&quot;right&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_right</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arrowup&quot;</span><span class="p">,</span> <span class="s2">&quot;up&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_up</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;arrowdown&quot;</span><span class="p">,</span> <span class="s2">&quot;down&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_down</span><span class="p">()</span>
 
-<span class="c1">#     def remove_character(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Remove a character and moves window and caret accordingly.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.caret_pos == 0:</span>
-<span class="c1">#             return</span>
-<span class="c1">#         self.message = (</span>
-<span class="c1">#             self.message[: self.caret_pos - 1] + self.message[self.caret_pos :]</span>
-<span class="c1">#         )</span>
-<span class="c1">#         self.move_caret_left()</span>
-<span class="c1">#         if len(self.message) &lt; self.height * self.width - 1:</span>
-<span class="c1">#             self.right_move_left()</span>
-<span class="c1">#         if self.window_right - self.window_left == self.height * self.width - 1:</span>
-<span class="c1">#             if self.window_left &gt; 0:</span>
-<span class="c1">#                 self.left_move_left()</span>
-<span class="c1">#                 self.right_move_left()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
 
-<span class="c1">#     def move_left(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Handle left button press.&quot;&quot;&quot;</span>
-<span class="c1">#         self.move_caret_left()</span>
-<span class="c1">#         if self.caret_pos == self.window_left - 1:</span>
-<span class="c1">#             if self.window_right - self.window_left == self.height * self.width - 1:</span>
-<span class="c1">#                 self.left_move_left()</span>
-<span class="c1">#                 self.right_move_left()</span>
 
-<span class="c1">#     def move_right(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Handle right button press.&quot;&quot;&quot;</span>
-<span class="c1">#         self.move_caret_right()</span>
-<span class="c1">#         if self.caret_pos == self.window_right + 1:</span>
-<span class="c1">#             if self.window_right - self.window_left == self.height * self.width - 1:</span>
-<span class="c1">#                 self.left_move_right()</span>
-<span class="c1">#                 self.right_move_right()</span>
+<div class="viewcode-block" id="TextBox2D.move_caret_right">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_caret_right">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_caret_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the caret towards right.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">))</span></div>
 
-<span class="c1">#     def showable_text(self, show_caret):</span>
-<span class="c1">#         &quot;&quot;&quot;Chop out text to be shown on the screen.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         show_caret : bool</span>
-<span class="c1">#             Whether or not to show the caret.</span>
+<div class="viewcode-block" id="TextBox2D.move_caret_left">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_caret_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_caret_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move the caret towards left.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if show_caret:</span>
-<span class="c1">#             ret_text = (</span>
-<span class="c1">#                 self.message[: self.caret_pos] + &quot;_&quot; + self.message[self.caret_pos :]</span>
-<span class="c1">#             )</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             ret_text = self.message</span>
-<span class="c1">#         ret_text = ret_text[self.window_left : self.window_right + 1]</span>
-<span class="c1">#         return ret_text</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def render_text(self, *, show_caret=True):</span>
-<span class="c1">#         &quot;&quot;&quot;Render text after processing.</span>
+<div class="viewcode-block" id="TextBox2D.right_move_right">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.right_move_right">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">right_move_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move right boundary of the text window right-wards.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         show_caret : bool</span>
-<span class="c1">#             Whether or not to show the caret.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         text = self.showable_text(show_caret)</span>
-<span class="c1">#         if text == &quot;&quot;:</span>
-<span class="c1">#             text = &quot;Enter Text&quot;</span>
-<span class="c1">#         self.text.message = self.width_set_text(text)</span>
+<div class="viewcode-block" id="TextBox2D.right_move_left">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.right_move_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">right_move_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move right boundary of the text window left-wards.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">-=</span> <span class="mi">1</span></div>
 
-<span class="c1">#     def edit_mode(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Turn on edit mode.&quot;&quot;&quot;</span>
-<span class="c1">#         if self.init:</span>
-<span class="c1">#             self.message = &quot;&quot;</span>
-<span class="c1">#             self.init = False</span>
-<span class="c1">#             self.caret_pos = 0</span>
-<span class="c1">#         self.render_text()</span>
 
-<span class="c1">#     def left_button_press(self, i_ren, _obj, _textbox_object):</span>
-<span class="c1">#         &quot;&quot;&quot;Handle left button press for textbox.</span>
+<div class="viewcode-block" id="TextBox2D.left_move_right">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.left_move_right">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_move_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move left boundary of the text window right-wards.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         i_ren: :class:`CustomInteractorStyle`</span>
-<span class="c1">#         obj: :class:`vtkActor`</span>
-<span class="c1">#             The picked actor</span>
-<span class="c1">#         _textbox_object: :class:`TextBox2D`</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         i_ren.add_active_prop(self.text.actor)</span>
-<span class="c1">#         self.edit_mode()</span>
-<span class="c1">#         i_ren.force_render()</span>
+<div class="viewcode-block" id="TextBox2D.left_move_left">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.left_move_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_move_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move left boundary of the text window left-wards.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">-=</span> <span class="mi">1</span></div>
 
-<span class="c1">#     def key_press(self, i_ren, _obj, _textbox_object):</span>
-<span class="c1">#         &quot;&quot;&quot;Handle Key press for textboxself.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         i_ren: :class:`CustomInteractorStyle`</span>
-<span class="c1">#         obj: :class:`vtkActor`</span>
-<span class="c1">#             The picked actor</span>
-<span class="c1">#         _textbox_object: :class:`TextBox2D`</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_adjust_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adjust the window boundaries to ensure caret and text visibility.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         key = i_ren.event.key</span>
-<span class="c1">#         key_char = i_ren.event.key_char</span>
-<span class="c1">#         is_done = self.handle_character(key, key_char)</span>
-<span class="c1">#         if is_done:</span>
-<span class="c1">#             i_ren.remove_active_prop(self.text.actor)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_height</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">line_of_caret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">line_of_caret</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">+</span> <span class="mi">1</span>
 
-<span class="c1">#         i_ren.force_render()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">max_window_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">max_window_left</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">&gt;</span> <span class="n">max_window_left</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="o">=</span> <span class="n">max_window_left</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_height</span><span class="p">()</span>
+
+<div class="viewcode-block" id="TextBox2D.add_character">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.add_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert a character into the text and moves window and caret.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        character : str</span>
+<span class="sd">                The character to be inserted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">character</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">character</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;space&quot;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">character</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;space&quot;</span><span class="p">:</span>
+            <span class="n">character</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">character</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_caret_right</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.remove_character">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.remove_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_character</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a character and moves window and caret accordingly.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="p">:]</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_caret_left</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.move_left">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_left">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle left button press.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_caret_left</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.move_right">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_right">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_right</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle right button press.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_caret_right</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.move_up">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_up">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_up</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle up button press.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.move_down">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.move_down">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">move_down</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle down button press.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_width</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_window</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.showable_text">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.showable_text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">showable_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">show_caret</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Chop out text to be shown on the screen.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        show_caret : bool</span>
+<span class="sd">            Whether or not to show the caret.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The visible portion of the text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ret_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">window_left</span> <span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_right</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">rel_caret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_left</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">rel_caret</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ret_text</span><span class="p">):</span>
+            <span class="n">marker</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">_&quot;</span> <span class="k">if</span> <span class="n">show_caret</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span>
+            <span class="n">ret_text</span> <span class="o">=</span> <span class="n">ret_text</span><span class="p">[:</span><span class="n">rel_caret</span><span class="p">]</span> <span class="o">+</span> <span class="n">marker</span> <span class="o">+</span> <span class="n">ret_text</span><span class="p">[</span><span class="n">rel_caret</span><span class="p">:]</span>
+
+        <span class="k">return</span> <span class="n">ret_text</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.render_text">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.render_text">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">show_caret</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Render text after processing.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        show_caret : bool</span>
+<span class="sd">            Whether or not to show the caret.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">showable_text</span><span class="p">(</span><span class="n">show_caret</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="ow">or</span> <span class="n">text</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">Enter Text&quot;</span>
+
+        <span class="n">formatted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">width_set_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">formatted</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span><span class="p">:</span>
+            <span class="n">caret_line</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                <span class="k">if</span> <span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+                    <span class="n">caret_line</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="k">break</span>
+
+            <span class="n">start_line</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">caret_line</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">end_line</span> <span class="o">=</span> <span class="n">start_line</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span>
+            <span class="k">if</span> <span class="n">end_line</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+                <span class="n">end_line</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+                <span class="n">start_line</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">end_line</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_height</span><span class="p">)</span>
+
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">start_line</span><span class="p">:</span><span class="n">end_line</span><span class="p">]</span>
+            <span class="n">formatted</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
+
+        <span class="n">formatted</span> <span class="o">=</span> <span class="n">formatted</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">formatted</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">update_alignment</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.edit_mode">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.edit_mode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">edit_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn on edit mode.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">init</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">==</span> <span class="s2">&quot;Enter Text&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_message</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">caret_pos</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.blur_textbox">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.blur_textbox">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">blur_textbox</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle blur event for textbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The pointer event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">(</span><span class="n">show_caret</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_blur</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.left_button_press">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.left_button_press">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle left button press for textbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The pointer event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span><span class="p">:</span>
+            <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blur_textbox</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">edit_mode</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.key_press">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.key_press">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">key_press</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle Key press for textbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : KeyboardEvent</span>
+<span class="sd">            The keyboard event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Shift&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift_pressed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;CapsLock&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_caps_lock_on</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caps_lock_on</span>
+
+        <span class="n">key_char</span> <span class="o">=</span> <span class="n">key</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">modifiers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="s2">&quot;modifiers&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shift_pressed</span> <span class="ow">and</span> <span class="s2">&quot;Shift&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modifiers</span><span class="p">:</span>
+            <span class="n">modifiers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Shift&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_caps_lock_on</span> <span class="ow">and</span> <span class="s2">&quot;CapsLock&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">modifiers</span><span class="p">:</span>
+            <span class="n">modifiers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;CapsLock&quot;</span><span class="p">)</span>
+
+        <span class="n">is_done</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_character</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key_char</span><span class="p">,</span> <span class="n">modifiers</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_done</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_has_focus</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">UIContext</span><span class="o">.</span><span class="n">active_ui</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">(</span><span class="n">show_caret</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_blur</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.key_release">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.key_release">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">key_release</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle Key release for textbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : KeyboardEvent</span>
+<span class="sd">            The keyboard event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;Shift&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_shift_pressed</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TextBox2D.wheel_scroll">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.TextBox2D.wheel_scroll">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wheel_scroll</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle mouse wheel event for textbox.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : WheelEvent</span>
+<span class="sd">            The wheel event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">dy</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_down</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">dy</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_up</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render_text</span><span class="p">()</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="LineDoubleSlider2D">
