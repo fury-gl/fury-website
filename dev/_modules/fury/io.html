@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.io &#8212; FURY 2.1.0.dev138+gc823434f0 documentation</title>
+    <title>fury.io &#8212; FURY 2.1.0.dev140+gdce34b5e1 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=c9253b7c"></script>
+    <script src="../../_static/documentation_options.js?v=247159fa"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -432,6 +432,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">wgpu</span>
 
 <span class="c1"># from fury.utils import set_input</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.network.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_network</span><span class="p">,</span> <span class="n">stringify_network</span>
 
 
 <div class="viewcode-block" id="load_cube_map_texture">
@@ -719,6 +720,67 @@ document.write(`
     <span class="k">if</span> <span class="n">ext</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ext</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
     <span class="k">return</span> <span class="n">ext</span></div>
+
+
+
+<div class="viewcode-block" id="load_network">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.load_network">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_network</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a network from a file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The path to the network file.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format of the network file (e.g., &#39;gexf&#39;, &#39;gml&#39;, or &#39;xnet&#39;).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - nodes_xyz (np.ndarray): Shape (N, 3) float32 array of node positions.</span>
+<span class="sd">        - edges_indices (np.ndarray): Shape (E, 2) int32 array of edge connections.</span>
+<span class="sd">        - colors (np.ndarray): Shape (N, 4) float32 array of node colors (RGBA).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">parse_network</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="save_network">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.save_network">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_network</span><span class="p">(</span><span class="n">network_data</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save a network to a file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    network_data : tuple</span>
+<span class="sd">        A tuple containing:</span>
+<span class="sd">        - nodes_xyz (np.ndarray): Shape (N, 3) float32 array of node positions.</span>
+<span class="sd">        - edges_indices (np.ndarray): Shape (E, 2) int32 array of edge connections.</span>
+<span class="sd">        - colors (np.ndarray): Shape (N, 4) float32 array of node colors (RGBA).</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The destination path where the network file will be written.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific export format of the network file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">ext</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">stringify_network</span><span class="p">(</span><span class="n">network_data</span><span class="p">,</span> <span class="nb">format</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 
 
