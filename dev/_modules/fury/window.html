@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.window &#8212; FURY 2.1.0.dev145+g69938db7d documentation</title>
+    <title>fury.window &#8212; FURY 2.1.0.dev147+g5e47124a7 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=a5a1a0e8"></script>
+    <script src="../../_static/documentation_options.js?v=117f7f06"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -342,6 +342,7 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html#animation">Animation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../fury-pybullet.html">FURY - pyBullet Integration Guide</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
@@ -437,6 +438,8 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_axes_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.animation</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animation</span><span class="p">,</span> <span class="n">CameraAnimation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.timeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timeline</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AmbientLight</span><span class="p">,</span>
@@ -1197,6 +1200,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_screen_setup</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">camera</span><span class="p">,</span> <span class="n">controller</span><span class="p">,</span> <span class="n">camera_light</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">screens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_screens</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stats_initialized</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1539,6 +1543,95 @@ document.write(`
     <span class="k">def</span><span class="w"> </span><span class="nf">cancel_resize_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancel the window resize callback function.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_on_resize</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_size</span><span class="p">:</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_camera_animations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">,</span> <span class="n">camera</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recursively set camera on CameraAnimation objects if needed.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        animation : Animation or Timeline</span>
+<span class="sd">            Animation object to inspect for camera animations.</span>
+<span class="sd">        camera : pygfx.Camera</span>
+<span class="sd">            Camera to assign to camera animations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="n">CameraAnimation</span><span class="p">)</span> <span class="ow">and</span> <span class="n">animation</span><span class="o">.</span><span class="n">camera</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">camera</span> <span class="o">=</span> <span class="n">camera</span>
+
+        <span class="k">for</span> <span class="n">child_animation</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="s2">&quot;_animations&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_camera_animations</span><span class="p">(</span><span class="n">child_animation</span><span class="p">,</span> <span class="n">camera</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an animation or timeline and request a redraw.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        animation : Animation or Timeline</span>
+<span class="sd">            Animation object to update.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">update_animation</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ShowManager.add_animation">
+<a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.add_animation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">update_rate</span><span class="o">=</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">60</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add an animation or timeline to the render update loop.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        animation : Animation or Timeline</span>
+<span class="sd">            The animation or timeline to add and update during rendering.</span>
+<span class="sd">        update_rate : float, optional</span>
+<span class="sd">            The time interval in seconds between updates. Default is 1/60.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="p">(</span><span class="n">Animation</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Expected an Animation or Timeline object.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">:</span>
+            <span class="n">scene</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scene</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">add_to_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_camera_animations</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">camera</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">animation</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+                <span class="n">animation</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+
+        <span class="n">callback_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;animation_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_callback</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_animation</span><span class="p">,</span>
+            <span class="n">update_rate</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="n">callback_name</span><span class="p">,</span>
+            <span class="n">animation</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ShowManager.remove_animation">
+<a class="viewcode-back" href="../../reference/fury.window.html#fury.window.ShowManager.remove_animation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">animation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove an animation or timeline from the render update loop.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        animation : Animation or Timeline</span>
+<span class="sd">            Animation object to remove.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">animation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cancel_callback</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;animation_</span><span class="si">{</span><span class="nb">id</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">:</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">remove_from_scene</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ShowManager.enable_imgui">
