@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.animation.timeline &#8212; FURY 2.1.0.dev151+ga361ebce8 documentation</title>
+    <title>fury.animation.timeline &#8212; FURY 2.1.0.dev158+g571c1eec0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=955a3341"></script>
+    <script src="../../../_static/documentation_options.js?v=a8d5706e"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -475,6 +475,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_loop</span> <span class="o">=</span> <span class="n">loop</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_length</span> <span class="o">=</span> <span class="n">length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_duration</span> <span class="o">=</span> <span class="n">length</span> <span class="k">if</span> <span class="n">length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_callback</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="n">playback_panel</span><span class="p">:</span>
 
@@ -495,6 +496,19 @@ document.write(`
         <span class="k">if</span> <span class="n">animations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">animations</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_record_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set recording callback on this timeline and its animations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        callback : callable or None</span>
+<span class="sd">            Function used to record this timeline, or None to clear it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_record_callback</span> <span class="o">=</span> <span class="n">callback</span>
+        <span class="k">for</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">:</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">_set_record_callback</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Timeline.update_duration">
 <a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.Timeline.update_duration">[docs]</a>
@@ -785,6 +799,7 @@ document.write(`
             <span class="k">if</span> <span class="n">animation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">:</span>
                 <span class="k">return</span>
             <span class="n">animation</span><span class="o">.</span><span class="n">timeline</span> <span class="o">=</span> <span class="bp">self</span>
+            <span class="n">animation</span><span class="o">.</span><span class="n">_set_record_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_record_callback</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_duration</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
@@ -834,6 +849,47 @@ document.write(`
                     <span class="bp">self</span><span class="o">.</span><span class="n">pause</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">playing</span> <span class="ow">or</span> <span class="n">force</span><span class="p">:</span>
             <span class="p">[</span><span class="n">anim</span><span class="o">.</span><span class="n">update_animation</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span> <span class="k">for</span> <span class="n">anim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_animations</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Timeline.record">
+<a class="viewcode-back" href="../../../reference/fury.animation.html#fury.animation.Timeline.record">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_frames</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Record the timeline to an mp4 file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str</span>
+<span class="sd">            The output file name. The ``.mp4`` extension is added when missing.</span>
+<span class="sd">        fps : int, optional</span>
+<span class="sd">            The number of frames per second in the output video.</span>
+<span class="sd">        speed : float, optional</span>
+<span class="sd">            Playback speed multiplier used while sampling the timeline.</span>
+<span class="sd">        size : tuple[int, int], optional</span>
+<span class="sd">            The offscreen render size as ``(width, height)``. If None, the</span>
+<span class="sd">            attached show manager size is used.</span>
+<span class="sd">        return_frames : bool, optional</span>
+<span class="sd">            If True, return the recorded RGBA frames. Defaults to False to avoid</span>
+<span class="sd">            storing long recordings in memory.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[ndarray] or None</span>
+<span class="sd">            The recorded RGBA frames when ``return_frames`` is True, otherwise None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_callback</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;Timeline recording requires a ShowManager. Add the timeline &quot;</span>
+                <span class="s2">&quot;to a ShowManager or call show_manager.record_animation(...).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_record_callback</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">fname</span><span class="p">,</span>
+            <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+            <span class="n">speed</span><span class="o">=</span><span class="n">speed</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+            <span class="n">return_frames</span><span class="o">=</span><span class="n">return_frames</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Timeline.add_to_scene">
