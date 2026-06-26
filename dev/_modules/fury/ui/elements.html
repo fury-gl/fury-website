@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.elements &#8212; FURY 2.1.0.dev162+g89d1fb94f documentation</title>
+    <title>fury.ui.elements &#8212; FURY 2.1.0.dev173+ge5fc01f2b documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=fc3329d3"></script>
+    <script src="../../../_static/documentation_options.js?v=85d52f82"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -432,7 +432,7 @@ document.write(`
     <span class="c1">#     &quot;Checkbox&quot;,</span>
     <span class="c1">#     &quot;Option&quot;,</span>
     <span class="c1">#     &quot;RadioButton&quot;,</span>
-    <span class="c1">#     &quot;ComboBox2D&quot;,</span>
+    <span class="s2">&quot;ComboBox2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ListBox2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ListBoxItem2D&quot;</span><span class="p">,</span>
     <span class="c1">#     &quot;FileMenu2D&quot;,</span>
@@ -444,6 +444,7 @@ document.write(`
 <span class="p">]</span>
 
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="kn">import</span> <span class="n">printable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
 
@@ -453,6 +454,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_viz_icons</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_extension</span><span class="p">,</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">load_image_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.containers</span><span class="w"> </span><span class="kn">import</span> <span class="n">ImageContainer2D</span><span class="p">,</span> <span class="n">Panel2D</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">UIContext</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -3163,349 +3165,434 @@ document.write(`
 <span class="c1">#         self.on_change(self)</span>
 
 
-<span class="c1"># class ComboBox2D(UI):</span>
-<span class="c1">#     &quot;&quot;&quot;UI element to create drop-down menus.</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="ComboBox2D">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ComboBox2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    UI element to create drop-down menus.</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     selection_box: :class: &#39;TextBox2D&#39;</span>
-<span class="c1">#         Display selection and placeholder text.</span>
-<span class="c1">#     drop_down_button: :class: &#39;Button2D&#39;</span>
-<span class="c1">#         Button to show or hide menu.</span>
-<span class="c1">#     drop_down_menu: :class: &#39;ListBox2D&#39;</span>
-<span class="c1">#         Container for item list.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    items : list of str, optional</span>
+<span class="sd">        List of items to be displayed as choices.</span>
+<span class="sd">    position : tuple of 2 floats, optional</span>
+<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of this</span>
+<span class="sd">        UI component.</span>
+<span class="sd">    size : tuple of 2 ints, optional</span>
+<span class="sd">        Width and height in pixels of this UI component.</span>
+<span class="sd">    placeholder : str, optional</span>
+<span class="sd">        Holds the default text to be displayed.</span>
+<span class="sd">    draggable : bool, optional</span>
+<span class="sd">        Whether the UI element is draggable or not.</span>
+<span class="sd">    selection_text_color : tuple of 3 floats, optional</span>
+<span class="sd">        Color of the selected text to be displayed.</span>
+<span class="sd">    selection_bg_color : tuple of 3 floats, optional</span>
+<span class="sd">        Background color of the selection text.</span>
+<span class="sd">    menu_text_color : tuple of 3 floats, optional</span>
+<span class="sd">        Color of the options displayed in drop down menu.</span>
+<span class="sd">    selected_color : tuple of 3 floats, optional</span>
+<span class="sd">        Background color of the selected option in drop down menu.</span>
+<span class="sd">    unselected_color : tuple of 3 floats, optional</span>
+<span class="sd">        Background color of the unselected option in drop down menu.</span>
+<span class="sd">    scroll_bar_active_color : tuple of 3 floats, optional</span>
+<span class="sd">        Color of the scrollbar when in active use.</span>
+<span class="sd">    scroll_bar_inactive_color : tuple of 3 floats, optional</span>
+<span class="sd">        Color of the scrollbar when inactive.</span>
+<span class="sd">    menu_opacity : float, optional</span>
+<span class="sd">        Opacity of the drop down menu background.</span>
+<span class="sd">    reverse_scrolling : bool, optional</span>
+<span class="sd">        If True, scrolling up will move the list of files down.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        The font size of selected text in pixels.</span>
+<span class="sd">    line_spacing : float, optional</span>
+<span class="sd">        Distance between drop down menu&#39;s items in pixels.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        Z-order of the UI component.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    selection_box : TextBox2D</span>
+<span class="sd">        Display selection and placeholder text.</span>
+<span class="sd">    drop_down_button : Button2D</span>
+<span class="sd">        Button to show or hide menu.</span>
+<span class="sd">    drop_down_menu : ListBox2D</span>
+<span class="sd">        Container for item list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(</span>
-<span class="c1">#         self,</span>
-<span class="c1">#         *,</span>
-<span class="c1">#         items=None,</span>
-<span class="c1">#         position=(0, 0),</span>
-<span class="c1">#         size=(300, 200),</span>
-<span class="c1">#         placeholder=&quot;Choose selection...&quot;,</span>
-<span class="c1">#         draggable=True,</span>
-<span class="c1">#         selection_text_color=(0, 0, 0),</span>
-<span class="c1">#         selection_bg_color=(1, 1, 1),</span>
-<span class="c1">#         menu_text_color=(0.2, 0.2, 0.2),</span>
-<span class="c1">#         selected_color=(0.9, 0.6, 0.6),</span>
-<span class="c1">#         unselected_color=(0.6, 0.6, 0.6),</span>
-<span class="c1">#         scroll_bar_active_color=(0.6, 0.2, 0.2),</span>
-<span class="c1">#         scroll_bar_inactive_color=(0.9, 0.0, 0.0),</span>
-<span class="c1">#         menu_opacity=1.0,</span>
-<span class="c1">#         reverse_scrolling=False,</span>
-<span class="c1">#         font_size=20,</span>
-<span class="c1">#         line_spacing=1.4,</span>
-<span class="c1">#     ):</span>
-<span class="c1">#         &quot;&quot;&quot;Init class Instance.</span>
+<div class="viewcode-block" id="ComboBox2D.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">items</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+        <span class="n">placeholder</span><span class="o">=</span><span class="s2">&quot;Choose selection...&quot;</span><span class="p">,</span>
+        <span class="n">draggable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">selection_text_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">selection_bg_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">menu_text_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
+        <span class="n">selected_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+        <span class="n">unselected_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+        <span class="n">scroll_bar_active_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">),</span>
+        <span class="n">scroll_bar_inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+        <span class="n">menu_opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">reverse_scrolling</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">line_spacing</span><span class="o">=</span><span class="mf">1.4</span><span class="p">,</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">items</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         items: list(string)</span>
-<span class="c1">#             List of items to be displayed as choices.</span>
-<span class="c1">#         position : (float, float)</span>
-<span class="c1">#             Absolute coordinates (x, y) of the lower-left corner of this</span>
-<span class="c1">#             UI component.</span>
-<span class="c1">#         size : (int, int)</span>
-<span class="c1">#             Width and height in pixels of this UI component.</span>
-<span class="c1">#         placeholder : str</span>
-<span class="c1">#             Holds the default text to be displayed.</span>
-<span class="c1">#         draggable: {True, False}</span>
-<span class="c1">#             Whether the UI element is draggable or not.</span>
-<span class="c1">#         selection_text_color : tuple of 3 floats</span>
-<span class="c1">#             Color of the selected text to be displayed.</span>
-<span class="c1">#         selection_bg_color : tuple of 3 floats</span>
-<span class="c1">#             Background color of the selection text.</span>
-<span class="c1">#         menu_text_color : tuple of 3 floats.</span>
-<span class="c1">#             Color of the options displayed in drop down menu.</span>
-<span class="c1">#         selected_color : tuple of 3 floats.</span>
-<span class="c1">#             Background color of the selected option in drop down menu.</span>
-<span class="c1">#         unselected_color : tuple of 3 floats.</span>
-<span class="c1">#             Background color of the unselected option in drop down menu.</span>
-<span class="c1">#         scroll_bar_active_color : tuple of 3 floats.</span>
-<span class="c1">#             Color of the scrollbar when in active use.</span>
-<span class="c1">#         scroll_bar_inactive_color : tuple of 3 floats.</span>
-<span class="c1">#             Color of the scrollbar when inactive.</span>
-<span class="c1">#         reverse_scrolling: {True, False}</span>
-<span class="c1">#             If True, scrolling up will move the list of files down.</span>
-<span class="c1">#         font_size: int</span>
-<span class="c1">#             The font size of selected text in pixels.</span>
-<span class="c1">#         line_spacing: float</span>
-<span class="c1">#             Distance between drop down menu&#39;s items in pixels.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="n">items</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reverse_scrolling</span> <span class="o">=</span> <span class="n">reverse_scrolling</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">line_spacing</span> <span class="o">=</span> <span class="n">line_spacing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span> <span class="o">=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span> <span class="o">=</span> <span class="n">placeholder</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection_ID</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span> <span class="o">=</span> <span class="n">draggable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_text_color</span> <span class="o">=</span> <span class="n">selection_text_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sel_bg_color</span> <span class="o">=</span> <span class="n">selection_bg_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_txt_color</span> <span class="o">=</span> <span class="n">menu_text_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selected_color</span> <span class="o">=</span> <span class="n">selected_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unselected_color</span> <span class="o">=</span> <span class="n">unselected_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_active_color</span> <span class="o">=</span> <span class="n">scroll_bar_active_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_inactive_color</span> <span class="o">=</span> <span class="n">scroll_bar_inactive_color</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">menu_opacity</span> <span class="o">=</span> <span class="n">menu_opacity</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if items is None:</span>
-<span class="c1">#             items = []</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_block_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_menu_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_button_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_sel_pos</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_btn_pos</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_menu_pos</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_layout</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-<span class="c1">#         self.items = items.copy()</span>
-<span class="c1">#         self.font_size = font_size</span>
-<span class="c1">#         self.reverse_scrolling = reverse_scrolling</span>
-<span class="c1">#         self.line_spacing = line_spacing</span>
-<span class="c1">#         self.panel_size = size</span>
-<span class="c1">#         self._selection = placeholder</span>
-<span class="c1">#         self._menu_visibility = False</span>
-<span class="c1">#         self._selection_ID = None</span>
-<span class="c1">#         self.draggable = draggable</span>
-<span class="c1">#         self.sel_text_color = selection_text_color</span>
-<span class="c1">#         self.sel_bg_color = selection_bg_color</span>
-<span class="c1">#         self.menu_txt_color = menu_text_color</span>
-<span class="c1">#         self.selected_color = selected_color</span>
-<span class="c1">#         self.unselected_color = unselected_color</span>
-<span class="c1">#         self.scroll_active_color = scroll_bar_active_color</span>
-<span class="c1">#         self.scroll_inactive_color = scroll_bar_inactive_color</span>
-<span class="c1">#         self.menu_opacity = menu_opacity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_icon_files</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;circle-down.png&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;pressed&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s2">&quot;circle-up.png&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
 
-<span class="c1">#         # Define subcomponent sizes.</span>
-<span class="c1">#         self.text_block_size = (int(0.9 * size[0]), int(0.1 * size[1]))</span>
-<span class="c1">#         self.drop_menu_size = (int(0.9 * size[0]), int(0.7 * size[1]))</span>
-<span class="c1">#         self.drop_button_size = (int(0.1 * size[0]), int(0.1 * size[1]))</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ComboBox2D</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">)</span></div>
 
-<span class="c1">#         self._icon_files = [</span>
-<span class="c1">#             (&quot;left&quot;, read_viz_icons(fname=&quot;circle-left.png&quot;)),</span>
-<span class="c1">#             (&quot;down&quot;, read_viz_icons(fname=&quot;circle-down.png&quot;)),</span>
-<span class="c1">#         ]</span>
 
-<span class="c1">#         super(ComboBox2D, self).__init__()</span>
-<span class="c1">#         self.position = position</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Setup this UI component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_block_size</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sel_text_color</span><span class="p">,</span>
+            <span class="n">bg_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sel_bg_color</span><span class="p">,</span>
+            <span class="n">text</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_selection</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span><span class="p">,</span>
+            <span class="n">justification</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span>
+            <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+            <span class="n">bold</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#     def _setup(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Setup this UI component.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span> <span class="o">=</span> <span class="n">TexturedButton2D</span><span class="p">(</span>
+            <span class="n">states</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_icon_files</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_button_size</span><span class="p">,</span> <span class="n">is_toggle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
-<span class="c1">#         Create the ListBox filled with empty slots (ListBoxItem2D).</span>
-<span class="c1">#         Create TextBox with placeholder text.</span>
-<span class="c1">#         Create Button for toggling drop down menu.</span>
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.selection_box = TextBlock2D(</span>
-<span class="c1">#             size=self.text_block_size,</span>
-<span class="c1">#             color=self.sel_text_color,</span>
-<span class="c1">#             bg_color=self.sel_bg_color,</span>
-<span class="c1">#             text=self._selection,</span>
-<span class="c1">#         )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span> <span class="o">=</span> <span class="n">ListBox2D</span><span class="p">(</span>
+            <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">,</span>
+            <span class="n">multiselection</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span><span class="p">,</span>
+            <span class="n">line_spacing</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">line_spacing</span><span class="p">,</span>
+            <span class="n">text_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_txt_color</span><span class="p">,</span>
+            <span class="n">selected_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_color</span><span class="p">,</span>
+            <span class="n">unselected_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unselected_color</span><span class="p">,</span>
+            <span class="n">scroll_bar_active_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll_active_color</span><span class="p">,</span>
+            <span class="n">scroll_bar_inactive_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll_inactive_color</span><span class="p">,</span>
+            <span class="n">background_opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">menu_opacity</span><span class="p">,</span>
+            <span class="n">reverse_scrolling</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">reverse_scrolling</span><span class="p">,</span>
+            <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_menu_size</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#         self.drop_down_button = Button2D(</span>
-<span class="c1">#             icon_fnames=self._icon_files, size=self.drop_button_size</span>
-<span class="c1">#         )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="c1">#         self.drop_down_menu = ListBox2D(</span>
-<span class="c1">#             values=self.items,</span>
-<span class="c1">#             multiselection=False,</span>
-<span class="c1">#             font_size=self.font_size,</span>
-<span class="c1">#             line_spacing=self.line_spacing,</span>
-<span class="c1">#             text_color=self.menu_txt_color,</span>
-<span class="c1">#             selected_color=self.selected_color,</span>
-<span class="c1">#             unselected_color=self.unselected_color,</span>
-<span class="c1">#             scroll_bar_active_color=self.scroll_active_color,</span>
-<span class="c1">#             scroll_bar_inactive_color=self.scroll_inactive_color,</span>
-<span class="c1">#             background_opacity=self.menu_opacity,</span>
-<span class="c1">#             reverse_scrolling=self.reverse_scrolling,</span>
-<span class="c1">#             size=self.drop_menu_size,</span>
-<span class="c1">#         )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span>
+            <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="p">(</span>
+            <span class="kc">None</span>
+        <span class="p">)</span>
 
-<span class="c1">#         self.drop_down_menu.set_visibility(False)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">,</span> <span class="n">opacity</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sel_pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_btn_pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_pos</span><span class="p">)</span>
 
-<span class="c1">#         self.panel = Panel2D(self.panel_size, opacity=0.0)</span>
-<span class="c1">#         self.panel.add_element(self.selection_box, (0.001, 0.7))</span>
-<span class="c1">#         self.panel.add_element(self.drop_down_button, (0.8, 0.7))</span>
-<span class="c1">#         self.panel.add_element(self.drop_down_menu, (0, 0))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_drag_events</span><span class="p">()</span>
 
-<span class="c1">#         if self.draggable:</span>
-<span class="c1">#             self.drop_down_button.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 self.left_button_dragged</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.drop_down_menu.panel.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 self.left_button_dragged</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.selection_box.on_left_mouse_button_dragged = self.left_button_dragged</span>
-<span class="c1">#             self.selection_box.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 self.left_button_dragged</span>
-<span class="c1">#             )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_option_callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="o">.</span><span class="n">on_clicked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menu_toggle_callback</span>
 
-<span class="c1">#             self.drop_down_button.on_left_mouse_button_pressed = (</span>
-<span class="c1">#                 self.left_button_pressed</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.drop_down_menu.panel.background.on_left_mouse_button_pressed = (</span>
-<span class="c1">#                 self.left_button_pressed</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.selection_box.on_left_mouse_button_pressed = self.left_button_pressed</span>
-<span class="c1">#             self.selection_box.background.on_left_mouse_button_pressed = (</span>
-<span class="c1">#                 self.left_button_pressed</span>
-<span class="c1">#             )</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.panel.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 lambda i_ren, _obj, _comp: i_ren.force_render</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.drop_down_menu.panel.background.on_left_mouse_button_dragged = (</span>
-<span class="c1">#                 lambda i_ren, _obj, _comp: i_ren.force_render</span>
-<span class="c1">#             )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ui</span><span class="p">:</span> <span class="kc">None</span>
 
-<span class="c1">#         # Handle mouse wheel events on the slots.</span>
-<span class="c1">#         for slot in self.drop_down_menu.slots:</span>
-<span class="c1">#             slot.add_callback(</span>
-<span class="c1">#                 slot.textblock.actor,</span>
-<span class="c1">#                 &quot;LeftButtonPressEvent&quot;,</span>
-<span class="c1">#                 self.select_option_callback,</span>
-<span class="c1">#             )</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="p">])</span>
 
-<span class="c1">#             slot.add_callback(</span>
-<span class="c1">#                 slot.background.actor,</span>
-<span class="c1">#                 &quot;LeftButtonPressEvent&quot;,</span>
-<span class="c1">#                 self.select_option_callback,</span>
-<span class="c1">#             )</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_drag_events</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attach drag event handlers to all interactive surfaces.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">draggable</span><span class="p">:</span>
+            <span class="n">drag_targets</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+            <span class="p">]</span>
 
-<span class="c1">#         self.drop_down_button.on_left_mouse_button_clicked = self.menu_toggle_callback</span>
+            <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">drag_targets</span><span class="p">:</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_dragged</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_button_pressed</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="kc">None</span>
 
-<span class="c1">#         # Offer some standard hooks to the user.</span>
-<span class="c1">#         self.on_change = lambda ui: None</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the actors composing this UI component.</span>
 
-<span class="c1">#     def _get_actors(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.panel.actors</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            A list of actors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
 
-<span class="c1">#     def resize(self, size):</span>
-<span class="c1">#         &quot;&quot;&quot;Resize ComboBox2D.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate subcomponent sizes and positions for the given overall size.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         size : (int, int)</span>
-<span class="c1">#             ComboBox size(width, height) in pixels.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : tuple of 2 ints</span>
+<span class="sd">            ComboBox size (width, height) in pixels.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.resize(size)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Tuple of (text_block_size, drop_menu_size, drop_button_size,</span>
+<span class="sd">            sel_pos, btn_pos, menu_pos).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text_block_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.85</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">drop_menu_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">drop_button_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">0.15</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.2</span> <span class="o">*</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
-<span class="c1">#         self.text_block_size = (int(0.9 * size[0]), int(0.1 * size[1]))</span>
-<span class="c1">#         self.drop_menu_size = (int(0.9 * size[0]), int(0.7 * size[1]))</span>
-<span class="c1">#         self.drop_button_size = (int(0.1 * size[0]), int(0.1 * size[1]))</span>
+        <span class="n">sel_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">btn_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">menu_pos</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
 
-<span class="c1">#         self.panel.update_element(self.selection_box, (0.001, 0.7))</span>
-<span class="c1">#         self.panel.update_element(self.drop_down_button, (0.8, 0.7))</span>
-<span class="c1">#         self.panel.update_element(self.drop_down_menu, (0, 0))</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">text_block_size</span><span class="p">,</span>
+            <span class="n">drop_menu_size</span><span class="p">,</span>
+            <span class="n">drop_button_size</span><span class="p">,</span>
+            <span class="n">sel_pos</span><span class="p">,</span>
+            <span class="n">btn_pos</span><span class="p">,</span>
+            <span class="n">menu_pos</span><span class="p">,</span>
+        <span class="p">)</span>
 
-<span class="c1">#         self.drop_down_button.resize(self.drop_button_size)</span>
-<span class="c1">#         self.drop_down_menu.resize(self.drop_menu_size)</span>
-<span class="c1">#         self.selection_box.resize(self.text_block_size)</span>
+<div class="viewcode-block" id="ComboBox2D.resize">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.resize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resize ComboBox2D.</span>
 
-<span class="c1">#     def _set_position(self, coords):</span>
-<span class="c1">#         &quot;&quot;&quot;Set the lower-left corner position of this UI component.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        size : tuple of 2 ints</span>
+<span class="sd">            ComboBox size(width, height) in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ratio</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span> <span class="o">=</span> <span class="n">size</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         coords: (float, float)</span>
-<span class="c1">#             Absolute pixel coordinates (x, y).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.position = coords</span>
-<span class="c1">#         self.panel.position = (</span>
-<span class="c1">#             self.panel.position[0],</span>
-<span class="c1">#             self.panel.position[1] - self.drop_menu_size[1],</span>
-<span class="c1">#         )</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">text_block_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_menu_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_button_size</span><span class="p">,</span>
+            <span class="n">sel_pos</span><span class="p">,</span>
+            <span class="n">btn_pos</span><span class="p">,</span>
+            <span class="n">menu_pos</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_layout</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
 
-<span class="c1">#     def _add_to_scene(self, scene):</span>
-<span class="c1">#         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="p">,</span> <span class="n">sel_pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="p">,</span> <span class="n">btn_pos</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="p">,</span> <span class="n">menu_pos</span><span class="p">)</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         scene : scene</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_button_size</span><span class="p">)</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.panel.add_to_scene(scene)</span>
-<span class="c1">#         self.selection_box.font_size = self.font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">slot_height</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">line_spacing</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_menu_size</span><span class="p">)</span>
 
-<span class="c1">#     def _get_size(self):</span>
-<span class="c1">#         return self.panel.size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text_block_size</span><span class="p">)</span>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def selected_text(self):</span>
-<span class="c1">#         return self._selection</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def selected_text_index(self):</span>
-<span class="c1">#         return self._selection_ID</span>
 
-<span class="c1">#     def set_visibility(self, visibility):</span>
-<span class="c1">#         super().set_visibility(visibility)</span>
-<span class="c1">#         if not self._menu_visibility:</span>
-<span class="c1">#             self.drop_down_menu.set_visibility(False)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the position of the actors.&quot;&quot;&quot;</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_menu_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
 
-<span class="c1">#     def append_item(self, *items):</span>
-<span class="c1">#         &quot;&quot;&quot;Append additional options to the menu.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the UI component.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         items : n-d list, n-d tuple, Number or str</span>
-<span class="c1">#             Additional options.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of 2 ints</span>
+<span class="sd">            Size of the UI component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">size</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         for item in items:</span>
-<span class="c1">#             if isinstance(item, (list, tuple)):</span>
-<span class="c1">#                 # Useful when n-d lists/tuples are used.</span>
-<span class="c1">#                 self.append_item(*item)</span>
-<span class="c1">#             elif isinstance(item, (str, Number)):</span>
-<span class="c1">#                 self.items.append(str(item))</span>
-<span class="c1">#             else:</span>
-<span class="c1">#                 raise TypeError(&quot;Invalid item instance {}&quot;.format(type(item)))</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selected_text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the currently selected text.</span>
 
-<span class="c1">#         self.drop_down_menu.update_scrollbar()</span>
-<span class="c1">#         if not self._menu_visibility:</span>
-<span class="c1">#             self.drop_down_menu.scroll_bar.set_visibility(False)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Currently selected text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
 
-<span class="c1">#     def select_option_callback(self, i_ren, _obj, listboxitem):</span>
-<span class="c1">#         &quot;&quot;&quot;Select the appropriate option</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">selected_text_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the index of the currently selected text.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         i_ren: :class:`CustomInteractorStyle`</span>
-<span class="c1">#         obj: :class:`vtkActor`</span>
-<span class="c1">#             The picked actor</span>
-<span class="c1">#         listboxitem: :class:`ListBoxItem2D`</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Index of the currently selected text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection_ID</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         # Set the Text of TextBlock2D to the text of listboxitem</span>
-<span class="c1">#         self._selection = listboxitem.element</span>
-<span class="c1">#         self._selection_ID = self.items.index(self._selection)</span>
+<div class="viewcode-block" id="ComboBox2D.set_visibility">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.set_visibility">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">visibility</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the visibility of the UI component.</span>
 
-<span class="c1">#         self.selection_box.message = self._selection</span>
-<span class="c1">#         clip_overflow(self.selection_box, self.selection_box.background.size[0])</span>
-<span class="c1">#         self.drop_down_menu.set_visibility(False)</span>
-<span class="c1">#         self._menu_visibility = False</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        visibility : bool</span>
+<span class="sd">            Whether the UI element is visible or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="n">visibility</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
 
-<span class="c1">#         self.drop_down_button.next_icon()</span>
 
-<span class="c1">#         self.on_change(self)</span>
+<div class="viewcode-block" id="ComboBox2D.append_item">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.append_item">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">append_item</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">items</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Append additional options to the menu.</span>
 
-<span class="c1">#         i_ren.force_render()</span>
-<span class="c1">#         i_ren.event.abort()</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        *items : str or float or list or tuple</span>
+<span class="sd">            Additional options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append_item</span><span class="p">(</span><span class="o">*</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Number</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Invalid item instance </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)))</span>
 
-<span class="c1">#     def menu_toggle_callback(self, i_ren, _vtkactor, _combobox):</span>
-<span class="c1">#         &quot;&quot;&quot;Toggle visibility of drop down menu list.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">update_scrollbar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span></div>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         i_ren : :class:`CustomInteractorStyle`</span>
-<span class="c1">#         vtkactor : :class:`vtkActor`</span>
-<span class="c1">#             The picked actor</span>
-<span class="c1">#         combobox : :class:`ComboBox2D`</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self._menu_visibility = not self._menu_visibility</span>
-<span class="c1">#         self.drop_down_menu.set_visibility(self._menu_visibility)</span>
+<div class="viewcode-block" id="ComboBox2D.select_option_callback">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.select_option_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_option_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select the appropriate option based on ListBox selection.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">selected</span><span class="p">:</span>
+            <span class="k">return</span>
 
-<span class="c1">#         self.drop_down_button.next_icon()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">selected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_selection_ID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">last_selection_idx</span>
 
-<span class="c1">#         i_ren.force_render()</span>
-<span class="c1">#         i_ren.event.abort()  # Stop propagating the event.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_selection</span>
+        <span class="n">clip_overflow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">selection_box</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<span class="c1">#     def left_button_pressed(self, i_ren, _obj, _sub_component):</span>
-<span class="c1">#         click_pos = np.array(i_ren.event.position)</span>
-<span class="c1">#         self._click_position = click_pos</span>
-<span class="c1">#         i_ren.event.abort()  # Stop propagating the event.</span>
 
-<span class="c1">#     def left_button_dragged(self, i_ren, _obj, _sub_component):</span>
-<span class="c1">#         click_position = np.array(i_ren.event.position)</span>
-<span class="c1">#         change = click_position - self._click_position</span>
-<span class="c1">#         self.panel.position += change</span>
-<span class="c1">#         self._click_position = click_position</span>
-<span class="c1">#         i_ren.force_render()</span>
+<div class="viewcode-block" id="ComboBox2D.menu_toggle_callback">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.menu_toggle_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">menu_toggle_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Toggle visibility of drop down menu list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The PyGfx pointer event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_menu_visibility</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drop_down_menu</span><span class="o">.</span><span class="n">update_scrollbar</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ComboBox2D.left_button_pressed">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.left_button_pressed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_pressed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle left mouse button press event for dragging.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The PyGfx pointer event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">click_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="o">=</span> <span class="n">click_pos</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ComboBox2D.left_button_dragged">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D.left_button_dragged">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">left_button_dragged</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle left mouse button drag event for movement.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event : PointerEvent</span>
+<span class="sd">            The PyGfx pointer event.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">click_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">event</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
+            <span class="n">new_position</span> <span class="o">=</span> <span class="n">click_position</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drag_offset</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">new_position</span><span class="p">)</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="ListBox2D">
@@ -3621,34 +3708,31 @@ document.write(`
         <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span>
         <span class="n">font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
         <span class="c1"># Calculating the number of slots.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">//</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">))</span>
 
         <span class="c1"># This panel facilitates adding slots at the right position.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span> <span class="o">=</span> <span class="n">Panel2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
         <span class="c1"># Add a scroll bar</span>
-        <span class="n">scroll_bar_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">*</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span> <span class="o">=</span> <span class="n">Rectangle2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">20</span><span class="p">),</span> <span class="n">scroll_bar_height</span><span class="p">))</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">scroll_bar_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">*</span> <span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span>
+        <span class="n">scroll_bar_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span> <span class="o">=</span> <span class="n">Rectangle2D</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">scroll_bar_width</span><span class="p">,</span> <span class="n">scroll_bar_height</span><span class="p">))</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">scroll_bar_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
-        <span class="n">scroll_bar_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+        <span class="n">scroll_bar_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">scroll_bar_width</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+        <span class="n">scroll_bar_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_top_y</span> <span class="o">=</span> <span class="n">scroll_bar_y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_x</span> <span class="o">=</span> <span class="n">scroll_bar_x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="p">,</span> <span class="p">(</span><span class="n">scroll_bar_x</span><span class="p">,</span> <span class="n">scroll_bar_y</span><span class="p">))</span>
 
         <span class="c1"># Initialisation of empty text actors</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">scroll_bar_width</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">):</span>
-            <span class="n">y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span>
             <span class="n">item</span> <span class="o">=</span> <span class="n">ListBoxItem2D</span><span class="p">(</span>
                 <span class="n">on_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">,</span>
                 <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">),</span>
@@ -3659,14 +3743,13 @@ document.write(`
             <span class="p">)</span>
             <span class="n">item</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+            <span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span>
 
         <span class="c1"># Add default events listener for this UI component.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">on_left_mouse_button_pressed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_click_callback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">on_left_mouse_button_released</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_release_callback</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">on_left_mouse_button_dragged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_drag_callback</span>
-
-        <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventType</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wheel_callback</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">WHEEL</span>
@@ -3693,7 +3776,56 @@ document.write(`
 <span class="sd">        size : (int, int)</span>
 <span class="sd">            Size to resize to.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">//</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">))</span>
+
+        <span class="n">new_scrollbar_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_x</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">new_scrollbar_width</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">new_scrollbar_width</span> <span class="o">-</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">):</span>
+            <span class="n">font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">)):</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">ListBoxItem2D</span><span class="p">(</span>
+                    <span class="n">on_select</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">select</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">),</span>
+                    <span class="n">text_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_color</span><span class="p">,</span>
+                    <span class="n">selected_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">selected_color</span><span class="p">,</span>
+                    <span class="n">unselected_color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">unselected_color</span><span class="p">,</span>
+                    <span class="n">background_opacity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">background_opacity</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">actor</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">wheel_callback</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">WHEEL</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">text_actor</span> <span class="ow">in</span> <span class="n">item</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">actors</span><span class="p">:</span>
+                    <span class="n">text_actor</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wheel_callback</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">WHEEL</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">add_element</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">:</span>
+            <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">remove_element</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+        <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
+        <span class="k">for</span> <span class="n">slot</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">slots</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="n">slot</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+            <span class="n">slot</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font_size</span>
+            <span class="n">slot</span><span class="o">.</span><span class="n">resize</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">slot_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span><span class="p">))</span>
+            <span class="n">y</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">new_scrollbar_width</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_scrollbar</span><span class="p">()</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -3728,7 +3860,7 @@ document.write(`
             <span class="k">return</span>
 
         <span class="n">scroll_bar_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_top_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_top_y</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">update_element</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_x</span><span class="p">,</span> <span class="n">scroll_bar_y</span><span class="p">))</span>
 
@@ -3814,19 +3946,17 @@ document.write(`
 <span class="sd">            The pygfx event.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">position_y</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">y</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">position_y</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_init_position</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">offset</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)):</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
-                <span class="o">-</span><span class="n">offset</span><span class="p">,</span>
-                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">offset</span> <span class="o">=</span> <span class="o">-</span><span class="n">offset</span>
+        <span class="k">if</span> <span class="n">offset</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)):</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">offset</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">offset</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">offset</span><span class="p">,</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">-=</span> <span class="n">offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view_offset</span> <span class="o">+=</span> <span class="n">offset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_scroll_bar_position</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scroll_init_position</span> <span class="o">+=</span> <span class="n">offset</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span></div>
@@ -3867,17 +3997,22 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Change the scroll-bar height when the values change.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">set_visibility</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">new_scrollbar_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">)</span> <span class="o">/</span> <span class="n">denom</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">new_scrollbar_height</span>
+
+        <span class="n">step_denom</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span>
+        <span class="k">if</span> <span class="n">step_denom</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">step_denom</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">-</span> <span class="n">new_scrollbar_height</span><span class="p">)</span> <span class="o">/</span> <span class="n">step_denom</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">scroll_step_size</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">slot_height</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">height</span>
-        <span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_top_y</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">panel_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">scroll_bar</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scroll_bar_top_y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_scroll_bar_position</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nb_slots</span><span class="p">:</span>
@@ -3927,8 +4062,8 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">selected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">element</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">last_selection_idx</span> <span class="o">=</span> <span class="n">selection_idx</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">()</span>  <span class="c1"># Call hook.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">()</span></div>
 </div>
 
 
