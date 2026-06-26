@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Keyframe animation: Camera and opacity &#8212; FURY 2.1.0.dev160+g6d57b2021 documentation</title>
+    <title>Keyframe animation: Camera and opacity &#8212; FURY 2.1.0.dev162+g89d1fb94f documentation</title>
   
   
   
@@ -44,7 +44,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=742e9973"></script>
+    <script src="../../_static/documentation_options.js?v=fc3329d3"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -439,8 +439,7 @@ to download the full example code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">fury</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.animation.html#fury.animation.Animation" title="fury.animation.Animation" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">,</span> <a href="../../reference/fury.animation.html#fury.animation.CameraAnimation" title="fury.animation.CameraAnimation" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CameraAnimation</span></a><span class="p">,</span> <a href="../../reference/fury.animation.html#fury.animation.Timeline" title="fury.animation.Timeline" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timeline</span></a>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.animation.interpolator</span><span class="w"> </span><span class="kn">import</span> <span class="n">cubic_spline_interpolator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.motion</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.motion.html#fury.motion.Animation" title="fury.motion.Animation" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">,</span> <a href="../../reference/fury.motion.html#fury.motion.CameraAnimation" title="fury.motion.CameraAnimation" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CameraAnimation</span></a><span class="p">,</span> <a href="../../reference/fury.motion.html#fury.motion.Timeline" title="fury.motion.Timeline" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timeline</span></a><span class="p">,</span> <a href="../../reference/fury.motion.html#fury.motion.cubic_spline_interpolator" title="fury.motion.cubic_spline_interpolator" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-function"><span class="n">cubic_spline_interpolator</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.data</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.data.html#fury.data.fetch_viz_cubemaps" title="fury.data.fetch_viz_cubemaps" class="sphx-glr-backref-module-fury-data sphx-glr-backref-type-py-function"><span class="n">fetch_viz_cubemaps</span></a><span class="p">,</span> <a href="../../reference/fury.data.html#fury.data.read_viz_cubemap" title="fury.data.read_viz_cubemap" class="sphx-glr-backref-module-fury-data sphx-glr-backref-type-py-function"><span class="n">read_viz_cubemap</span></a>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.io.html#fury.io.load_cube_map_texture" title="fury.io.load_cube_map_texture" class="sphx-glr-backref-module-fury-io sphx-glr-backref-type-py-function"><span class="n">load_cube_map_texture</span></a>
 </pre></div>
@@ -468,7 +467,7 @@ show <code class="docutils literal notranslate"><span class="pre">FURY</span></c
 <h2>Creating the main <code class="docutils literal notranslate"><span class="pre">Timeline</span></code><a class="headerlink" href="#creating-the-main-timeline" title="Link to this heading">#</a></h2>
 <p>Here we create a <code class="docutils literal notranslate"><span class="pre">Timeline</span></code> so that it can control all animations from one
 place. A playback panel is attached to provide interactive playback controls.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">timeline</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.Timeline" title="fury.animation.Timeline" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timeline</span></a><span class="p">(</span><span class="n">playback_panel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">timeline</span> <span class="o">=</span> <a href="../../reference/fury.motion.html#fury.motion.Timeline" title="fury.motion.Timeline" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Timeline</span></a><span class="p">(</span><span class="n">playback_panel</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Creating an actor for visualization.</p>
@@ -488,7 +487,7 @@ place. A playback panel is attached to provide interactive playback controls.</p
 </pre></div>
 </div>
 <p>Creating an <code class="docutils literal notranslate"><span class="pre">Animation</span></code> to animate the opacity of <code class="docutils literal notranslate"><span class="pre">fury_text</span></code>.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">text_anim</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.Animation" title="fury.animation.Animation" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">fury_text</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">text_anim</span> <span class="o">=</span> <a href="../../reference/fury.motion.html#fury.motion.Animation" title="fury.motion.Animation" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">fury_text</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Opacity is set to 0 at time 29 and to 1 at time 35. Linear interpolation is
@@ -512,7 +511,7 @@ used by default.</p>
 
     <span class="c1">###########################################################################</span>
     <span class="c1"># Create one animation for this sphere.</span>
-    <span class="n">animation</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.Animation" title="fury.animation.Animation" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">sphere_actor</span><span class="p">)</span>
+    <span class="n">animation</span> <span class="o">=</span> <a href="../../reference/fury.motion.html#fury.motion.Animation" title="fury.motion.Animation" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Animation</span></a><span class="p">(</span><span class="n">actors</span><span class="o">=</span><span class="n">sphere_actor</span><span class="p">)</span>
 
     <span class="c1">###########################################################################</span>
     <span class="c1"># Generate random position and scale values every two seconds.</span>
@@ -522,7 +521,7 @@ used by default.</p>
 
     <span class="c1">###########################################################################</span>
     <span class="c1"># Change the position interpolator to cubic spline interpolation.</span>
-    <span class="n">animation</span><span class="o">.</span><span class="n">set_position_interpolator</span><span class="p">(</span><span class="n">cubic_spline_interpolator</span><span class="p">)</span>
+    <span class="n">animation</span><span class="o">.</span><span class="n">set_position_interpolator</span><span class="p">(</span><a href="../../reference/fury.motion.html#fury.motion.cubic_spline_interpolator" title="fury.motion.cubic_spline_interpolator" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-function"><span class="n">cubic_spline_interpolator</span></a><span class="p">)</span>
     <span class="n">timeline</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">animation</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -531,7 +530,7 @@ used by default.</p>
 <h2>Animating the camera<a class="headerlink" href="#animating-the-camera" title="Link to this heading">#</a></h2>
 <p>Camera animations are represented with <code class="docutils literal notranslate"><span class="pre">CameraAnimation</span></code>. Three properties
 can control the camera: position, focal position, and view-up direction.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">camera_anim</span> <span class="o">=</span> <a href="../../reference/fury.animation.html#fury.animation.CameraAnimation" title="fury.animation.CameraAnimation" class="sphx-glr-backref-module-fury-animation sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CameraAnimation</span></a><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">camera_anim</span> <span class="o">=</span> <a href="../../reference/fury.motion.html#fury.motion.CameraAnimation" title="fury.motion.CameraAnimation" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">CameraAnimation</span></a><span class="p">(</span><span class="n">loop</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">timeline</span><span class="o">.</span><span class="n">add_animation</span><span class="p">(</span><span class="n">camera_anim</span><span class="p">)</span>
 
 <span class="n">camera_positions</span> <span class="o">=</span> <span class="p">{</span>
@@ -557,8 +556,8 @@ can control the camera: position, focal position, and view-up direction.</p>
 </pre></div>
 </div>
 <p>Change camera position and focal interpolators.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">camera_anim</span><span class="o">.</span><span class="n">set_position_interpolator</span><span class="p">(</span><span class="n">cubic_spline_interpolator</span><span class="p">)</span>
-<span class="n">camera_anim</span><span class="o">.</span><span class="n">set_focal_interpolator</span><span class="p">(</span><span class="n">cubic_spline_interpolator</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">camera_anim</span><span class="o">.</span><span class="n">set_position_interpolator</span><span class="p">(</span><a href="../../reference/fury.motion.html#fury.motion.cubic_spline_interpolator" title="fury.motion.cubic_spline_interpolator" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-function"><span class="n">cubic_spline_interpolator</span></a><span class="p">)</span>
+<span class="n">camera_anim</span><span class="o">.</span><span class="n">set_focal_interpolator</span><span class="p">(</span><a href="../../reference/fury.motion.html#fury.motion.cubic_spline_interpolator" title="fury.motion.cubic_spline_interpolator" class="sphx-glr-backref-module-fury-motion sphx-glr-backref-type-py-function"><span class="n">cubic_spline_interpolator</span></a><span class="p">)</span>
 </pre></div>
 </div>
 <p>Add non-animated actors to the scene.</p>
