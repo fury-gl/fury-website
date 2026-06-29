@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.bio &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.bio &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -430,6 +430,7 @@ document.write(`
     <span class="n">show_slices</span><span class="p">,</span>
     <span class="n">vector_field_slicer</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_transformed_cube_bounds</span>
 
 
@@ -588,8 +589,9 @@ document.write(`
 <span class="sd">        An ROI file that will be binarized and displayed.</span>
 <span class="sd">    affine : ndarray, optional</span>
 <span class="sd">        The affine transformation matrix to apply to the contour.</span>
-<span class="sd">    color : tuple, optional</span>
-<span class="sd">        The RGB output color of the contour in the range [0, 1].</span>
+<span class="sd">    color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The output color of the contour. Accepts a hex string, RGB(A) in</span>
+<span class="sd">        [0, 1], or RGB(A) in [0, 255].</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        The opacity of the contour.</span>
 <span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque).</span>
@@ -624,10 +626,11 @@ document.write(`
 <span class="sd">        A labeled volume where each integer label represents a different region.</span>
 <span class="sd">    affine : ndarray, optional</span>
 <span class="sd">        The affine transformation matrix to apply to the contour.</span>
-<span class="sd">    colors : ndarray, shape (N, 3) or (N, 4), optional</span>
-<span class="sd">        An array of RGB or RGBA colors for each unique label in the volume.</span>
-<span class="sd">        where N is the number of unique labels (excluding background label 0).</span>
-<span class="sd">        If None, random colors will be assigned.</span>
+<span class="sd">    colors : list or ndarray, shape (N, 3) or (N, 4), optional</span>
+<span class="sd">        A color for each unique label in the volume, where N is the number</span>
+<span class="sd">        of unique labels (excluding background label 0). Each entry accepts a</span>
+<span class="sd">        hex string, RGB(A) in [0, 1], or RGB(A) in [0, 255]. If None, random</span>
+<span class="sd">        colors will be assigned.</span>
 <span class="sd">    opacities : ndarray, shape (N,) or None, optional</span>
 <span class="sd">        The opacities of the contours.</span>
 <span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque). It will be overridden</span>
@@ -647,8 +650,10 @@ document.write(`
 
     <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect color array shape&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Incorrect color array shape&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">nb_surfaces</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
         <span class="n">opacities</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>

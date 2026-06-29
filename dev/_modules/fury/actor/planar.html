@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.planar &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.planar &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -985,10 +985,10 @@ document.write(`
 <span class="sd">    text : str or list of str</span>
 <span class="sd">        The plain text to render. When a list is given, each item becomes</span>
 <span class="sd">        a separate text actor and a Group is returned.</span>
-<span class="sd">    colors : tuple (3,) or tuple (4,) or list of tuple, optional</span>
-<span class="sd">        RGB or RGBA values in the range [0, 1]. When ``text`` is a list,</span>
-<span class="sd">        this can be a single color applied to all actors, or a list of</span>
-<span class="sd">        colors (one per text item).</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        A hex string, RGB(A) in [0, 1], or RGB(A) in [0, 255]. When ``text``</span>
+<span class="sd">        is a list, this can be a single color applied to all actors, or a</span>
+<span class="sd">        list of colors (one per text item). See :func:`normalize_colors`.</span>
 <span class="sd">    position : tuple (3,) or list of tuple (3,), optional</span>
 <span class="sd">        The (x, y, z) coordinates to place the text in 3D space. When</span>
 <span class="sd">        ``text`` is a list, this can be a single position applied to all</span>
@@ -1050,7 +1050,7 @@ document.write(`
         <span class="n">is_color_seq</span> <span class="o">=</span> <span class="p">(</span>
             <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
             <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">))</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">is_color_seq</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
@@ -1366,16 +1366,17 @@ document.write(`
 <span class="sd">        A list of lines to be projected.</span>
 <span class="sd">    plane : tuple, optional</span>
 <span class="sd">        The plane equation (a, b, c, d) for the projection.</span>
-<span class="sd">    colors : tuple, optional</span>
-<span class="sd">        The color of the lines.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The color of the lines. Accepts a hex string, RGB(A) in [0, 1],</span>
+<span class="sd">        RGB(A) in [0, 255], or one such color per line.</span>
 <span class="sd">    lengths : list, optional</span>
 <span class="sd">        A list of lengths for each line.</span>
 <span class="sd">    offsets : list, optional</span>
 <span class="sd">        A list of offsets for each line.</span>
 <span class="sd">    thickness : float, optional</span>
 <span class="sd">        Thickness of the cross-section.</span>
-<span class="sd">    outline_color : tuple, optional</span>
-<span class="sd">        The color of the outline.</span>
+<span class="sd">    outline_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The color of the outline. Same formats as ``colors``.</span>
 <span class="sd">    outline_thickness : float, optional</span>
 <span class="sd">        The thickness of the outline.</span>
 <span class="sd">    opacity : float, optional</span>
@@ -1450,7 +1451,10 @@ document.write(`
         <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># A single color: collapse so it is tiled across all lines.</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -1468,7 +1472,10 @@ document.write(`
         <span class="k">if</span> <span class="n">outline_color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">outline_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">outline_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+            <span class="n">outline_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">outline_color</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">outline_color</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># A single color: collapse so it is tiled across all lines.</span>
+                <span class="n">outline_color</span> <span class="o">=</span> <span class="n">outline_color</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">outline_color</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">outline_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">outline_color</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_lines</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -1608,17 +1615,17 @@ document.write(`
 <span class="sd">        A list of lines to be projected.</span>
 <span class="sd">    plane : {str, tuple}, optional</span>
 <span class="sd">        The plane equation (a, b, c, d) for the projection.</span>
-<span class="sd">    colors : {tuple, list, ndarray}, optional</span>
-<span class="sd">        The color of the cross-section point. It can be a single color or</span>
-<span class="sd">        a list of colors for each line.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The color of the cross-section point. Accepts a hex string, RGB(A)</span>
+<span class="sd">        in [0, 1], RGB(A) in [0, 255], or one such color per line.</span>
 <span class="sd">    lengths : list, optional</span>
 <span class="sd">        A list of lengths for each line.</span>
 <span class="sd">    offsets : list, optional</span>
 <span class="sd">        A list of offsets for each line.</span>
 <span class="sd">    thickness : float, optional</span>
 <span class="sd">        Thickness of the cross-section.</span>
-<span class="sd">    outline_color : tuple, optional</span>
-<span class="sd">        The color of the outline.</span>
+<span class="sd">    outline_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The color of the outline. Same formats as ``colors``.</span>
 <span class="sd">    outline_thickness : float, optional</span>
 <span class="sd">        The thickness of the outline.</span>
 <span class="sd">    opacity : float, optional</span>

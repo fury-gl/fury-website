@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.slicer &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.slicer &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -431,6 +431,7 @@ document.write(`
     <span class="n">set_group_visibility</span><span class="p">,</span>
     <span class="n">show_slices</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">buffer_to_geometry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Geometry</span><span class="p">,</span>
@@ -581,8 +582,9 @@ document.write(`
 <span class="sd">    cross_section : list or tuple, shape (3,), optional</span>
 <span class="sd">        A list or tuple representing the cross section dimensions.</span>
 <span class="sd">        If None, the cross section will be ignored and complete field will be shown.</span>
-<span class="sd">    colors : tuple, optional</span>
-<span class="sd">        Color for the vectors. If None, the color will used from the orientation.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the vectors. Accepts a hex string, RGB(A) in [0, 1], or</span>
+<span class="sd">        RGB(A) in [0, 255]. If None, the color is taken from the orientation.</span>
 <span class="sd">    scales : {float, ndarray}, shape {(X, Y, Z, N) or (X, Y, Z)}, optional</span>
 <span class="sd">        Scale factor for the vectors. If ndarray, it should match the shape of the</span>
 <span class="sd">        field.</span>
@@ -648,7 +650,7 @@ document.write(`
         <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 
         <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="n">total_vectors</span> <span class="o">*</span> <span class="n">pnts_per_vector</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">buffer_to_geometry</span><span class="p">(</span><span class="n">positions</span><span class="o">=</span><span class="n">pts</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
@@ -885,8 +887,9 @@ document.write(`
 <span class="sd">    actor_type : str, optional</span>
 <span class="sd">        The type of vector field visualization. Options are &quot;thin_line&quot;,</span>
 <span class="sd">        &quot;line&quot;, and &quot;arrow&quot;.</span>
-<span class="sd">    colors : tuple, optional</span>
-<span class="sd">        Color for the vectors. If None, the color will used from the orientation.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the vectors. Accepts a hex string, RGB(A) in [0, 1], or</span>
+<span class="sd">        RGB(A) in [0, 255]. If None, the color is taken from the orientation.</span>
 <span class="sd">    scales : {float, ndarray}, shape {(X, Y, Z, N) or (X, Y, Z)}, optional</span>
 <span class="sd">        Scale factor for the vectors. If ndarray, it should match the shape of the</span>
 <span class="sd">        field.</span>
@@ -943,8 +946,9 @@ document.write(`
 <span class="sd">    cross_section : list or tuple, shape (3,), optional</span>
 <span class="sd">        A list or tuple representing the cross section dimensions.</span>
 <span class="sd">        If None, the cross section will be ignored and complete field will be shown.</span>
-<span class="sd">    colors : tuple, optional</span>
-<span class="sd">        Color for the vectors. If None, the color will used from the orientation.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the vectors. Accepts a hex string, RGB(A) in [0, 1], or</span>
+<span class="sd">        RGB(A) in [0, 255]. If None, the color is taken from the orientation.</span>
 <span class="sd">    scales : {float, ndarray}, shape {(X, Y, Z, N) or (X, Y, Z)}, optional</span>
 <span class="sd">        Scale factor for the vectors. If ndarray, it should match the shape of the</span>
 <span class="sd">        field.</span>

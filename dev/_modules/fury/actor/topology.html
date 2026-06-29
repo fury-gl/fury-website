@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.topology &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.topology &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -426,6 +426,7 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span><span class="p">,</span> <span class="n">create_mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">buffer_to_geometry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image_texture</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">_create_mesh_material</span><span class="p">,</span> <span class="n">validate_opacity</span>
@@ -458,8 +459,9 @@ document.write(`
 <span class="sd">    material : str, optional</span>
 <span class="sd">        The material type for the surface mesh. Options are &#39;phong&#39; and &#39;basic&#39;. This</span>
 <span class="sd">        option only works with colors is passed.</span>
-<span class="sd">    colors : ndarray, shape (N, 3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
-<span class="sd">        RGB or RGBA values in the range [0, 1].</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        A per-vertex ``(N, 3)``/``(N, 4)`` array, or a single color as a hex</span>
+<span class="sd">        string, RGB(A) in [0, 1], or RGB(A) in [0, 255].</span>
 <span class="sd">    texture : str, optional</span>
 <span class="sd">        Path to the texture image file.</span>
 <span class="sd">    texture_axis : str, optional</span>
@@ -487,6 +489,13 @@ document.write(`
     <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">texture</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Texture will be ignored when colors are provided.&quot;</span><span class="p">)</span>
+
+        <span class="n">is_per_vertex</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_per_vertex</span><span class="p">:</span>
+            <span class="c1"># A single color: normalize hex / [0, 255] / [0, 1] to RGB.</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
             <span class="n">geo</span> <span class="o">=</span> <span class="n">buffer_to_geometry</span><span class="p">(</span>
@@ -561,8 +570,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    data : ndarray, shape (X, Y, Z)</span>
 <span class="sd">        An ROI file that will be binarized and displayed.</span>
-<span class="sd">    color : tuple, optional</span>
-<span class="sd">        The RGB output color of the contour in the range [0, 1].</span>
+<span class="sd">    color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The output color of the contour. Accepts a hex string, RGB(A) in</span>
+<span class="sd">        [0, 1], or RGB(A) in [0, 255].</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        The opacity of the contour.</span>
 <span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque).</span>
@@ -574,8 +584,9 @@ document.write(`
 <span class="sd">    Group</span>
 <span class="sd">        A group of actors containing the generated contours from the volume data.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">color</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">color</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Color must be a tuple of three values (R, G, B).&quot;</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">color</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
 
     <span class="n">surface_data</span> <span class="o">=</span> <span class="n">voxel_mesh_by_object</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">connectivity</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 

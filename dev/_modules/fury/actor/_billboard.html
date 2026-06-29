@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor._billboard &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor._billboard &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -429,6 +429,7 @@ document.write(`
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">buffer_to_geometry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">register_wgpu_render_function</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.material</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -483,8 +484,8 @@ document.write(`
         <span class="n">centers</span> <span class="o">=</span> <span class="n">centers</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">centers</span><span class="p">)</span>
 
-    <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="k">elif</span> <span class="n">colors</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
         <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -694,8 +695,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    centers : (N,3) array_like</span>
 <span class="sd">        Billboard positions.</span>
-<span class="sd">    colors : (N,3|4) array_like or single color</span>
-<span class="sd">        Per-billboard RGB(A) colors.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Per-billboard color. Accepts a hex string, RGB(A) in [0, 1], RGB(A)</span>
+<span class="sd">        in [0, 255], or one such color per billboard.</span>
 <span class="sd">    sizes : (N,2) | (2,) | float | (N,) array_like</span>
 <span class="sd">        Width/height per billboard. Scalar or single pair broadcast.</span>
 <span class="sd">    opacity : float, optional</span>
@@ -737,8 +739,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    centers : array_like</span>
 <span class="sd">        Sphere centers provided as an ``(N, 3)`` array or broadcastable input.</span>
-<span class="sd">    colors : array_like, optional</span>
-<span class="sd">        RGB or RGBA color per sphere. Single color inputs are broadcast.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color per sphere. Accepts a hex string, RGB(A) in [0, 1], RGB(A) in</span>
+<span class="sd">        [0, 255], or one such color per sphere. Single colors are broadcast.</span>
 <span class="sd">    radii : array_like, optional</span>
 <span class="sd">        Scalar radii or per-sphere radii array. Used to compute billboard size.</span>
 <span class="sd">    opacity : float, optional</span>

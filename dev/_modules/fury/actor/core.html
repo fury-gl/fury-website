@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.core &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.core &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1126,12 +1126,13 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    scale : tuple (3,), optional</span>
 <span class="sd">        The size (length) of each axis in the x, y, and z directions.</span>
-<span class="sd">    color_x : tuple (3,), optional</span>
-<span class="sd">        Color for the X-axis.</span>
-<span class="sd">    color_y : tuple (3,), optional</span>
-<span class="sd">        Color for the Y-axis.</span>
-<span class="sd">    color_z : tuple (3,), optional</span>
-<span class="sd">        Color for the Z-axis.</span>
+<span class="sd">    color_x : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the X-axis. Accepts a hex string, RGB in [0, 1], or</span>
+<span class="sd">        RGB in [0, 255].</span>
+<span class="sd">    color_y : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the Y-axis. Same formats as ``color_x``.</span>
+<span class="sd">    color_z : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color for the Z-axis. Same formats as ``color_x``.</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        Takes values from 0 (fully transparent) to 1 (opaque).</span>
 
@@ -1152,8 +1153,15 @@ document.write(`
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
     <span class="n">directions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">color_x</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">color_x</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">color_y</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">color_y</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">color_z</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">color_z</span><span class="p">)[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
     <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-        <span class="p">[</span><span class="n">color_x</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,),</span> <span class="n">color_y</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,),</span> <span class="n">color_z</span> <span class="o">+</span> <span class="p">(</span><span class="n">opacity</span><span class="p">,)]</span>
+        <span class="p">[</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">color_x</span><span class="p">,</span> <span class="n">opacity</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">color_y</span><span class="p">,</span> <span class="n">opacity</span><span class="p">],</span>
+            <span class="p">[</span><span class="o">*</span><span class="n">color_z</span><span class="p">,</span> <span class="n">opacity</span><span class="p">],</span>
+        <span class="p">]</span>
     <span class="p">)</span>
     <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">scale</span><span class="p">)</span>
 
@@ -1183,8 +1191,9 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    labels : list of str, optional</span>
 <span class="sd">        Labels for [-X, +X, -Y, +Y, -Z, +Z].</span>
-<span class="sd">    colors : list of tuple, optional</span>
-<span class="sd">        RGB colors for each axis endpoint.</span>
+<span class="sd">    colors : list, optional</span>
+<span class="sd">        Color for each axis endpoint. Each entry accepts a hex string,</span>
+<span class="sd">        RGB in [0, 1], or RGB in [0, 255].</span>
 <span class="sd">    thickness : float, optional</span>
 <span class="sd">        Thickness for endpoint lines.</span>
 <span class="sd">    center_disk_radius : float, optional</span>

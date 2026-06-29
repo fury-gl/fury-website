@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.curved &#8212; FURY 2.1.0.dev175+gc5141ea57 documentation</title>
+    <title>fury.actor.curved &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=65e30a32"></script>
+    <script src="../../../_static/documentation_options.js?v=be8d7c6a"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1149,13 +1149,11 @@ document.write(`
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">outline_thickness</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="n">outline_thickness</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;outline_thickness must be a non-negative number&quot;</span><span class="p">)</span>
 
-        <span class="n">outline_color</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">outline_color</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">outline_color</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">outline_color</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">outline_color</span><span class="o">.</span><span class="n">size</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;outline_color must be a tuple/array of 3 (RGB) or 4 (RGBA) values&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">((</span><span class="n">outline_color</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">outline_color</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;outline_color values must be between 0 and 1&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">enable_picking</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;enable_picking must be a boolean&quot;</span><span class="p">)</span>
@@ -1408,16 +1406,18 @@ document.write(`
 <span class="sd">    ----------</span>
 <span class="sd">    lines : list of ndarray of shape (P, 3) or ndarray of shape (N, P, 3)</span>
 <span class="sd">        Lines points.</span>
-<span class="sd">    colors : ndarray, shape (N, 3) or (N, 4) or tuple (3,) or tuple (4,), optional</span>
-<span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1].</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        A hex string, RGB(A) in [0, 1], RGB(A) in [0, 255], or a per-line /</span>
+<span class="sd">        per-vertex array of such colors. See :func:`normalize_colors`.</span>
 <span class="sd">    thickness : float, optional</span>
 <span class="sd">        The thickness of the streamline.</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        The opacity of the streamline.</span>
 <span class="sd">    outline_thickness : float, optional</span>
 <span class="sd">        The thickness of the outline.</span>
-<span class="sd">    outline_color : tuple, optional</span>
-<span class="sd">        The color of the outline.</span>
+<span class="sd">    outline_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        The color of the outline. Accepts a hex string, RGB(A) in [0, 1], or</span>
+<span class="sd">        RGB(A) in [0, 255].</span>
 <span class="sd">    roi_mask : ndarray, optional</span>
 <span class="sd">        3D array where values &gt; 0 define the ROI voxels. When provided,</span>
 <span class="sd">        streamlines are filtered in a compute baking pass using this volumetric</span>
@@ -1447,6 +1447,11 @@ document.write(`
         <span class="n">running</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">ln</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">running</span> <span class="o">+=</span> <span class="mi">1</span>  <span class="c1"># separator slot</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># A single color: collapse to 1-D so it is tiled across all lines.</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">lines_positions</span><span class="p">,</span> <span class="n">lines_colors</span> <span class="o">=</span> <span class="n">line_buffer_separator</span><span class="p">(</span><span class="n">lines_list</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">colors</span><span class="p">)</span>
 
@@ -2432,9 +2437,12 @@ document.write(`
 <span class="sd">        List of lines, where each line is a set of 3D points.</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        Overall opacity of the actor, from 0.0 to 1.0.</span>
-<span class="sd">    colors : tuple or ndarray, optional</span>
-<span class="sd">        - A single color tuple (e.g., (1,0,0)) for all lines.</span>
+<span class="sd">    colors : str, tuple, list or ndarray, optional</span>
+<span class="sd">        - A hex string (e.g. ``&quot;#FF0000&quot;``) or RGB(A) tuple for all lines.</span>
+<span class="sd">        - RGB(A) values in [0, 255] are accepted and normalized.</span>
 <span class="sd">        - An array of colors, one for each line (e.g., [[1,0,0], [0,1,0],...]).</span>
+<span class="sd">        - The special string ``&quot;rgb&quot;`` colors each tube by orientation</span>
+<span class="sd">          (requires ``backend=&quot;gpu&quot;``).</span>
 <span class="sd">    radius : float, optional</span>
 <span class="sd">        The radius of the tubes.</span>
 <span class="sd">    segments : int, optional</span>
@@ -2488,6 +2496,21 @@ document.write(`
 
     <span class="k">if</span> <span class="n">backend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;gpu&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;backend must be &#39;cpu&#39; or &#39;gpu&#39;, got </span><span class="si">{</span><span class="n">backend</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Normalize hex / [0, 255] / [0, 1] colors. The special &quot;rgb&quot; mode and</span>
+    <span class="c1"># per-point color arrays (list of 2D ndarrays) are passed through as-is.</span>
+    <span class="n">is_rgb_mode</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colors</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;rgb&quot;</span>
+    <span class="n">is_per_point</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">))</span>
+        <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_rgb_mode</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_per_point</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">normalize_colors</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">colors</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># A single color: collapse to 1-D so it is tiled across all lines.</span>
+            <span class="n">colors</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">color_components</span> <span class="o">=</span> <span class="n">_resolve_color_components_for_streamtube</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">backend</span><span class="p">)</span>
     <span class="n">wgpu_device</span> <span class="o">=</span> <span class="n">gfx_wgpu</span><span class="o">.</span><span class="n">get_shared</span><span class="p">()</span><span class="o">.</span><span class="n">device</span>
