@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.io &#8212; FURY 2.1.0.dev180+ge82926a8c documentation</title>
+    <title>fury.io &#8212; FURY 2.1.0.dev185+g8f0a11f5a documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=be8d7c6a"></script>
+    <script src="../../_static/documentation_options.js?v=6ae4f924"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -421,18 +421,14 @@ document.write(`
 <span></span><span class="sd">&quot;&quot;&quot;I/O functions for loading and saving images, textures.&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-
-<span class="c1"># from tempfile import TemporaryDirectory as InTemporaryDirectory</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">urllib.request</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlretrieve</span>
 
 <span class="c1"># import warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">polyxios</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
 
-<span class="c1"># from fury.decorators import warn_on_args_to_kwargs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">wgpu</span>
-
-<span class="c1"># from fury.utils import set_input</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.network.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_network</span><span class="p">,</span> <span class="n">stringify_network</span>
 
 
@@ -782,6 +778,130 @@ document.write(`
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="read_mesh">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.read_mesh">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_mesh</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a mesh from a file using polyxios.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The path to the mesh file.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format override (e.g. &#39;.vtk&#39;). Inferred from the file</span>
+<span class="sd">        extension when None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - vertices (np.ndarray): Shape (N, 3) float32 array of vertex positions.</span>
+<span class="sd">        - faces (np.ndarray or None): Shape (M, 3) int32 array of triangle face</span>
+<span class="sd">          indices, or None when the mesh has no surface elements.</span>
+<span class="sd">        - colors (np.ndarray or None): Shape (N, 3) float32 array of per-vertex</span>
+<span class="sd">          RGB colors in [0, 1], or None when no vertex colors are present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">faces</span>
+    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">vertex_colors</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">colors</span></div>
+
+
+
+<div class="viewcode-block" id="read_points">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.read_points">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_points</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read point coordinates from a file using polyxios.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The path to the mesh file.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format override (e.g. &#39;.vtk&#39;). Inferred from the file</span>
+<span class="sd">        extension when None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - points (np.ndarray): Shape (N, 3) float32 array of point positions.</span>
+<span class="sd">        - colors (np.ndarray or None): Shape (N, 3) float32 array of per-point</span>
+<span class="sd">          RGB colors in [0, 1], or None when no vertex colors are present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+
+    <span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">vertex_colors</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">points</span><span class="p">,</span> <span class="n">colors</span></div>
+
+
+
+<div class="viewcode-block" id="read_lines">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.read_lines">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_lines</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read line segments from a file using polyxios.</span>
+
+<span class="sd">    Each line or poly_line element is translated into an array of its vertex</span>
+<span class="sd">    positions, ready to be consumed by FURY line actors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The path to the mesh file.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format override (e.g. &#39;.vtk&#39;). Inferred from the file</span>
+<span class="sd">        extension when None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - lines (list of np.ndarray): One Shape (P, 3) float32 array of vertex</span>
+<span class="sd">          positions per line. Empty list when the file has no line elements.</span>
+<span class="sd">        - colors (list of np.ndarray or None): One Shape (P, 3) float32 array of</span>
+<span class="sd">          per-vertex RGB colors in [0, 1] per line, or None when no vertex</span>
+<span class="sd">          colors are present.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+
+    <span class="n">line_indices</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">lines</span>
+    <span class="k">if</span> <span class="n">line_indices</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[],</span> <span class="kc">None</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertices</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">line_indices</span><span class="p">]</span>
+
+    <span class="n">vertex_colors</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">transforms</span><span class="o">.</span><span class="n">vertex_colors</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">vertex_colors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">vertex_colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vertex_colors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertex_colors</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">line_indices</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">colors</span></div>
 
 
 
