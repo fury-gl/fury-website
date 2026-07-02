@@ -64,6 +64,12 @@ Import the required libraries.
     from fury.io import read_lines, read_mesh, read_points
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 43-44
 
 Define helper to process geometry, normalize space, and apply fallback gradients.
@@ -170,6 +176,12 @@ Define helper to process geometry, normalize space, and apply fallback gradients
 
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 142-147
 
 Fetch the sample data assets via polyxios.
@@ -196,6 +208,23 @@ Fetch the sample data assets via polyxios.
     print(f"star.mesh (Points): {point_nv} points")
 
 
+
+
+
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+    Fetching vtp.zip: [#-----------------------------] 5.2%    Fetching vtp.zip: [###---------------------------] 10.3%    Fetching vtp.zip: [####--------------------------] 15.5%    Fetching vtp.zip: [######------------------------] 20.6%    Fetching vtp.zip: [#######-----------------------] 25.8%    Fetching vtp.zip: [#########---------------------] 31.0%    Fetching vtp.zip: [##########--------------------] 36.1%    Fetching vtp.zip: [############------------------] 41.3%    Fetching vtp.zip: [#############-----------------] 46.4%    Fetching vtp.zip: [###############---------------] 51.6%    Fetching vtp.zip: [#################-------------] 56.8%    Fetching vtp.zip: [##################------------] 61.9%    Fetching vtp.zip: [####################----------] 67.1%    Fetching vtp.zip: [#####################---------] 72.2%    Fetching vtp.zip: [#######################-------] 77.4%    Fetching vtp.zip: [########################------] 82.6%    Fetching vtp.zip: [##########################----] 87.7%    Fetching vtp.zip: [###########################---] 92.9%    Fetching vtp.zip: [#############################-] 98.0%    Fetching vtp.zip: [##############################] 100.0%
+    Fetching vtk.zip: [------------------------------] 0.6%    Fetching vtk.zip: [------------------------------] 1.2%    Fetching vtk.zip: [------------------------------] 1.8%    Fetching vtk.zip: [------------------------------] 2.4%    Fetching vtk.zip: [------------------------------] 2.9%    Fetching vtk.zip: [#-----------------------------] 3.5%    Fetching vtk.zip: [#-----------------------------] 4.1%    Fetching vtk.zip: [#-----------------------------] 4.7%    Fetching vtk.zip: [#-----------------------------] 5.3%    Fetching vtk.zip: [#-----------------------------] 5.9%    Fetching vtk.zip: [#-----------------------------] 6.5%    Fetching vtk.zip: [##----------------------------] 7.1%    Fetching vtk.zip: [##----------------------------] 7.7%    Fetching vtk.zip: [##----------------------------] 8.3%    Fetching vtk.zip: [##----------------------------] 8.8%    Fetching vtk.zip: [##----------------------------] 9.4%    Fetching vtk.zip: [###---------------------------] 10.0%    Fetching vtk.zip: [###---------------------------] 10.6%    Fetching vtk.zip: [###---------------------------] 11.2%    Fetching vtk.zip: [###---------------------------] 11.8%    Fetching vtk.zip: [###---------------------------] 12.4%    Fetching vtk.zip: [###---------------------------] 13.0%    Fetching vtk.zip: [####--------------------------] 13.6%    Fetching vtk.zip: [####--------------------------] 14.1%    Fetching vtk.zip: [####--------------------------] 14.7%    Fetching vtk.zip: [####--------------------------] 15.3%    Fetching vtk.zip: [####--------------------------] 15.9%    Fetching vtk.zip: [####--------------------------] 16.5%    Fetching vtk.zip: [#####-------------------------] 17.1%    Fetching vtk.zip: [#####-------------------------] 17.7%    Fetching vtk.zip: [#####-------------------------] 18.3%    Fetching vtk.zip: [#####-------------------------] 18.9%    Fetching vtk.zip: [#####-------------------------] 19.4%    Fetching vtk.zip: [######------------------------] 20.0%    Fetching vtk.zip: [######------------------------] 20.6%    Fetching vtk.zip: [######------------------------] 21.2%    Fetching vtk.zip: [######------------------------] 21.8%    Fetching vtk.zip: [######------------------------] 22.4%    Fetching vtk.zip: [######------------------------] 23.0%    Fetching vtk.zip: [#######-----------------------] 23.6%    Fetching vtk.zip: [#######-----------------------] 24.2%    Fetching vtk.zip: [#######-----------------------] 24.8%    Fetching vtk.zip: [#######-----------------------] 25.3%    Fetching vtk.zip: [#######-----------------------] 25.9%    Fetching vtk.zip: [#######-----------------------] 26.5%    Fetching vtk.zip: [########----------------------] 27.1%    Fetching vtk.zip: [########----------------------] 27.7%    Fetching vtk.zip: [########----------------------] 28.3%    Fetching vtk.zip: [########----------------------] 28.9%    Fetching vtk.zip: [########----------------------] 29.5%    Fetching vtk.zip: [#########---------------------] 30.1%    Fetching vtk.zip: [#########---------------------] 30.6%    Fetching vtk.zip: [#########---------------------] 31.2%    Fetching vtk.zip: [#########---------------------] 31.8%    Fetching vtk.zip: [#########---------------------] 32.4%    Fetching vtk.zip: [#########---------------------] 33.0%    Fetching vtk.zip: [##########--------------------] 33.6%    Fetching vtk.zip: [##########--------------------] 34.2%    Fetching vtk.zip: [##########--------------------] 34.8%    Fetching vtk.zip: [##########--------------------] 35.4%    Fetching vtk.zip: [##########--------------------] 35.9%    Fetching vtk.zip: [##########--------------------] 36.5%    Fetching vtk.zip: [###########-------------------] 37.1%    Fetching vtk.zip: [###########-------------------] 37.7%    Fetching vtk.zip: [###########-------------------] 38.3%    Fetching vtk.zip: [###########-------------------] 38.9%    Fetching vtk.zip: [###########-------------------] 39.5%    Fetching vtk.zip: [############------------------] 40.1%    Fetching vtk.zip: [############------------------] 40.7%    Fetching vtk.zip: [############------------------] 41.3%    Fetching vtk.zip: [############------------------] 41.8%    Fetching vtk.zip: [############------------------] 42.4%    Fetching vtk.zip: [############------------------] 43.0%    Fetching vtk.zip: [#############-----------------] 43.6%    Fetching vtk.zip: [#############-----------------] 44.2%    Fetching vtk.zip: [#############-----------------] 44.8%    Fetching vtk.zip: [#############-----------------] 45.4%    Fetching vtk.zip: [#############-----------------] 46.0%    Fetching vtk.zip: [#############-----------------] 46.6%    Fetching vtk.zip: [##############----------------] 47.1%    Fetching vtk.zip: [##############----------------] 47.7%    Fetching vtk.zip: [##############----------------] 48.3%    Fetching vtk.zip: [##############----------------] 48.9%    Fetching vtk.zip: [##############----------------] 49.5%    Fetching vtk.zip: [###############---------------] 50.1%    Fetching vtk.zip: [###############---------------] 50.7%    Fetching vtk.zip: [###############---------------] 51.3%    Fetching vtk.zip: [###############---------------] 51.9%    Fetching vtk.zip: [###############---------------] 52.4%    Fetching vtk.zip: [###############---------------] 53.0%    Fetching vtk.zip: [################--------------] 53.6%    Fetching vtk.zip: [################--------------] 54.2%    Fetching vtk.zip: [################--------------] 54.8%    Fetching vtk.zip: [################--------------] 55.4%    Fetching vtk.zip: [################--------------] 56.0%    Fetching vtk.zip: [################--------------] 56.6%    Fetching vtk.zip: [#################-------------] 57.2%    Fetching vtk.zip: [#################-------------] 57.8%    Fetching vtk.zip: [#################-------------] 58.3%    Fetching vtk.zip: [#################-------------] 58.9%    Fetching vtk.zip: [#################-------------] 59.5%    Fetching vtk.zip: [##################------------] 60.1%    Fetching vtk.zip: [##################------------] 60.7%    Fetching vtk.zip: [##################------------] 61.3%    Fetching vtk.zip: [##################------------] 61.9%    Fetching vtk.zip: [##################------------] 62.5%    Fetching vtk.zip: [##################------------] 63.1%    Fetching vtk.zip: [###################-----------] 63.6%    Fetching vtk.zip: [###################-----------] 64.2%    Fetching vtk.zip: [###################-----------] 64.8%    Fetching vtk.zip: [###################-----------] 65.4%    Fetching vtk.zip: [###################-----------] 66.0%    Fetching vtk.zip: [###################-----------] 66.6%    Fetching vtk.zip: [####################----------] 67.2%    Fetching vtk.zip: [####################----------] 67.8%    Fetching vtk.zip: [####################----------] 68.4%    Fetching vtk.zip: [####################----------] 68.9%    Fetching vtk.zip: [####################----------] 69.5%    Fetching vtk.zip: [#####################---------] 70.1%    Fetching vtk.zip: [#####################---------] 70.7%    Fetching vtk.zip: [#####################---------] 71.3%    Fetching vtk.zip: [#####################---------] 71.9%    Fetching vtk.zip: [#####################---------] 72.5%    Fetching vtk.zip: [#####################---------] 73.1%    Fetching vtk.zip: [######################--------] 73.7%    Fetching vtk.zip: [######################--------] 74.3%    Fetching vtk.zip: [######################--------] 74.8%    Fetching vtk.zip: [######################--------] 75.4%    Fetching vtk.zip: [######################--------] 76.0%    Fetching vtk.zip: [######################--------] 76.6%    Fetching vtk.zip: [#######################-------] 77.2%    Fetching vtk.zip: [#######################-------] 77.8%    Fetching vtk.zip: [#######################-------] 78.4%    Fetching vtk.zip: [#######################-------] 79.0%    Fetching vtk.zip: [#######################-------] 79.6%    Fetching vtk.zip: [########################------] 80.1%    Fetching vtk.zip: [########################------] 80.7%    Fetching vtk.zip: [########################------] 81.3%    Fetching vtk.zip: [########################------] 81.9%    Fetching vtk.zip: [########################------] 82.5%    Fetching vtk.zip: [########################------] 83.1%    Fetching vtk.zip: [#########################-----] 83.7%    Fetching vtk.zip: [#########################-----] 84.3%    Fetching vtk.zip: [#########################-----] 84.9%    Fetching vtk.zip: [#########################-----] 85.4%    Fetching vtk.zip: [#########################-----] 86.0%    Fetching vtk.zip: [#########################-----] 86.6%    Fetching vtk.zip: [##########################----] 87.2%    Fetching vtk.zip: [##########################----] 87.8%    Fetching vtk.zip: [##########################----] 88.4%    Fetching vtk.zip: [##########################----] 89.0%    Fetching vtk.zip: [##########################----] 89.6%    Fetching vtk.zip: [###########################---] 90.2%    Fetching vtk.zip: [###########################---] 90.8%    Fetching vtk.zip: [###########################---] 91.3%    Fetching vtk.zip: [###########################---] 91.9%    Fetching vtk.zip: [###########################---] 92.5%    Fetching vtk.zip: [###########################---] 93.1%    Fetching vtk.zip: [############################--] 93.7%    Fetching vtk.zip: [############################--] 94.3%    Fetching vtk.zip: [############################--] 94.9%    Fetching vtk.zip: [############################--] 95.5%    Fetching vtk.zip: [############################--] 96.1%    Fetching vtk.zip: [############################--] 96.6%    Fetching vtk.zip: [#############################-] 97.2%    Fetching vtk.zip: [#############################-] 97.8%    Fetching vtk.zip: [#############################-] 98.4%    Fetching vtk.zip: [#############################-] 99.0%    Fetching vtk.zip: [#############################-] 99.6%    Fetching vtk.zip: [##############################] 100.0%
+    Fetching mesh.zip: [##############----------------] 47.3%    Fetching mesh.zip: [############################--] 94.6%    Fetching mesh.zip: [##############################] 100.0%
+    Human.vtp (Mesh): 17665 vertices, 34660 faces
+    hello.vtk (Lines): 30 vertices across 15 lines
+    star.mesh (Points): 31 points
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 161-167
 
 Coordinate alignment transforms.
@@ -212,6 +241,12 @@ so it faces the camera.
     mesh_actor.rotate((-90, 180, 0))
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 170-171
 
 Place the three actors side by side (Left, Center, Right) to avoid overlapping.
@@ -223,6 +258,12 @@ Place the three actors side by side (Left, Center, Right) to avoid overlapping.
     mesh_actor.local.position = (-3.0, 0.0, 0.0)
     line_actor.local.position = (0.0, 0.0, 0.0)
     point_actor.local.position = (3.0, 0.0, 0.0)
+
+
+
+
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 176-177
@@ -242,6 +283,12 @@ Add matching 3D text labels directly beneath each of the three objects.
     )
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 186-187
 
 Set up the 3D scene and register all visual elements.
@@ -255,6 +302,12 @@ Set up the 3D scene and register all visual elements.
     scene.add(line_actor)
     scene.add(point_actor)
     scene.add(labels_actor)
+
+
+
+
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 194-195
@@ -284,6 +337,12 @@ Add a 2D text HUD overlay detailing what each object represents.
     scene.add(hud_label)
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 214-216
 
 Initialize the ShowManager, frame the camera to fit the wider 3-element layout,
@@ -302,6 +361,22 @@ and initialize the rendering window loop.
     camera.look_at((0.0, -0.15, 0.0))
 
     show_m.start()
+
+
+
+.. image-sg:: /auto_examples/04_demos/images/sphx_glr_viz_read_mesh_001.png
+   :alt: viz read mesh
+   :srcset: /auto_examples/04_demos/images/sphx_glr_viz_read_mesh_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
+.. rst-class:: sphx-glr-timing
+
+   **Total running time of the script:** (0 minutes 2.329 seconds)
 
 
 .. _sphx_glr_download_auto_examples_04_demos_viz_read_mesh.py:

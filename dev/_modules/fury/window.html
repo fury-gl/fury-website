@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.window &#8212; FURY 2.1.0.dev188+ga2476b729 documentation</title>
+    <title>fury.window &#8212; FURY 2.1.0.dev192+g8ad61c4df documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=5ef6c9de"></script>
+    <script src="../../_static/documentation_options.js?v=8a0dec25"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -455,6 +455,7 @@ document.write(`
     <span class="n">PerspectiveCamera</span><span class="p">,</span>
     <span class="n">PointerEvent</span><span class="p">,</span>
     <span class="n">QtCanvas</span><span class="p">,</span>
+    <span class="n">QtGui</span><span class="p">,</span>
     <span class="n">Renderer</span><span class="p">,</span>
     <span class="n">Scene</span> <span class="k">as</span> <span class="n">GfxScene</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
     <span class="n">ScreenCoordsCamera</span><span class="p">,</span>
@@ -2179,12 +2180,180 @@ document.write(`
 <span class="sd">        ndarray</span>
 <span class="sd">            A NumPy array representing the captured image data (RGBA).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_qt</span><span class="p">:</span>
+            <span class="n">qt_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_snapshot</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qt_arr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">qt_arr</span>
+
         <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">snapshot</span><span class="p">())</span>
         <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">img</span> <span class="o">=</span> <span class="n">image_from_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
             <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">arr</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_qt_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Capture the full Qt widget/window instead of only the render canvas.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fname : str, optional</span>
+<span class="sd">            File path where the snapshot image should be saved. If None, the</span>
+<span class="sd">            image is only returned as an array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or None</span>
+<span class="sd">            Captured RGBA image data, or None if Qt widget capture is not</span>
+<span class="sd">            available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_parent</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_parent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="s2">&quot;grab&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="o">=</span> <span class="n">get_app</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="s2">&quot;show&quot;</span><span class="p">):</span>
+            <span class="n">widget</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">screen</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">:</span>
+            <span class="n">update_camera</span><span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
+
+        <span class="n">pixmap</span> <span class="o">=</span> <span class="n">widget</span><span class="o">.</span><span class="n">grab</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">isNull</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">qimage_format</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">,</span> <span class="s2">&quot;Format&quot;</span><span class="p">,</span> <span class="n">QtGui</span><span class="o">.</span><span class="n">QImage</span><span class="p">)</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">pixmap</span><span class="o">.</span><span class="n">toImage</span><span class="p">()</span><span class="o">.</span><span class="n">convertToFormat</span><span class="p">(</span><span class="n">qimage_format</span><span class="o">.</span><span class="n">Format_RGBA8888</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">bytes_per_line</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">bytesPerLine</span><span class="p">()</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">bits</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="s2">&quot;setsize&quot;</span><span class="p">):</span>
+            <span class="n">bits</span><span class="o">.</span><span class="n">setsize</span><span class="p">(</span><span class="n">height</span> <span class="o">*</span> <span class="n">bytes_per_line</span><span class="p">)</span>
+
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">bits</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="n">bytes_per_line</span><span class="p">))</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">width</span> <span class="o">*</span> <span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">render_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">snapshot</span><span class="p">())</span>
+        <span class="n">canvas_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">mapTo</span><span class="p">(</span><span class="n">widget</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">rect</span><span class="p">()</span><span class="o">.</span><span class="n">topLeft</span><span class="p">())</span>
+        <span class="n">canvas_x</span> <span class="o">=</span> <span class="n">canvas_pos</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+        <span class="n">canvas_y</span> <span class="o">=</span> <span class="n">canvas_pos</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="n">canvas_width</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+        <span class="n">canvas_height</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+
+        <span class="n">x0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">canvas_x</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">canvas_y</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">canvas_x</span> <span class="o">+</span> <span class="n">canvas_width</span><span class="p">,</span> <span class="n">width</span><span class="p">)</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">canvas_y</span> <span class="o">+</span> <span class="n">canvas_height</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">x1</span> <span class="o">&gt;</span> <span class="n">x0</span> <span class="ow">and</span> <span class="n">y1</span> <span class="o">&gt;</span> <span class="n">y0</span><span class="p">:</span>
+            <span class="n">render_img</span> <span class="o">=</span> <span class="n">image_from_array</span><span class="p">(</span><span class="n">render_arr</span><span class="p">)</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">canvas_width</span><span class="p">,</span> <span class="n">canvas_height</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">render_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">render_img</span><span class="p">)</span>
+            <span class="n">src_x0</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">-</span> <span class="n">canvas_x</span>
+            <span class="n">src_y0</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">-</span> <span class="n">canvas_y</span>
+            <span class="n">src_x1</span> <span class="o">=</span> <span class="n">src_x0</span> <span class="o">+</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span>
+            <span class="n">src_y1</span> <span class="o">=</span> <span class="n">src_y0</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+            <span class="n">arr</span><span class="p">[</span><span class="n">y0</span><span class="p">:</span><span class="n">y1</span><span class="p">,</span> <span class="n">x0</span><span class="p">:</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">render_arr</span><span class="p">[</span><span class="n">src_y0</span><span class="p">:</span><span class="n">src_y1</span><span class="p">,</span> <span class="n">src_x0</span><span class="p">:</span><span class="n">src_x1</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">fname</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">image_from_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">arr</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_snapshot_array</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Capture the current frame as an array.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            Captured RGBA image data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_qt</span><span class="p">:</span>
+            <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_snapshot</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">arr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">arr</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">snapshot</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_offscreen_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_animation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save an offscreen PNG or GIF for documentation builds.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record_animation : bool</span>
+<span class="sd">            If True and callbacks are registered, save a GIF. Otherwise, save a</span>
+<span class="sd">            single PNG snapshot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="ow">and</span> <span class="n">record_animation</span><span class="p">:</span>
+            <span class="n">max_frames</span> <span class="o">=</span> <span class="mi">300</span>
+            <span class="n">env_max_frames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FURY_OFFSCREEN_MAX_FRAMES&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">env_max_frames</span> <span class="ow">and</span> <span class="n">env_max_frames</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">max_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">env_max_frames</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_frames</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="k">for</span> <span class="n">_name</span><span class="p">,</span> <span class="n">cb_info</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                    <span class="n">func</span><span class="p">,</span> <span class="n">cb_time</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">cb_info</span>
+                    <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
+                <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_from_array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_snapshot_array</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
+            <span class="n">gif_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_title</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.gif&quot;</span>
+            <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                <span class="n">gif_name</span><span class="p">,</span>
+                <span class="n">append_images</span><span class="o">=</span><span class="n">frames</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                <span class="n">save_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                <span class="n">loop</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_title</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_qt_offscreen_capture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record_animation</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Qt briefly so the canvas can render before doc capture.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        record_animation : bool</span>
+<span class="sd">            If True and callbacks are registered, save a GIF. Otherwise, save a</span>
+<span class="sd">            single PNG snapshot.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="o">=</span> <span class="n">get_app</span><span class="p">()</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">capture_and_close</span><span class="p">():</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Capture the Qt window and stop the Qt event loop.&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_offscreen_capture</span><span class="p">(</span><span class="n">record_animation</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+        <span class="n">qcall_later</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">capture_and_close</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_draw_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Draw all screens and request a window redraw.&quot;&quot;&quot;</span>
@@ -2223,42 +2392,15 @@ document.write(`
             <span class="s2">&quot;true&quot;</span><span class="p">,</span>
             <span class="s2">&quot;1&quot;</span><span class="p">,</span>
         <span class="p">]:</span>
-            <span class="n">frames</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">record_animation</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FURY_RECORD_ANIMATION&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
                 <span class="s2">&quot;true&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;1&quot;</span><span class="p">,</span>
             <span class="p">]</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="ow">and</span> <span class="n">record_animation</span><span class="p">:</span>
-                <span class="n">max_frames</span> <span class="o">=</span> <span class="mi">300</span>
-                <span class="n">env_max_frames</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;FURY_OFFSCREEN_MAX_FRAMES&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">env_max_frames</span> <span class="ow">and</span> <span class="n">env_max_frames</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-                    <span class="n">max_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">env_max_frames</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_qt</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_start_qt_offscreen_capture</span><span class="p">(</span><span class="n">record_animation</span><span class="p">)</span>
+                <span class="k">return</span>
 
-                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_frames</span><span class="p">):</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
-                        <span class="k">break</span>
-
-                    <span class="k">for</span> <span class="n">_name</span><span class="p">,</span> <span class="n">cb_info</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
-                        <span class="n">func</span><span class="p">,</span> <span class="n">cb_time</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="n">cb_info</span>
-                        <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
-
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
-                    <span class="n">arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">()</span>
-                    <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_from_array</span><span class="p">(</span><span class="n">arr</span><span class="p">))</span>
-
-            <span class="k">if</span> <span class="n">frames</span><span class="p">:</span>
-                <span class="n">gif_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_title</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">.gif&quot;</span>
-                <span class="n">frames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-                    <span class="n">gif_name</span><span class="p">,</span>
-                    <span class="n">append_images</span><span class="o">=</span><span class="n">frames</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
-                    <span class="n">save_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">duration</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
-                    <span class="n">loop</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">snapshot</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_title</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
-
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_offscreen_capture</span><span class="p">(</span><span class="n">record_animation</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">window</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">return</span>
 
