@@ -2,10 +2,77 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog - Posts tagged google</title>
-  <updated>2026-07-22T21:40:44.203177+00:00</updated>
+  <updated>2026-07-22T21:41:40.795793+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/tag/google/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.13">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2026/2026-07-13-week-7-medha.html</id>
+    <title>Week 7: Rounded Rectangle Research and Website Enhancements</title>
+    <updated>2026-07-13T00:00:00+00:00</updated>
+    <author>
+      <name>Medha Bhardwaj</name>
+    </author>
+    <content type="html">&lt;section id="week-7-rounded-rectangle-research-and-website-enhancements"&gt;
+
+&lt;p&gt;During the week, I focused on researching different approaches for implementing a Rounded Rectangle UI component in FURY and continued working on the FURY website revamp.&lt;/p&gt;
+&lt;section id="overview"&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This week, I worked on the following pull requests and carried out a design study for the Rounded Rectangle component.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="website-revamp"&gt;
+&lt;h2&gt;Website Revamp&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Community page (both light and dark mode)&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1293"&gt;#1293&lt;/a&gt;)
+I built the Community page for the FURY website with full support for both light and dark mode, maintaining visual consistency with the rest of the site.&lt;/p&gt;
+&lt;img alt="Community Page Light Mode" class="align-center" src="https://github.com/user-attachments/assets/621fbabd-f2af-4741-9f71-61c35dc6e169" /&gt;
+&lt;img alt="Community Page Dark Mode" class="align-center" src="https://github.com/user-attachments/assets/f8b1d4aa-b5e2-4df2-9d56-bdb3823ed6d4" /&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;em&gt;Adds FURY next to logo in homepage in navbar&lt;/em&gt; (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1284"&gt;#1284&lt;/a&gt;)
+I added the “FURY” text alongside the logo in the homepage navbar to improve brand visibility and recognition.&lt;/p&gt;
+&lt;img alt="FURY Logo in Navbar" class="align-center" src="https://github.com/user-attachments/assets/bf4cb2d8-4b42-4b5c-830b-f30b524b4ccb" /&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="rounded-rectangle-approaches"&gt;
+&lt;h2&gt;Rounded Rectangle Approaches&lt;/h2&gt;
+&lt;p&gt;A significant portion of this week was spent researching and documenting four different approaches for creating a Rounded Rectangle primitive in FURY. I wrote a detailed comparison document covering each method’s implementation, pros, and cons.&lt;/p&gt;
+&lt;dl class="simple"&gt;
+&lt;dt&gt;&lt;strong&gt;1. Fragment Shader SDF&lt;/strong&gt;&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Render a simple rectangular quad and use a Signed Distance Field in the fragment shader to mathematically carve out the rounded corners per pixel. This gives resolution-independent, perfectly smooth curves with minimal geometry (just two triangles), and is easy to extend with borders and outlines. However, it requires careful scaling management and proper depth sorting so that the transparent corners don’t occlude elements behind them.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;2. Geometry Composition (Rectangles + Discs)&lt;/strong&gt;&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Physically assemble the shape from six actors: two overlapping rectangles and four quarter-disc arcs placed at the corners. This approach is simple and uses only existing FURY components, and click/hover detection works correctly out of the box. The downsides are six separate draw calls per rectangle, a transparency overlap artifact (the center appears darker at partial opacity), and difficulty adding continuous visual effects like outlines or gradients.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;3. Custom Geometry Primitive&lt;/strong&gt;&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Mathematically calculate the full outline using trigonometry for the curved corners and fill the shape with triangles to form a single continuous mesh. This solves the transparency overlap problem, gives accurate interactivity, and requires only a single draw call. The trade-off is that the curves are approximated by straight-line segments (which can appear jagged at extreme zoom), and resizing requires rebuilding the entire mesh.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;dt&gt;&lt;strong&gt;4. Texture-Based (Canvas Rendering)&lt;/strong&gt;&lt;/dt&gt;&lt;dd&gt;&lt;p&gt;Use a Python image library to draw a rounded rectangle image with transparent corners and apply it as a texture to a flat quad. This is straightforward, makes it easy to add gradients and borders via image processing, and looks crisp at native resolution. However, it becomes blurry when zoomed in, resizing requires regenerating the image on the CPU, and each unique size/color combination consumes separate texture memory.&lt;/p&gt;
+&lt;/dd&gt;
+&lt;/dl&gt;
+&lt;/section&gt;
+&lt;section id="what-i-learned"&gt;
+&lt;h2&gt;What I Learned&lt;/h2&gt;
+&lt;p&gt;This week gave me a deep understanding of the different trade-offs involved in rendering 2D shapes within a 3D visualization framework. I learned about Signed Distance Fields and how fragment shaders can produce resolution-independent curves, the compositing problems that arise from overlapping semi-transparent geometry, and the balance between mesh complexity and visual fidelity when building custom geometry primitives. On the website side, I continued refining the site’s look and feel with the new Community page and navbar branding.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="in-the-upcoming-week-i-plan-to"&gt;
+&lt;h2&gt;In the upcoming week, I plan to:&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Begin implementing the Rounded Rectangle component using the chosen approach.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Work on additional UI components.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="connect-with-me"&gt;
+&lt;h2&gt;Connect with Me&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2026/2026-07-13-week-7-medha.html"/>
+    <summary>During the week, I focused on researching different approaches for implementing a Rounded Rectangle UI component in FURY and continued working on the FURY website revamp.</summary>
+    <category term="google" label="google"/>
+    <published>2026-07-13T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2026/2026-07-06-week-6-medha.html</id>
     <title>Week 6: Combobox UI Component and Global Theme Integration</title>
@@ -559,59 +626,6 @@ I will likely close this PR. Although the current approach to building the galle
 </content>
     <link href="https://fury.gl/posts/2024/2024-07-27-week7-robin.html"/>
     <summary>Hi, I’m Robin and this is my blog about week 7.</summary>
-    <category term="google" label="google"/>
-    <published>2024-07-27T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2024/2024-07-27-week6-robin.html</id>
-    <title>Week 6: UI Improvements and RAG performance evaluation</title>
-    <updated>2024-07-27T00:00:00+00:00</updated>
-    <author>
-      <name>Robin Roy</name>
-    </author>
-    <content type="html">&lt;section id="week-6-ui-improvements-and-rag-performance-evaluation"&gt;
-
-&lt;p&gt;Hi, I’m &lt;a class="reference external" href="https://github.com/robinroy03"&gt;Robin&lt;/a&gt; and this is my blog about week 6.&lt;/p&gt;
-&lt;p&gt;This week, I worked on some UI improvements and studied and evaluated the RAG performance.&lt;/p&gt;
-&lt;section id="things-i-did-in-week-6"&gt;
-&lt;h2&gt;Things I did in week 6&lt;/h2&gt;
-&lt;ol class="arabic simple"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Line number references&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Earlier, the bot used to reference the Python file directly. This made it difficult to search and find the particular function/class. We had to manually go and search. I modified the code to include a link with line numbers. Now the references section will give a link which wraps around the function/class. To do this I had to re-index the whole library again using the new parser code. The present model points to the latest stable release of FURY.&lt;/p&gt;
-&lt;p&gt;I also tried to compress it all into one Discord message, reducing one extra ping :)&lt;/p&gt;
-&lt;ol class="arabic simple" start="2"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;RAG Performance Evaluation&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-07-27-week6-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “2” (ordinal 2)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;I added a new benchmark to measure RAG performance. It essentially checks whether certain key information was retrieved from the database. There are certain situations where the model fetches data irrelevant to the question, this could help in fixing that.&lt;/p&gt;
-&lt;p&gt;The RAG benchmark dataset consists of a prompt to the LLM and expected references to be fetched from the database. I’ll give a score based on the % of correct fetches.&lt;/p&gt;
-&lt;ol class="arabic simple" start="3"&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Fine-tuning feasibility study&lt;/strong&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2024/2024-07-27-week6-robin.rst&lt;/span&gt;, line 2)&lt;/p&gt;
-&lt;p&gt;Enumerated list start value not ordinal-1: “3” (ordinal 3)&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;It was time to start thinking about fine-tuning. Gemini had a generous free tier and it was possible to fine-tune Gemini-1.0-pro. I looked into it and started collecting data for it. For fine-tuning Gemini, I had to format the data as an input/output pair. Most of the data were planned to be collected from Discord and GitHub.&lt;/p&gt;
-&lt;p&gt;I also checked into fine-tuning models like phi-3 and llama 7b. It is possible to do the fine-tuning on google colab/kaggle. We could use a small quantized model and fine-tune that without much performance loss.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-is-coming-up-next-week"&gt;
-&lt;h2&gt;What is coming up next week?&lt;/h2&gt;
-&lt;p&gt;I’ll be taking a break next week due to my semester final examinations. I’ll study model finetuning and keep brainstorming interesting trajectories for FURY.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="did-you-get-stuck-anywhere"&gt;
-&lt;h2&gt;Did you get stuck anywhere?&lt;/h2&gt;
-&lt;p&gt;No, I did not get stuck anywhere.&lt;/p&gt;
-&lt;p&gt;Thank you for reading!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2024/2024-07-27-week6-robin.html"/>
-    <summary>Hi, I’m Robin and this is my blog about week 6.</summary>
     <category term="google" label="google"/>
     <published>2024-07-27T00:00:00+00:00</published>
   </entry>
