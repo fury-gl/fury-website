@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.core &#8212; FURY 2.1.0.dev216+g800c3b14a documentation</title>
+    <title>fury.ui.core &#8212; FURY 2.1.0.dev219+gd2beab4bc documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a4fd96d5"></script>
+    <script src="../../../_static/documentation_options.js?v=2dfdbbc8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -469,7 +469,7 @@ document.write(`
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    position : (float, float)</span>
-<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of this</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this</span>
 <span class="sd">        UI component.</span>
 <span class="sd">    center : (float, float)</span>
 <span class="sd">        Absolute coordinates (x, y) of the center of this UI component.</span>
@@ -1115,7 +1115,7 @@ document.write(`
 <span class="sd">    size : (int, int)</span>
 <span class="sd">        The size of the rectangle (width, height) in pixels.</span>
 <span class="sd">    position : (float, float)</span>
-<span class="sd">        Coordinates (x, y) of the lower-left corner of the rectangle.</span>
+<span class="sd">        Coordinates (x, y) of the top-left corner of the rectangle.</span>
 <span class="sd">    color : str, tuple, list or ndarray</span>
 <span class="sd">        A hex string (&quot;#FF0000&quot;), RGB(A) in [0, 1], or RGB(A) in [0, 255].</span>
 <span class="sd">    opacity : float</span>
@@ -2302,11 +2302,14 @@ document.write(`
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Determine the current visual state key based on priority.</span>
 
-<span class="sd">        The priority order is:</span>
-<span class="sd">        1. &#39;disabled&#39; (if not enabled)</span>
-<span class="sd">        2. &#39;pressed&#39; (if is_pressed or toggled is True)</span>
-<span class="sd">        3. &#39;hover&#39; (if is_hovered)</span>
-<span class="sd">        4. &#39;default&#39;</span>
+<span class="sd">        Two schemes are supported, chosen by the keys the subclass provides:</span>
+
+<span class="sd">        * One-dimensional (default): ``&#39;disabled&#39;`` &gt; ``&#39;pressed&#39;`` (when</span>
+<span class="sd">          ``is_pressed`` or ``toggled``) &gt; ``&#39;hover&#39;`` &gt; ``&#39;default&#39;``.</span>
+<span class="sd">        * Two-dimensional toggle icons: when a ``&#39;selected&#39;`` key is present,</span>
+<span class="sd">          the selected dimension (``toggled``) is combined with interaction</span>
+<span class="sd">          feedback, yielding ``&#39;default&#39;``, ``&#39;selected&#39;``, ``&#39;pressed&#39;`` or</span>
+<span class="sd">          ``&#39;pressed-selected&#39;``. This suits checkbox/radio state icons.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2320,6 +2323,16 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;disabled&quot;</span> <span class="k">if</span> <span class="s2">&quot;disabled&quot;</span> <span class="ow">in</span> <span class="n">available_keys</span> <span class="k">else</span> <span class="s2">&quot;default&quot;</span>
+
+        <span class="c1"># Two-dimensional toggle icons: selected state x interaction feedback.</span>
+        <span class="k">if</span> <span class="s2">&quot;selected&quot;</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">:</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_toggle</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">toggled</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pressed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_hovered</span>
+            <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="n">selected</span> <span class="ow">and</span> <span class="s2">&quot;pressed-selected&quot;</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;pressed-selected&quot;</span>
+            <span class="k">if</span> <span class="n">active</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">selected</span> <span class="ow">and</span> <span class="s2">&quot;pressed&quot;</span> <span class="ow">in</span> <span class="n">available_keys</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;pressed&quot;</span>
+            <span class="k">return</span> <span class="s2">&quot;selected&quot;</span> <span class="k">if</span> <span class="n">selected</span> <span class="k">else</span> <span class="s2">&quot;default&quot;</span>
 
         <span class="n">is_active</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pressed</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">is_toggle</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">toggled</span><span class="p">)</span>
 

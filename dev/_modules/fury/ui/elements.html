@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.ui.elements &#8212; FURY 2.1.0.dev216+g800c3b14a documentation</title>
+    <title>fury.ui.elements &#8212; FURY 2.1.0.dev219+gd2beab4bc documentation</title>
   
   
   
@@ -43,7 +43,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a4fd96d5"></script>
+    <script src="../../../_static/documentation_options.js?v=2dfdbbc8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -423,15 +423,12 @@ document.write(`
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;TexturedButton2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TextButton2D&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;LineSlider2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;TextBox2D&quot;</span><span class="p">,</span>
-    <span class="c1">#     &quot;LineSlider2D&quot;,</span>
-    <span class="c1">#     &quot;LineDoubleSlider2D&quot;,</span>
+    <span class="s2">&quot;LineSlider2D&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LineDoubleSlider2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;RingSlider2D&quot;</span><span class="p">,</span>
-    <span class="c1">#     &quot;RangeSlider&quot;,</span>
     <span class="c1">#     &quot;Checkbox&quot;,</span>
     <span class="c1">#     &quot;Option&quot;,</span>
-    <span class="c1">#     &quot;RadioButton&quot;,</span>
     <span class="s2">&quot;ComboBox2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ListBox2D&quot;</span><span class="p">,</span>
     <span class="s2">&quot;ListBoxItem2D&quot;</span><span class="p">,</span>
@@ -447,6 +444,7 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="kn">import</span> <span class="n">printable</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">textwrap</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">UnidentifiedImageError</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -503,12 +501,12 @@ document.write(`
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_load_textures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">states</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load image files into PyGfx textures.</span>
+<span class="sd">        Load state images into PyGfx textures.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        states : dict</span>
-<span class="sd">            Dictionary of state names and file paths.</span>
+<span class="sd">            Dictionary of state names to image file paths.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1967,7 +1965,7 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    position : (float, float), optional</span>
-<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of the slider.</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of the slider.</span>
 <span class="sd">    initial_values : (float, float), optional</span>
 <span class="sd">        Initial values for the left and right handles respectively.</span>
 <span class="sd">    min_value : float, optional</span>
@@ -2843,331 +2841,548 @@ document.write(`
 
 
 
-<span class="c1"># class Option(UI):</span>
-<span class="c1">#     &quot;&quot;&quot;A set of a Button2D and a TextBlock2D to act as a single option</span>
-<span class="c1">#     for checkboxes and radio buttons.</span>
-<span class="c1">#     Clicking the button toggles its checked/unchecked status.</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_toggle_icon_states</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build the four-state texture mapping for a toggle icon.</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     label : str</span>
-<span class="c1">#         The label for the option.</span>
-<span class="c1">#     font_size : int</span>
-<span class="c1">#             Font Size of the label.</span>
+<span class="sd">    Uses the ``new_icons`` set, which provides an idle and a pressed image for</span>
+<span class="sd">    both the unselected and selected states of ``name`` (e.g. ``&quot;checkbox&quot;`` or</span>
+<span class="sd">    ``&quot;circle&quot;``): ``name.png``, ``name-selected.png``, ``name-pressed.png`` and</span>
+<span class="sd">    ``name-pressed-selected.png``.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str</span>
+<span class="sd">        Base name of the icon in the ``new_icons`` set.</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(self, label, *, position=(0, 0), font_size=18, checked=False):</span>
-<span class="c1">#         &quot;&quot;&quot;Init this class instance.</span>
-
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         label : str</span>
-<span class="c1">#             Text to be displayed next to the option&#39;s button.</span>
-<span class="c1">#         position : (float, float)</span>
-<span class="c1">#             Absolute coordinates (x, y) of the lower-left corner of</span>
-<span class="c1">#             the button of the option.</span>
-<span class="c1">#         font_size : int</span>
-<span class="c1">#             Font size of the label.</span>
-<span class="c1">#         checked : bool, optional</span>
-<span class="c1">#             Boolean value indicates the initial state of the option</span>
-
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.label = label</span>
-<span class="c1">#         self.font_size = font_size</span>
-<span class="c1">#         self.checked = checked</span>
-<span class="c1">#         self.button_size = (font_size * 1.2, font_size * 1.2)</span>
-<span class="c1">#         self.button_label_gap = 10</span>
-<span class="c1">#         super(Option, self).__init__(position=position)</span>
-
-<span class="c1">#         # Offer some standard hooks to the user.</span>
-<span class="c1">#         self.on_change = lambda obj: None</span>
-
-<span class="c1">#     def _setup(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Setup this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         # Option&#39;s button</span>
-<span class="c1">#         self.button_icons = []</span>
-<span class="c1">#         self.button_icons.append((&quot;unchecked&quot;, read_viz_icons(fname=&quot;stop2.png&quot;)))</span>
-<span class="c1">#         self.button_icons.append((&quot;checked&quot;, read_viz_icons(fname=&quot;checkmark.png&quot;)))</span>
-<span class="c1">#         self.button = Button2D(icon_fnames=self.button_icons, size=self.button_size)</span>
-
-<span class="c1">#         self.text = TextBlock2D(text=self.label, font_size=self.font_size)</span>
-
-<span class="c1">#         # Display initial state</span>
-<span class="c1">#         if self.checked:</span>
-<span class="c1">#             self.button.set_icon_by_name(&quot;checked&quot;)</span>
-
-<span class="c1">#         # Add callbacks</span>
-<span class="c1">#         self.button.on_left_mouse_button_clicked = self.toggle</span>
-<span class="c1">#         self.text.on_left_mouse_button_clicked = self.toggle</span>
-
-<span class="c1">#     def _get_actors(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         return self.button.actors + self.text.actors</span>
-
-<span class="c1">#     def _add_to_scene(self, scene):</span>
-<span class="c1">#         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
-
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         scene : scene</span>
-
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.button.add_to_scene(scene)</span>
-<span class="c1">#         self.text.add_to_scene(scene)</span>
-
-<span class="c1">#     def _get_size(self):</span>
-<span class="c1">#         width = self.button.size[0] + self.button_label_gap + self.text.size[0]</span>
-<span class="c1">#         height = max(self.button.size[1], self.text.size[1])</span>
-<span class="c1">#         return np.array([width, height])</span>
-
-<span class="c1">#     def _set_position(self, coords):</span>
-<span class="c1">#         &quot;&quot;&quot;Set the lower-left corner position of this UI component.</span>
-
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         coords: (float, float)</span>
-<span class="c1">#             Absolute pixel coordinates (x, y).</span>
-
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         num_newlines = self.label.count(&quot;\n&quot;)</span>
-<span class="c1">#         self.button.position = coords + (0, num_newlines * self.font_size * 0.5)</span>
-<span class="c1">#         offset = (self.button.size[0] + self.button_label_gap, 0)</span>
-<span class="c1">#         self.text.position = coords + offset</span>
-
-<span class="c1">#     def toggle(self, i_ren, _obj, _element):</span>
-<span class="c1">#         if self.checked:</span>
-<span class="c1">#             self.deselect()</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.select()</span>
-
-<span class="c1">#         self.on_change(self)</span>
-<span class="c1">#         i_ren.force_render()</span>
-
-<span class="c1">#     def select(self):</span>
-<span class="c1">#         self.checked = True</span>
-<span class="c1">#         self.button.set_icon_by_name(&quot;checked&quot;)</span>
-
-<span class="c1">#     def deselect(self):</span>
-<span class="c1">#         self.checked = False</span>
-<span class="c1">#         self.button.set_icon_by_name(&quot;unchecked&quot;)</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Mapping of ``&quot;default&quot;``, ``&quot;selected&quot;``, ``&quot;pressed&quot;`` and</span>
+<span class="sd">        ``&quot;pressed-selected&quot;`` to icon file paths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;new_icons&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;selected&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;new_icons&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-selected.png&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;pressed&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;new_icons&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-pressed.png&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;pressed-selected&quot;</span><span class="p">:</span> <span class="n">read_viz_icons</span><span class="p">(</span>
+            <span class="n">style</span><span class="o">=</span><span class="s2">&quot;new_icons&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">-pressed-selected.png&quot;</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
 
 
-<span class="c1"># class Checkbox(UI):</span>
-<span class="c1">#     &quot;&quot;&quot;A 2D set of :class:&#39;Option&#39; objects.</span>
-<span class="c1">#     Multiple options can be selected.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ButtonGroup</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for a group of labeled toggle buttons.</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     labels : list(string)</span>
-<span class="c1">#         List of labels of each option.</span>
-<span class="c1">#     options : dict(Option)</span>
-<span class="c1">#         Dictionary of all the options in the checkbox set.</span>
-<span class="c1">#     padding : float</span>
-<span class="c1">#         Distance between two adjacent options</span>
+<span class="sd">    Each entry pairs a :class:`TexturedButton2D` (used as a toggle) with a</span>
+<span class="sd">    :class:`TextBlock2D` label. Entries are laid out either vertically or</span>
+<span class="sd">    horizontally. This class is not meant to be used directly; it provides</span>
+<span class="sd">    the shared machinery for the :class:`Checkbox` and :class:`RadioButton`</span>
+<span class="sd">    components, which subclass it to define their selection semantics.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list of str</span>
+<span class="sd">        Text label for each option.</span>
+<span class="sd">    checked_labels : list of str, optional</span>
+<span class="sd">        Labels that should be toggled on initially.</span>
+<span class="sd">    button_states : dict, optional</span>
+<span class="sd">        Mapping of state names to icon file paths for the toggle button. The</span>
+<span class="sd">        ``&quot;default&quot;``/``&quot;selected&quot;`` images are shown when an option is off/on,</span>
+<span class="sd">        and the ``&quot;pressed&quot;``/``&quot;pressed-selected&quot;`` images provide the</span>
+<span class="sd">        hover-and-press feedback for those states. When omitted, the icons from</span>
+<span class="sd">        :meth:`_make_button_states` are used (checkbox icons by default).</span>
+<span class="sd">    orientation : str, optional</span>
+<span class="sd">        Layout direction of the options: ``&quot;vertical&quot;`` or ``&quot;horizontal&quot;``.</span>
+<span class="sd">    padding : float, optional</span>
+<span class="sd">        Spacing in pixels between two adjacent options.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Font size of the labels in pixels.</span>
+<span class="sd">    font_family : str, optional</span>
+<span class="sd">        Font family of the labels. Currently only supports &quot;Arial&quot;.</span>
+<span class="sd">    text_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color of the label text. Accepts a hex string (&quot;#FF0000&quot;), RGB(A) in</span>
+<span class="sd">        [0, 1], or RGB(A) in [0, 255].</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this component.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        Z-order of the UI component.</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(</span>
-<span class="c1">#         self,</span>
-<span class="c1">#         labels,</span>
-<span class="c1">#         *,</span>
-<span class="c1">#         checked_labels=(),</span>
-<span class="c1">#         padding=1,</span>
-<span class="c1">#         font_size=18,</span>
-<span class="c1">#         font_family=&quot;Arial&quot;,</span>
-<span class="c1">#         position=(0, 0),</span>
-<span class="c1">#     ):</span>
-<span class="c1">#         &quot;&quot;&quot;Init this class instance.</span>
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list of str</span>
+<span class="sd">        Ordered list of option labels.</span>
+<span class="sd">    options : dict</span>
+<span class="sd">        Mapping of label to its ``(button, text)`` pair.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         labels : list(str)</span>
-<span class="c1">#             List of labels of each option.</span>
-<span class="c1">#         checked_labels: list(str), optional</span>
-<span class="c1">#             List of labels that are checked on setting up.</span>
-<span class="c1">#         padding : float, optional</span>
-<span class="c1">#             The distance between two adjacent options</span>
-<span class="c1">#         font_size : int, optional</span>
-<span class="c1">#             Size of the text font.</span>
-<span class="c1">#         font_family : str, optional</span>
-<span class="c1">#             Currently only supports Arial.</span>
-<span class="c1">#         position : (float, float), optional</span>
-<span class="c1">#             Absolute coordinates (x, y) of the lower-left corner of</span>
-<span class="c1">#             the button of the first option.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">checked_labels</span><span class="o">=</span><span class="p">(),</span>
+        <span class="n">button_states</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+        <span class="n">font_family</span><span class="o">=</span><span class="s2">&quot;Arial&quot;</span><span class="p">,</span>
+        <span class="n">text_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;orientation should be &#39;vertical&#39; or &#39;horizontal&#39;, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="n">orientation</span><span class="si">!r}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         self.labels = list(reversed(list(labels)))</span>
-<span class="c1">#         self._padding = padding</span>
-<span class="c1">#         self._font_size = font_size</span>
-<span class="c1">#         self.font_family = font_family</span>
-<span class="c1">#         self.checked_labels = list(checked_labels)</span>
-<span class="c1">#         super(Checkbox, self).__init__(position=position)</span>
-<span class="c1">#         self.on_change = lambda checkbox: None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">checked_labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">=</span> <span class="n">orientation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_padding</span> <span class="o">=</span> <span class="n">padding</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span> <span class="o">=</span> <span class="n">font_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">font_family</span> <span class="o">=</span> <span class="n">font_family</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text_color</span> <span class="o">=</span> <span class="n">text_color</span>
 
-<span class="c1">#     def _setup(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Setup this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         self.options = OrderedDict()</span>
-<span class="c1">#         button_y = self.position[1]</span>
-<span class="c1">#         for label in self.labels:</span>
-<span class="c1">#             option = Option(</span>
-<span class="c1">#                 label=label,</span>
-<span class="c1">#                 font_size=self.font_size,</span>
-<span class="c1">#                 position=(self.position[0], button_y),</span>
-<span class="c1">#                 checked=(label in self.checked_labels),</span>
-<span class="c1">#             )</span>
+        <span class="k">if</span> <span class="n">button_states</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">button_states</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_button_states</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button_states</span> <span class="o">=</span> <span class="n">button_states</span>
 
-<span class="c1">#             line_spacing = option.text.actor.GetTextProperty().GetLineSpacing()</span>
-<span class="c1">#             button_y = (</span>
-<span class="c1">#                 button_y</span>
-<span class="c1">#                 + self.font_size * (label.count(&quot;\n&quot;) + 1) * (line_spacing + 0.1)</span>
-<span class="c1">#                 + self.padding</span>
-<span class="c1">#             )</span>
-<span class="c1">#             self.options[label] = option</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button_size</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">font_size</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">font_size</span> <span class="o">*</span> <span class="mf">1.2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">button_label_gap</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">font_size</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)))</span>
 
-<span class="c1">#             # Set callback</span>
-<span class="c1">#             option.on_change = self._handle_option_change</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ButtonGroup</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span> <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">)</span>
 
-<span class="c1">#     def _get_actors(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the actors composing this UI component.&quot;&quot;&quot;</span>
-<span class="c1">#         actors = []</span>
-<span class="c1">#         for option in self.options.values():</span>
-<span class="c1">#             actors = actors + option.actors</span>
-<span class="c1">#         return actors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">group</span><span class="p">:</span> <span class="kc">None</span>
 
-<span class="c1">#     def _add_to_scene(self, scene):</span>
-<span class="c1">#         &quot;&quot;&quot;Add all subcomponents or VTK props that compose this UI component.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_button_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the toggle-button icon states for this group.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         scene : scene</span>
+<span class="sd">        The base implementation returns the checkbox icons. Subclasses override</span>
+<span class="sd">        this to provide their own icons, e.g. the radio button&#39;s circle icons.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         for option in self.options.values():</span>
-<span class="c1">#             option.add_to_scene(scene)</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Mapping of state names to icon file paths, as returned by</span>
+<span class="sd">            :func:`_toggle_icon_states`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_toggle_icon_states</span><span class="p">(</span><span class="s2">&quot;checkbox&quot;</span><span class="p">)</span>
 
-<span class="c1">#     def _get_size(self):</span>
-<span class="c1">#         option_width, option_height = self.options.values()[0].get_size()</span>
-<span class="c1">#         height = len(self.labels) * (option_height + self.padding) - self.padding</span>
-<span class="c1">#         return np.asarray([option_width, height])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up this UI component.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_label_by_button</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="c1">#     def _handle_option_change(self, option):</span>
-<span class="c1">#         &quot;&quot;&quot;Update whenever an option changes.</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="n">button</span> <span class="o">=</span> <span class="n">TexturedButton2D</span><span class="p">(</span>
+                <span class="n">states</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">button_states</span><span class="p">,</span>
+                <span class="n">size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">button_size</span><span class="p">,</span>
+                <span class="n">is_toggle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">TextBlock2D</span><span class="p">(</span>
+                <span class="n">text</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">font_size</span><span class="p">,</span>
+                <span class="n">font_family</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">font_family</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_color</span><span class="p">,</span>
+                <span class="n">dynamic_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># A dynamic_bbox text only knows its true width after the first</span>
+            <span class="c1"># render; force the layout now so options don&#39;t overlap.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_measure_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         option : :class:`Option`</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">:</span>
+                <span class="n">button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">True</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if option.checked:</span>
-<span class="c1">#             self.checked_labels.append(option.label)</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             self.checked_labels.remove(option.label)</span>
+            <span class="c1"># Clicking either the button or its label toggles the option.</span>
+            <span class="n">button</span><span class="o">.</span><span class="n">on_clicked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_button_clicked</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">on_left_mouse_button_clicked</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">_event</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="n">button</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">do_click</span><span class="p">()</span>
 
-<span class="c1">#         self.on_change(self)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">button</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_label_by_button</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">button</span><span class="p">)]</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_children</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">button</span><span class="p">,</span> <span class="n">text</span><span class="p">])</span>
 
-<span class="c1">#     def _set_position(self, coords):</span>
-<span class="c1">#         &quot;&quot;&quot;Set the lower-left corner position of this UI component.</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_measure_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Force a text block to compute its glyph layout.</span>
 
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         coords: (float, float)</span>
-<span class="c1">#             Absolute pixel coordinates (x, y).</span>
+<span class="sd">        A :class:`TextBlock2D` created with ``dynamic_bbox=True`` reports a</span>
+<span class="sd">        stale, undersized width until the text actor is laid out during the</span>
+<span class="sd">        first render. Calling the actor&#39;s ``_update_object`` hook performs</span>
+<span class="sd">        that layout eagerly, so the reported size is accurate at positioning</span>
+<span class="sd">        time and options do not overlap.</span>
 
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         button_y = coords[1]</span>
-<span class="c1">#         for option_no, option in enumerate(self.options.values()):</span>
-<span class="c1">#             option.position = (coords[0], button_y)</span>
-<span class="c1">#             line_spacing = option.text.actor.GetTextProperty().GetLineSpacing()</span>
-<span class="c1">#             button_y = (</span>
-<span class="c1">#                 button_y</span>
-<span class="c1">#                 + self.font_size</span>
-<span class="c1">#                 * (self.labels[option_no].count(&quot;\n&quot;) + 1)</span>
-<span class="c1">#                 * (line_spacing + 0.1)</span>
-<span class="c1">#                 + self.padding</span>
-<span class="c1">#             )</span>
+<span class="sd">        ``_update_object`` is a pygfx internal with no public equivalent that</span>
+<span class="sd">        produces the correct size. If a future pygfx version removes it, its</span>
+<span class="sd">        absence is reported as a warning (rather than silently ignored) so the</span>
+<span class="sd">        overlap can be diagnosed; layout then falls back to the stale size.</span>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def font_size(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Gets the font size of text.&quot;&quot;&quot;</span>
-<span class="c1">#         return self._font_size</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        text : TextBlock2D</span>
+<span class="sd">            The text block whose layout should be computed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">update</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">text</span><span class="o">.</span><span class="n">actor</span><span class="p">,</span> <span class="s2">&quot;_update_object&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">callable</span><span class="p">(</span><span class="n">update</span><span class="p">):</span>
+            <span class="n">update</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;TextBlock2D actor has no callable &#39;_update_object&#39;; option &quot;</span>
+                <span class="s2">&quot;labels are sized from a stale layout and may overlap. This &quot;</span>
+                <span class="s2">&quot;likely means the installed pygfx version is incompatible.&quot;</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">text</span><span class="o">.</span><span class="n">update_bounding_box</span><span class="p">()</span>
 
-<span class="c1">#     @property</span>
-<span class="c1">#     def padding(self):</span>
-<span class="c1">#         &quot;&quot;&quot;Get the padding between options.&quot;&quot;&quot;</span>
-<span class="c1">#         return self._padding</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_actors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the actors composing this UI component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            An empty list; rendering is delegated to the child components.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the size of the UI component.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        (int, int)</span>
+<span class="sd">            Width and height of the UI component in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">along</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cross</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">):</span>
+            <span class="n">button</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">row_w</span> <span class="o">=</span> <span class="n">button</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">button_label_gap</span> <span class="o">+</span> <span class="n">text</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">row_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">button</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">text</span><span class="o">.</span><span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+                <span class="n">along</span> <span class="o">+=</span> <span class="n">row_w</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="k">if</span> <span class="n">index</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">cross</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cross</span><span class="p">,</span> <span class="n">row_h</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">along</span> <span class="o">+=</span> <span class="n">row_h</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="k">if</span> <span class="n">index</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">cross</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cross</span><span class="p">,</span> <span class="n">row_w</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">along</span><span class="p">,</span> <span class="n">cross</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">cross</span><span class="p">,</span> <span class="n">along</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the position of the internal actors.&quot;&quot;&quot;</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">(</span><span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">)</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="n">button</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+            <span class="n">b_w</span><span class="p">,</span> <span class="n">b_h</span> <span class="o">=</span> <span class="n">button</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">t_w</span><span class="p">,</span> <span class="n">t_h</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">size</span>
+            <span class="n">row_h</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">b_h</span><span class="p">,</span> <span class="n">t_h</span><span class="p">)</span>
+
+            <span class="c1"># Vertically center the button and label within the row.</span>
+            <span class="n">button</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">cursor</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cursor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">row_h</span> <span class="o">-</span> <span class="n">b_h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span>
+                <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">text</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">cursor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">b_w</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">button_label_gap</span><span class="p">,</span>
+                    <span class="n">cursor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">row_h</span> <span class="o">-</span> <span class="n">t_h</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">x_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span>
+                <span class="n">y_anchor</span><span class="o">=</span><span class="n">Anchor</span><span class="o">.</span><span class="n">TOP</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">orientation</span> <span class="o">==</span> <span class="s2">&quot;horizontal&quot;</span><span class="p">:</span>
+                <span class="n">cursor</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">b_w</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">button_label_gap</span> <span class="o">+</span> <span class="n">t_w</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">cursor</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">row_h</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">padding</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_button_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">button</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle a click on one of the option buttons.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        button : TexturedButton2D</span>
+<span class="sd">            The button that was clicked. Its ``toggled`` state has already</span>
+<span class="sd">            been updated by the time this is called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_by_button</span><span class="p">[</span><span class="nb">id</span><span class="p">(</span><span class="n">button</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_option_change</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_change</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_option_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update the checked state after an option is toggled.</span>
+
+<span class="sd">        Subclasses override this to enforce their selection semantics (e.g.</span>
+<span class="sd">        a radio button clears the other options). The base implementation</span>
+<span class="sd">        keeps :attr:`checked_labels` in sync with the buttons&#39; toggled state,</span>
+<span class="sd">        allowing multiple options to be checked at once.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            The label of the option that changed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">button</span><span class="o">.</span><span class="n">toggled</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">button</span><span class="o">.</span><span class="n">toggled</span> <span class="ow">and</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">select</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Toggle the option on.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            The label of the option to select.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">deselect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Toggle the option off.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            The label of the option to deselect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checked_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the labels of the currently checked options.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of str</span>
+<span class="sd">            Labels of the options that are currently toggled on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">font_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the font size of the labels.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Font size of the labels in pixels.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">padding</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the padding between options.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Spacing in pixels between two adjacent options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_padding</span>
 
 
-<span class="c1"># class RadioButton(Checkbox):</span>
-<span class="c1">#     &quot;&quot;&quot;A 2D set of :class:&#39;Option&#39; objects.</span>
-<span class="c1">#     Only one option can be selected.</span>
+<div class="viewcode-block" id="Checkbox">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Checkbox">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Checkbox</span><span class="p">(</span><span class="n">ButtonGroup</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A group of independently toggleable options.</span>
 
-<span class="c1">#     Attributes</span>
-<span class="c1">#     ----------</span>
-<span class="c1">#     labels : list(string)</span>
-<span class="c1">#         List of labels of each option.</span>
-<span class="c1">#     options : dict(Option)</span>
-<span class="c1">#         Dictionary of all the options in the checkbox set.</span>
-<span class="c1">#     padding : float</span>
-<span class="c1">#         Distance between two adjacent options</span>
+<span class="sd">    Any number of options may be checked at the same time. This is a thin</span>
+<span class="sd">    :class:`ButtonGroup` that uses the checkbox icons (a square box that gains</span>
+<span class="sd">    a checkmark when checked); clicking an option toggles it on or off without</span>
+<span class="sd">    affecting the others.</span>
 
-<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list of str</span>
+<span class="sd">        Text label for each option.</span>
+<span class="sd">    checked_labels : list of str, optional</span>
+<span class="sd">        Labels that should be checked initially.</span>
+<span class="sd">    orientation : str, optional</span>
+<span class="sd">        Layout direction of the options: ``&quot;vertical&quot;`` or ``&quot;horizontal&quot;``.</span>
+<span class="sd">    padding : float, optional</span>
+<span class="sd">        Spacing in pixels between two adjacent options.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Font size of the labels in pixels.</span>
+<span class="sd">    font_family : str, optional</span>
+<span class="sd">        Font family of the labels. Currently only supports &quot;Arial&quot;.</span>
+<span class="sd">    text_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color of the label text. Accepts a hex string (&quot;#FF0000&quot;), RGB(A) in</span>
+<span class="sd">        [0, 1], or RGB(A) in [0, 255].</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this component.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        Z-order of the UI component.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-<span class="c1">#     @warn_on_args_to_kwargs()</span>
-<span class="c1">#     def __init__(</span>
-<span class="c1">#         self,</span>
-<span class="c1">#         labels,</span>
-<span class="c1">#         checked_labels,</span>
-<span class="c1">#         *,</span>
-<span class="c1">#         padding=1,</span>
-<span class="c1">#         font_size=18,</span>
-<span class="c1">#         font_family=&quot;Arial&quot;,</span>
-<span class="c1">#         position=(0, 0),</span>
-<span class="c1">#     ):</span>
-<span class="c1">#         &quot;&quot;&quot;Init class instance.</span>
-
-<span class="c1">#         Parameters</span>
-<span class="c1">#         ----------</span>
-<span class="c1">#         labels : list(str)</span>
-<span class="c1">#             List of labels of each option.</span>
-<span class="c1">#         checked_labels: list(str), optional</span>
-<span class="c1">#             List of labels that are checked on setting up.</span>
-<span class="c1">#         padding : float, optional</span>
-<span class="c1">#             The distance between two adjacent options</span>
-<span class="c1">#         font_size : int, optional</span>
-<span class="c1">#             Size of the text font.</span>
-<span class="c1">#         font_family : str, optional</span>
-<span class="c1">#             Currently only supports Arial.</span>
-<span class="c1">#         position : (float, float), optional</span>
-<span class="c1">#             Absolute coordinates (x, y) of the lower-left corner of</span>
-<span class="c1">#             the button of the first option.</span>
-
-<span class="c1">#         &quot;&quot;&quot;</span>
-<span class="c1">#         if len(checked_labels) &gt; 1:</span>
-<span class="c1">#             err_msg = &quot;Only one option can be preselected for radio buttons.&quot;</span>
-<span class="c1">#             raise ValueError(err_msg)</span>
-
-<span class="c1">#         super(RadioButton, self).__init__(</span>
-<span class="c1">#             labels=labels,</span>
-<span class="c1">#             position=position,</span>
-<span class="c1">#             padding=padding,</span>
-<span class="c1">#             font_size=font_size,</span>
-<span class="c1">#             font_family=font_family,</span>
-<span class="c1">#             checked_labels=checked_labels,</span>
-<span class="c1">#         )</span>
-
-<span class="c1">#     def _handle_option_change(self, option):</span>
-<span class="c1">#         for option_ in self.options.values():</span>
-<span class="c1">#             option_.deselect()</span>
-
-<span class="c1">#         option.select()</span>
-<span class="c1">#         self.checked_labels = [option.label]</span>
-<span class="c1">#         self.on_change(self)</span>
+<div class="viewcode-block" id="Checkbox.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.Checkbox.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">checked_labels</span><span class="o">=</span><span class="p">(),</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+        <span class="n">font_family</span><span class="o">=</span><span class="s2">&quot;Arial&quot;</span><span class="p">,</span>
+        <span class="n">text_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Checkbox</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">labels</span><span class="p">,</span>
+            <span class="n">checked_labels</span><span class="o">=</span><span class="n">checked_labels</span><span class="p">,</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+            <span class="n">font_family</span><span class="o">=</span><span class="n">font_family</span><span class="p">,</span>
+            <span class="n">text_color</span><span class="o">=</span><span class="n">text_color</span><span class="p">,</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+</div>
 
 
-<span class="c1">#</span>
+
+<div class="viewcode-block" id="RadioButton">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.RadioButton">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RadioButton</span><span class="p">(</span><span class="n">ButtonGroup</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A group of mutually exclusive options.</span>
+
+<span class="sd">    Only a single option can be selected at a time. This :class:`ButtonGroup`</span>
+<span class="sd">    uses the circle icons (a ring that gains a filled center dot when selected)</span>
+<span class="sd">    and enforces single selection: clicking an option selects it and clears the</span>
+<span class="sd">    previously selected one.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    labels : list of str</span>
+<span class="sd">        Text label for each option.</span>
+<span class="sd">    checked_labels : list of str, optional</span>
+<span class="sd">        Label that should be selected initially. At most one is allowed.</span>
+<span class="sd">    orientation : str, optional</span>
+<span class="sd">        Layout direction of the options: ``&quot;vertical&quot;`` or ``&quot;horizontal&quot;``.</span>
+<span class="sd">    padding : float, optional</span>
+<span class="sd">        Spacing in pixels between two adjacent options.</span>
+<span class="sd">    font_size : int, optional</span>
+<span class="sd">        Font size of the labels in pixels.</span>
+<span class="sd">    font_family : str, optional</span>
+<span class="sd">        Font family of the labels. Currently only supports &quot;Arial&quot;.</span>
+<span class="sd">    text_color : str, tuple, list or ndarray, optional</span>
+<span class="sd">        Color of the label text. Accepts a hex string (&quot;#FF0000&quot;), RGB(A) in</span>
+<span class="sd">        [0, 1], or RGB(A) in [0, 255].</span>
+<span class="sd">    position : (float, float), optional</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this component.</span>
+<span class="sd">    z_order : int, optional</span>
+<span class="sd">        Z-order of the UI component.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If more than one label is passed in ``checked_labels``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RadioButton.__init__">
+<a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.RadioButton.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">checked_labels</span><span class="o">=</span><span class="p">(),</span>
+        <span class="n">orientation</span><span class="o">=</span><span class="s2">&quot;vertical&quot;</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span>
+        <span class="n">font_family</span><span class="o">=</span><span class="s2">&quot;Arial&quot;</span><span class="p">,</span>
+        <span class="n">text_color</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+        <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">z_order</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Init class instance.&quot;&quot;&quot;</span>
+        <span class="n">checked_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">checked_labels</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">checked_labels</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only one option can be preselected for radio buttons.&quot;</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">RadioButton</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">labels</span><span class="p">,</span>
+            <span class="n">checked_labels</span><span class="o">=</span><span class="n">checked_labels</span><span class="p">,</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="n">font_size</span><span class="p">,</span>
+            <span class="n">font_family</span><span class="o">=</span><span class="n">font_family</span><span class="p">,</span>
+            <span class="n">text_color</span><span class="o">=</span><span class="n">text_color</span><span class="p">,</span>
+            <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="n">z_order</span><span class="o">=</span><span class="n">z_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_make_button_states</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build the radio button&#39;s circle icon states.</span>
+
+<span class="sd">        The ``circle`` icons show a ring when unselected and a ring with a</span>
+<span class="sd">        filled center dot when selected.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Mapping of state names to icon file paths, as returned by</span>
+<span class="sd">            :func:`_toggle_icon_states`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_toggle_icon_states</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_option_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Enforce single selection when an option is clicked.</span>
+
+<span class="sd">        The clicked option always ends up selected (clicking the currently</span>
+<span class="sd">        selected option leaves it selected), and every other option is</span>
+<span class="sd">        cleared.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        label : str</span>
+<span class="sd">            The label of the option that was clicked.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span> <span class="o">==</span> <span class="n">label</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">other_button</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">other</span><span class="p">]</span>
+            <span class="n">other_button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">selected_button</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
+        <span class="n">selected_button</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_checked_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">label</span><span class="p">]</span></div>
+
+
+
 <div class="viewcode-block" id="ComboBox2D">
 <a class="viewcode-back" href="../../../reference/fury.ui.html#fury.ui.ComboBox2D">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ComboBox2D</span><span class="p">(</span><span class="n">UI</span><span class="p">):</span>
@@ -3179,7 +3394,7 @@ document.write(`
 <span class="sd">    items : list of str, optional</span>
 <span class="sd">        List of items to be displayed as choices.</span>
 <span class="sd">    position : tuple of 2 floats, optional</span>
-<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of this</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this</span>
 <span class="sd">        UI component.</span>
 <span class="sd">    size : tuple of 2 ints, optional</span>
 <span class="sd">        Width and height in pixels of this UI component.</span>
@@ -3637,7 +3852,7 @@ document.write(`
 <span class="sd">        Values used to populate this listbox. Objects must be castable</span>
 <span class="sd">        to string.</span>
 <span class="sd">    position : (float, float), optional</span>
-<span class="sd">        Absolute coordinates (x, y) of the lower-left corner of this</span>
+<span class="sd">        Absolute coordinates (x, y) of the top-left corner of this</span>
 <span class="sd">        UI component.</span>
 <span class="sd">    size : (int, int), optional</span>
 <span class="sd">        Width and height in pixels of this UI component.</span>
@@ -3882,7 +4097,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">size</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Position the lower-left corner of this UI component.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Position the top-left corner of this UI component.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">panel</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">())</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_scroll_bar_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -4207,7 +4422,7 @@ document.write(`
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">size</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_actors_position</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the lower-left corner position of this UI component.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set the top-left corner position of this UI component.&quot;&quot;&quot;</span>
         <span class="n">coords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">textblock</span><span class="o">.</span><span class="n">set_position</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
