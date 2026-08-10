@@ -2,10 +2,87 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
   <id>https://fury.gl/</id>
   <title>Blog</title>
-  <updated>2026-08-10T15:35:13.046384+00:00</updated>
+  <updated>2026-08-10T15:37:14.843242+00:00</updated>
   <link href="https://fury.gl/"/>
   <link href="https://fury.gl/blog/atom.xml" rel="self"/>
   <generator uri="https://ablog.readthedocs.io/" version="0.11.13">ABlog</generator>
+  <entry>
+    <id>https://fury.gl/posts/2026/2026-08-03-week-10-medha.html</id>
+    <title>Week 10: Finalizing Website Revamp and Performance Optimization</title>
+    <updated>2026-08-03T00:00:00+00:00</updated>
+    <author>
+      <name>Medha Bhardwaj</name>
+    </author>
+    <content type="html">&lt;section id="week-10-finalizing-website-revamp-and-performance-optimization"&gt;
+
+&lt;p&gt;This week, I focused on finalizing the FURY website revamp in preparation for the upcoming v2.0 release, with a major emphasis on SEO and performance optimization.&lt;/p&gt;
+&lt;section id="overview"&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This week, I worked on the following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Finalizing the new website revamp to launch alongside the FURY v2 release (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1312"&gt;#1312&lt;/a&gt;).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Conducting a comprehensive performance audit and implementing SEO and load-time optimizations.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="the-core-problem-website-performance"&gt;
+&lt;h2&gt;The Core Problem: Website Performance&lt;/h2&gt;
+&lt;p&gt;During our final review of the revamped website, a performance audit revealed that the homepage was shipping a massive &lt;strong&gt;~51.8 MB network payload&lt;/strong&gt;, driving the Largest Contentful Paint (LCP) past 11 seconds. For a well-optimized page, this should ideally stay under 2–3 MB.&lt;/p&gt;
+&lt;p&gt;The root cause was unoptimized media. The site is visually heavy with animated demo GIFs, hero banners, and sponsor logos. Furthermore, much of this media was being hotlinked from external domains (e.g., &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;raw.githubusercontent.com&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;dipy.org&lt;/span&gt;&lt;/code&gt;, and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;furiousatoms.com&lt;/span&gt;&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;This external hotlinking caused two major issues:&lt;/p&gt;
+&lt;ol class="arabic simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Performance overhead&lt;/strong&gt;: Each distinct domain requires a fresh DNS lookup and TLS handshake, slowing down the initial load.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Reliability risks&lt;/strong&gt;: If any of those external repositories get renamed or moved, the FURY homepage would silently break.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/section&gt;
+&lt;section id="optimization-strategies-implemented"&gt;
+&lt;h2&gt;Optimization Strategies Implemented&lt;/h2&gt;
+&lt;p&gt;To drastically reduce the payload size and improve load times, I implemented several key optimizations:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Media Optimization and Self-Hosting&lt;/strong&gt;
+This was our biggest lever, saving an estimated &lt;strong&gt;35.9 MB&lt;/strong&gt;.&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Converted images&lt;/strong&gt;: We converted large PNGs and JPEGs to modern formats like WebP and AVIF.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Replaced GIFs with Videos&lt;/strong&gt;: We replaced every animated GIF with muted, autoplaying, looping &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;&amp;lt;video&amp;gt;&lt;/span&gt;&lt;/code&gt; elements (MP4/WebM). Since GIF is a 40-year-old format with poor compression, this alone provided an 80–95% size reduction per animation!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Self-hosting&lt;/strong&gt;: We migrated all hotlinked media to FURY’s own domain to eliminate third-party DNS overhead.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Lazy Loading&lt;/strong&gt;: Added &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;loading=&amp;quot;lazy&amp;quot;&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;decoding=&amp;quot;async&amp;quot;&lt;/span&gt;&lt;/code&gt; to all below-the-fold images to defer loading until the user scrolls to them.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2. Preventing Layout Shifts (CLS)&lt;/strong&gt;
+We were experiencing Cumulative Layout Shift (CLS) because images were missing explicit dimensions. I added explicit &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;width&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;height&lt;/span&gt;&lt;/code&gt; attributes to every image and video, allowing the browser to reserve layout space before the files finish loading.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. Caching and Delivery&lt;/strong&gt;
+To save bandwidth for returning visitors (an estimated &lt;strong&gt;46.9 MB&lt;/strong&gt; savings), we configured our server with long-lived cache headers (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Cache-Control:&lt;/span&gt; &lt;span class="pre"&gt;public,&lt;/span&gt; &lt;span class="pre"&gt;max-age=31536000,&lt;/span&gt; &lt;span class="pre"&gt;immutable&lt;/span&gt;&lt;/code&gt;) for versioned static assets, while keeping the main HTML on a short cache lifetime. We also eliminated unnecessary URL redirect chains.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. Eliminating Render-Blocking Resources&lt;/strong&gt;&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;JavaScript&lt;/strong&gt;: Moved non-critical scripts to the bottom of the body or marked them with &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;defer&lt;/span&gt;&lt;/code&gt; so they wouldn’t block the initial HTML parse and paint.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;CSS&lt;/strong&gt;: Inlined critical above-the-fold CSS and deferred the rest of the stylesheets.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;5. Dead Code Elimination and Minification&lt;/strong&gt;
+We integrated PurgeCSS to strip out unused CSS selectors and used bundler code-splitting to ensure we only ship the JavaScript actually needed for each page. All assets are now automatically minified in the build pipeline.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6. Accessibility Improvements&lt;/strong&gt;
+Several repeated links originally used identical, non-descriptive text like “View More”. I updated these to be descriptive (e.g., “View more Physics examples”), which greatly improves navigation for screen readers and AI browsing agents.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="what-i-learned"&gt;
+&lt;h2&gt;What I Learned&lt;/h2&gt;
+&lt;p&gt;This week was an incredible deep dive into modern web performance and SEO. I learned that simply replacing GIFs with modern video formats is one of the most effective ways to cut down page weight. I also gained hands-on experience with browser rendering pipelines—understanding how DNS lookups, render-blocking scripts, and missing image dimensions can severely impact user experience metrics like LCP and CLS.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="in-the-upcoming-week-i-plan-to"&gt;
+&lt;h2&gt;In the upcoming week, I plan to:&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Work on fully implementing the SEO and performance optimizations outlined above to significantly improve the website’s load times and overall performance.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="connect-with-me"&gt;
+&lt;h2&gt;Connect with Me&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2026/2026-08-03-week-10-medha.html"/>
+    <summary>This week, I focused on finalizing the FURY website revamp in preparation for the upcoming v2.0 release, with a major emphasis on SEO and performance optimization.</summary>
+    <category term="google" label="google"/>
+    <published>2026-08-03T00:00:00+00:00</published>
+  </entry>
   <entry>
     <id>https://fury.gl/posts/2026/2026-08-03-release-announcement.html</id>
     <title>FURY 2.0.0 Released</title>
@@ -68,6 +145,90 @@ We can also join our &lt;a class="reference external" href="https://discord.gg/6
 FURY is a free and open source software library for scientific visualization and 3D animations.</summary>
     <category term="fury" label="fury"/>
     <published>2026-08-03T00:00:00+00:00</published>
+  </entry>
+  <entry>
+    <id>https://fury.gl/posts/2026/2026-07-27-week-9-medha.html</id>
+    <title>Week 9: Improving Tree UI from Review Feedback and Migration Guide</title>
+    <updated>2026-07-27T00:00:00+00:00</updated>
+    <author>
+      <name>Medha Bhardwaj</name>
+    </author>
+    <content type="html">&lt;section id="week-9-improving-tree-ui-from-review-feedback-and-migration-guide"&gt;
+
+&lt;p&gt;This week, I focused on improving the Tree UI component based on detailed mentor feedback, and authored a comprehensive migration guide for users transitioning from FURY 0.12.x to v2.0.0.&lt;/p&gt;
+&lt;section id="overview"&gt;
+&lt;h2&gt;Overview&lt;/h2&gt;
+&lt;p&gt;This week, I worked on the following:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Improving the Tree UI component based on review feedback (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1283"&gt;#1283&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Writing the FURY 0.12.x → v2.0.0 migration guide (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1302"&gt;#1302&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="tree-ui-improvements"&gt;
+&lt;h2&gt;Tree UI Improvements&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Before Improvements:&lt;/strong&gt;&lt;/p&gt;
+&lt;img alt="Tree UI Component (Before)" class="align-center" src="https://github.com/user-attachments/assets/82ab994b-ecfe-4498-8de9-90cbe6709816" /&gt;
+&lt;p&gt;After submitting the initial Tree UI implementation, I received a thorough code review from my mentor. The feedback covered both functional improvements and architectural concerns. Here is a summary of the key feedback items I worked on:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Collapse/expand button positioning&lt;/strong&gt;: The default button position collided with other elements and was not visible until the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeNode&lt;/span&gt;&lt;/code&gt; was activated. I fixed the layout so buttons are properly positioned and visible by default.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Using ``TexturedButton2D`` over ``ImageContainer2D``&lt;/strong&gt;: The review suggested using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TexturedButton2D&lt;/span&gt;&lt;/code&gt; instead of &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ImageContainer2D&lt;/span&gt;&lt;/code&gt; for interactive icons, as it provides proper button semantics and toggle mode support out of the box.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Customizable button position&lt;/strong&gt;: The expand/collapse button should be positionable at either the start or end of the node. I made this configurable, defaulting to the start position with plus/minus icons to resemble a standard file tree.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Toggle mode for expand/collapse&lt;/strong&gt;: Instead of manually swapping icon states, I leveraged the existing toggle mode in our button components to handle the expanded/collapsed visual state.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Scroll wheel support on TreeNodes&lt;/strong&gt;: Previously, only the scrollbar itself responded to scroll events. I added wheel event listeners to the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TreeNode&lt;/span&gt;&lt;/code&gt; and background panel so users can scroll by hovering anywhere over the tree, matching the behavior already established in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox&lt;/span&gt;&lt;/code&gt; and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ComboBox&lt;/span&gt;&lt;/code&gt;.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Scrollbar abstraction&lt;/strong&gt;: The review pointed out that the scrollbar implementation is duplicated across &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ComboBox&lt;/span&gt;&lt;/code&gt;, and now &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;Tree2D&lt;/span&gt;&lt;/code&gt;. I explored the feasibility of abstracting it into a shared component.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Richer example scene&lt;/strong&gt;: The example was expanded to include all available UI elements — sliders, buttons, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ComboBox&lt;/span&gt;&lt;/code&gt;, and more — turning the tree into a comprehensive showcase of every UI component in FURY.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;ListBox rendering fix&lt;/strong&gt;: A rendering issue in &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;ListBox&lt;/span&gt;&lt;/code&gt; was identified during review, and I investigated and addressed it.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;After Improvements:&lt;/strong&gt;&lt;/p&gt;
+&lt;img alt="Tree UI Component (After)" class="align-center" src="https://github.com/user-attachments/assets/66608574-5501-4fd7-8a3a-51bb0fa3942b" /&gt;
+&lt;/section&gt;
+&lt;section id="migration-guide-fury-0-12-x-v2-0-0"&gt;
+&lt;h2&gt;Migration Guide: FURY 0.12.x → v2.0.0&lt;/h2&gt;
+&lt;p&gt;I also authored a comprehensive migration guide documenting all user-level API changes between FURY 0.12.x and v2.0.0. The guide covers 18 major areas of change, including:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Rendering backend switch&lt;/strong&gt; from VTK to PyGfx/WGPU, with code examples showing how to migrate direct VTK calls.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Color API normalization&lt;/strong&gt;, including auto-conversion of 0 to 255 integer colors and hex string support.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Actor module restructuring&lt;/strong&gt;, documenting the new sub-module layout (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;core.py&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;curved.py&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;planar.py&lt;/span&gt;&lt;/code&gt;, etc.).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;New per-actor transform API&lt;/strong&gt; with &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;rotate()&lt;/span&gt;&lt;/code&gt;, &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;translate()&lt;/span&gt;&lt;/code&gt;, and &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;scale()&lt;/span&gt;&lt;/code&gt; methods directly on actor objects.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Window and ShowManager changes&lt;/strong&gt;, including the new multi-screen layout, callback system, and ImGui integration.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;UI sub-system rebuild&lt;/strong&gt;, listing all currently available components and those still pending migration.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Removed APIs&lt;/strong&gt;, providing a clear table of modules and symbols that no longer exist in v2.0.0.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;A few nuances that came up while writing the migration guide:&lt;/p&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Angle units changed&lt;/strong&gt;: The old &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;euler_matrix&lt;/span&gt;&lt;/code&gt; function used radians, while the new &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;actor.rotate()&lt;/span&gt;&lt;/code&gt; uses degrees. This is a subtle breaking change that could easily be missed.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Background API change&lt;/strong&gt;: &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;scene.background()&lt;/span&gt;&lt;/code&gt; was a method call in 0.12.x but is now a settable property (&lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;scene.background&lt;/span&gt; &lt;span class="pre"&gt;=&lt;/span&gt; &lt;span class="pre"&gt;(r,&lt;/span&gt; &lt;span class="pre"&gt;g,&lt;/span&gt; &lt;span class="pre"&gt;b,&lt;/span&gt; &lt;span class="pre"&gt;a)&lt;/span&gt;&lt;/code&gt;), and it accepts RGBA rather than just RGB.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Legacy backward-compatibility code explicitly removed&lt;/strong&gt;: The old UI system had compatibility shims that were deliberately stripped out, meaning old UI code will fail immediately rather than degrade gracefully.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;section id="what-i-learned"&gt;
+&lt;h2&gt;What I Learned&lt;/h2&gt;
+&lt;p&gt;This week reinforced the importance of thorough code review in improving component quality. The mentor feedback on the Tree UI pushed me to think about reusability (scrollbar abstraction), proper component composition (using &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TexturedButton2D&lt;/span&gt;&lt;/code&gt; with toggle mode instead of manual state management), and user experience details (scroll-anywhere behavior). Writing the migration guide also deepened my understanding of the entire FURY architecture and the scale of changes involved in the VTK to PyGfx transition.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section id="in-the-upcoming-week-i-plan-to"&gt;
+&lt;h2&gt;In the upcoming week, I plan to:&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;Continue addressing review comments on the Tree UI PR.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Work on fury website SEO and image optimization.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;aside class="system-message"&gt;
+&lt;p class="system-message-title"&gt;System Message: WARNING/2 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2026/2026-07-27-week-9-medha.rst&lt;/span&gt;, line 74)&lt;/p&gt;
+&lt;p&gt;Bullet list ends without a blank line; unexpected unindent.&lt;/p&gt;
+&lt;/aside&gt;
+&lt;/section&gt;
+&lt;section id="connect-with-me"&gt;
+&lt;h2&gt;Connect with Me&lt;/h2&gt;
+&lt;ul class="simple"&gt;
+&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/section&gt;
+&lt;/section&gt;
+</content>
+    <link href="https://fury.gl/posts/2026/2026-07-27-week-9-medha.html"/>
+    <summary>This week, I focused on improving the Tree UI component based on detailed mentor feedback, and authored a comprehensive migration guide for users transitioning from FURY 0.12.x to v2.0.0.</summary>
+    <category term="google" label="google"/>
+    <published>2026-07-27T00:00:00+00:00</published>
   </entry>
   <entry>
     <id>https://fury.gl/posts/2026/2026-07-20-week8-medha.html</id>
@@ -544,121 +705,5 @@ I will likely close this PR. Although the current approach to building the galle
     <summary>The second week of the coding period was a highly productive start, and I was able to accomplish a lot of work that I am honestly proud of. This week, my primary focus was on improving the FURY documentation pipeline and fixing various build warnings.</summary>
     <category term="google" label="google"/>
     <published>2026-06-08T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2026/2026-06-01-week-1-medha.html</id>
-    <title>Week 1: Fixing Doc Build Warnings and Introducing RingSlider</title>
-    <updated>2026-06-01T00:00:00+00:00</updated>
-    <author>
-      <name>Medha Bhardwaj</name>
-    </author>
-    <content type="html">&lt;section id="week-1-fixing-doc-build-warnings-and-introducing-ringslider"&gt;
-
-&lt;p&gt;The first week of the coding period has been a productive start. This week, I primarily worked on two contributions:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Fixing documentation build warnings across the FURY codebase.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Completing the migration of the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;RingSlider2D&lt;/span&gt;&lt;/code&gt; to the new PyGfx implementation.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Both of these pull requests were successfully merged during the week.&lt;/p&gt;
-&lt;section id="overview"&gt;
-&lt;h2&gt;Overview&lt;/h2&gt;
-&lt;p&gt;This week, I worked on the following pull requests:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Fix documentation build warnings (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1164"&gt;#1164&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Port &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;RingSlider2D&lt;/span&gt;&lt;/code&gt; to v2 architecture (&lt;a class="reference external" href="https://github.com/fury-gl/fury/pull/1121"&gt;#1121&lt;/a&gt;)&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="fixing-documentation-build-warnings"&gt;
-&lt;h2&gt;Fixing Documentation Build Warnings&lt;/h2&gt;
-&lt;p&gt;I opened this pull request during the community bonding period and continued refining the changes and discussing them with maintainers during the first week of the coding period.&lt;/p&gt;
-&lt;p&gt;While building the documentation locally using:&lt;/p&gt;
-&lt;div class="highlight-default notranslate"&gt;&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;span class="n"&gt;make&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;C&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="n"&gt;clean&lt;/span&gt; &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="n"&gt;make&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;C&lt;/span&gt; &lt;span class="o"&gt;.&lt;/span&gt; &lt;span class="n"&gt;html&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;no&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;examples&lt;/span&gt;
-&lt;/pre&gt;&lt;/div&gt;
-&lt;/div&gt;
-&lt;p&gt;I encountered dozens of warnings. Most of them originated from &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;.rst&lt;/span&gt;&lt;/code&gt; files, while a few were related to attributes that were intended to be private but were not documented as such.&lt;/p&gt;
-&lt;p&gt;I went through the warnings individually, updating documentation where necessary and removing outdated or redundant content. Since many of the warnings were repetitive, this was a good opportunity to become more familiar with the project’s documentation structure and conventions. After review and discussion, the pull request was merged successfully.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="working-on-ringslider2d-and-pygfx-migration"&gt;
-&lt;h2&gt;Working on RingSlider2D and PyGfx Migration&lt;/h2&gt;
-&lt;p&gt;I also continued work on &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;RingSlider2D&lt;/span&gt;&lt;/code&gt; and its migration to the new PyGfx implementation.&lt;/p&gt;
-&lt;p&gt;Most of the work this week involved fixing bugs, polishing the implementation, and ensuring that the slider behaved correctly. Through testing and feedback, I identified a number of smaller issues that needed to be addressed before the feature was ready to be merged.&lt;/p&gt;
-&lt;p&gt;After making the necessary fixes and final refinements, the pull request was merged successfully.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="what-i-learned"&gt;
-&lt;h2&gt;What I Learned&lt;/h2&gt;
-&lt;p&gt;Beyond the code itself, this week helped me better understand some of the development practices followed within FURY.&lt;/p&gt;
-&lt;p&gt;One thing that stood out was the importance of maintaining a clean repository history. Through reviews and discussions, I learned how presenting work in a smaller number of meaningful commits makes changes easier to review, understand, and track in the future. It is a simple practice, but one that has a significant impact on project maintenance in the long term.&lt;/p&gt;
-&lt;p&gt;Overall, it was encouraging to start the coding period by gaining a deeper understanding of both the codebase and the contribution workflow.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="next-week"&gt;
-&lt;h2&gt;Next Week&lt;/h2&gt;
-&lt;p&gt;Next week, I plan to work on the following tasks:&lt;/p&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;Enable the version switcher on the FURY website.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Address review comments and complete the &lt;code class="docutils literal notranslate"&gt;&lt;span class="pre"&gt;TextBox2D&lt;/span&gt;&lt;/code&gt; PyGfx implementation pull request.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Better understand the FURY documentation workflow.&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;Explore Sphinx Gallery and understand how it can be used to improve the documentation workflow.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;section id="connect-with-me"&gt;
-&lt;h2&gt;Connect with Me&lt;/h2&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2026/2026-06-01-week-1-medha.html"/>
-    <summary>The first week of the coding period has been a productive start. This week, I primarily worked on two contributions:</summary>
-    <category term="google" label="google"/>
-    <published>2026-06-01T00:00:00+00:00</published>
-  </entry>
-  <entry>
-    <id>https://fury.gl/posts/2026/2026-05-25-week-0-medha.html</id>
-    <title>Week 0: Community Bonding Period</title>
-    <updated>2026-05-25T00:00:00+00:00</updated>
-    <author>
-      <name>Medha Bhardwaj</name>
-    </author>
-    <content type="html">&lt;section id="week-0-community-bonding-period"&gt;
-
-&lt;p&gt;Hello everyone!&lt;/p&gt;
-&lt;p&gt;I’m Medha Bhardwaj, and I’m incredibly happy to share that I have been selected for Google Summer of Code 2026 with &lt;a class="reference external" href="https://fury.gl/"&gt;FURY&lt;/a&gt;. This summer, I will be working on &lt;em&gt;Optimizing FURY’s Documentation Pipeline and Website Architecture&lt;/em&gt;, a project aimed at improving the documentation workflow and enhancing the experience for both contributors and users.&lt;/p&gt;
-&lt;section id="about-me"&gt;
-&lt;h2&gt;About Me&lt;/h2&gt;
-&lt;p&gt;I am a Computer Science student with a minor in Business. I started contributing to &lt;a class="reference external" href="https://www.pybamm.org/"&gt;PyBaMM&lt;/a&gt;, and since then, open source has become an important part of my learning journey and growth as a developer.&lt;/p&gt;
-&lt;p&gt;I am also actively involved with the FOSS Wing at my college as a senior member, where I help students take their first steps into open source and project contributions.&lt;/p&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2026/2026-05-25-week-0-medha.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id1"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “pybamm”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;This eventually led me to participate in &lt;a class="reference external" href="https://summerofcode.withgoogle.com/archive/2025/projects/3t9McTvW"&gt;Google Summer of Code 2025&lt;/a&gt; with &lt;a class="reference external" href="https://www.pybamm.org/"&gt;PyBaMM&lt;/a&gt; under &lt;a class="reference external" href="https://numfocus.org/"&gt;NumFOCUS&lt;/a&gt;. It was a really rewarding experience that enhanced my technical skills and also taught me how to collaborate and communicate effectively while working within a team.&lt;/p&gt;
-&lt;aside class="system-message"&gt;
-&lt;p class="system-message-title"&gt;System Message: INFO/1 (&lt;span class="docutils literal"&gt;/home/runner/work/fury/fury/docs/source/posts/2026/2026-05-25-week-0-medha.rst&lt;/span&gt;, line 2); &lt;em&gt;&lt;a href="#id2"&gt;backlink&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-&lt;p&gt;Duplicate explicit target name: “fury”.&lt;/p&gt;
-&lt;/aside&gt;
-&lt;p&gt;After GSoC, while exploring other projects, I came across &lt;a class="reference external" href="https://fury.gl/"&gt;FURY&lt;/a&gt;. What initially drew me in was how creative and interactive the project felt. I started contributing to the project, became more involved with the community over time, and I’m grateful that this eventually led to me being selected for Google Summer of Code 2026 with FURY.&lt;/p&gt;
-&lt;/section&gt;
-&lt;section id="community-bonding-period"&gt;
-&lt;h2&gt;Community Bonding Period&lt;/h2&gt;
-&lt;p&gt;The community bonding period has already been an amazing start to the summer. I had the opportunity to meet my mentors and  &lt;a class="reference external" href="https://github.com/TomasGuija"&gt;Tomás&lt;/a&gt;, who is a fellow GSoC contributor at &lt;a class="reference external" href="https://dipy.org/"&gt;DIPY&lt;/a&gt;. It was inspiring to interact with so many passionate people from different backgrounds, all connected by a shared enthusiasm for open source.&lt;/p&gt;
-&lt;p&gt;We also talked about expectations for the summer, communication practices, project timelines, and the overall flow of the coding period. One thing I really appreciated was how direct and open the communication was from the very beginning. The mentors were very clear about what they expected from us and how the project would progress, giving me a clear understanding of what I am expected to do and how I can contribute effectively.&lt;/p&gt;
-&lt;p&gt;It was also very reassuring to see how welcoming and collaborative the community is. Even before the coding period officially begins, the atmosphere already feels incredibly motivating and supportive, and I am really looking forward to learning and contributing over the next few months.&lt;/p&gt;
-&lt;section id="connect-with-me"&gt;
-&lt;h3&gt;Connect with Me&lt;/h3&gt;
-&lt;ul class="simple"&gt;
-&lt;li&gt;&lt;p&gt;GitHub: &lt;a class="reference external" href="https://github.com/medha-14"&gt;medha-14&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;LinkedIn: &lt;a class="reference external" href="https://www.linkedin.com/in/medhabhardwaj/"&gt;Medha Bhardwaj&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Stay tuned for updates on my GSoC journey as I share my progress, challenges, and everything I learn along the way!&lt;/p&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-&lt;/section&gt;
-</content>
-    <link href="https://fury.gl/posts/2026/2026-05-25-week-0-medha.html"/>
-    <summary>Hello everyone!</summary>
-    <category term="google" label="google"/>
-    <published>2026-05-25T00:00:00+00:00</published>
   </entry>
 </feed>
