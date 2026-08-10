@@ -44,32 +44,33 @@ world generation, composite actor transformation, and real-time event-loop rende
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 20-42
+.. GENERATED FROM PYTHON SOURCE LINES 20-43
 
 Let's define some variables and their description:
 
-* **V_FWD**: numpy.ndarray, shape (3,)
-      Primary forward-facing direction baseline tracking vector.
-* **V_UP**: numpy.ndarray, shape (3,)
-      Primary vertical orientation baseline tracking vector.
-* **V_R**: numpy.ndarray, shape (3,)
-      Primary lateral orientation baseline tracking vector.
-* **V_ZERO**: numpy.ndarray, shape (3,)
-      Zero-coordinate reference origin vector.
-* **state**: dict
-      Active global configuration tracker managing physical attributes.
-* **SPAWN_DIST**: float
-      Maximum coordinate offset boundary to populate environment components.
-* **DESPAWN_DIST**: float
-      Minimum viewport-relative depth to purge out-of-range objects.
-* **CLOUD_COUNT**: int
-      Total persistent active instances representing sky assets.
-* **TREE_COUNT**: int
-      Total active instances representing vegetation structures.
-* **MOUNTAIN_COUNT**: int
-      Total active instances representing background obstacle terrain.
+ * **V_FWD**: numpy.ndarray, shape (3,)
+       Primary forward-facing direction baseline tracking vector.
+ * **V_UP**: numpy.ndarray, shape (3,)
+       Primary vertical orientation baseline tracking vector.
+ * **V_R**: numpy.ndarray, shape (3,)
+       Primary lateral orientation baseline tracking vector.
+ * **V_ZERO**: numpy.ndarray, shape (3,)
+       Zero-coordinate reference origin vector.
+ * **state**: dict
+       Active global configuration tracker managing physical attributes.
+ * **SPAWN_DIST**: float
+       Maximum coordinate offset boundary to populate environment components.
+ * **DESPAWN_DIST**: float
+       Minimum viewport-relative depth to purge out-of-range objects.
+ * **CLOUD_COUNT**: int
+       Total persistent active instances representing sky assets.
+ * **TREE_COUNT**: int
+       Total active instances representing vegetation structures.
+ * **MOUNTAIN_COUNT**: int
+       Total active instances representing background obstacle terrain.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-72
+.. GENERATED FROM PYTHON SOURCE LINES 43-73
 
 .. code-block:: Python
 
@@ -110,16 +111,17 @@ Let's define some variables and their description:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-79
+.. GENERATED FROM PYTHON SOURCE LINES 74-81
 
 Before we fly, we need a way to spin and turn our aircraft smoothly in 3D space.
-If we try to use standard pitch, roll, and yaw angles directly, we will quickly run
-into the "gimbal lock" where our control axes overlap and trap us in a 2D plane.
-To avoid this, we represent our plane's orientation using Quaternions. Let's write
-some handy helper functions to turn angles into rotations, multiply them together,
-and rotate our direction vectors.
+ If we try to use standard pitch, roll, and yaw angles directly, we will quickly run
+ into the "gimbal lock" where our control axes overlap and trap us in a 2D plane.
+ To avoid this, we represent our plane's orientation using Quaternions. Let's write
+ some handy helper functions to turn angles into rotations, multiply them together,
+ and rotate our direction vectors.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-185
+.. GENERATED FROM PYTHON SOURCE LINES 81-187
 
 .. code-block:: Python
 
@@ -236,14 +238,15 @@ and rotate our direction vectors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 186-190
+.. GENERATED FROM PYTHON SOURCE LINES 188-193
 
 Now that our math works, we need a 3D world to visualize it. FURY organizes everything
-inside a Scene. Let's initialize it, paint the sky blue, and drop in a giant flat
-box to act as our endless grassy ground. We'll also place a bright sphere far away
-to represent our sun.
+ inside a Scene. Let's initialize it, paint the sky blue, and drop in a giant flat
+ box to act as our endless grassy ground. We'll also place a bright sphere far away
+ to represent our sun.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-208
+.. GENERATED FROM PYTHON SOURCE LINES 193-211
 
 .. code-block:: Python
 
@@ -272,14 +275,15 @@ to represent our sun.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 209-213
+.. GENERATED FROM PYTHON SOURCE LINES 212-217
 
 Every pilot needs an airfield. However, constructing a realistic runway across huge
-distances can cause single-precision floating-point jitter on the GPU.
-To keep performance in check, we build a RunwayManager. It dynamically moves the mesh
-and its lights along with our plane's Z position, tricking the pilot's eyes.
+ distances can cause single-precision floating-point jitter on the GPU.
+ To keep performance in check, we build a RunwayManager. It dynamically moves the mesh
+ and its lights along with our plane's Z position, tricking the pilot's eyes.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-295
+.. GENERATED FROM PYTHON SOURCE LINES 217-299
 
 .. code-block:: Python
 
@@ -372,14 +376,15 @@ and its lights along with our plane's Z position, tricking the pilot's eyes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 296-300
+.. GENERATED FROM PYTHON SOURCE LINES 300-305
 
 Who says you need complex CAD modeling skills? Here we compose a beautiful plane
-by combining basic shapes (cylinders, cones, boxes, and spheres). We store their local
-relative offsets from the plane's center of gravity. When we update the plane's flight
-coordinates, we apply our quaternion rotation to project each sub-part cleanly.
+ by combining basic shapes (cylinders, cones, boxes, and spheres). We store their local
+ relative offsets from the plane's center of gravity. When we update the plane's flight
+ coordinates, we apply our quaternion rotation to project each sub-part cleanly.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 300-445
+.. GENERATED FROM PYTHON SOURCE LINES 305-450
 
 .. code-block:: Python
 
@@ -535,14 +540,15 @@ coordinates, we apply our quaternion rotation to project each sub-part cleanly.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 446-450
+.. GENERATED FROM PYTHON SOURCE LINES 451-456
 
 Flying over empty fields gets boring quickly. To make our world immersive, let's write
-classes to assemble procedural terrain assets. Our low-poly Tree model stacks colored
-cones over a cylinder trunk, and our Mountain model places a snowy cone cap on top
-of a larger, rocky base.
+ classes to assemble procedural terrain assets. Our low-poly Tree model stacks colored
+ cones over a cylinder trunk, and our Mountain model places a snowy cone cap on top
+ of a larger, rocky base.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 450-541
+.. GENERATED FROM PYTHON SOURCE LINES 456-547
 
 .. code-block:: Python
 
@@ -644,14 +650,15 @@ of a larger, rocky base.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 542-546
+.. GENERATED FROM PYTHON SOURCE LINES 548-553
 
 If we keep instantiating new trees and mountains as we fly, Python will run out of
-memory and the CPU will stutter from allocations. Instead, we write a WorldManager
-that maintains a static pool of objects. When an object drifts behind us, we project
-it ahead of our plane. Continuous landscape generation without garbage-collection.
+ memory and the CPU will stutter from allocations. Instead, we write a WorldManager
+ that maintains a static pool of objects. When an object drifts behind us, we project
+ it ahead of our plane. Continuous landscape generation without garbage-collection.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 546-675
+.. GENERATED FROM PYTHON SOURCE LINES 553-682
 
 .. code-block:: Python
 
@@ -791,13 +798,14 @@ it ahead of our plane. Continuous landscape generation without garbage-collectio
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 676-679
+.. GENERATED FROM PYTHON SOURCE LINES 683-687
 
 Now we initialize FURY TextBlock2D screen overlay blocks to paint
-live instrument displays directly onto our screen viewport, showing our altitude,
-speed, and score.
+ live instrument displays directly onto our screen viewport, showing our altitude,
+ speed, and score.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 679-718
+.. GENERATED FROM PYTHON SOURCE LINES 687-726
 
 .. code-block:: Python
 
@@ -847,13 +855,14 @@ speed, and score.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 719-722
+.. GENERATED FROM PYTHON SOURCE LINES 727-731
 
 Here we listen to keyboard events and store active states. We also write
-a collision checking script. If the center coordinates of our airplane glide too close
-to mountain bounds or tree trunk geometries, we restart the game!
+ a collision checking script. If the center coordinates of our airplane glide too close
+ to mountain bounds or tree trunk geometries, we restart the game!
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 722-816
+.. GENERATED FROM PYTHON SOURCE LINES 731-825
 
 .. code-block:: Python
 
@@ -958,14 +967,15 @@ to mountain bounds or tree trunk geometries, we restart the game!
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 817-821
+.. GENERATED FROM PYTHON SOURCE LINES 826-831
 
 This is where our virtual world comes alive! During each frame step, we calculate
-pitch, roll, and yaw input rates. We integrate lift factors based on speed and adjust
-our local coordinate direction vectors to smoothly transition our chase-camera
-coordinates directly behind the plane's exhaust.
+ pitch, roll, and yaw input rates. We integrate lift factors based on speed and adjust
+ our local coordinate direction vectors to smoothly transition our chase-camera
+ coordinates directly behind the plane's exhaust.
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 821-978
+.. GENERATED FROM PYTHON SOURCE LINES 831-988
 
 .. code-block:: Python
 
@@ -1133,13 +1143,14 @@ coordinates directly behind the plane's exhaust.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 979-982
+.. GENERATED FROM PYTHON SOURCE LINES 989-993
 
 Now we instantiate the FURY ShowManager, register global event handlers to hook up
-player control keys, block default camera behaviors to let our custom chase camera
-drive, and launch our flight simulator!
+ player control keys, block default camera behaviors to let our custom chase camera
+ drive, and launch our flight simulator!
+#########################################################################################
 
-.. GENERATED FROM PYTHON SOURCE LINES 982-998
+.. GENERATED FROM PYTHON SOURCE LINES 993-1009
 
 .. code-block:: Python
 
@@ -1174,7 +1185,7 @@ drive, and launch our flight simulator!
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 52.000 seconds)
+   **Total running time of the script:** (0 minutes 49.394 seconds)
 
 
 .. _sphx_glr_download_auto_examples_04_demos_viz_flight_simulator.py:

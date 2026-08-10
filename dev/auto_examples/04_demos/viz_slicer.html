@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="FURY" />
 <meta name="description" content="This example demonstrates how to use the slicer actor to visualize 3D data in a 2D slice view. The slicer actor allows you to interactively slice through a 3D volume and visualize the resulting 2D ..." />
 
-    <title>3D Image Slicer &#8212; FURY 2.0.0 documentation</title>
+    <title>3D Image Slicer &#8212; FURY 2.1.0.dev5+ga1be904dd documentation</title>
   
   
   
@@ -40,27 +40,28 @@
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
     <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/fury_theme.css?v=aa9e183b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/fury_theme.css?v=5dd5a9b7" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=79f5c508"></script>
+    <script src="../../_static/documentation_options.js?v=5723a645"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/04_demos/viz_slicer';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/latest/_static/versions_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v2.0.0';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
         DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
         </script>
     <link rel="canonical" href="https://fury.gl/latest/auto_examples/04_demos/viz_slicer.html" />
@@ -505,7 +506,7 @@ in <a class="reference external" href="https://dipy.org">DIPY</a>’s data. The 
 intensity value and use arrow keys to navigate through the slices.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury</span><span class="w"> </span><span class="kn">import</span> <span class="n">actor</span><span class="p">,</span> <span class="n">window</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.actor.html#fury.actor.get_slices" title="fury.actor.get_slices" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">get_slices</span></a><span class="p">,</span> <a href="../../reference/fury.actor.html#fury.actor.show_slices" title="fury.actor.show_slices" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">show_slices</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_slices</span><span class="p">,</span> <span class="n">show_slices</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dipy.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_mni_template</span>
 </pre></div>
@@ -515,26 +516,26 @@ This example demonstrates how to create a 3D cube with a sphere inside it
 and visualize it using the <cite>slicer</cite> actor. The cube is filled with blue color,
 and the sphere is filled with white color. The user can interactively slice
 through the cube and visualize the resulting 2D slices.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">=</span> <span class="mi">100</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cube</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float32" title="numpy.float32" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">np</span><span class="o">.</span><span class="n">float32</span></a><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cube</span></a><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Set blue color for the cube</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">size</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">cube</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">cube</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Set blue color for the cube</span>
 
 <span class="c1"># Create coordinate grids</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">z</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.indices.html#numpy.indices" title="numpy.indices" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">indices</span></a><span class="p">((</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a><span class="p">))</span>
-<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">center</span></a> <span class="o">=</span> <span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">((</span><span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span>
+<span class="n">center</span> <span class="o">=</span> <span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
 
 <span class="c1"># Calculate distances from center</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">distances</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">((</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">x</span></a> <span class="o">-</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">center</span></a><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">-</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">center</span></a><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">z</span></a> <span class="o">-</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">center</span></a><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
 <span class="c1"># Create sphere (white)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_mask</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">distances</span></a> <span class="o">&lt;=</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">size</span></a> <span class="o">//</span> <span class="mi">2</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cube</span></a><span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_mask</span></a><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="n">sphere_mask</span> <span class="o">=</span> <span class="n">distances</span> <span class="o">&lt;=</span> <span class="n">size</span> <span class="o">//</span> <span class="mi">2</span>
+<span class="n">cube</span><span class="p">[</span><span class="n">sphere_mask</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Create a slice actor for the cube and add it to the scene.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.data_slicer" title="fury.actor.data_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">data_slicer</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cube</span></a><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slicer_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">data_slicer</span><span class="p">(</span><span class="n">cube</span><span class="p">)</span>
 <span class="n">scene</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span>
-<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">slicer_actor</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create a function to handle key events and navigate through the slices.
@@ -544,17 +545,17 @@ The <cite>get_slices</cite> function retrieves the current slice positions, and 
 positions. The <cite>show_m.render()</cite> function is called to update the scene
 after each key event.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">handle_key_event</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
-    <span class="n">position</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.get_slices" title="fury.actor.get_slices" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">get_slices</span></a><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="p">)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">get_slices</span><span class="p">(</span><span class="n">slicer_actor</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;ArrowUp&quot;</span><span class="p">:</span>
         <span class="n">position</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;ArrowDown&quot;</span><span class="p">:</span>
         <span class="n">position</span> <span class="o">-=</span> <span class="mi">1</span>
 
-    <span class="n">bounds</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="o">.</span><span class="n">get_bounding_box</span><span class="p">()</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="n">slicer_actor</span><span class="o">.</span><span class="n">get_bounding_box</span><span class="p">()</span>
 
-    <span class="n">position</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">maximum</span></a><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
-    <span class="n">position</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">minimum</span></a><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
-    <a href="../../reference/fury.actor.html#fury.actor.show_slices" title="fury.actor.show_slices" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">show_slices</span></a><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">position</span><span class="p">)</span>
+    <span class="n">show_slices</span><span class="p">(</span><span class="n">slicer_actor</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
     <span class="n">show_m</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -563,7 +564,7 @@ after each key event.</p>
 <span class="n">show_m</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handle_key_event</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;function handle_key_event at 0x311e268e0&gt;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;function handle_key_event at 0x7ff2105ccb80&gt;
 </pre></div>
 </div>
 <p>Start the show manager to display the scene and allow interaction.</p>
@@ -573,17 +574,101 @@ after each key event.</p>
 <img src="../../_images/sphx_glr_viz_slicer_001.png" srcset="../../_images/sphx_glr_viz_slicer_001.png" alt="viz slicer" class = "sphx-glr-single-img"/><p>Let’s read the 3D data from dipy and check the shape of the data. The data also has
 an affine transformation matrix that maps the voxel coordinates to world coordinates.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">nifti</span> <span class="o">=</span> <span class="n">read_mni_template</span><span class="p">()</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="numpy.asarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">asarray</span></a><span class="p">(</span><span class="n">nifti</span><span class="o">.</span><span class="n">dataobj</span><span class="p">)</span>
-<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">affine</span></a> <span class="o">=</span> <span class="n">nifti</span><span class="o">.</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">affine</span></a>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">nifti</span><span class="o">.</span><span class="n">dataobj</span><span class="p">)</span>
+<span class="n">affine</span> <span class="o">=</span> <span class="n">nifti</span><span class="o">.</span><span class="n">affine</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2026-08-05 09:10:02][dipy] INFO: Data size is approximately 70MB
-[2026-08-05 09:10:02][dipy] INFO: Dataset is already in place. If you want to fetch it again please first remove the folder /Users/maharshigor/.dipy/mni_template
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[2026-08-10 13:07:41][dipy] INFO: Creating new folder /home/runner/.dipy/mni_template
+[2026-08-10 13:07:41][dipy] INFO: Data size is approximately 70MB
+[2026-08-10 13:07:41][dipy] INFO: Downloading &quot;mni_icbm152_t2_tal_nlin_asym_09a.nii&quot; to /home/runner/.dipy/mni_template
+[2026-08-10 13:07:41][dipy] INFO: From: https://ndownloader.figshare.com/files/5572676?private_link=4b8666116a0128560fb5
+
+  0%|          | 0/1060 MB [00:00]
+  0%|          | 4/1060 MB [00:00]
+  1%|          | 9/1060 MB [00:00]
+  2%|▏         | 17/1060 MB [00:00]
+  3%|▎         | 30/1060 MB [00:00]
+  4%|▍         | 43/1060 MB [00:00]
+  6%|▌         | 66/1060 MB [00:00]
+  8%|▊         | 90/1060 MB [00:00]
+ 13%|█▎        | 134/1060 MB [00:00]
+ 18%|█▊        | 190/1060 MB [00:01]
+ 26%|██▌       | 275/1060 MB [00:01]
+ 39%|███▊      | 409/1060 MB [00:01]
+ 54%|█████▍    | 570/1060 MB [00:01]
+ 70%|██████▉   | 741/1060 MB [00:01]
+ 86%|████████▌ | 910/1060 MB [00:01]
+100%|██████████| 1060/1060 MB [00:01]
+[2026-08-10 13:07:44][dipy] INFO: Downloading &quot;mni_icbm152_t1_tal_nlin_asym_09a.nii&quot; to /home/runner/.dipy/mni_template
+[2026-08-10 13:07:44][dipy] INFO: From: https://ndownloader.figshare.com/files/5572673?private_link=93216e750d5a7e568bda
+
+  0%|          | 0/1060 MB [00:00]
+  0%|          | 2/1060 MB [00:00]
+  0%|          | 4/1060 MB [00:00]
+  1%|          | 7/1060 MB [00:00]
+  1%|          | 12/1060 MB [00:00]
+  2%|▏         | 19/1060 MB [00:00]
+  3%|▎         | 29/1060 MB [00:00]
+  4%|▍         | 41/1060 MB [00:00]
+  6%|▌         | 61/1060 MB [00:00]
+  7%|▋         | 78/1060 MB [00:00]
+ 11%|█         | 112/1060 MB [00:01]
+ 14%|█▍        | 149/1060 MB [00:01]
+ 20%|██        | 212/1060 MB [00:01]
+ 27%|██▋       | 283/1060 MB [00:01]
+ 38%|███▊      | 399/1060 MB [00:01]
+ 49%|████▉     | 522/1060 MB [00:01]
+ 69%|██████▉   | 731/1060 MB [00:01]
+ 89%|████████▉ | 944/1060 MB [00:01]
+100%|██████████| 1060/1060 MB [00:01]
+[2026-08-10 13:07:49][dipy] INFO: Downloading &quot;mni_icbm152_t1_tal_nlin_asym_09c_mask.nii&quot; to /home/runner/.dipy/mni_template
+[2026-08-10 13:07:49][dipy] INFO: From: https://ndownloader.figshare.com/files/5572670?private_link=33c92d54d1afb9aa7ed2
+
+  0%|          | 0/1042 MB [00:00]
+  0%|          | 2/1042 MB [00:00]
+  0%|          | 4/1042 MB [00:00]
+  1%|          | 9/1042 MB [00:00]
+  1%|          | 13/1042 MB [00:00]
+  2%|▏         | 19/1042 MB [00:00]
+  2%|▏         | 24/1042 MB [00:00]
+  3%|▎         | 36/1042 MB [00:00]
+  5%|▍         | 48/1042 MB [00:00]
+  7%|▋         | 69/1042 MB [00:00]
+  8%|▊         | 86/1042 MB [00:01]
+ 10%|█         | 109/1042 MB [00:01]
+ 12%|█▏        | 130/1042 MB [00:01]
+ 17%|█▋        | 175/1042 MB [00:01]
+ 21%|██        | 218/1042 MB [00:01]
+ 30%|██▉       | 308/1042 MB [00:01]
+ 38%|███▊      | 398/1042 MB [00:01]
+ 55%|█████▍    | 572/1042 MB [00:01]
+ 71%|███████▏  | 744/1042 MB [00:01]
+ 95%|█████████▌| 992/1042 MB [00:01]
+100%|██████████| 1042/1042 MB [00:01]
+[2026-08-10 13:07:52][dipy] INFO: Downloading &quot;mni_icbm152_t1_tal_nlin_asym_09c.nii&quot; to /home/runner/.dipy/mni_template
+[2026-08-10 13:07:52][dipy] INFO: From: https://ndownloader.figshare.com/files/5572661?private_link=584319b23e7343fed707
+
+  0%|          | 0/1042 MB [00:00]
+  0%|          | 4/1042 MB [00:00]
+  1%|          | 11/1042 MB [00:00]
+  2%|▏         | 25/1042 MB [00:00]
+  4%|▍         | 46/1042 MB [00:00]
+  6%|▌         | 63/1042 MB [00:00]
+ 10%|▉         | 101/1042 MB [00:00]
+ 16%|█▌        | 163/1042 MB [00:01]
+ 22%|██▏       | 229/1042 MB [00:01]
+ 32%|███▏      | 333/1042 MB [00:01]
+ 41%|████      | 425/1042 MB [00:01]
+ 57%|█████▋    | 591/1042 MB [00:01]
+ 73%|███████▎  | 762/1042 MB [00:01]
+ 95%|█████████▌| 991/1042 MB [00:01]
+100%|██████████| 1042/1042 MB [00:01]
+[2026-08-10 13:07:55][dipy] INFO: Files successfully downloaded to /home/runner/.dipy/mni_template
 </pre></div>
 </div>
 <p>Let’s check the shape of the data and the affine transformation matrix.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span><span class="o">.</span><span class="n">shape</span></a><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">affine</span></a><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">affine</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>(197, 233, 189)
@@ -594,12 +679,12 @@ an affine transformation matrix that maps the voxel coordinates to world coordin
 </pre></div>
 </div>
 <p>Create volume_slicer actor to visualize the 3D data as XY, YZ and XZ slices.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.volume_slicer" title="fury.actor.volume_slicer" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">volume_slicer</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">data</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">affine</span></a><span class="o">=</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">affine</span></a><span class="p">,</span> <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slicer_actor</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">volume_slicer</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">affine</span><span class="o">=</span><span class="n">affine</span><span class="p">,</span> <span class="n">depth_write</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create a scene and add the slicer actor to it.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">scene</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">Scene</span><span class="p">()</span>
-<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="p">)</span>
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">slicer_actor</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Create a function to handle the pick event and print the intensity of the
@@ -607,12 +692,12 @@ voxel that was clicked. The event contains information about the picked
 voxel, including its index and intensity value.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">handle_pick_event</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">pick_info</span>
-    <span class="n">intensity</span> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.asarray.html#numpy.asarray" title="numpy.asarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">asarray</span></a><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;rgba&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rgb</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;rgba&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rgb</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Voxel </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;index&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">intensity</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Add event handlers to the slicer actor for picking and key events.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="../../reference/fury.actor.html#fury.actor.Group" title="fury.actor.Group" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slicer_actor</span></a><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handle_pick_event</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_DOWN</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">slicer_actor</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handle_pick_event</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">POINTER_DOWN</span><span class="p">)</span>
 
 <span class="n">show_m</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">ShowManager</span><span class="p">(</span><span class="n">scene</span><span class="o">=</span><span class="n">scene</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;FURY MNI Template Slicer Example&quot;</span><span class="p">)</span>
 <span class="n">show_m</span><span class="o">.</span><span class="n">renderer</span><span class="o">.</span><span class="n">add_event_handler</span><span class="p">(</span><span class="n">handle_key_event</span><span class="p">,</span> <span class="n">EventType</span><span class="o">.</span><span class="n">KEY_DOWN</span><span class="p">)</span>
@@ -623,7 +708,7 @@ voxel, including its index and intensity value.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">show_m</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../../_images/sphx_glr_viz_slicer_002.gif" srcset="../../_images/sphx_glr_viz_slicer_002.gif" alt="viz slicer" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.514 seconds)</p>
+<img src="../../_images/sphx_glr_viz_slicer_002.gif" srcset="../../_images/sphx_glr_viz_slicer_002.gif" alt="viz slicer" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 37.821 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-04-demos-viz-slicer-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../../_downloads/28e6d1161c185842fba28af3939a3636/viz_slicer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_slicer.ipynb</span></code></a></p>

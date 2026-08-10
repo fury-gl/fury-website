@@ -35,7 +35,7 @@ First, a bunch of imports
 
     import numpy as np
 
-    from fury.ui import Rectangle2D, Disk2D
+    from fury.ui import Rectangle2D, Disk2D, RoundedRectangle2D
     from fury.window import (
         Scene,
         ShowManager,
@@ -105,9 +105,33 @@ Then we can draw a solid circle, or disk.
 
 .. GENERATED FROM PYTHON SOURCE LINES 38-39
 
+And a rounded rectangle with custom corner radius and opacity.
+
+.. GENERATED FROM PYTHON SOURCE LINES 39-48
+
+.. code-block:: Python
+
+
+    rounded_rect = RoundedRectangle2D(
+        size=(150, 100),
+        position=(500, 200),
+        color=(0.2, 0.6, 0.9),
+        corner_radius=20,
+        opacity=0.9,
+    )
+
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
+
 Adding interaction using mouse events
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-74
+.. GENERATED FROM PYTHON SOURCE LINES 50-119
 
 .. code-block:: Python
 
@@ -146,6 +170,38 @@ Adding interaction using mouse events
     disk.on_right_mouse_button_pressed = disk_right_button_pressed
 
 
+    _rounded_rect_drag_offset = None
+
+
+    def rounded_rect_left_button_pressed(event: PointerEvent):
+        """Calculates offset when dragging starts."""
+        global _rounded_rect_drag_offset
+
+        rect_position = rounded_rect.get_position()
+        click_pos = np.array([event.x, event.y])
+        _rounded_rect_drag_offset = click_pos - rect_position
+
+        rounded_rect.color = np.random.random([3])
+
+
+    def rounded_rect_left_button_dragged(event: PointerEvent):
+        """Updates the rounded rectangle's position based on mouse movement."""
+        global _rounded_rect_drag_offset
+        if _rounded_rect_drag_offset is not None:
+            click_position = np.array([event.x, event.y])
+            new_position = click_position - _rounded_rect_drag_offset
+            rounded_rect.set_position(new_position)
+
+
+    def rounded_rect_left_button_released(event: PointerEvent):
+        """Resets the drag offset."""
+        global _rounded_rect_drag_offset
+        _rounded_rect_drag_offset = None
+
+
+    rounded_rect.on_left_mouse_button_pressed = rounded_rect_left_button_pressed
+    rounded_rect.on_left_mouse_button_dragged = rounded_rect_left_button_dragged
+    rounded_rect.on_left_mouse_button_released = rounded_rect_left_button_released
 
 
 
@@ -153,16 +209,19 @@ Adding interaction using mouse events
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-76
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 120-121
 
 Now that all the elements have been initialised, we add them to the scene.
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-86
+.. GENERATED FROM PYTHON SOURCE LINES 121-132
 
 .. code-block:: Python
 
     scene.add(rect)
     scene.add(disk)
+    scene.add(rounded_rect)
 
     current_size = (800, 800)
     show_manager = ShowManager(
@@ -186,7 +245,7 @@ Now that all the elements have been initialised, we add them to the scene.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.154 seconds)
+   **Total running time of the script:** (0 minutes 0.262 seconds)
 
 
 .. _sphx_glr_download_auto_examples_07_ui_viz_shapes.py:
