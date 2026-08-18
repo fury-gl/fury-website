@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.transform &#8212; FURY 2.1.0.dev13+g5e573a70c documentation</title>
+    <title>fury.transform &#8212; FURY 2.1.0.dev15+g8e136580d documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=0f7cda92"></script>
+    <script src="../../_static/documentation_options.js?v=00de6a60"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -468,7 +468,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                    <h1>Source code for fury.transform</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Transformation functions for 3D graphics.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Transformation functions for 3D graphics."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 
@@ -480,30 +480,30 @@ document.write(`
 
 <span class="c1"># map axes strings to/from tuples of inner axis, parity, repetition, frame</span>
 <span class="n">_AXES2TUPLE</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;sxyz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;sxyx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;sxzy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;sxzx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;syzx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;syzy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;syxz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;syxy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;szxy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;szxz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;szyx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;szyz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-    <span class="s2">&quot;rzyx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rxyx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;ryzx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rxzx&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rxzy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;ryzy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rzxy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;ryxy&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;ryxz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rzxz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rxyz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
-    <span class="s2">&quot;rzyz&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"sxyz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"sxyx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"sxzy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"sxzx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"syzx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"syzy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"syxz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"syxy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"szxy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"szxz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"szyx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"szyz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="s2">"rzyx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rxyx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"ryzx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rxzx"</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rxzy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"ryzy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rzxy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"ryxy"</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"ryxz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rzxz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rxyz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="s2">"rzyz"</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="n">_TUPLE2AXES</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">_AXES2TUPLE</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
@@ -511,8 +511,8 @@ document.write(`
 
 <div class="viewcode-block" id="euler_matrix">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.euler_matrix">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">euler_matrix</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="n">ak</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="s2">&quot;sxyz&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">euler_matrix</span><span class="p">(</span><span class="n">ai</span><span class="p">,</span> <span class="n">aj</span><span class="p">,</span> <span class="n">ak</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="s2">"sxyz"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return homogeneous rotation matrix from Euler angles and axis sequence.</span>
 
 <span class="sd">    Parameters</span>
@@ -524,7 +524,7 @@ document.write(`
 <span class="sd">    ak : float</span>
 <span class="sd">        Third Euler angle in radians.</span>
 <span class="sd">    axes : str or tuple, optional</span>
-<span class="sd">        One of 24 axis sequences as string or encoded tuple. Default is &#39;sxyz&#39;.</span>
+<span class="sd">        One of 24 axis sequences as string or encoded tuple. Default is 'sxyz'.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -539,7 +539,7 @@ document.write(`
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import numpy</span>
-<span class="sd">    &gt;&gt;&gt; R = euler_matrix(1, 2, 3, axes=&#39;syxz&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; R = euler_matrix(1, 2, 3, axes='syxz')</span>
 <span class="sd">    &gt;&gt;&gt; numpy.allclose(numpy.sum(R[0]), -1.34786452)</span>
 <span class="sd">    True</span>
 <span class="sd">    &gt;&gt;&gt; R = euler_matrix(1, 2, 3, axes=(0, 1, 0, 1))</span>
@@ -550,7 +550,7 @@ document.write(`
 <span class="sd">    ...    _ = euler_matrix(ai, aj, ak, axes=axes)</span>
 <span class="sd">    &gt;&gt;&gt; for axes in _TUPLE2AXES.keys():</span>
 <span class="sd">    ...    _ = euler_matrix(ai, aj, ak, axes=axes)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">firstaxis</span><span class="p">,</span> <span class="n">parity</span><span class="p">,</span> <span class="n">repetition</span><span class="p">,</span> <span class="n">frame</span> <span class="o">=</span> <span class="n">_AXES2TUPLE</span><span class="p">[</span><span class="n">axes</span><span class="p">]</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">):</span>
@@ -598,7 +598,7 @@ document.write(`
 <div class="viewcode-block" id="sphere2cart">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.sphere2cart">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">sphere2cart</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert spherical coordinates to Cartesian coordinates.</span>
 
 <span class="sd">    Parameters</span>
@@ -635,8 +635,8 @@ document.write(`
 <span class="sd">    the angle between the projection of P onto the XY plane, and the X</span>
 <span class="sd">    axis.</span>
 
-<span class="sd">    Geographical nomenclature designates theta as &#39;co-latitude&#39;, and phi</span>
-<span class="sd">    as &#39;longitude&#39;.</span>
+<span class="sd">    Geographical nomenclature designates theta as 'co-latitude', and phi</span>
+<span class="sd">    as 'longitude'.</span>
 
 <span class="sd">    See these pages for more details:</span>
 <span class="sd">    * http://en.wikipedia.org/wiki/Spherical_coordinate_system</span>
@@ -645,7 +645,7 @@ document.write(`
 <span class="sd">    We have deliberately named this function ``sphere2cart`` rather than</span>
 <span class="sd">    ``sph2cart`` to distinguish it from the Matlab function of that</span>
 <span class="sd">    name, which uses a different convention.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">sin_theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin_theta</span>
     <span class="n">y</span> <span class="o">=</span> <span class="n">r</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin_theta</span>
@@ -658,7 +658,7 @@ document.write(`
 <div class="viewcode-block" id="cart2sphere">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.cart2sphere">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cart2sphere</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-<span class="w">    </span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">    Convert Cartesian coordinates to spherical coordinates.</span>
 
 <span class="sd">    Parameters</span>
@@ -687,7 +687,7 @@ document.write(`
 <span class="sd">    $0\le\theta\mathrm{(theta)}\le\pi$ and $-\pi\le\phi\mathrm{(phi)}\le\pi$</span>
 
 <span class="sd">    See sphere2cart for detailed description of the coordinate convention.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="o">*</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="o">*</span> <span class="n">z</span><span class="p">)</span>
     <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span>
         <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">where</span><span class="o">=</span><span class="n">r</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">))</span>
@@ -700,7 +700,7 @@ document.write(`
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_apply_actor_transform</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Apply a transformation matrix to an actor based on the given mode.</span>
 
 <span class="sd">    Parameters</span>
@@ -714,18 +714,18 @@ document.write(`
 <span class="sd">        `relative` or `absolute`.</span>
 <span class="sd">        - The `relative` transformation multiplies the current transformation matrix</span>
 <span class="sd">        with the new matrix.</span>
-<span class="sd">        - The `absolute` transformation sets the actor&#39;s transformation matrix to the</span>
+<span class="sd">        - The `absolute` transformation sets the actor's transformation matrix to the</span>
 <span class="sd">        new matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">actor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span>
 
-    <span class="k">if</span> <span class="n">transfomation_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;relative&quot;</span><span class="p">,</span> <span class="s2">&quot;absolute&quot;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">transfomation_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"relative"</span><span class="p">,</span> <span class="s2">"absolute"</span><span class="p">]:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;transfomation_type should be either `relative` or `absolute`.&quot;</span>
+            <span class="s2">"transfomation_type should be either `relative` or `absolute`."</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">transfomation_type</span> <span class="o">==</span> <span class="s2">&quot;relative&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">transfomation_type</span> <span class="o">==</span> <span class="s2">"relative"</span><span class="p">:</span>
         <span class="n">actor</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span> <span class="o">@</span> <span class="n">actor</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">actor</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">matrix</span> <span class="o">=</span> <span class="n">matrix</span>
@@ -733,8 +733,8 @@ document.write(`
 
 <div class="viewcode-block" id="translate">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.translate">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">translate</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">&quot;relative&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">translate</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">"relative"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a transformation matrix for translation.</span>
 
 <span class="sd">    Parameters</span>
@@ -748,7 +748,7 @@ document.write(`
 <span class="sd">        `relative` or `absolute`.</span>
 <span class="sd">        - The `relative` transformation multiplies the current transformation matrix</span>
 <span class="sd">        with the new translation matrix.</span>
-<span class="sd">        - The `absolute` transformation sets the actor&#39;s transformation matrix to the</span>
+<span class="sd">        - The `absolute` transformation sets the actor's transformation matrix to the</span>
 <span class="sd">        new translation matrix.</span>
 
 <span class="sd">    Returns</span>
@@ -767,7 +767,7 @@ document.write(`
 <span class="sd">           [0.  , 1.  , 0.  , 0.2 ],</span>
 <span class="sd">           [0.  , 0.  , 1.  , 0.25],</span>
 <span class="sd">           [0.  , 0.  , 0.  , 1.  ]])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">iden</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">translation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">translation</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
@@ -785,8 +785,8 @@ document.write(`
 
 <div class="viewcode-block" id="rotate">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.rotate">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">rotate</span><span class="p">(</span><span class="n">quat</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">&quot;relative&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">rotate</span><span class="p">(</span><span class="n">quat</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">"relative"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a transformation matrix for rotation using quaternion.</span>
 
 <span class="sd">    Parameters</span>
@@ -800,7 +800,7 @@ document.write(`
 <span class="sd">        `relative` or `absolute`.</span>
 <span class="sd">        - The `relative` transformation multiplies the current transformation matrix</span>
 <span class="sd">        with the new rotation matrix.</span>
-<span class="sd">        - The `absolute` transformation sets the actor&#39;s transformation matrix to the</span>
+<span class="sd">        - The `absolute` transformation sets the actor's transformation matrix to the</span>
 <span class="sd">        new rotation matrix.</span>
 
 <span class="sd">    Returns</span>
@@ -818,7 +818,7 @@ document.write(`
 <span class="sd">           [ 0.        ,  0.86586979, -0.50026944,  0.        ],</span>
 <span class="sd">           [ 0.        ,  0.50026944,  0.86586979,  0.        ],</span>
 <span class="sd">           [ 0.        ,  0.        ,  0.        ,  1.        ]])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">iden</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="n">rotation_mat</span> <span class="o">=</span> <span class="n">Rot</span><span class="o">.</span><span class="n">from_quat</span><span class="p">(</span><span class="n">quat</span><span class="p">)</span><span class="o">.</span><span class="n">as_matrix</span><span class="p">()</span>
 
@@ -835,8 +835,8 @@ document.write(`
 
 <div class="viewcode-block" id="scale">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.scale">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">&quot;relative&quot;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">scale</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">actor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transfomation_type</span><span class="o">=</span><span class="s2">"relative"</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Create a transformation matrix for scaling.</span>
 
 <span class="sd">    Parameters</span>
@@ -850,7 +850,7 @@ document.write(`
 <span class="sd">        `relative` or `absolute`.</span>
 <span class="sd">        - The `relative` transformation multiplies the current transformation matrix</span>
 <span class="sd">        with the new scaling matrix.</span>
-<span class="sd">        - The `absolute` transformation sets the actor&#39;s transformation matrix</span>
+<span class="sd">        - The `absolute` transformation sets the actor's transformation matrix</span>
 <span class="sd">        to the new scaling matrix.</span>
 
 <span class="sd">    Returns</span>
@@ -868,7 +868,7 @@ document.write(`
 <span class="sd">           [0. , 1. , 0. , 0. ],</span>
 <span class="sd">           [0. , 0. , 0.5, 0. ],</span>
 <span class="sd">           [0. , 0. , 0. , 1. ]])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">scale_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
     <span class="n">scales</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scales</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
@@ -883,7 +883,7 @@ document.write(`
 <div class="viewcode-block" id="apply_transformation">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.apply_transformation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">apply_transformation</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">transformation</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Apply transformation matrix to vertices.</span>
 
 <span class="sd">    Parameters</span>
@@ -903,7 +903,7 @@ document.write(`
 <span class="sd">    This function multiplies the transformation matrix with the vertices to</span>
 <span class="sd">    transform them in 3D space. The vertices are converted to homogeneous</span>
 <span class="sd">    coordinates before multiplication.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="n">vertices</span><span class="o">.</span><span class="n">shape</span>
     <span class="n">temp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">vertices</span><span class="p">,</span> <span class="n">temp</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -919,7 +919,7 @@ document.write(`
 <div class="viewcode-block" id="transform_from_matrix">
 <a class="viewcode-back" href="../../reference/fury.transform.html#fury.transform.transform_from_matrix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">transform_from_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Decompose transformation matrix into components.</span>
 
 <span class="sd">    Parameters</span>
@@ -943,7 +943,7 @@ document.write(`
 <span class="sd">    the matrix, calculates the scale by computing the norm of each of the</span>
 <span class="sd">    first three columns, and then derives the rotation matrix after</span>
 <span class="sd">    normalizing for scale.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">translate</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,))[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="n">temp</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">][:</span><span class="mi">3</span><span class="p">]</span>
