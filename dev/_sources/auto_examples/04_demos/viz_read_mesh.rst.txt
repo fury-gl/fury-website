@@ -209,19 +209,18 @@ Fetch the sample data assets via polyxios.
 
 
 
+
+
 .. rst-class:: sphx-glr-script-out
 
-.. code-block:: pytb
+ .. code-block:: none
 
-    Traceback (most recent call last):
-      File "/home/runner/work/fury/fury/docs/examples_revamped/04_demos/viz_read_mesh.py", line 147, in <module>
-        human_path = px.fetch("Human.vtp")
-                     ^^^^^^^^^^^^^^^^^^^^^
-      File "/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/polyxios/fetcher.py", line 142, in fetch
-        _download_and_extract_zip(subfolder)
-      File "/opt/hostedtoolcache/Python/3.12.13/x64/lib/python3.12/site-packages/polyxios/fetcher.py", line 94, in _download_and_extract_zip
-        raise FetcherError(
-    polyxios.exceptions.FetcherError: Release package 'vtp.zip' was not found on remote server.
+    Fetching Human.vtp: [#-----------------------------] 3.8%    Fetching Human.vtp: [##----------------------------] 7.5%    Fetching Human.vtp: [###---------------------------] 11.3%    Fetching Human.vtp: [####--------------------------] 15.0%    Fetching Human.vtp: [#####-------------------------] 18.8%    Fetching Human.vtp: [######------------------------] 22.5%    Fetching Human.vtp: [#######-----------------------] 26.3%    Fetching Human.vtp: [#########---------------------] 30.0%    Fetching Human.vtp: [##########--------------------] 33.8%    Fetching Human.vtp: [###########-------------------] 37.5%    Fetching Human.vtp: [############------------------] 41.3%    Fetching Human.vtp: [#############-----------------] 45.0%    Fetching Human.vtp: [##############----------------] 48.8%    Fetching Human.vtp: [###############---------------] 52.5%    Fetching Human.vtp: [################--------------] 56.3%    Fetching Human.vtp: [##################------------] 60.0%    Fetching Human.vtp: [###################-----------] 63.8%    Fetching Human.vtp: [####################----------] 67.5%    Fetching Human.vtp: [#####################---------] 71.3%    Fetching Human.vtp: [######################--------] 75.0%    Fetching Human.vtp: [#######################-------] 78.8%    Fetching Human.vtp: [########################------] 82.5%    Fetching Human.vtp: [#########################-----] 86.3%    Fetching Human.vtp: [###########################---] 90.0%    Fetching Human.vtp: [############################--] 93.8%    Fetching Human.vtp: [#############################-] 97.5%    Fetching Human.vtp: [##############################] 100.0%
+    Fetching hello.vtk: [##############################] 100.0%
+    Fetching star.mesh: [##############################] 100.0%
+    Human.vtp (Mesh): 17665 vertices, 34660 faces
+    hello.vtk (Lines): 30 vertices across 15 lines
+    star.mesh (Points): 31 points
 
 
 
@@ -242,6 +241,12 @@ so it faces the camera.
     mesh_actor.rotate((-90, 180, 0))
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 170-171
 
 Place the three actors side by side (Left, Center, Right) to avoid overlapping.
@@ -253,6 +258,12 @@ Place the three actors side by side (Left, Center, Right) to avoid overlapping.
     mesh_actor.local.position = (-3.0, 0.0, 0.0)
     line_actor.local.position = (0.0, 0.0, 0.0)
     point_actor.local.position = (3.0, 0.0, 0.0)
+
+
+
+
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 176-177
@@ -272,6 +283,12 @@ Add matching 3D text labels directly beneath each of the three objects.
     )
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 186-187
 
 Set up the 3D scene and register all visual elements.
@@ -285,6 +302,12 @@ Set up the 3D scene and register all visual elements.
     scene.add(line_actor)
     scene.add(point_actor)
     scene.add(labels_actor)
+
+
+
+
+
+
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 194-195
@@ -314,6 +337,12 @@ Add a 2D text HUD overlay detailing what each object represents.
     scene.add(hud_label)
 
 
+
+
+
+
+
+
 .. GENERATED FROM PYTHON SOURCE LINES 214-216
 
 Initialize the ShowManager, frame the camera to fit the wider 3-element layout,
@@ -334,9 +363,20 @@ and initialize the rendering window loop.
     show_m.start()
 
 
+
+.. image-sg:: /auto_examples/04_demos/images/sphx_glr_viz_read_mesh_001.png
+   :alt: viz read mesh
+   :srcset: /auto_examples/04_demos/images/sphx_glr_viz_read_mesh_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.311 seconds)
+   **Total running time of the script:** (0 minutes 1.259 seconds)
 
 
 .. _sphx_glr_download_auto_examples_04_demos_viz_read_mesh.py:
