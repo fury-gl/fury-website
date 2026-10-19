@@ -64,7 +64,7 @@ thing you notice:
 
     from fury.data import fetch_viz_cubemaps, read_viz_cubemap
     from fury.io import load_cube_map_texture
-    from fury.lib import AmbientLight, Buffer, DirectionalLight
+    from fury.lib import AmbientLight, DirectionalLight
     from fury.ui import LineSlider2D, TabUI, TextBlock2D, TextButton2D
     from fury.window import Scene, ShowManager
     import fury.actor as actor
@@ -195,7 +195,7 @@ good, and their sliders -- along with every preset that leans on them -- move
 without changing a pixel. Flooring them at a value far too small to see keeps
 each branch in the shader, ready for the slider to drive.
 
-.. GENERATED FROM PYTHON SOURCE LINES 121-144
+.. GENERATED FROM PYTHON SOURCE LINES 121-155
 
 .. code-block:: Python
 
@@ -211,111 +211,23 @@ each branch in the shader, ready for the slider to drive.
         return value
 
 
-    sphere_actor = actor.sphere(
-        np.zeros((1, 3)),
-        colors=(0.97, 0.96, 0.92),
-        radii=8.0,
+    # The public factory supplies smooth radial normals, split UV endpoints and
+    # pole-safe tangents. Without an image, material color and environment reflections
+    # remain in control, including when anisotropy is enabled by a preset.
+    sphere_actor = actor.texture_on_sphere(
         phi=96,
         theta=96,
-        impostor=False,
         material="physical",
         material_params={name: gated(name, value) for name, value in INITIAL.items()},
     )
-    sphere_actor.material.flat_shading = False
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 145-149
-
-``actor.sphere`` bakes the colour into a vertex buffer. Switching the material
-to ``color_mode="auto"`` hands control to ``material.color`` instead, so the
-presets below can restage the sphere -- a metal, a dark bubble, a dyed cloth --
-rather than only nudging its reflectance.
-
-.. GENERATED FROM PYTHON SOURCE LINES 149-158
-
-.. code-block:: Python
-
+    sphere_actor.local.scale = 8.0
 
     # Silver: near-white reflectance, very slightly warm. On a metal the base
     # colour *is* the reflectance, so this is what tints every reflection.
     BASE_COLOR = (0.97, 0.96, 0.92, 1.0)
-    sphere_actor.material.color_mode = "auto"
     sphere_actor.material.color = BASE_COLOR
     sphere_actor.material.sheen_color = (1.0, 1.0, 1.0)
     sphere_actor.material.emissive = (0.35, 0.12, 0.5)
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 159-168
-
-``prim_sphere`` closes the sphere by repeating its first column of vertices at
-longitude +180, so the seam is two coincident rows of *separate* vertices.
-Handed no normals, pygfx averages the face normals meeting at each vertex, and
-each copy of the seam only sees the faces on its own side -- the two disagree
-by half a segment, 5 degrees at the resolution used here. On something mirror
-smooth that reads as the reflection being cut and shoved sideways down one
-meridian, round the back of the default view. A sphere's normals are known
-exactly, so hand them over rather than let them be inferred: centred on the
-origin, the normal is the normalised position.
-
-.. GENERATED FROM PYTHON SOURCE LINES 168-173
-
-.. code-block:: Python
-
-
-    unit = sphere_actor.geometry.positions.data
-    unit = unit / np.linalg.norm(unit, axis=1, keepdims=True)
-    sphere_actor.geometry.normals = Buffer(unit.astype(np.float32))
-
-
-
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 174-193
-
-Anisotropy stretches the highlight along the surface's tangent direction, and
-something has to supply that direction. With nothing else to go on pygfx
-derives it from the screen-space derivatives of the texture coordinates, which
-are constant across a triangle -- so the highlight breaks into facets -- and
-which jump a whole turn where the longitude wraps, drawing a bright seam down
-the sphere. It also cannot read the 3-component texcoords ``actor.sphere``
-leaves behind, and fails shader validation outright.
-
-A ``tangents`` attribute replaces all of that guesswork. The direction wanted
-is the one along which longitude increases, ``cross(up, n)`` normalised, which
-works out as ``(cos, 0, -sin)`` of the longitude alone. Taking it from the
-longitude rather than from the cross product matters at the poles: there the
-cross product vanishes and has to be replaced by something, and any single
-stand-in direction leaves the fan triangle on the far side interpolating its
-tangent from that stand-in to its opposite -- straight through zero, which
-collapses the tangent frame and lights a speck at each pole on every material.
-The longitude survives at the pole vertices, held in x and z at around 1e-16,
-so each copy still caps its own fan and the tangent stays well defined. The
-fourth component picks the handedness of the bitangent.
-
-.. GENERATED FROM PYTHON SOURCE LINES 193-204
-
-.. code-block:: Python
-
-
-    lon = np.arctan2(unit[:, 0], unit[:, 2])
-    tangents = np.column_stack([np.cos(lon), np.zeros_like(lon), -np.sin(lon)])
-    sphere_actor.geometry.tangents = Buffer(
-        np.column_stack([tangents, np.ones(len(tangents))]).astype(np.float32)
-    )
 
     scene.add(sphere_actor)
 
@@ -328,7 +240,7 @@ fourth component picks the handedness of the bitangent.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-213
+.. GENERATED FROM PYTHON SOURCE LINES 156-164
 
 Every control is one row: a label, a slider, and the value the slider prints.
 ``TABS`` is the whole specification -- tab title, then one entry per property
@@ -339,7 +251,7 @@ another property is a single line.
 upper bound of ``iridescence_thickness_range`` in nanometres: it is the film
 thickness that decides which colours the interference shifts towards.
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-325
+.. GENERATED FROM PYTHON SOURCE LINES 164-276
 
 .. code-block:: Python
 
@@ -462,7 +374,7 @@ thickness that decides which colours the interference shifts towards.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 326-334
+.. GENERATED FROM PYTHON SOURCE LINES 277-285
 
 Lay the rows out in a :class:`fury.ui.TabUI`. Grouping the fifteen properties
 into three tabs keeps the widget short enough to sit beside the sphere, and
@@ -473,7 +385,7 @@ content panel's top-left corner. Each slider prints its value just above the
 track, which is why the rows are spaced more generously than the text alone
 would need.
 
-.. GENERATED FROM PYTHON SOURCE LINES 334-389
+.. GENERATED FROM PYTHON SOURCE LINES 285-340
 
 .. code-block:: Python
 
@@ -539,13 +451,13 @@ would need.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 390-393
+.. GENERATED FROM PYTHON SOURCE LINES 341-344
 
 Presets. Each one restages the whole material so the property it is named for
 is the thing you notice, then pushes the new values back into the sliders so
 the panel keeps telling the truth.
 
-.. GENERATED FROM PYTHON SOURCE LINES 393-498
+.. GENERATED FROM PYTHON SOURCE LINES 344-449
 
 .. code-block:: Python
 
@@ -661,7 +573,7 @@ the panel keeps telling the truth.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 499-506
+.. GENERATED FROM PYTHON SOURCE LINES 450-457
 
 The buttons themselves. ``TextButton2D`` takes the same ``states`` mapping
 viz_button.py demonstrates -- one entry per state the button can resolve --
@@ -671,7 +583,7 @@ preset currently on the sphere stays in the accent colour. That last part is
 what ``is_toggle`` buys; the click handler switches the others off, which
 turns six independent buttons into one group with a current selection.
 
-.. GENERATED FROM PYTHON SOURCE LINES 506-575
+.. GENERATED FROM PYTHON SOURCE LINES 457-526
 
 .. code-block:: Python
 
@@ -751,7 +663,7 @@ turns six independent buttons into one group with a current selection.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 576-584
+.. GENERATED FROM PYTHON SOURCE LINES 527-535
 
 Frame the sphere with ``camera.show_object``. That does more than place the
 camera: it also leaves the controller orbiting about the sphere, so dragging
@@ -762,7 +674,7 @@ The default camera light stays on. Turning it off leaves the skybox as the
 only illumination, which looks fine for metals but flattens sheen to almost
 nothing -- a retroreflective lobe needs a light near the viewer to show up.
 
-.. GENERATED FROM PYTHON SOURCE LINES 584-595
+.. GENERATED FROM PYTHON SOURCE LINES 535-546
 
 .. code-block:: Python
 
@@ -784,11 +696,11 @@ nothing -- a retroreflective lobe needs a light near the viewer to show up.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 596-597
+.. GENERATED FROM PYTHON SOURCE LINES 547-548
 
 Keep the tab widget anchored to the top-left corner as the window is resized.
 
-.. GENERATED FROM PYTHON SOURCE LINES 597-607
+.. GENERATED FROM PYTHON SOURCE LINES 548-558
 
 .. code-block:: Python
 
@@ -817,7 +729,7 @@ Keep the tab widget anchored to the top-left corner as the window is resized.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.386 seconds)
+   **Total running time of the script:** (0 minutes 1.170 seconds)
 
 
 .. _sphx_glr_download_auto_examples_04_demos_viz_pbr_interactive.py:

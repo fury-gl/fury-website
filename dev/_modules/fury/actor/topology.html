@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.topology &#8212; FURY 2.1.0.dev72+g6ee6ac5db documentation</title>
+    <title>fury.actor.topology &#8212; FURY 2.1.0.dev74+gffd582b7a documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=95f3a34b"></script>
+    <script src="../../../_static/documentation_options.js?v=91f8ff20"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -478,8 +478,10 @@ document.write(`
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span><span class="p">,</span> <span class="n">create_mesh</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.colormap</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_colors</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">buffer_to_geometry</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span><span class="p">,</span> <span class="n">load_image_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Texture</span><span class="p">,</span> <span class="n">TextureMap</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.material</span><span class="w"> </span><span class="kn">import</span> <span class="n">_create_mesh_material</span><span class="p">,</span> <span class="n">validate_opacity</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.primitive</span><span class="w"> </span><span class="kn">import</span> <span class="n">prim_sphere</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_planar_uvs</span><span class="p">,</span> <span class="n">voxel_mesh_by_object</span>
 
 
@@ -519,7 +521,8 @@ document.write(`
 <span class="sd">        A per-vertex ``(N, 3)``/``(N, 4)`` array, or a single color as a hex</span>
 <span class="sd">        string, RGB(A) in [0, 1], or RGB(A) in [0, 255].</span>
 <span class="sd">    texture : str, optional</span>
-<span class="sd">        Path to the texture image file.</span>
+<span class="sd">        Path to the texture image file. For spherical imagery, use</span>
+<span class="sd">        :func:`texture_on_sphere`.</span>
 <span class="sd">    texture_axis : str, optional</span>
 <span class="sd">        The axis to generate UV coordinates for the texture. Options are 'xy', 'yz',</span>
 <span class="sd">        and 'xz'. This option only works with texture is passed.</span>
@@ -624,6 +627,147 @@ document.write(`
 
     <span class="n">obj</span> <span class="o">=</span> <span class="n">create_mesh</span><span class="p">(</span><span class="n">geo</span><span class="p">,</span> <span class="n">mat</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">obj</span></div>
+
+
+
+<div class="viewcode-block" id="texture_on_sphere">
+<a class="viewcode-back" href="../../../reference/fury.actor.html#fury.actor.texture_on_sphere">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">texture_on_sphere</span><span class="p">(</span>
+    <span class="n">texture</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">theta</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">phi</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">interpolation</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">"phong"</span><span class="p">,</span>
+    <span class="n">material_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Map an equirectangular image onto a smooth unit sphere.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    texture : str, os.PathLike or ndarray, optional</span>
+<span class="sd">        Local image filename or uint8 RGB/RGBA array of shape (H, W, 3) or</span>
+<span class="sd">        (H, W, 4). None leaves the material color and environment in control.</span>
+<span class="sd">    theta : int, optional</span>
+<span class="sd">        Number of longitude segments, at least 3.</span>
+<span class="sd">    phi : int, optional</span>
+<span class="sd">        Number of latitude segments, at least 3.</span>
+<span class="sd">    interpolation : str, optional</span>
+<span class="sd">        Image sampling method, either 'linear' or 'nearest'.</span>
+<span class="sd">    material : str, optional</span>
+<span class="sd">        Mesh material: 'phong', 'basic', 'standard' or 'physical'.</span>
+<span class="sd">    material_params : dict, optional</span>
+<span class="sd">        Extra material properties, including PBR parameters. See</span>
+<span class="sd">        :func:`fury.material._create_mesh_material`.</span>
+<span class="sd">    opacity : float, optional</span>
+<span class="sd">        Opacity from 0 (transparent) to 1 (opaque).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Mesh</span>
+<span class="sd">        Origin-centered sphere of radius 1, with poles on the Y axis.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If the texture type or dtype is unsupported, or a resolution is not</span>
+<span class="sd">        an integer.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If an image is empty or not RGB/RGBA, a resolution is below 3, or</span>
+<span class="sd">        interpolation, material properties or opacity are invalid.</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the local image file does not exist.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    U increases around Y from the seam at -Z through +Z at U=0.5.</span>
+<span class="sd">    V runs from 0 at +Y to 1 at -Y; image rows are not flipped.</span>
+<span class="sd">    Separate UV endpoints, radial normals and pole-safe tangents avoid</span>
+<span class="sd">    geometric shading seams. The image's left and right edges must still</span>
+<span class="sd">    match for its content to appear continuous.</span>
+
+<span class="sd">    Use the mesh's ``local`` transform to change its radius or placement.</span>
+<span class="sd">    Smooth shading is used unless overridden in ``material_params``.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">    &gt;&gt;&gt; from fury import actor</span>
+<span class="sd">    &gt;&gt;&gt; image = np.full((32, 64, 3), 255, dtype=np.uint8)</span>
+<span class="sd">    &gt;&gt;&gt; globe = actor.texture_on_sphere(image)</span>
+<span class="sd">    &gt;&gt;&gt; globe.local.scale = 2.0</span>
+<span class="sd">    """</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">resolution</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"theta"</span><span class="p">,</span> <span class="n">theta</span><span class="p">),</span> <span class="p">(</span><span class="s2">"phi"</span><span class="p">,</span> <span class="n">phi</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolution</span><span class="p">,</span> <span class="p">(</span><span class="nb">bool</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">resolution</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">integer</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be an integer."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">resolution</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be at least 3."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">interpolation</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"linear"</span><span class="p">,</span> <span class="s2">"nearest"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"interpolation must be 'linear' or 'nearest'."</span><span class="p">)</span>
+
+    <span class="n">texture_map</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">texture</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">texture</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">)):</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">texture</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Texture file '</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">' not found."</span><span class="p">)</span>
+            <span class="n">pixels</span> <span class="o">=</span> <span class="n">load_image</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">texture</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">pixels</span> <span class="o">=</span> <span class="n">texture</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"texture must be a local filename or NumPy array."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pixels</span><span class="o">.</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"texture must have dtype uint8."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">pixels</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">3</span>
+            <span class="ow">or</span> <span class="n">pixels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="n">pixels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+            <span class="ow">or</span> <span class="n">pixels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"texture must have nonempty shape (H, W, 3) or (H, W, 4)."</span><span class="p">)</span>
+        <span class="n">texture_map</span> <span class="o">=</span> <span class="n">TextureMap</span><span class="p">(</span>
+            <span class="n">Texture</span><span class="p">(</span><span class="n">pixels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">generate_mipmaps</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+            <span class="nb">filter</span><span class="o">=</span><span class="n">interpolation</span><span class="p">,</span>
+            <span class="n">wrap_s</span><span class="o">=</span><span class="s2">"repeat"</span><span class="p">,</span>
+            <span class="n">wrap_t</span><span class="o">=</span><span class="s2">"clamp"</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span> <span class="o">=</span> <span class="n">prim_sphere</span><span class="p">(</span><span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">theta</span><span class="o">=</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">normals</span> <span class="o">=</span> <span class="p">(</span><span class="n">vertices</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">float32</span>
+    <span class="p">)</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">texcoords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">phi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">texcoords</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u</span>
+    <span class="n">texcoords</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">phi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">]</span>
+
+    <span class="n">longitude</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">u</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>
+    <span class="n">tangents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">phi</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">theta</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">tangents</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">longitude</span><span class="p">)</span>
+    <span class="n">tangents</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">tangents</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">longitude</span><span class="p">)</span>
+    <span class="c1"># cross(normal, tangent) points north; image V increases southward.</span>
+    <span class="n">tangents</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">geometry</span> <span class="o">=</span> <span class="n">buffer_to_geometry</span><span class="p">(</span>
+        <span class="n">positions</span><span class="o">=</span><span class="n">vertices</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+        <span class="n">indices</span><span class="o">=</span><span class="n">faces</span><span class="p">,</span>
+        <span class="n">normals</span><span class="o">=</span><span class="n">normals</span><span class="p">,</span>
+        <span class="n">texcoords</span><span class="o">=</span><span class="n">texcoords</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="n">tangents</span><span class="o">=</span><span class="n">tangents</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"flat_shading"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="p">(</span><span class="n">material_params</span> <span class="ow">or</span> <span class="p">{})}</span>
+    <span class="n">mesh_material</span> <span class="o">=</span> <span class="n">_create_mesh_material</span><span class="p">(</span>
+        <span class="n">material</span><span class="o">=</span><span class="n">material</span><span class="p">,</span>
+        <span class="n">texture</span><span class="o">=</span><span class="n">texture_map</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">"auto"</span><span class="p">,</span>
+        <span class="n">opacity</span><span class="o">=</span><span class="n">opacity</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">params</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">create_mesh</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="n">mesh_material</span><span class="p">)</span></div>
 
 
 

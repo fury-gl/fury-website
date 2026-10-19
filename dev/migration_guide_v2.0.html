@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="FURY" />
 <meta name="description" content="This document catalogs all user-level API changes introduced between FURY 0.12.x and the master branch (targeting FURY v2.0.0). Every entry is grounded in the actual source code and the official re..." />
 
-    <title>Migration Guide: FURY 0.12.0 → v2.0.0 &#8212; FURY 2.1.0.dev72+g6ee6ac5db documentation</title>
+    <title>Migration Guide: FURY 0.12.0 → v2.0.0 &#8212; FURY 2.1.0.dev74+gffd582b7a documentation</title>
   
   
   
@@ -51,7 +51,7 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="_static/documentation_options.js?v=95f3a34b"></script>
+    <script src="_static/documentation_options.js?v=91f8ff20"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -635,7 +635,7 @@ the following sub-modules:</p>
 <code class="docutils literal notranslate"><span class="pre">vector_field</span></code>, <code class="docutils literal notranslate"><span class="pre">vector_field_slicer</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">topology.py</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">contour_from_volume</span></code>, <code class="docutils literal notranslate"><span class="pre">surface</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">contour_from_volume</span></code>, <code class="docutils literal notranslate"><span class="pre">surface</span></code>, <code class="docutils literal notranslate"><span class="pre">texture_on_sphere</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bio.py</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">contour_from_roi</span></code>, <code class="docutils literal notranslate"><span class="pre">contour_from_label</span></code>, <code class="docutils literal notranslate"><span class="pre">peaks_slicer</span></code>,
@@ -751,10 +751,13 @@ affine support <a class="reference external" href="https://github.com/fury-gl/fu
 <td><p>Same name in 0.12.x; rewritten on PyGfx <a class="reference external" href="https://github.com/fury-gl/fury/pull/997/">PR #997</a>,
 <a class="reference external" href="https://github.com/fury-gl/fury/pull/1040/">PR #1040</a></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">actor.contour_from_roi</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">actor.texture_on_sphere</span></code></p></td>
+<td><p>Same name in 0.12.x; rewritten on PyGfx / WGPU <a class="reference external" href="https://github.com/fury-gl/fury/pull/1370/">PR #1370</a></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">actor.contour_from_roi</span></code></p></td>
 <td><p>Same name in 0.12.x; rewritten on PyGfx <a class="reference external" href="https://github.com/fury-gl/fury/pull/1053/">PR #1053</a></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">actor.sph_glyph</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">actor.sph_glyph</span></code></p></td>
 <td><p>Generalizes/replaces 0.12.x’s <code class="docutils literal notranslate"><span class="pre">odf</span></code> and <code class="docutils literal notranslate"><span class="pre">odf_slicer</span></code> for
 arbitrary spherical-harmonics glyphs <a class="reference external" href="https://github.com/fury-gl/fury/pull/1009/">PR #1009</a></p></td>
 </tr>
@@ -762,6 +765,42 @@ arbitrary spherical-harmonics glyphs <a class="reference external" href="https:/
 </table>
 <p>The <code class="docutils literal notranslate"><span class="pre">actor.image</span></code> actor now supports directional parameters.
 (Ref: <a class="reference external" href="https://github.com/fury-gl/fury/pull/1001/">PR #1001</a>)</p>
+<section id="texture-on-sphere-images-and-pbr-spheres">
+<h3><code class="docutils literal notranslate"><span class="pre">texture_on_sphere</span></code>: images and PBR spheres<a class="headerlink" href="#texture-on-sphere-images-and-pbr-spheres" title="Link to this heading">#</a></h3>
+<p><strong>Summary</strong> (Ref: <a class="reference external" href="https://github.com/fury-gl/fury/pull/1370/">PR #1370</a>)</p>
+<p><code class="docutils literal notranslate"><span class="pre">actor.texture_on_sphere</span></code> now returns a PyGfx-backed FURY <code class="docutils literal notranslate"><span class="pre">Mesh</span></code>.
+Rename <code class="docutils literal notranslate"><span class="pre">rgb</span></code> to <code class="docutils literal notranslate"><span class="pre">texture</span></code> and replace <code class="docutils literal notranslate"><span class="pre">interpolate=True/False</span></code> with
+<code class="docutils literal notranslate"><span class="pre">interpolation=&quot;linear&quot;/&quot;nearest&quot;</span></code>. Positional uint8 RGB/RGBA arrays remain
+supported.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># FURY 0.12.x</span>
+<span class="n">globe</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span><span class="p">(</span><span class="n">rgb</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># FURY 2.0</span>
+<span class="n">globe</span> <span class="o">=</span> <span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span><span class="p">(</span><span class="n">texture</span><span class="o">=</span><span class="n">image</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s2">"linear"</span><span class="p">)</span>
+<span class="n">globe</span><span class="o">.</span><span class="n">opacity</span> <span class="o">=</span> <span class="mf">0.8</span>
+<span class="n">globe</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Sphere resolution naming is now consistent: <code class="docutils literal notranslate"><span class="pre">primitive.prim_sphere</span></code>,
+<code class="docutils literal notranslate"><span class="pre">actor.texture_on_sphere</span></code>, and the mesh branches of <code class="docutils literal notranslate"><span class="pre">actor.sphere</span></code> and
+<code class="docutils literal notranslate"><span class="pre">actor.ellipsoid</span></code> use <code class="docutils literal notranslate"><span class="pre">phi</span></code> for latitude segments and <code class="docutils literal notranslate"><span class="pre">theta</span></code> for
+longitude segments. Sphere and ellipsoid impostors ignore these tessellation
+controls.</p>
+<p>In 0.12, <code class="docutils literal notranslate"><span class="pre">prim_sphere</span></code> implemented the opposite of its documentation and
+the VTK actors. Swap unequal <code class="docutils literal notranslate"><span class="pre">phi</span></code>/<code class="docutils literal notranslate"><span class="pre">theta</span></code> values only in code relying
+on that reversed procedural behavior, including the pre-correction PyGfx
+mesh actors, to preserve angular resolution. This is not required for all
+VTK actor callers. Equal values need no change.</p>
+<p>Custom <code class="docutils literal notranslate"><span class="pre">actor.sph_glyph</span></code> tuples follow the same convention:
+<code class="docutils literal notranslate"><span class="pre">sphere=(a,</span> <span class="pre">b)</span></code> means <code class="docutils literal notranslate"><span class="pre">a</span></code> latitude segments and <code class="docutils literal notranslate"><span class="pre">b</span></code> longitude segments.
+Callers relying on pre-correction PyGfx sampling must use <code class="docutils literal notranslate"><span class="pre">sphere=(b,</span> <span class="pre">a)</span></code>
+to preserve the former angular resolution when the values differ. Named
+spheres and equal tuple values need no change.</p>
+<p>The sphere now has radius <strong>1</strong> and Y-axis poles, versus radius <strong>0.5</strong>
+and Z-axis poles in VTK. Use <code class="docutils literal notranslate"><span class="pre">globe.local.scale</span> <span class="pre">=</span> <span class="pre">0.5</span></code> for the old radius.
+See <a class="reference internal" href="reference/fury.actor.html#fury.actor.texture_on_sphere" title="fury.actor.texture_on_sphere"><code class="xref py py-func docutils literal notranslate"><span class="pre">fury.actor.texture_on_sphere()</span></code></a> for image orientation, filename
+inputs and PBR material options.</p>
+</section>
 </section>
 <section id="slicer-api-get-slices-show-slices">
 <h2>7. Slicer API: <code class="docutils literal notranslate"><span class="pre">get_slices</span></code> / <code class="docutils literal notranslate"><span class="pre">show_slices</span></code><a class="headerlink" href="#slicer-api-get-slices-show-slices" title="Link to this heading">#</a></h2>
@@ -1158,7 +1197,10 @@ v2.0.0 stabilization):</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actor-base-class-and-per-actor-transform-api">3. Actor Base Class and Per-Actor Transform API</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actor-module-restructuring">4. Actor Module Restructuring</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#actor-from-primitive-api">5. <code class="docutils literal notranslate"><span class="pre">actor_from_primitive</span></code> API</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#new-and-rewritten-actors-in-master">6. New and Rewritten Actors in master</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#new-and-rewritten-actors-in-master">6. New and Rewritten Actors in master</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#texture-on-sphere-images-and-pbr-spheres"><code class="docutils literal notranslate"><span class="pre">texture_on_sphere</span></code>: images and PBR spheres</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#slicer-api-get-slices-show-slices">7. Slicer API: <code class="docutils literal notranslate"><span class="pre">get_slices</span></code> / <code class="docutils literal notranslate"><span class="pre">show_slices</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fury-window-module">8. <code class="docutils literal notranslate"><span class="pre">fury.window</span></code> Module</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drag-events-pointer-drag">9. Drag Events (<code class="docutils literal notranslate"><span class="pre">POINTER_DRAG</span></code>)</a></li>
