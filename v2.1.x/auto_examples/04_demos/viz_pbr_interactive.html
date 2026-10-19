@@ -1,0 +1,1202 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta property="og:title" content="Interactive PBR Demo" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://fury.gl/latest/auto_examples/04_demos/viz_pbr_interactive.html" />
+<meta property="og:site_name" content="FURY" />
+<meta property="og:description" content="Physically based rendering (PBR) describes a surface by how it interacts with light rather than by an ad-hoc colour formula, so the same material reads convincingly under any lighting. This tutoria..." />
+<meta property="og:image" content="https://fury.gl/latest/_static/images/text-logo.png" />
+<meta property="og:image:alt" content="FURY" />
+<meta name="description" content="Physically based rendering (PBR) describes a surface by how it interacts with light rather than by an ad-hoc colour formula, so the same material reads convincingly under any lighting. This tutoria..." />
+
+    <title>Interactive PBR Demo &#8212; FURY 2.1.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/custom_github.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="../../_static/css/fury_theme.css?v=5dd5a9b7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../_static/documentation_options.js?v=1d3a154c"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'auto_examples/04_demos/viz_pbr_interactive';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.15.2';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://fury.gl/_static/versions_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v2.1.0';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner = false;
+        </script>
+    <link rel="canonical" href="https://fury.gl/latest/auto_examples/04_demos/viz_pbr_interactive.html" />
+    <link rel="icon" href="../../_static/logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Interactive 3D Flight Simulator in FURY" href="viz_flight_simulator.html" />
+    <link rel="prev" title="Vortex (Helical) Solar System Model" href="viz_helical_solar_system.html" /> 
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/> 
+<link
+  rel="alternate"
+  type="application/atom+xml"
+  href="../../blog/atom.xml"
+  title="Blog"
+/>
+  
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../_static/logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">FURY</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><!-- Overrides PyData theme's center navbar to explicitly curate navigation links. -->
+<ul class="bd-navbar-elements navbar-nav">
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../installation.html">Installation</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../index.html">Examples</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../reference/index.html">API</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../migration_guide_v2.0.html">Migration Guide</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../blog.html">Blog</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../community.html">Community</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../symlink/contributing.html">Contribute</a>
+  </li>
+</ul></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-2"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-2"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-2"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-2">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/fury-gl/fury" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><!-- Overrides PyData theme's center navbar to explicitly curate navigation links. -->
+<ul class="bd-navbar-elements navbar-nav">
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../installation.html">Installation</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../index.html">Examples</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../reference/index.html">API</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../migration_guide_v2.0.html">Migration Guide</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../blog.html">Blog</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../community.html">Community</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link nav-internal" href="../../symlink/contributing.html">Contribute</a>
+  </li>
+</ul></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<script>
+document.write(`
+  <div class="version-switcher__container dropdown">
+    <button id="pst-version-switcher-button-3"
+      type="button"
+      class="version-switcher__button btn btn-sm navbar-btn dropdown-toggle"
+      data-bs-toggle="dropdown"
+      aria-haspopup="listbox"
+      aria-controls="pst-version-switcher-list-3"
+      aria-label="Version switcher list"
+    >
+      Choose version  <!-- this text may get changed later by javascript -->
+      <span class="caret"></span>
+    </button>
+    <div id="pst-version-switcher-list-3"
+      class="version-switcher__menu dropdown-menu list-group-flush py-0"
+      role="listbox" aria-labelledby="pst-version-switcher-button-3">
+      <!-- dropdown will be populated by javascript on page load -->
+    </div>
+  </div>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/fury-gl/fury" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<h3><a href="../../index.html">Table of Contents</a></h3>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">About FURY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../blog.html">Blog</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Programming with FURY</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../migration_guide_v2.0.html">Migration guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../index.html#introductory">Introductory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#demos">Demos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../index.html#ui">UI</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html#animation">Animation</a></li>
+</ul>
+</li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../symlink/contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Join our community!</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../community.html">Contributors</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://discord.gg/6btFPPj">Discord Community</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://mail.python.org/mailman3/lists/fury.python.org">Mailing list</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury">Source Code</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">File a bug</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/fury-gl/fury/issues/new/choose">Feature Request</a></li>
+</ul>
+</div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Tutorials</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Demos</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Interactive PBR Demo</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                   <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-04-demos-viz-pbr-interactive-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="interactive-pbr-demo">
+<span id="sphx-glr-auto-examples-04-demos-viz-pbr-interactive-py"></span><h1>Interactive PBR Demo<a class="headerlink" href="#interactive-pbr-demo" title="Link to this heading">#</a></h1>
+<p>Physically based rendering (PBR) describes a surface by how it interacts with
+light rather than by an ad-hoc colour formula, so the same material reads
+convincingly under any lighting. This tutorial puts every property FURY’s
+<code class="docutils literal notranslate"><span class="pre">'physical'</span></code> material exposes on a slider, grouped into tabs, so you can watch
+each one act on a single sphere in real time.</p>
+<p>Most of the light here comes from the environment: a metal has no diffuse
+response, so what you see on it is the skybox reflected back. <code class="docutils literal notranslate"><span class="pre">Scene(skybox=...)</span></code>
+hands the cube map to the material as its <code class="docutils literal notranslate"><span class="pre">env_map</span></code> automatically. A single
+directional light sits on top of that, because <strong>sheen</strong> is retroreflective –
+it bounces light back towards wherever it came from, so with environment
+lighting alone its characteristic rim barely registers. It is a light in the
+scene rather than FURY’s default camera-mounted one: a light riding the camera
+keeps its highlight pinned to the same spot on the sphere however you orbit,
+which on a mirror reads as a headlamp instead of a reflection.</p>
+<p>Several properties only mean something on the right kind of surface, which is
+what the <strong>Presets</strong> tab is for – each preset moves the whole material,
+including the base colour, to a state where the effect it is named for is the
+thing you notice:</p>
+<ul class="simple">
+<li><p><strong>Index of refraction</strong> and <strong>specular intensity</strong> shape the reflectance of
+<em>dielectrics</em>. A metal takes its reflectance from the base colour instead, so
+at <code class="docutils literal notranslate"><span class="pre">Metalness</span> <span class="pre">=</span> <span class="pre">1</span></code> both are ignored outright and the render does not change
+by a single pixel. Pull Metalness to 0 and they come alive.</p></li>
+<li><p><strong>Sheen</strong> is a cloth layer: a retroreflective rim that reads on a rough
+dielectric, not on polished metal. It is also tinted by <code class="docutils literal notranslate"><span class="pre">sheen_color</span></code>, which
+defaults to black – a white tint at full strength simply bleaches the sphere.
+Try the <em>Velvet</em> preset.</p></li>
+<li><p><strong>Iridescence</strong> is a thin film whose interference colours are drowned by a
+saturated albedo. It needs a dark, smooth dielectric to show its rainbow
+shift. Try the <em>Soap bubble</em> preset.</p></li>
+</ul>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_viz_cubemaps</span><span class="p">,</span> <span class="n">read_viz_cubemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_cube_map_texture</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="n">AmbientLight</span><span class="p">,</span> <span class="n">DirectionalLight</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.ui</span><span class="w"> </span><span class="kn">import</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">LineSlider2D</span></a><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TabUI</span></a><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TextBlock2D</span></a><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TextButton2D</span></a>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.window</span><span class="w"> </span><span class="kn">import</span> <span class="n">Scene</span><span class="p">,</span> <span class="n">ShowManager</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">actor</span>
+</pre></div>
+</div>
+<p>Fetch a cube map and build the scene. The skybox is both the backdrop and,
+just as importantly, the light source for the material.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">fetch_viz_cubemaps</span><span class="p">()</span>
+<span class="n">cube_map</span> <span class="o">=</span> <span class="n">load_cube_map_texture</span><span class="p">(</span><span class="n">read_viz_cubemap</span><span class="p">(</span><span class="s2">&quot;skybox&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Dataset is already in place. If you want to fetch it again please first remove the folder C:\Users\magor\.fury\cubemaps
+</pre></div>
+</div>
+<p>The light. <code class="docutils literal notranslate"><span class="pre">camera_light=False</span></code> on the <code class="docutils literal notranslate"><span class="pre">ShowManager</span></code> below drops the
+default light that rides along with the camera, and this one takes its place,
+pointed from where the skybox’s own sun is so that the highlight it casts
+lands on the sun the sphere is already reflecting. Reading that direction off
+the cube map’s face layout gets the sign of x wrong; it was measured instead,
+by rendering a mirror sphere from several angles and looking for the light
+direction whose highlight sits on top of the reflected sun – 30 degrees up,
+and 60 degrees round from +Z towards -X. The sun’s glow in this cube map is
+a good ten degrees wide, so there is no more precision to be had than that.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">DirectionalLight</span></code> shines from its position towards its target, which is
+the origin by default, so the position is that direction pushed out beyond the
+sphere – distance does not matter to a directional light, only the direction
+it points. The payoff is a highlight that belongs to the scene: it stays with
+the reflection while the sphere is turned under it, so what the sliders do to
+a highlight can be watched from any angle.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SUN_DIRECTION</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="o">-</span><span class="mf">0.75</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.43</span><span class="p">])</span>
+
+<span class="n">sun</span> <span class="o">=</span> <span class="n">DirectionalLight</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s2">&quot;#fff4e0&quot;</span><span class="p">,</span> <span class="n">intensity</span><span class="o">=</span><span class="mf">3.0</span><span class="p">)</span>
+<span class="n">sun</span><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="mf">40.0</span> <span class="o">*</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SUN_DIRECTION</span></a><span class="p">)</span>
+
+<span class="c1"># Passing ``lights`` replaces the ambient light a bare ``Scene`` would add, so</span>
+<span class="c1"># put one back: it is what keeps the side facing away from the sun from going</span>
+<span class="c1"># flat black on the materials the environment map does not reach.</span>
+<span class="n">scene</span> <span class="o">=</span> <span class="n">Scene</span><span class="p">(</span><span class="n">skybox</span><span class="o">=</span><span class="n">cube_map</span><span class="p">,</span> <span class="n">lights</span><span class="o">=</span><span class="p">[</span><span class="n">AmbientLight</span><span class="p">(),</span> <span class="n">sun</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>The sphere itself. <code class="docutils literal notranslate"><span class="pre">material='physical'</span></code> selects pygfx’s
+<code class="docutils literal notranslate"><span class="pre">MeshPhysicalMaterial</span></code>, the superset that adds clearcoat, sheen, anisotropy
+and iridescence on top of the metallic-roughness workflow.</p>
+<p>Two of the properties below are modulated by a colour that defaults to black,
+which would make their sliders look broken: <code class="docutils literal notranslate"><span class="pre">sheen</span></code> is tinted by
+<code class="docutils literal notranslate"><span class="pre">sheen_color</span></code> and <code class="docutils literal notranslate"><span class="pre">emissive_intensity</span></code> scales <code class="docutils literal notranslate"><span class="pre">emissive</span></code>. Both colours
+are seeded here so the sliders have something to act on.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+    <span class="s2">&quot;ior&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+    <span class="s2">&quot;specular_intensity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;env_map&quot;</span><span class="p">:</span> <span class="n">cube_map</span><span class="p">,</span>
+    <span class="s2">&quot;env_map_intensity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;clearcoat&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;clearcoat_roughness&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;anisotropy&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;anisotropy_rotation&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;sheen&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;sheen_roughness&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="s2">&quot;iridescence&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="s2">&quot;iridescence_ior&quot;</span><span class="p">:</span> <span class="mf">1.3</span><span class="p">,</span>
+    <span class="s2">&quot;emissive_intensity&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Four of those properties – <code class="docutils literal notranslate"><span class="pre">clearcoat</span></code>, <code class="docutils literal notranslate"><span class="pre">sheen</span></code>, <code class="docutils literal notranslate"><span class="pre">anisotropy</span></code> and
+<code class="docutils literal notranslate"><span class="pre">iridescence</span></code> – are shader gates as much as they are values. pygfx compiles
+each of their branches into the shader only when the property is non-zero at
+the time the material is first drawn; a later write lands in the uniform
+buffer and never triggers a rebuild. Left at 0.0 they are compiled out for
+good, and their sliders – along with every preset that leans on them – move
+without changing a pixel. Flooring them at a value far too small to see keeps
+each branch in the shader, ready for the slider to drive.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SHADER_GATED</span></a> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;clearcoat&quot;</span><span class="p">,</span> <span class="s2">&quot;sheen&quot;</span><span class="p">,</span> <span class="s2">&quot;anisotropy&quot;</span><span class="p">,</span> <span class="s2">&quot;iridescence&quot;</span><span class="p">)</span>
+<a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GATE_EPSILON</span></a> <span class="o">=</span> <span class="mf">1e-6</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">gated</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Keep a shader-gated property non-zero so its branch stays compiled.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SHADER_GATED</span></a><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GATE_EPSILON</span></a><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="c1"># The public factory supplies smooth radial normals, split UV endpoints and</span>
+<span class="c1"># pole-safe tangents. Without an image, material color and environment reflections</span>
+<span class="c1"># remain in control, including when anisotropy is enabled by a preset.</span>
+<a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.texture_on_sphere" title="fury.actor.texture_on_sphere" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-function"><span class="n">actor</span><span class="o">.</span><span class="n">texture_on_sphere</span></a><span class="p">(</span>
+    <span class="n">phi</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+    <span class="n">theta</span><span class="o">=</span><span class="mi">96</span><span class="p">,</span>
+    <span class="n">material</span><span class="o">=</span><span class="s2">&quot;physical&quot;</span><span class="p">,</span>
+    <span class="n">material_params</span><span class="o">=</span><span class="p">{</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">:</span> <span class="n">gated</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+<span class="p">)</span>
+<a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="o">.</span><span class="n">local</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="mf">8.0</span>
+
+<span class="c1"># Silver: near-white reflectance, very slightly warm. On a metal the base</span>
+<span class="c1"># colour *is* the reflectance, so this is what tints every reflection.</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BASE_COLOR</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.97</span><span class="p">,</span> <span class="mf">0.96</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">color</span> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BASE_COLOR</span></a>
+<a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">sheen_color</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+<a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="o">.</span><span class="n">material</span><span class="o">.</span><span class="n">emissive</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="p">)</span>
+
+<span class="n">material</span> <span class="o">=</span> <a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="o">.</span><span class="n">material</span>
+</pre></div>
+</div>
+<p>Every control is one row: a label, a slider, and the value the slider prints.
+<code class="docutils literal notranslate"><span class="pre">TABS</span></code> is the whole specification – tab title, then one entry per property
+giving its label, range, starting value and how to apply it – so adding
+another property is a single line.</p>
+<p><code class="docutils literal notranslate"><span class="pre">anisotropy_rotation</span></code> is in radians. The iridescence film slider drives the
+upper bound of <code class="docutils literal notranslate"><span class="pre">iridescence_thickness_range</span></code> in nanometres: it is the film
+thickness that decides which colours the interference shifts towards.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">_set</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a callback that writes a slider&#39;s value onto the material.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">apply</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="p">):</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">gated</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">apply</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_set_iridescence_thickness</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="p">):</span>
+    <span class="n">material</span><span class="o">.</span><span class="n">iridescence_thickness_range</span> <span class="o">=</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="c1">#: tab title -&gt; rows of (label, min, max, initial, callback, decimals)</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TABS</span></a> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Base&quot;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Metalness&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;metalness&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;metalness&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Roughness&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;roughness&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;roughness&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Index of refraction&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;ior&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;ior&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Specular intensity&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;specular_intensity&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;specular_intensity&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Environment light&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">3.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;env_map_intensity&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;env_map_intensity&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Coating&quot;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Clearcoat&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;clearcoat&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;clearcoat&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Clearcoat roughness&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;clearcoat_roughness&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;clearcoat_roughness&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;Sheen&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;sheen&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;sheen&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Sheen roughness&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;sheen_roughness&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;sheen_roughness&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Emissive intensity&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">3.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;emissive_intensity&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;emissive_intensity&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Optical&quot;</span><span class="p">,</span>
+        <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;Anisotropy&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;anisotropy&quot;</span><span class="p">],</span> <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;anisotropy&quot;</span><span class="p">),</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Anisotropy rotation&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mi">2</span> <span class="o">*</span> <a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;anisotropy_rotation&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;anisotropy_rotation&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Iridescence&quot;</span><span class="p">,</span>
+                <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;iridescence&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;iridescence&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Iridescence IoR&quot;</span><span class="p">,</span>
+                <span class="mf">1.0</span><span class="p">,</span>
+                <span class="mf">2.3</span><span class="p">,</span>
+                <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">[</span><span class="s2">&quot;iridescence_ior&quot;</span><span class="p">],</span>
+                <span class="n">_set</span><span class="p">(</span><span class="s2">&quot;iridescence_ior&quot;</span><span class="p">),</span>
+                <span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span>
+                <span class="s2">&quot;Iridescence film (nm)&quot;</span><span class="p">,</span>
+                <span class="mf">100.0</span><span class="p">,</span>
+                <span class="mf">800.0</span><span class="p">,</span>
+                <span class="mf">400.0</span><span class="p">,</span>
+                <span class="n">_set_iridescence_thickness</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Lay the rows out in a <a class="reference internal" href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">fury.ui.TabUI</span></code></a>. Grouping the fifteen properties
+into three tabs keeps the widget short enough to sit beside the sphere, and
+<code class="docutils literal notranslate"><span class="pre">TabUI</span></code> is not draggable by default, so it stays where it is put.</p>
+<p>Coordinates in <code class="docutils literal notranslate"><span class="pre">add_element</span></code> are pixel offsets measured down from the
+content panel’s top-left corner. Each slider prints its value just above the
+track, which is why the rows are spaced more generously than the text alone
+would need.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># The tab bar splits its width evenly between the tabs, so each title has to</span>
+<span class="c1"># fit in TAB_SIZE[0] / n_tabs pixels. Long titles wrap onto a second line and</span>
+<span class="c1"># spill out of their header into the neighbouring ones.</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TAB_SIZE</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">420</span><span class="p">,</span> <span class="mi">260</span><span class="p">)</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ROW_HEIGHT</span></a> <span class="o">=</span> <span class="mi">44</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FIRST_ROW_Y</span></a> <span class="o">=</span> <span class="mi">34</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LABEL_X</span></a> <span class="o">=</span> <span class="mi">14</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_X</span></a> <span class="o">=</span> <span class="mi">195</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_LENGTH</span></a> <span class="o">=</span> <span class="mi">120</span>
+
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_TAB_INDEX</span></a> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TABS</span></a><span class="p">)</span>
+
+<a href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_ui</span></a> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TabUI</span></a><span class="p">(</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+    <span class="n">size</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TAB_SIZE</span></a><span class="p">,</span>
+    <span class="n">tab_titles</span><span class="o">=</span><span class="p">[</span><span class="n">title</span> <span class="k">for</span> <span class="n">title</span><span class="p">,</span> <span class="n">_rows</span> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TABS</span></a><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;Presets&quot;</span><span class="p">],</span>
+    <span class="n">startup_tab_id</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">font_size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+    <span class="n">draggable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">inactive_color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.09</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">),</span>
+<span class="p">)</span>
+
+<a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sliders</span></a> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_index</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_title</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rows</span></a><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TABS</span></a><span class="p">):</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">low</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">high</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">start</span></a><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">decimals</span></a><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rows</span></a><span class="p">):</span>
+        <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FIRST_ROW_Y</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ROW_HEIGHT</span></a>
+
+        <a href="../../reference/fury.ui.html#fury.ui.TabUI.add_element" title="fury.ui.TabUI.add_element" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-method"><span class="n">tab_ui</span><span class="o">.</span><span class="n">add_element</span></a><span class="p">(</span>
+            <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_index</span></a><span class="p">,</span>
+            <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TextBlock2D</span></a><span class="p">(</span>
+                <span class="n">text</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="p">,</span>
+                <span class="n">font_size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+                <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">),</span>
+                <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+                <span class="n">dynamic_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">LABEL_X</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">),</span>
+        <span class="p">)</span>
+
+        <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">LineSlider2D</span></a><span class="p">(</span>
+            <span class="n">initial_value</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">start</span></a><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">low</span></a><span class="p">,</span>
+            <span class="n">max_value</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">high</span></a><span class="p">,</span>
+            <span class="n">length</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_LENGTH</span></a><span class="p">,</span>
+            <span class="n">line_width</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;disk&quot;</span><span class="p">,</span>
+            <span class="n">outer_radius</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+            <span class="n">font_size</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+            <span class="n">text_template</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="s2">value:.</span><span class="si">{</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">decimals</span></a><span class="si">}</span><span class="s2">f</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="o">.</span><span class="n">on_moving_slider</span> <span class="o">=</span> <span class="n">callback</span>
+        <a href="../../reference/fury.ui.html#fury.ui.TabUI.add_element" title="fury.ui.TabUI.add_element" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-method"><span class="n">tab_ui</span><span class="o">.</span><span class="n">add_element</span></a><span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_index</span></a><span class="p">,</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_X</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">y</span></a><span class="p">))</span>
+        <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sliders</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>Presets. Each one restages the whole material so the property it is named for
+is the thing you notice, then pushes the new values back into the sliders so
+the panel keeps telling the truth.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESETS</span></a> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Polished metal&quot;</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;color&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BASE_COLOR</span></a><span class="p">,</span> <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">},</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Brushed metal&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BASE_COLOR</span></a><span class="p">,</span>
+            <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.45</span><span class="p">,</span>
+            <span class="s2">&quot;anisotropy&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;anisotropy_rotation&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Car paint&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="s2">&quot;clearcoat&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;clearcoat_roughness&quot;</span><span class="p">:</span> <span class="mf">0.03</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Velvet&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;sheen&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;sheen_roughness&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;sheen_color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Soap bubble&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+            <span class="s2">&quot;iridescence&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;iridescence_ior&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="s2">&quot;iridescence_thickness_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">550.0</span><span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+    <span class="p">(</span>
+        <span class="s2">&quot;Glass&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.85</span><span class="p">,</span> <span class="mf">0.92</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+            <span class="s2">&quot;metalness&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;roughness&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span>
+            <span class="s2">&quot;ior&quot;</span><span class="p">:</span> <span class="mf">1.8</span><span class="p">,</span>
+            <span class="s2">&quot;specular_intensity&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+
+<span class="c1">#: Every property a preset may touch, with the value to fall back to when it</span>
+<span class="c1">#: does not mention one. Without this a preset would inherit whatever the last</span>
+<span class="c1">#: one left behind.</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_DEFAULTS</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;color&quot;</span><span class="p">:</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BASE_COLOR</span></a><span class="p">,</span>
+    <span class="s2">&quot;sheen_color&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
+    <span class="s2">&quot;iridescence_thickness_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="mf">400.0</span><span class="p">),</span>
+    <span class="o">**</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">INITIAL</span></a><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="c1">#: slider label -&gt; the material property it drives, for syncing after a preset</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_PROPERTY</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Metalness&quot;</span><span class="p">:</span> <span class="s2">&quot;metalness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Roughness&quot;</span><span class="p">:</span> <span class="s2">&quot;roughness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Index of refraction&quot;</span><span class="p">:</span> <span class="s2">&quot;ior&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Specular intensity&quot;</span><span class="p">:</span> <span class="s2">&quot;specular_intensity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Environment light&quot;</span><span class="p">:</span> <span class="s2">&quot;env_map_intensity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Clearcoat&quot;</span><span class="p">:</span> <span class="s2">&quot;clearcoat&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Clearcoat roughness&quot;</span><span class="p">:</span> <span class="s2">&quot;clearcoat_roughness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Sheen&quot;</span><span class="p">:</span> <span class="s2">&quot;sheen&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Sheen roughness&quot;</span><span class="p">:</span> <span class="s2">&quot;sheen_roughness&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Emissive intensity&quot;</span><span class="p">:</span> <span class="s2">&quot;emissive_intensity&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Anisotropy&quot;</span><span class="p">:</span> <span class="s2">&quot;anisotropy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Anisotropy rotation&quot;</span><span class="p">:</span> <span class="s2">&quot;anisotropy_rotation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Iridescence&quot;</span><span class="p">:</span> <span class="s2">&quot;iridescence&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Iridescence IoR&quot;</span><span class="p">:</span> <span class="s2">&quot;iridescence_ior&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_ROWS</span></a> <span class="o">=</span> <span class="p">[</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="k">for</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">_title</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rows</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TABS</span></a> <span class="k">for</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">rows</span></a><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_preset</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Put the material into a named state and resync every slider.&quot;&quot;&quot;</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_DEFAULTS</span></a><span class="p">)</span>
+    <span class="n">settings</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">)</span>
+    <span class="k">for</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="n">material</span><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">gated</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+
+    <span class="k">for</span> <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="p">,</span> <span class="o">*</span><span class="n">_rest</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sliders</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_ROWS</span></a><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Iridescence film&quot;</span><span class="p">):</span>
+            <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><span class="s2">&quot;iridescence_thickness_range&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <a href="../../reference/fury.ui.html#fury.ui.LineSlider2D" title="fury.ui.LineSlider2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slider</span></a><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">settings</span><span class="p">[</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">SLIDER_PROPERTY</span></a><span class="p">[</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="p">]]</span>
+</pre></div>
+</div>
+<p>The buttons themselves. <code class="docutils literal notranslate"><span class="pre">TextButton2D</span></code> takes the same <code class="docutils literal notranslate"><span class="pre">states</span></code> mapping
+viz_button.py demonstrates – one entry per state the button can resolve –
+and here each state is a colour rather than a colour and a caption, so the
+label stays put and only the plate under it reacts: it lifts on hover, and the
+preset currently on the sphere stays in the accent colour. That last part is
+what <code class="docutils literal notranslate"><span class="pre">is_toggle</span></code> buys; the click handler switches the others off, which
+turns six independent buttons into one group with a current selection.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_STATES</span></a> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.20</span><span class="p">,</span> <span class="mf">0.21</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">),</span>
+    <span class="s2">&quot;hover&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.28</span><span class="p">,</span> <span class="mf">0.30</span><span class="p">,</span> <span class="mf">0.40</span><span class="p">),</span>
+    <span class="s2">&quot;pressed&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.68</span><span class="p">),</span>
+    <span class="s2">&quot;disabled&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">),</span>
+<span class="p">}</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_LABEL_COLOR</span></a> <span class="o">=</span> <span class="p">(</span><span class="mf">0.90</span><span class="p">,</span> <span class="mf">0.91</span><span class="p">,</span> <span class="mf">0.96</span><span class="p">)</span>
+
+<span class="c1"># Two columns of three, sized from the panel rather than by eye: the grid is</span>
+<span class="c1"># centred in TAB_SIZE[0] and starts below the tab bar, so every button lands</span>
+<span class="c1"># inside the content area with room to spare.</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">186</span><span class="p">,</span> <span class="mi">38</span><span class="p">)</span>
+<a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_GAP</span></a> <span class="o">=</span> <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">)</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_COLUMNS</span></a> <span class="o">=</span> <span class="mi">2</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_WIDTH</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_COLUMNS</span></a> <span class="o">*</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_COLUMNS</span></a> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_GAP</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_X</span></a> <span class="o">=</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">TAB_SIZE</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_WIDTH</span></a><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+<a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_Y</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">FIRST_ROW_Y</span></a>  <span class="c1"># start on the same line the slider tabs start on</span>
+
+<a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preset_buttons</span></a> <span class="o">=</span> <span class="p">[]</span>
+<a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preset_status</span></a> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TextBlock2D</span></a><span class="p">(</span>
+    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Pick a preset&quot;</span><span class="p">,</span>
+    <span class="n">font_size</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span>
+    <span class="n">vertical_justification</span><span class="o">=</span><span class="s2">&quot;middle&quot;</span><span class="p">,</span>
+    <span class="n">dynamic_bbox</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_select_preset</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Apply a preset and leave its own button lit, the others dark.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">clicked</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a><span class="p">):</span>
+        <span class="n">apply_preset</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">)</span>
+        <span class="k">for</span> <span class="n">other</span> <span class="ow">in</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preset_buttons</span></a><span class="p">:</span>
+            <span class="n">other</span><span class="o">.</span><span class="n">toggled</span> <span class="o">=</span> <span class="n">other</span> <span class="ow">is</span> <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a>
+        <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D.message" title="fury.ui.TextBlock2D.message" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-property"><span class="n">preset_status</span><span class="o">.</span><span class="n">message</span></a> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;On the sphere: </span><span class="si">{</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">return</span> <span class="n">clicked</span>
+
+
+<span class="k">for</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">index</span></a><span class="p">,</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESETS</span></a><span class="p">):</span>
+    <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">column</span></a> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">index</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_COLUMNS</span></a><span class="p">)</span>
+    <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a> <span class="o">=</span> <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class"><span class="n">TextButton2D</span></a><span class="p">(</span>
+        <a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">label</span></a><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span>
+        <span class="n">states</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_STATES</span></a><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a><span class="p">,</span>
+        <span class="n">font_size</span><span class="o">=</span><span class="mi">14</span><span class="p">,</span>
+        <span class="n">is_toggle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D.color" title="fury.ui.TextBlock2D.color" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-property"><span class="n">button</span><span class="o">.</span><span class="n">child</span><span class="o">.</span><span class="n">color</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_LABEL_COLOR</span></a>
+    <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a><span class="o">.</span><span class="n">on_clicked</span> <span class="o">=</span> <span class="n">_select_preset</span><span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">name</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">values</span></a><span class="p">)</span>
+    <a href="../../reference/fury.ui.html#fury.ui.TabUI.add_element" title="fury.ui.TabUI.add_element" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-method"><span class="n">tab_ui</span><span class="o">.</span><span class="n">add_element</span></a><span class="p">(</span>
+        <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_TAB_INDEX</span></a><span class="p">,</span>
+        <a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a><span class="p">,</span>
+        <span class="p">(</span>
+            <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_X</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">column</span></a> <span class="o">*</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_GAP</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_Y</span></a> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="o">*</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_GAP</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preset_buttons</span></a><span class="o">.</span><span class="n">append</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.TextButton2D" title="fury.ui.TextButton2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">button</span></a><span class="p">)</span>
+
+<a href="../../reference/fury.ui.html#fury.ui.TabUI.add_element" title="fury.ui.TabUI.add_element" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-method"><span class="n">tab_ui</span><span class="o">.</span><span class="n">add_element</span></a><span class="p">(</span>
+    <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">PRESET_TAB_INDEX</span></a><span class="p">,</span>
+    <a href="../../reference/fury.ui.html#fury.ui.TextBlock2D" title="fury.ui.TextBlock2D" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">preset_status</span></a><span class="p">,</span>
+    <span class="p">(</span><a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_X</span></a><span class="p">,</span> <a href="https://docs.python.org/3/builtins/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">GRID_Y</span></a> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="p">(</span><a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_SIZE</span></a><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="builtins.tuple" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">BUTTON_GAP</span></a><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">6</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">scene</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><a href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_ui</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>Frame the sphere with <code class="docutils literal notranslate"><span class="pre">camera.show_object</span></code>. That does more than place the
+camera: it also leaves the controller orbiting about the sphere, so dragging
+rotates around the object rather than about some unrelated point. <code class="docutils literal notranslate"><span class="pre">scale</span></code>
+pulls the camera back a little so the sphere clears the tab widget.</p>
+<p>The default camera light stays on. Turning it off leaves the skybox as the
+only illumination, which looks fine for metals but flattens sheen to almost
+nothing – a retroreflective lobe needs a light near the viewer to show up.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">show_manager</span> <span class="o">=</span> <span class="n">ShowManager</span><span class="p">(</span>
+    <span class="n">scene</span><span class="o">=</span><span class="n">scene</span><span class="p">,</span>
+    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1360</span><span class="p">,</span> <span class="mi">820</span><span class="p">),</span>
+    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;FURY Interactive PBR Demo&quot;</span><span class="p">,</span>
+    <span class="n">camera_light</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">camera</span> <span class="o">=</span> <a href="https://docs.python.org/3/builtins/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">show_manager</span><span class="o">.</span><span class="n">screens</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">camera</span>
+<span class="n">camera</span><span class="o">.</span><span class="n">show_object</span><span class="p">(</span><a href="../../reference/fury.actor.html#fury.actor.Mesh" title="fury.actor.Mesh" class="sphx-glr-backref-module-fury-actor sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">sphere_actor</span></a><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1.6</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Keep the tab widget anchored to the top-left corner as the window is resized.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">keep_tabs_anchored</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+    <a href="../../reference/fury.ui.html#fury.ui.TabUI" title="fury.ui.TabUI" class="sphx-glr-backref-module-fury-ui sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">tab_ui</span></a><span class="o">.</span><span class="n">set_position</span><span class="p">((</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+
+
+<span class="n">show_manager</span><span class="o">.</span><span class="n">resize_callback</span><span class="p">(</span><span class="n">keep_tabs_anchored</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">show_manager</span><span class="o">.</span><a href="https://docs.python.org/3/builtins/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">start</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../../_images/sphx_glr_viz_pbr_interactive_001.png" srcset="../../_images/sphx_glr_viz_pbr_interactive_001.png" alt="viz pbr interactive" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.897 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-04-demos-viz-pbr-interactive-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/e22a09689bdb9d1c7847fe275f1e83ba/viz_pbr_interactive.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">viz_pbr_interactive.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/ea42b6e1d50eac5b2d3d01d0757008ef/viz_pbr_interactive.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">viz_pbr_interactive.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../../_downloads/9040c05e2c689e6b3272aa9d9fd1f4c7/viz_pbr_interactive.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">viz_pbr_interactive.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+
+<div class="section ablog__blog_comments">
+   
+</div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="viz_helical_solar_system.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Vortex (Helical) Solar System Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="viz_flight_simulator.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Interactive 3D Flight Simulator in FURY</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/auto_examples/04_demos/viz_pbr_interactive.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><div class="fury-footer-wrapper">
+    <!-- Main Footer Section -->
+    <div class="fury-footer__main">
+        <div class="fury-footer__inner">
+            <div class="fury-footer__grid">
+                <!-- Column 1: Logo & Info -->
+                <div class="fury-footer__col">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                        <img src="../../_static/images/logo.svg" alt="FURY Logo" class="fury-footer__logo" style="margin: 0;">
+                        <span class="fury-footer__logo-text">FURY</span>
+                    </div>
+                    <p class="fury-footer__desc">
+                        Free Unified Rendering in pYthon. Scientific visualization and 3D animation on the GPU.
+                    </p>
+                    <div class="fury-footer__socials">
+                        <a href="https://github.com/fury-gl/fury" class="fury-footer__social-btn" aria-label="GitHub">
+                            <i class="fa-brands fa-github"></i>
+                        </a>
+                        <a href="https://discord.gg/fury" class="fury-footer__social-btn" aria-label="Discord">
+                            <i class="fa-brands fa-discord"></i>
+                        </a>
+                        <a href="https://x.com/fury_gl" class="fury-footer__social-btn" aria-label="X">
+                            <i class="fa-brands fa-x-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Column 2: Docs -->
+                <div class="fury-footer__col">
+                    <h4 class="fury-footer__heading">DOCS</h4>
+                    <ul class="fury-footer__links">
+                        <li><a href="../../installation.html">Installation</a></li>
+                        <li><a href="../../getting_started.html">Getting started</a></li>
+                        <li><a href="../index.html">Examples</a></li>
+                        <li><a href="../../reference/index.html">API reference</a></li>
+                        <li><a href="../../migration_guide_v2.0.html">Migration Guide</a></li>
+                        <li><a href="../../blog.html">Blog</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3: Project -->
+                <div class="fury-footer__col">
+                    <h4 class="fury-footer__heading">PROJECT</h4>
+                    <ul class="fury-footer__links">
+                        <li><a href="../../community.html">Contributors</a></li>
+                        <li><a href="https://github.com/fury-gl/fury/issues">Report a bug</a></li>
+                        <li><a href="https://mail.python.org/mailman3/lists/fury.python.org/">Mailing list</a></li>
+                        <li><a href="https://github.com/fury-gl/fury/blob/master/LICENSE">License</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4: Friends & Support -->
+                <div class="fury-footer__col">
+                    <h4 class="fury-footer__heading">FRIENDS &amp; SUPPORT</h4>
+                    <ul class="fury-footer__links">
+                        <li><a href="https://dipy.org/">DIPY</a></li>
+                        <li><a href="https://polyxios.org">Polyxios</a></li>
+                        <li><a href="https://engineering.indiana.edu/">Intelligent Systems Engineering, IU</a></li>
+                        <li><a href="https://www.nsf.gov/awardsearch/showAward?AWD_ID=1720625">NSF award #1720625</a></li>
+                        <li><a href="https://summerofcode.withgoogle.com/">Google Summer of Code</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="fury-footer__bottom">
+                <div class="fury-footer__copyright">
+                    &copy; 2018-2026, FURY. BSD 3-Clause licensed.
+                </div>
+                <div class="fury-footer__joss">
+                    <a href="https://joss.theoj.org/papers/10.21105/joss.03384">JOSS - 10.21105/joss.03384</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div></div>
+      
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+  </body>
+</html>
