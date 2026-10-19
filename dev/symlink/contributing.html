@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="FURY" />
 <meta name="description" content="Contributions are welcome, and they are greatly appreciated! Every little bit helps, and credit will always be given. You can contribute in many ways: Types of Contributions: Report Bugs: Report bu..." />
 
-    <title>Contributing &#8212; FURY 2.1.0.dev74+gffd582b7a documentation</title>
+    <title>Contributing &#8212; FURY 2.1.0.dev78+ge821b296e documentation</title>
   
   
   
@@ -51,7 +51,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=91f8ff20"></script>
+    <script src="../_static/documentation_options.js?v=1697290a"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -636,8 +636,8 @@ you can double check that every contributor is recognized.</p></li>
 <li><p>It checks (and updates if needed) the copyright year range in <code class="docutils literal notranslate"><span class="pre">LICENSE</span></code>.</p></li>
 <li><p>It asks for the new version number, then generates the release notes by
 running <code class="docutils literal notranslate"><span class="pre">docs/source/ext/github_tools.py</span></code> for you, creating
-<code class="docutils literal notranslate"><span class="pre">release_notes/releasev&lt;version&gt;.rst</span></code>. It will pause for you to manually
-fill in the “Quick overview” section of that file.</p></li>
+<code class="docutils literal notranslate"><span class="pre">docs/source/release_notes/releasev&lt;version&gt;.rst</span></code>. It will pause for you to
+manually fill in the “Quick overview” section of that file.</p></li>
 <li><p>It updates <code class="docutils literal notranslate"><span class="pre">release-history.rst</span></code> to include the newly generated release
 notes file.</p></li>
 <li><p>It creates a release announcement blog post stub under
@@ -645,10 +645,35 @@ notes file.</p></li>
 <li><p>It asks you to confirm that deprecated functions/modules have been
 checked before continuing.</p></li>
 <li><p>It runs the test suite (<code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">-svv</span> <span class="pre">--doctest-modules</span> <span class="pre">fury</span></code>) and builds
-the documentation (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">docs</span> <span class="pre">html</span></code>), then asks you to confirm the
-generated docs look correct - looping back through tests/docs until you
-confirm.</p></li>
+the documentation (<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">-C</span> <span class="pre">docs</span> <span class="pre">html</span></code>). It then runs the platform’s
+<code class="docutils literal notranslate"><span class="pre">serve</span></code> target, opening a browser at <code class="docutils literal notranslate"><span class="pre">http://localhost:8000</span></code>. Review the
+generated docs, then press Ctrl+C in the terminal to stop the preview and
+answer the confirmation prompt. On Windows, confirm batch termination if
+prompted. Answering no to the documentation confirmation repeats the tests,
+build, and preview until you confirm the docs look correct.</p></li>
 </ul>
+</li>
+<li><p>Before tagging, commit <code class="docutils literal notranslate"><span class="pre">.github/workflows/release.yml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tools/github_release.py</span></code>, and the prepared
+<code class="docutils literal notranslate"><span class="pre">docs/source/release_notes/releasev&lt;version&gt;.rst</span></code>. Verify its
+<code class="docutils literal notranslate"><span class="pre">Release</span> <span class="pre">notes</span> <span class="pre">v&lt;version&gt;</span></code> title, nonempty <code class="docutils literal notranslate"><span class="pre">Quick</span> <span class="pre">Overview</span></code>, and previous
+tag in the <code class="docutils literal notranslate"><span class="pre">GitHub</span> <span class="pre">stats</span></code> line. Both tags must exist when the workflow runs.</p></li>
+<li><p>Install the development dependencies (including bundled Pandoc) and preview
+a prepared release locally:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">e</span> <span class="s2">".[dev]"</span>
+<span class="n">python</span> <span class="n">tools</span><span class="o">/</span><span class="n">github_release</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">tag</span> <span class="n">v2</span><span class="mf">.0.0</span> <span class="o">--</span><span class="n">preview</span> <span class="o">--</span><span class="n">output</span><span class="o">-</span><span class="n">file</span> <span class="n">RELEASE_PREVIEW</span><span class="o">.</span><span class="n">md</span>
+</pre></div>
+</div>
+<p>Inspect the Markdown in your editor, including links and formatting.
+This works offline without authentication or release creation. Omit
+<code class="docutils literal notranslate"><span class="pre">--preview</span></code> to generate only the introduction used by the workflow.</p>
+<p>Add <code class="docutils literal notranslate"><span class="pre">--previous-tag</span> <span class="pre">v0.12.0</span></code> to override the recorded baseline. This changes
+the comparison link and printed metadata, not the prepared PR list or source
+notes. GitHub adds final PR author mentions and <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">Contributors</span></code> during
+publication; the local preview uses prepared PRs and contributor names.</p>
+<p>Use explicitly labelled <code class="docutils literal notranslate"><span class="pre">:doc:</span></code> links in the overview; replace other Sphinx
+roles with ordinary RST links or inline literals. The helper prefers system
+Pandoc over the bundled copy; the workflow installs its own.</p>
 </li>
 <li><p>The release should now be ready.</p></li>
 </ul>
@@ -682,11 +707,28 @@ on a value like X.Y.Z+1.g58ad5f7, where +1 means “1 commit past version X.Y.Z�
 first 7 characters of the hash of the current commit. The letter g stands for “git”. This is all managed
 automatically by versioneer and in accordance with the specification in PEP 440.</p>
 </li>
-<li><p>Push the new commit and the tag to master:</p>
+<li><p>Push the new commit and the tag to the upstream <code class="docutils literal notranslate"><span class="pre">fury-gl/fury</span></code> repository
+(the following assumes <code class="docutils literal notranslate"><span class="pre">origin</span></code> points there):</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">master</span>
 <span class="n">git</span> <span class="n">push</span> <span class="n">origin</span> <span class="n">vX</span><span class="o">.</span><span class="n">Y</span><span class="o">.</span><span class="n">Z</span>
 </pre></div>
 </div>
+<p>The <code class="docutils literal notranslate"><span class="pre">Release</span></code> workflow publishes a GitHub release immediately, not a draft.
+It runs only for upstream tag pushes; pushing a tag to a fork does not
+publish an upstream release. Supported tags are <code class="docutils literal notranslate"><span class="pre">vMAJOR.MINOR.PATCH</span></code> with
+optional <code class="docutils literal notranslate"><span class="pre">aN</span></code>, <code class="docutils literal notranslate"><span class="pre">bN</span></code>, or <code class="docutils literal notranslate"><span class="pre">rcN</span></code> suffixes. Suffixed versions are marked
+as prereleases and are not selected as latest.</p>
+<p>The release title is the tag. Its body contains the curated Quick Overview,
+a link to the full tagged release notes, and GitHub-generated <code class="docutils literal notranslate"><span class="pre">What's</span>
+<span class="pre">Changed</span></code> entries comparing against the notes’ recorded previous tag.
+The workflow uploads no assets and does not publish to PyPI or deploy the
+website; the package publication steps below remain separate.</p>
+<p>Check the Actions run and the published release. Missing or malformed notes,
+missing tags, conversion failures, and API/permission errors fail the run.
+Infrastructure failures before publication can be retried. An existing
+release is never overwritten: rerunning after successful publication fails
+with a conflict and leaves it unchanged. Do not move a published tag to fix
+release preparation.</p>
 </li>
 <li><p>Register for a PyPI account and Install twine, a tool for uploading packages to PyPI:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">twine</span>
