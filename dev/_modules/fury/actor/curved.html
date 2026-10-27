@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.actor.curved &#8212; FURY 2.2.0.dev5+gf9eea96f5 documentation</title>
+    <title>fury.actor.curved &#8212; FURY 2.2.0.dev12+gb5b0eb92f documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../../_static/documentation_options.js?v=a82a11da"></script>
+    <script src="../../../_static/documentation_options.js?v=ee36586d"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -1128,8 +1128,9 @@ document.write(`
 <span class="sd">        The positions of the points along the streamline.</span>
 <span class="sd">    colors : ndarray, shape (N, 3) or (N, 4), optional</span>
 <span class="sd">        RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1].</span>
-<span class="sd">    thickness : float, optional</span>
-<span class="sd">        The thickness of the streamline.</span>
+<span class="sd">    thickness : float or array_like, optional</span>
+<span class="sd">        A positive finite thickness for all streamlines, or a 1D array with</span>
+<span class="sd">        one positive finite thickness per streamline.</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        The opacity of the streamline.</span>
 <span class="sd">    outline_thickness : float, optional</span>
@@ -1249,8 +1250,9 @@ document.write(`
 <span class="sd">            The positions of the points along the streamline.</span>
 <span class="sd">        colors : ndarray, shape (N, 3) or (N, 4), optional</span>
 <span class="sd">            RGB or RGBA (for opacity) R, G, B and A should be at the range [0, 1].</span>
-<span class="sd">        thickness : float, optional</span>
-<span class="sd">            The thickness of the streamline.</span>
+<span class="sd">        thickness : float or array_like, optional</span>
+<span class="sd">            A positive finite thickness for all streamlines, or a 1D array with</span>
+<span class="sd">            one positive finite thickness per streamline.</span>
 <span class="sd">        opacity : float, optional</span>
 <span class="sd">            The opacity of the streamline.</span>
 <span class="sd">        outline_thickness : float, optional</span>
@@ -1275,9 +1277,6 @@ document.write(`
 <span class="sd">            NaN separators.</span>
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thickness</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="n">thickness</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thickness must be a positive number"</span><span class="p">)</span>
 
         <span class="n">opacity</span> <span class="o">=</span> <span class="n">validate_opacity</span><span class="p">(</span><span class="n">opacity</span><span class="p">)</span>
 
@@ -1307,6 +1306,9 @@ document.write(`
             <span class="n">positions_arr</span><span class="p">,</span> <span class="n">line_lengths</span><span class="o">=</span><span class="n">line_lengths</span><span class="p">,</span> <span class="n">line_offsets</span><span class="o">=</span><span class="n">line_offsets</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_lines</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_lengths</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">thickness</span> <span class="o">=</span> <span class="n">_validate_streamline_thickness</span><span class="p">(</span><span class="n">thickness</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_lines</span><span class="p">)</span>
+        <span class="n">line_thicknesses</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">thickness</span><span class="p">)</span> <span class="k">else</span> <span class="n">thickness</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses</span> <span class="o">=</span> <span class="n">line_thicknesses</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_out_capacity</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">positions_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_color_channels</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">colors_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">colors_arr</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span> <span class="k">else</span> <span class="mi">3</span>
 
@@ -1328,7 +1330,7 @@ document.write(`
             <span class="s2">"outline_color"</span><span class="p">:</span> <span class="n">outline_color</span><span class="p">,</span>
             <span class="s2">"pick_write"</span><span class="p">:</span> <span class="n">enable_picking</span><span class="p">,</span>
             <span class="s2">"opacity"</span><span class="p">:</span> <span class="n">opacity</span><span class="p">,</span>
-            <span class="s2">"thickness"</span><span class="p">:</span> <span class="n">thickness</span><span class="p">,</span>
+            <span class="s2">"thickness"</span><span class="p">:</span> <span class="n">thickness</span> <span class="k">if</span> <span class="n">line_thicknesses</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">2.0</span><span class="p">,</span>
             <span class="s2">"color_mode"</span><span class="p">:</span> <span class="s2">"vertex"</span><span class="p">,</span>
         <span class="p">}</span>
 
@@ -1343,9 +1345,63 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_line_offsets_buffer</span> <span class="o">=</span> <span class="n">Buffer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_line_offsets</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_line_positions_in</span> <span class="o">=</span> <span class="n">Buffer</span><span class="p">(</span><span class="n">positions_arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_line_colors_in</span> <span class="o">=</span> <span class="n">Buffer</span><span class="p">(</span><span class="n">colors_arr</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses_data</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">line_thicknesses</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">_expand_streamline_thicknesses</span><span class="p">(</span>
+                <span class="n">line_thicknesses</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_line_lengths</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_line_offsets</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_out_capacity</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_roi_mask_buffer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_roi_auto_detach</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">roi_mask</span> <span class="o">=</span> <span class="n">roi_mask</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">thicknesses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get the per-streamline thickness values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray or None</span>
+<span class="sd">            The per-streamline thickness values, or None when scalar</span>
+<span class="sd">            thickness is used.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_thicknesses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">thicknesses</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Update per-streamline thickness values without rebuilding geometry.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        thicknesses : array_like, shape (n_streamlines,)</span>
+<span class="sd">            Positive finite thickness for each streamline.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If this actor was created with scalar thickness or the values are</span>
+<span class="sd">            not a positive finite 1D array with one value per streamline.</span>
+<span class="sd">        """</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"update_thicknesses requires an actor created with per-streamline "</span>
+                <span class="s2">"thickness values"</span>
+            <span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">_validate_streamline_thickness</span><span class="p">(</span><span class="n">thicknesses</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_lines</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thicknesses must contain one value per streamline"</span><span class="p">)</span>
+        <span class="n">expanded</span> <span class="o">=</span> <span class="n">_expand_streamline_thicknesses</span><span class="p">(</span>
+            <span class="n">values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_lengths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_line_offsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_capacity</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses_data</span> <span class="o">=</span> <span class="n">expanded</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_line_thicknesses</span> <span class="o">=</span> <span class="n">values</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">roi_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1523,6 +1579,88 @@ document.write(`
 <span class="n">Streamlines</span> <span class="o">=</span> <span class="n">StreamlinesActor</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_validate_streamline_thickness</span><span class="p">(</span><span class="n">thickness</span><span class="p">,</span> <span class="n">n_lines</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Validate scalar or per-line streamline thickness values.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    thickness : float or array_like</span>
+<span class="sd">        A positive finite scalar or a 1D array with one value per streamline.</span>
+<span class="sd">    n_lines : int</span>
+<span class="sd">        Number of streamlines.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float or ndarray</span>
+<span class="sd">        The validated scalar thickness or per-line thicknesses as float32.</span>
+<span class="sd">    """</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">thickness</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">"fiub"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thickness must be a positive finite number"</span><span class="p">)</span>
+
+        <span class="n">scalar</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">scalar</span><span class="p">)</span> <span class="ow">or</span> <span class="n">scalar</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thickness must be a positive finite number"</span><span class="p">)</span>
+
+        <span class="n">float32_limits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">max_thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">float32_limits</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+        <span class="n">min_thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="n">scalar</span> <span class="o">&gt;</span> <span class="n">max_thickness</span> <span class="ow">or</span> <span class="n">scalar</span> <span class="o">&lt;</span> <span class="n">min_thickness</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thickness must be representable as float32"</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="n">scalar</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">values</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">values</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="s2">"fiu"</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">"thickness must be a scalar or a 1D array with one value per streamline"</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n_lines</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"thickness must contain one value per streamline; "</span>
+            <span class="sa">f</span><span class="s2">"expected </span><span class="si">{</span><span class="n">n_lines</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">values</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"all thickness values must be positive and finite"</span><span class="p">)</span>
+    <span class="n">float32_limits</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">max_thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">float32_limits</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
+    <span class="n">min_thickness</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nextafter</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">values</span> <span class="o">&gt;</span> <span class="n">max_thickness</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">values</span> <span class="o">&lt;</span> <span class="n">min_thickness</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"thickness values must be representable as float32"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_expand_streamline_thicknesses</span><span class="p">(</span><span class="n">thicknesses</span><span class="p">,</span> <span class="n">line_lengths</span><span class="p">,</span> <span class="n">line_offsets</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Expand per-line thicknesses to a point-aligned buffer.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    thicknesses : ndarray</span>
+<span class="sd">        One thickness value per streamline.</span>
+<span class="sd">    line_lengths : ndarray</span>
+<span class="sd">        Number of points in each streamline.</span>
+<span class="sd">    line_offsets : ndarray</span>
+<span class="sd">        Starting position of each streamline in the flattened buffer.</span>
+<span class="sd">    size : int</span>
+<span class="sd">        Number of entries in the flattened positions buffer.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndarray</span>
+<span class="sd">        Float32 thickness values aligned with positions, with NaN separators.</span>
+<span class="sd">    """</span>
+    <span class="n">expanded</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">length</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+        <span class="n">thicknesses</span><span class="p">,</span> <span class="n">line_offsets</span><span class="p">,</span> <span class="n">line_lengths</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">):</span>
+        <span class="n">expanded</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">length</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">expanded</span>
+
+
 <div class="viewcode-block" id="streamlines">
 <a class="viewcode-back" href="../../../reference/fury.actor.html#fury.actor.streamlines">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">streamlines</span><span class="p">(</span>
@@ -1547,8 +1685,9 @@ document.write(`
 <span class="sd">    colors : str, tuple, list or ndarray, optional</span>
 <span class="sd">        A hex string, RGB(A) in [0, 1], RGB(A) in [0, 255], or a per-line /</span>
 <span class="sd">        per-vertex array of such colors. See :func:`normalize_colors`.</span>
-<span class="sd">    thickness : float, optional</span>
-<span class="sd">        The thickness of the streamline.</span>
+<span class="sd">    thickness : float or array_like, optional</span>
+<span class="sd">        A positive finite thickness for all streamlines, or a 1D array with</span>
+<span class="sd">        one positive finite thickness per streamline.</span>
 <span class="sd">    opacity : float, optional</span>
 <span class="sd">        The opacity of the streamline.</span>
 <span class="sd">    outline_thickness : float, optional</span>

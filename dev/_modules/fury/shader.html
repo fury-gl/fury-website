@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.shader &#8212; FURY 2.2.0.dev5+gf9eea96f5 documentation</title>
+    <title>fury.shader &#8212; FURY 2.2.0.dev12+gb5b0eb92f documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=a82a11da"></script>
+    <script src="../../_static/documentation_options.js?v=ee36586d"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -691,7 +691,52 @@ document.write(`
 <div class="viewcode-block" id="StreamlinesShader">
 <a class="viewcode-back" href="../../reference/fury.shader.html#fury.network.StreamlinesShader">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StreamlinesShader</span><span class="p">(</span><span class="n">LineShader</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Shader for StreamlineActor."""</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Shader for StreamlineActor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    wobject : Streamlines</span>
+<span class="sd">        The streamline object rendered by this shader.</span>
+<span class="sd">    """</span>
+
+<div class="viewcode-block" id="StreamlinesShader.__init__">
+<a class="viewcode-back" href="../../reference/fury.shader.html#fury.network.StreamlinesShader.__init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wobject</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">wobject</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">[</span><span class="s2">"per_line_thickness"</span><span class="p">]</span> <span class="o">=</span> <span class="n">wobject</span><span class="o">.</span><span class="n">_line_thicknesses_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="StreamlinesShader.get_bindings">
+<a class="viewcode-back" href="../../reference/fury.shader.html#fury.network.StreamlinesShader.get_bindings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_bindings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wobject</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">scene</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Get resource bindings for the streamline shader.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        wobject : Streamlines</span>
+<span class="sd">            The streamline object being rendered.</span>
+<span class="sd">        shared : dict</span>
+<span class="sd">            Shared rendering information.</span>
+<span class="sd">        scene : fury.window.Scene</span>
+<span class="sd">            The current rendering scene.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Resource bindings used by the shader.</span>
+<span class="sd">        """</span>
+        <span class="n">bindings</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_bindings</span><span class="p">(</span><span class="n">wobject</span><span class="p">,</span> <span class="n">shared</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+        <span class="n">thickness_data</span> <span class="o">=</span> <span class="n">wobject</span><span class="o">.</span><span class="n">_line_thicknesses_data</span>
+        <span class="k">if</span> <span class="n">thickness_data</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">thickness_buffer</span> <span class="o">=</span> <span class="n">Buffer</span><span class="p">(</span><span class="n">thickness_data</span><span class="p">)</span>
+            <span class="n">bindings</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="nb">max</span><span class="p">(</span><span class="n">bindings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">Binding</span><span class="p">(</span>
+                <span class="s2">"s_thicknesses"</span><span class="p">,</span> <span class="s2">"buffer/read_only_storage"</span><span class="p">,</span> <span class="n">thickness_buffer</span><span class="p">,</span> <span class="s2">"VERTEX"</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">define_bindings</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">bindings</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">bindings</span></div>
+
 
 <div class="viewcode-block" id="StreamlinesShader.get_render_info">
 <a class="viewcode-back" href="../../reference/fury.shader.html#fury.network.StreamlinesShader.get_render_info">[docs]</a>
