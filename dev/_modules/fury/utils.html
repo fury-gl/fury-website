@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.utils &#8212; FURY 2.2.0.dev12+gb5b0eb92f documentation</title>
+    <title>fury.utils &#8212; FURY 2.2.0.dev15+g9d5cf0dc5 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=ee36586d"></script>
+    <script src="../../_static/documentation_options.js?v=a006f3c7"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -764,13 +764,16 @@ document.write(`
 <span class="sd">    The normal for each face is calculated and then accumulated for each</span>
 <span class="sd">    vertex. The final normals are normalized to unit length.</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">faces</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">vertices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+
     <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">vertices</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">vertices</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">tris</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">faces</span><span class="p">]</span>
     <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">tris</span><span class="p">[::,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">tris</span><span class="p">[::,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">tris</span><span class="p">[::,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">tris</span><span class="p">[::,</span> <span class="mi">0</span><span class="p">])</span>
     <span class="n">normalize_v3</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="n">norm</span><span class="p">[</span><span class="n">faces</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">n</span>
-    <span class="n">norm</span><span class="p">[</span><span class="n">faces</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">n</span>
-    <span class="n">norm</span><span class="p">[</span><span class="n">faces</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">n</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">faces</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">faces</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">add</span><span class="o">.</span><span class="n">at</span><span class="p">(</span><span class="n">norm</span><span class="p">,</span> <span class="n">faces</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">n</span><span class="p">)</span>
     <span class="n">normalize_v3</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">norm</span></div>
 
