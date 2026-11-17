@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.io &#8212; FURY 2.2.0.dev37+g2f86eb186 documentation</title>
+    <title>fury.io &#8212; FURY 2.2.0.dev39+g00f459a1f documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=1dbe4edc"></script>
+    <script src="../../_static/documentation_options.js?v=72696a15"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -952,6 +952,128 @@ document.write(`
         <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="n">vertex_colors</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">line_indices</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">lines</span><span class="p">,</span> <span class="n">colors</span></div>
+
+
+
+<div class="viewcode-block" id="read_gltf">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.read_gltf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">read_gltf</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Read a glTF 2.0 or GLB file as a single surface mesh using polyxios.</span>
+
+<span class="sd">    The node transforms of the default scene are applied and all of its meshes</span>
+<span class="sd">    are merged into one. Materials, textures, skins and animations are ignored.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The path to the ``.gltf`` or ``.glb`` file.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format override (e.g. '.glb'). Inferred from the file</span>
+<span class="sd">        extension when None.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing:</span>
+
+<span class="sd">        - vertices (np.ndarray): Shape (N, 3) float32 array of world-space vertex</span>
+<span class="sd">          positions.</span>
+<span class="sd">        - faces (np.ndarray or None): Shape (M, 3) int32 array of triangle face</span>
+<span class="sd">          indices, or None when the scene has no surface primitives.</span>
+<span class="sd">        - colors (np.ndarray or None): Shape (N, 3) float32 array of per-vertex</span>
+<span class="sd">          RGB colors in [0, 1], or None when no mesh has vertex colors. Vertices</span>
+<span class="sd">          of meshes without colors are white.</span>
+<span class="sd">        - normals (np.ndarray or None): Shape (N, 3) float32 array of per-vertex</span>
+<span class="sd">          normals, or None when any mesh lacks normals.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the file extension or ``format`` is not ``gltf`` or ``glb``.</span>
+<span class="sd">    """</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="p">(</span><span class="nb">format</span> <span class="ow">or</span> <span class="n">get_extension</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"gltf"</span><span class="p">,</span> <span class="s2">"glb"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Only .gltf and .glb files are supported, got '</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read_scene</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span><span class="o">.</span><span class="n">to_polydata</span><span class="p">()</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">poly</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">faces</span>
+    <span class="k">if</span> <span class="n">faces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">colors</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">vertex_attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"colors"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">colors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">colors</span><span class="p">[:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">colors</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">colors</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+    <span class="n">normals</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">vertex_attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"normals"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">normals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">normals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">normals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">normals</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="n">normals</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">colors</span><span class="p">,</span> <span class="n">normals</span></div>
+
+
+
+<div class="viewcode-block" id="save_gltf">
+<a class="viewcode-back" href="../../reference/fury.io.html#fury.io.save_gltf">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_gltf</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">faces</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">normals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Save a triangle surface as a glTF 2.0 or GLB file using polyxios.</span>
+
+<span class="sd">    The surface is written as a single mesh attached to one node of the default</span>
+<span class="sd">    scene. No materials, textures, skins or animations are written.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    vertices : ndarray, shape (N, 3)</span>
+<span class="sd">        The vertex positions.</span>
+<span class="sd">    faces : ndarray, shape (M, 3)</span>
+<span class="sd">        The indices of the vertices that form each triangular face.</span>
+<span class="sd">    file_path : str</span>
+<span class="sd">        The output path. A ``.glb`` path writes a single binary file and a</span>
+<span class="sd">        ``.gltf`` path writes JSON plus a ``.bin`` buffer next to it.</span>
+<span class="sd">    colors : ndarray, shape (N, 3) or (N, 4), optional</span>
+<span class="sd">        Per-vertex RGB(A) colors in [0, 1], written as the glTF ``COLOR_0``</span>
+<span class="sd">        attribute.</span>
+<span class="sd">    normals : ndarray, shape (N, 3), optional</span>
+<span class="sd">        Per-vertex normals.</span>
+<span class="sd">    format : str, optional</span>
+<span class="sd">        The specific file format override (e.g. '.glb'). Inferred from the file</span>
+<span class="sd">        extension when None.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``colors`` or ``normals`` do not have one row per vertex, or if the</span>
+<span class="sd">        file extension or ``format`` is not ``gltf`` or ``glb``.</span>
+<span class="sd">    """</span>
+    <span class="n">ext</span> <span class="o">=</span> <span class="p">(</span><span class="nb">format</span> <span class="ow">or</span> <span class="n">get_extension</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">"."</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"gltf"</span><span class="p">,</span> <span class="s2">"glb"</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Only .gltf and .glb files are supported, got '</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
+
+    <span class="n">vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">faces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">faces</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">vertex_attrs</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="p">((</span><span class="s2">"colors"</span><span class="p">,</span> <span class="n">colors</span><span class="p">),</span> <span class="p">(</span><span class="s2">"normals"</span><span class="p">,</span> <span class="n">normals</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must have one row per vertex, got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows "</span>
+                <span class="sa">f</span><span class="s2">"for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)</span><span class="si">}</span><span class="s2"> vertices."</span>
+            <span class="p">)</span>
+        <span class="n">vertex_attrs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="n">poly</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">make_polydata</span><span class="p">(</span><span class="n">vertices</span><span class="p">,</span> <span class="p">[(</span><span class="s2">"triangle"</span><span class="p">,</span> <span class="n">faces</span><span class="p">)],</span> <span class="n">vertex_attrs</span><span class="o">=</span><span class="n">vertex_attrs</span><span class="p">)</span>
+    <span class="n">scene</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">SceneData</span><span class="p">(</span><span class="n">meshes</span><span class="o">=</span><span class="p">(</span><span class="n">poly</span><span class="p">,),</span> <span class="n">nodes</span><span class="o">=</span><span class="p">(</span><span class="n">px</span><span class="o">.</span><span class="n">SceneNode</span><span class="p">(</span><span class="n">mesh</span><span class="o">=</span><span class="mi">0</span><span class="p">),),</span> <span class="n">scenes</span><span class="o">=</span><span class="p">((</span><span class="mi">0</span><span class="p">,),))</span>
+    <span class="n">px</span><span class="o">.</span><span class="n">write_scene</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span></div>
 
 
 
