@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="FURY" />
 <meta name="description" content="FURY window module. This module provides functionality for creating and managing rendering windows using PyGfx. It includes classes and functions for handling scenes, cameras, controllers, and rend..." />
 
-    <title>window &#8212; FURY 2.2.0.dev39+g00f459a1f documentation</title>
+    <title>window &#8212; FURY 2.2.0.dev42+g2a00ef29b documentation</title>
   
   
   
@@ -51,7 +51,7 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../_static/documentation_options.js?v=72696a15"></script>
+    <script src="../_static/documentation_options.js?v=8254aabf"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -525,7 +525,7 @@ scenes, cameras, controllers, and rendering multiple screens.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#fury.window.create_screen" title="fury.window.create_screen"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_screen</span></code></a>(renderer, *[, rect, scene, ...])</p></td>
 <td><p>Compose a Screen object with viewport, scene, camera, and controller.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#fury.window.update_camera" title="fury.window.update_camera"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_camera</span></code></a>(camera, size, target)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#fury.window.update_camera" title="fury.window.update_camera"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update_camera</span></code></a>(camera, *[, size, target, ...])</p></td>
 <td><p>Update the camera's view to encompass the target object or scene.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#fury.window.set_camera_from_axis" title="fury.window.set_camera_from_axis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_camera_from_axis</span></code></a>(screen, axis_direction)</p></td>
@@ -1174,18 +1174,33 @@ is created and associated with the camera and viewport. Defaults to None.</p></l
 <h2>update_camera<a class="headerlink" href="#update-camera" title="Link to this heading">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="fury.window.update_camera">
-<span class="sig-prename descclassname"><span class="pre">fury.window.</span></span><span class="sig-name descname"><span class="pre">update_camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/window.html#update_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fury.window.update_camera" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">fury.window.</span></span><span class="sig-name descname"><span class="pre">update_camera</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">camera</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_up</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fury/window.html#update_camera"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fury.window.update_camera" title="Link to this definition">#</a></dt>
 <dd><p>Update the camera’s view to encompass the target object or scene.</p>
 <p>If the target is a non-empty scene or another object, the camera adjusts
-to show it. If the target is an empty scene, the camera’s aspect ratio
-is updated based on the provided size.</p>
+to show it.  If the target is an empty scene, the camera’s aspect ratio
+is updated based on the provided size.  At least one of <em>size</em> or
+<em>target</em> must be given.</p>
+<p>When <em>view_dir</em> or <em>view_up</em> are given they are forwarded to
+<code class="docutils literal notranslate"><span class="pre">camera.show_object</span></code> so the caller can control the camera orientation
+(see <code class="xref py py-func docutils literal notranslate"><span class="pre">pygfx.PerspectiveCamera.show_object()</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>camera</strong> (<a class="reference internal" href="fury.lib.html#fury.lib.Camera" title="fury.lib.Camera"><em>Camera</em></a>) – The PyGfx camera object to update.</p></li>
-<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><em>tuple</em></a>) – The size (width, height) of the viewport, used if the target is empty.</p></li>
-<li><p><strong>target</strong> (<em>Object</em><em> or </em><a class="reference internal" href="#fury.window.Scene" title="fury.window.Scene"><em>Scene</em></a>) – The PyGfx object or scene the camera should focus on.</p></li>
+<li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.15)"><em>tuple</em></a><em>, </em><em>optional</em>) – The size (width, height) of the viewport, used if the target is empty.</p></li>
+<li><p><strong>target</strong> (<em>Object</em><em> or </em><a class="reference internal" href="#fury.window.Scene" title="fury.window.Scene"><em>Scene</em></a><em>, </em><em>optional</em>) – The PyGfx object or scene the camera should focus on.  Framing the
+target takes precedence over <em>size</em> when both are given.</p></li>
+<li><p><strong>view_dir</strong> (<em>array-like</em><em> of </em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – The direction from which the camera looks at the target as an
+<code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> sequence.  For example <code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">-1)</span></code> looks along the
+negative-Z axis (front view).  When <em>None</em> the current camera
+direction is kept.</p></li>
+<li><p><strong>view_up</strong> (<em>array-like</em><em> of </em><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="(in Python v3.15)"><em>float</em></a><em>, </em><em>optional</em>) – The reference up direction as an <code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y,</span> <span class="pre">z)</span></code> sequence.  For example
+<code class="docutils literal notranslate"><span class="pre">(0,</span> <span class="pre">1,</span> <span class="pre">0)</span></code> treats the positive-Y axis as up.  When <em>None</em> the
+current reference up is kept.</p></li>
 </ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.15)"><strong>ValueError</strong></a> – If neither <em>size</em> nor <em>target</em> is given.</p>
 </dd>
 </dl>
 </dd></dl>

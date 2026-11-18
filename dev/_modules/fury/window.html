@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fury.window &#8212; FURY 2.2.0.dev39+g00f459a1f documentation</title>
+    <title>fury.window &#8212; FURY 2.2.0.dev42+g2a00ef29b documentation</title>
   
   
   
@@ -42,7 +42,7 @@
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
   <script src="../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
 
-    <script src="../../_static/documentation_options.js?v=72696a15"></script>
+    <script src="../../_static/documentation_options.js?v=8254aabf"></script>
     <script src="../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -489,6 +489,7 @@ document.write(`
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor</span><span class="w"> </span><span class="kn">import</span> <span class="n">Group</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.actor.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_axes_helper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fury.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn_on_args_to_kwargs</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">fury.lib</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AmbientLight</span><span class="p">,</span>
@@ -934,30 +935,54 @@ document.write(`
         <span class="n">controller</span> <span class="o">=</span> <span class="n">TrackballController</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">register_events</span><span class="o">=</span><span class="n">vp</span><span class="p">)</span>
 
     <span class="n">screen</span> <span class="o">=</span> <span class="n">Screen</span><span class="p">(</span><span class="n">vp</span><span class="p">,</span> <span class="n">scene</span><span class="p">,</span> <span class="n">camera</span><span class="p">,</span> <span class="n">controller</span><span class="p">)</span>
-    <span class="n">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+    <span class="n">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">scene</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">screen</span></div>
 
 
 
 <div class="viewcode-block" id="update_camera">
 <a class="viewcode-back" href="../../reference/fury.window.html#fury.window.update_camera">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<span class="nd">@warn_on_args_to_kwargs</span><span class="p">(</span><span class="n">until_version</span><span class="o">=</span><span class="s2">"2.4.0"</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">view_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">view_up</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Update the camera's view to encompass the target object or scene.</span>
 
 <span class="sd">    If the target is a non-empty scene or another object, the camera adjusts</span>
-<span class="sd">    to show it. If the target is an empty scene, the camera's aspect ratio</span>
-<span class="sd">    is updated based on the provided size.</span>
+<span class="sd">    to show it.  If the target is an empty scene, the camera's aspect ratio</span>
+<span class="sd">    is updated based on the provided size.  At least one of *size* or</span>
+<span class="sd">    *target* must be given.</span>
+
+<span class="sd">    When *view_dir* or *view_up* are given they are forwarded to</span>
+<span class="sd">    ``camera.show_object`` so the caller can control the camera orientation</span>
+<span class="sd">    (see :func:`pygfx.PerspectiveCamera.show_object`).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    camera : Camera</span>
 <span class="sd">        The PyGfx camera object to update.</span>
-<span class="sd">    size : tuple</span>
+<span class="sd">    size : tuple, optional</span>
 <span class="sd">        The size (width, height) of the viewport, used if the target is empty.</span>
-<span class="sd">    target : Object or Scene</span>
-<span class="sd">        The PyGfx object or scene the camera should focus on.</span>
+<span class="sd">    target : Object or Scene, optional</span>
+<span class="sd">        The PyGfx object or scene the camera should focus on.  Framing the</span>
+<span class="sd">        target takes precedence over *size* when both are given.</span>
+<span class="sd">    view_dir : array-like of float, optional</span>
+<span class="sd">        The direction from which the camera looks at the target as an</span>
+<span class="sd">        ``(x, y, z)`` sequence.  For example ``(0, 0, -1)`` looks along the</span>
+<span class="sd">        negative-Z axis (front view).  When *None* the current camera</span>
+<span class="sd">        direction is kept.</span>
+<span class="sd">    view_up : array-like of float, optional</span>
+<span class="sd">        The reference up direction as an ``(x, y, z)`` sequence.  For example</span>
+<span class="sd">        ``(0, 1, 0)`` treats the positive-Y axis as up.  When *None* the</span>
+<span class="sd">        current reference up is kept.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If neither *size* nor *target* is given.</span>
 <span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"update_camera needs either size or target, got neither"</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">Scene</span><span class="p">):</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">main_scene</span>
 
@@ -966,10 +991,13 @@ document.write(`
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">has_object</span> <span class="ow">and</span> <span class="n">target</span><span class="o">.</span><span class="n">get_world_bounding_sphere</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">camera</span><span class="o">.</span><span class="n">show_object</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">camera</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">camera</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+        <span class="n">camera</span><span class="o">.</span><span class="n">show_object</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">view_dir</span><span class="o">=</span><span class="n">view_dir</span><span class="p">,</span> <span class="n">up</span><span class="o">=</span><span class="n">view_up</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">camera</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">camera</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="n">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">view_up</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">camera</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">reference_up</span> <span class="o">=</span> <span class="n">view_up</span></div>
 
 
 
@@ -1062,7 +1090,7 @@ document.write(`
     <span class="n">camera</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">reference_up</span> <span class="o">=</span> <span class="n">_reference_up_for_axis</span><span class="p">(</span><span class="n">axis_direction</span><span class="p">)</span>
     <span class="n">camera</span><span class="o">.</span><span class="n">world</span><span class="o">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">new_pos</span>
     <span class="n">camera</span><span class="o">.</span><span class="n">look_at</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-    <span class="n">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span></div>
+    <span class="n">update_camera</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span></div>
 
 
 
@@ -1081,7 +1109,7 @@ document.write(`
 <span class="sd">    """</span>
     <span class="k">for</span> <span class="n">screen</span><span class="p">,</span> <span class="n">screen_bb</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">screens</span><span class="p">,</span> <span class="n">screen_bbs</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">screen</span><span class="o">.</span><span class="n">bounding_box</span> <span class="o">=</span> <span class="n">screen_bb</span>
-        <span class="n">update_camera</span><span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span></div>
+        <span class="n">update_camera</span><span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span></div>
 
 
 
@@ -2350,7 +2378,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">screen</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">screens</span><span class="p">:</span>
-            <span class="n">update_camera</span><span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
+            <span class="n">update_camera</span><span class="p">(</span><span class="n">screen</span><span class="o">.</span><span class="n">camera</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="n">screen</span><span class="o">.</span><span class="n">scene</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_draw_function</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_qt_app</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
